@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +11,8 @@ import TrendingBooksSection from "@/components/books/TrendingBooksSection";
 import BookConnectHeader from "@/components/BookConnectHeader";
 import { ProfileDialog } from "@/components/profile";
 import { generateLiteraryUsername } from "@/utils/usernameGenerator";
+import ExploreHeader from "@/components/books/ExploreHeader";
+import ExploreContainer from "@/components/books/ExploreContainer";
 
 const FALLBACK_TRENDING_BOOKS = [
   { 
@@ -42,12 +43,10 @@ const ExploreBooks: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   
-  // Handle multiple genres from URL or localStorage
   const genreParam = searchParams.get("genre") || "";
   const genres = genreParam.split(',').filter(Boolean);
   const primaryGenre = genres[0] || localStorage.getItem("selected_genre") || "Fiction";
   
-  // Load all selected genres from localStorage if not in URL
   useEffect(() => {
     if (!genreParam) {
       try {
@@ -55,7 +54,6 @@ const ExploreBooks: React.FC = () => {
         if (savedGenres) {
           const parsedGenres = JSON.parse(savedGenres);
           if (Array.isArray(parsedGenres) && parsedGenres.length > 0) {
-            // We don't update the URL here to avoid navigation loops
             console.log("Loaded genres from localStorage:", parsedGenres);
           }
         }
@@ -64,16 +62,13 @@ const ExploreBooks: React.FC = () => {
       }
     }
     
-    // Check if first time visit and show profile dialog
     const hasVisitedBefore = localStorage.getItem("has_visited_explore");
     if (!hasVisitedBefore) {
-      // Generate a username if not already set
       if (!localStorage.getItem("username")) {
         const generatedUsername = generateLiteraryUsername();
         localStorage.setItem("username", generatedUsername);
       }
       
-      // Show the profile dialog after a slight delay
       setTimeout(() => {
         setShowProfileDialog(true);
       }, 500);
@@ -85,7 +80,6 @@ const ExploreBooks: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Search query handling with enabled set to true when searchQuery has content
   const { 
     data: searchResults, 
     isLoading: isSearching, 
@@ -97,7 +91,6 @@ const ExploreBooks: React.FC = () => {
     enabled: searchQuery.length > 0,
     meta: {
       onError: (error: Error) => {
-        // Log error to Sentry
         Sentry.captureException(error, {
           tags: { 
             component: "ExploreBooks",
@@ -115,7 +108,6 @@ const ExploreBooks: React.FC = () => {
     }
   });
 
-  // Trending books query
   const { 
     data: trendingBooks, 
     isLoading: isTrendingLoading, 
@@ -125,7 +117,6 @@ const ExploreBooks: React.FC = () => {
     queryFn: () => fetchTrendingBooks(primaryGenre, 5),
     meta: {
       onError: (error: Error) => {
-        // Log error to Sentry 
         Sentry.captureException(error, {
           tags: { 
             component: "ExploreBooks", 
@@ -158,37 +149,14 @@ const ExploreBooks: React.FC = () => {
   return (
     <div className="min-h-screen bg-bookconnect-cream">
       <BookConnectHeader />
-      <div 
-        className="relative py-12 px-6 md:px-8 lg:px-12 max-w-7xl mx-auto"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1524578271613-d550eacf6090?q=80&w=1470&auto=format&fit=crop')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-          backgroundBlendMode: "overlay",
-          backgroundColor: "rgba(248, 243, 230, 0.92)",
-        }}
-      >
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-bookconnect-brown text-center">
-            Explore Books
-          </h1>
-          <p className="text-center text-bookconnect-brown/70 mt-2 font-serif max-w-2xl mx-auto">
-            {genres.length > 1 
-              ? `Discover amazing reads in ${genres.slice(0, 3).join(', ')}${genres.length > 3 ? '...' : ''}`
-              : primaryGenre 
-                ? `Discover amazing reads in ${primaryGenre}` 
-                : "Find your next favorite book"}
-          </p>
-        </div>
+      
+      <ExploreContainer>
+        <ExploreHeader genres={genres} primaryGenre={primaryGenre} />
 
-        {/* Search Section */}
         <div className="mb-12">
           <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
         </div>
 
-        {/* Search Results */}
         <SearchResults 
           searchQuery={searchQuery}
           searchResults={searchResults}
@@ -196,7 +164,6 @@ const ExploreBooks: React.FC = () => {
           onJoinDiscussion={handleJoinDiscussion}
         />
 
-        {/* Trending Section */}
         <TrendingBooksSection
           genre={primaryGenre}
           books={trendingBooks}
@@ -205,9 +172,8 @@ const ExploreBooks: React.FC = () => {
           fallbackBooks={FALLBACK_TRENDING_BOOKS}
           onJoinDiscussion={handleJoinDiscussion}
         />
-      </div>
+      </ExploreContainer>
       
-      {/* Profile Dialog */}
       <ProfileDialog 
         open={showProfileDialog} 
         onClose={() => setShowProfileDialog(false)} 

@@ -16,7 +16,15 @@ import { Button } from "@/components/ui/button";
 import UsernameEditor from "./UsernameEditor";
 import ProfileForm from "./ProfileForm";
 import ChatRequestsList, { ChatRequest } from "./ChatRequestsList";
-import { fetchChatRequests, fetchActiveChatsCount, handleChatAction, saveProfile, loadProfileData } from "./profileService";
+import ChatSettings from "./ChatSettings";
+import { 
+  fetchChatRequests, 
+  fetchActiveChatsCount, 
+  handleChatAction, 
+  saveProfile, 
+  loadProfileData 
+} from "./profileService";
+import ReadingActivity from "./ReadingActivity";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -188,14 +196,23 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
             setBio={setBio}
           />
 
-          {/* Chat Requests */}
-          <ChatRequestsList 
-            chatRequests={chatRequests}
-            activeChatsCount={activeChatsCount}
+          {/* Chat Settings */}
+          <ChatSettings 
             allowChats={allowChats}
             setAllowChats={setAllowChats}
-            onChatAction={handleChatActionRequest}
+            activeChatsCount={activeChatsCount}
           />
+
+          {/* Chat Requests */}
+          {chatRequests.length > 0 && (
+            <ChatRequestsList 
+              chatRequests={chatRequests}
+              onChatAction={handleChatActionRequest}
+            />
+          )}
+
+          {/* Reading Activity */}
+          <ReadingActivity />
         </div>
 
         <DialogFooter>
