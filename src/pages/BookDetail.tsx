@@ -31,17 +31,19 @@ const BookDetail = () => {
     enabled: !!id,
   });
 
-  // Fetch chat messages
+  // Fetch chat messages - Fix: Replace onSuccess with proper handling
   const { data: initialMessages } = useQuery({
     queryKey: ['bookChat', id],
     queryFn: () => id ? getBookChat(id) : [],
     enabled: !!id,
-    onSuccess: (data) => {
-      if (data) {
-        setChatMessages(data);
-      }
-    }
   });
+
+  // Update chat messages when initial messages are loaded
+  useEffect(() => {
+    if (initialMessages) {
+      setChatMessages(initialMessages);
+    }
+  }, [initialMessages]);
 
   // Subscribe to chat messages
   useEffect(() => {
