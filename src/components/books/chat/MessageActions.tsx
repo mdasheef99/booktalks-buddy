@@ -1,6 +1,7 @@
 
 import React from "react";
-import { ChatMessage, deleteMessage } from "@/services/chat/messageService";
+import { deleteMessage } from "@/services/chat/messageService";
+import { ChatMessage } from "@/services/chat/models"; // Import from models file directly
 import { MoreHorizontal, Reply, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MessageReaction from "./MessageReaction";

@@ -25,7 +25,10 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
 
   // If there are no reactions, don't render anything
-  if (!reactions || reactions.length === 0) return null;
+  if (!reactions || reactions.length === 0) {
+    console.log("No reactions for message:", messageId);
+    return null;
+  }
 
   console.log("Rendering reactions:", reactions);
 
@@ -57,7 +60,7 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
             }}
           >
             <span>{reaction}</span>
-            <span>{count}</span>
+            <span className="ml-1">{count}</span>
           </button>
         ))}
       </div>

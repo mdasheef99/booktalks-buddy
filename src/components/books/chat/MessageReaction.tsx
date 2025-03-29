@@ -58,13 +58,12 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   
   const handleReact = async (emoji: string) => {
     try {
-      console.log("Adding reaction:", emoji);
+      console.log("Adding reaction:", emoji, "to message:", messageId);
       await addReaction(messageId, currentUsername, emoji);
-      // Important: Do NOT close the popover here
       
-      // Reload reactions after adding a new one
+      // Immediately reload reactions after adding a new one
       const updatedReactions = await getMessageReactions(messageId);
-      console.log("Updated reactions:", updatedReactions);
+      console.log("Updated reactions after adding:", updatedReactions);
       setReactions(updatedReactions);
     } catch (error) {
       console.error("Error adding reaction:", error);
@@ -111,18 +110,7 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
         align="start" 
         sideOffset={5}
         sticky="always"
-        onInteractOutside={(e) => {
-          e.preventDefault();
-          // Only close when clicking outside the popover
-        }}
-        onEscapeKeyDown={(e) => {
-          e.preventDefault();
-          // Prevent closing on Escape key
-        }}
-        onPointerDownOutside={(e) => {
-          e.preventDefault();
-          // Prevent closing when clicking outside
-        }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
           {availableReactions.map(emoji => (

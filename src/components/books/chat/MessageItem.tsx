@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ChatMessage } from "@/services/chatService";
+import { ChatMessage } from "@/services/chat/messageService";
 import { Check } from "lucide-react";
 import ReplyPreview from "./ReplyPreview";
 import MessageActions from "./MessageActions";
@@ -38,14 +38,19 @@ const MessageItem: React.FC<MessageItemProps> = ({
     }
   };
 
+  // Debug: Log reactions for this message
+  if (message.reactions && message.reactions.length > 0) {
+    console.log(`Message ${message.id} has ${message.reactions.length} reactions:`, message.reactions);
+  }
+
   return (
     <div 
-      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}
       ref={setRef}
     >
-      <div className="flex flex-col items-end">
+      <div className="flex flex-col max-w-[80%]">
         <div 
-          className={`relative max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
+          className={`relative px-3 py-2 rounded-lg font-serif text-sm
             ${isCurrentUser 
               ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
               : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
@@ -93,7 +98,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
         </div>
         
         {/* Place reactions outside and below the message bubble */}
-        <div className={`mt-1 ${isCurrentUser ? 'self-end' : 'self-start'} w-full max-w-[80%]`}>
+        <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'}`}>
           <MessageReactionList
             reactions={message.reactions}
             messageId={message.id}
