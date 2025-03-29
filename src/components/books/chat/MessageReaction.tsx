@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { addReaction, getMessageReactions, subscribeToReactions } from "@/services/chat/messageService";
 import { Smile } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -90,17 +89,16 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
       }}
     >
       <PopoverTrigger asChild>
-        <div 
-          className="flex items-center text-xs text-bookconnect-brown/80 hover:text-bookconnect-brown cursor-pointer w-full"
+        <button 
+          className="p-1 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/60"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setIsOpen(true);
           }}
         >
-          <Smile size={14} className="mr-1.5" />
-          <span>React</span>
-        </div>
+          <Smile size={14} />
+        </button>
       </PopoverTrigger>
       <PopoverContent 
         className="w-auto p-2 bg-white" 

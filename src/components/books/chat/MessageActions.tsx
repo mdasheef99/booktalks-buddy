@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
-import { Reply, Trash2, MoreHorizontal } from "lucide-react";
+import { Reply, Trash2, MoreHorizontal, Smile } from "lucide-react";
 import { ChatMessage, deleteMessage } from "@/services/chat/messageService";
 import { toast } from "sonner";
 import MessageReaction from "./MessageReaction";
@@ -56,15 +56,23 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   
   return (
     <>
-      {/* Three-dot menu in top-right corner of message bubble */}
-      <div className={`absolute top-1 ${isCurrentUser ? 'right-1' : 'right-1'}`}>
+      {/* Action buttons in top-right corner of message bubble */}
+      <div className={`absolute top-1 ${isCurrentUser ? 'right-1' : 'right-1'} flex items-center`}>
+        {/* Reaction button */}
+        <MessageReaction 
+          messageId={message.id} 
+          currentUsername={currentUsername}
+          onReactionsUpdated={onReactionsUpdated}
+        />
+        
+        {/* Three-dot menu */}
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="p-1 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/60">
+            <button className="p-1 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/60 ml-1">
               <MoreHorizontal size={14} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align={isCurrentUser ? "end" : "end"} className="w-auto min-w-32 p-2">
+          <DropdownMenuContent align={isCurrentUser ? "end" : "end"} className="w-auto min-w-32 p-2 bg-white">
             {/* Display actions in dropdown */}
             <div className="flex flex-col gap-1">
               {/* Reply button */}
@@ -74,18 +82,6 @@ const MessageActions: React.FC<MessageActionsProps> = ({
               >
                 <Reply size={14} className="mr-1.5" />
                 <span>Reply</span>
-              </DropdownMenuItem>
-              
-              {/* React button */}
-              <DropdownMenuItem
-                onSelect={(e) => e.preventDefault()}
-                className="flex items-center text-xs text-bookconnect-brown/80 hover:bg-bookconnect-terracotta/10 px-2 py-1 rounded cursor-pointer"
-              >
-                <MessageReaction 
-                  messageId={message.id} 
-                  currentUsername={currentUsername}
-                  onReactionsUpdated={onReactionsUpdated}
-                />
               </DropdownMenuItem>
               
               {/* Delete button (only for user's own messages) */}
