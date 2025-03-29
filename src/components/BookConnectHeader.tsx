@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
-import ProfileDialog from "./dialogs/ProfileDialog";
+import { ProfileDialog } from "./profile";
 
 const BookConnectHeader = () => {
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
