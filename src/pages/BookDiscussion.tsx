@@ -75,7 +75,8 @@ const BookDiscussion: React.FC = () => {
     
     try {
       console.log("Sending message:", message, "for book:", id, "as user:", username);
-      const result = await sendChatMessage(message, id, username);
+      // Pass the title and author to ensure the book exists in the database
+      const result = await sendChatMessage(message, id, username, title, author);
       
       if (!result) {
         console.error("No result returned from sendChatMessage");
@@ -88,7 +89,7 @@ const BookDiscussion: React.FC = () => {
       console.error("Error sending message:", error);
       Sentry.captureException(error, {
         tags: { component: "BookDiscussion", action: "sendMessage" },
-        extra: { bookId: id, username }
+        extra: { bookId: id, username, title, author }
       });
       throw error; // Re-throw so the input component can handle it
     }
