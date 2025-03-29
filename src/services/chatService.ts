@@ -9,6 +9,8 @@ export interface ChatMessage {
   username: string;
   timestamp: string;
   user_id?: string;
+  created_at?: string;
+  read?: boolean;
 }
 
 export async function getBookChat(bookId: string): Promise<ChatMessage[]> {

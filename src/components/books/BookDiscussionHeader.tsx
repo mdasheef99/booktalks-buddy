@@ -15,21 +15,21 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
   onBack 
 }) => {
   return (
-    <header className="sticky top-0 z-10 bg-bookconnect-brown shadow-md py-2 px-4">
+    <header className="sticky top-0 z-10 bg-bookconnect-brown shadow-md py-1.5 px-3">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onBack} 
-            className="mr-1 text-white hover:bg-bookconnect-brown/20 h-8 w-8 p-0"
+            className="mr-1 text-white hover:bg-bookconnect-brown/20 h-7 w-7 p-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           
-          <h1 className="font-serif text-lg md:text-xl text-bookconnect-cream">
+          <h1 className="font-serif text-base md:text-lg text-bookconnect-cream line-clamp-1">
             <span className="font-bold">{title}</span>
-            {author && <span className="italic font-normal text-sm"> by {author}</span>}
+            {author && <span className="italic font-normal text-xs"> by {author}</span>}
           </h1>
         </div>
         
@@ -37,11 +37,11 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-bookconnect-cream hover:bg-bookconnect-brown/20 flex items-center h-8"
+            className="text-bookconnect-cream hover:bg-bookconnect-brown/20 flex items-center h-7"
           >
             <span className="relative mr-1">
               <span className="absolute top-0 left-0 w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <Users className="h-4 w-4" />
+              <Users className="h-3.5 w-3.5" />
             </span>
             <span className="hidden sm:inline-block ml-1 text-xs">Online</span>
           </Button>

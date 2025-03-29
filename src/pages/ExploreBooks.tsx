@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -38,6 +37,11 @@ const FALLBACK_TRENDING_BOOKS = [
     description: "A story about the childhood experiences of fraternal twins whose lives are destroyed by the 'Love Laws'" 
   }
 ];
+
+interface BookCardProps {
+  book: BookWithId;
+  onJoinDiscussion: (bookId: string, bookTitle: string, bookAuthor: string) => void;
+}
 
 const ExploreBooks: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -143,8 +147,14 @@ const ExploreBooks: React.FC = () => {
     }
   };
 
-  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor?: string) => {
-    navigate(`/books/${bookId}/discussion?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor || "")}`);
+  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string) => {
+    if (window.innerWidth < 768) {
+      navigate(`/books/${bookId}/discussion?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
+    } else {
+      setShowDiscussion(true);
+      setSelectedBookId(bookId);
+      setSelectedBookTitle(bookTitle);
+    }
   };
 
   return (

@@ -1,6 +1,9 @@
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { ChatMessage } from "@/services/chatService";
+import { Check, ArrowUp, ArrowDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface BookDiscussionChatProps {
   messages: ChatMessage[];
@@ -13,6 +16,52 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   loading,
   currentUsername 
 }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Handle scroll position changes
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      // Show top arrow if not at the top
+      setShowScrollTop(scrollTop > 20);
+      // Show bottom arrow if not at the bottom
+      setShowScrollBottom(scrollTop < scrollHeight - clientHeight - 20);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [messages]);
+
+  // Scroll to the bottom when new messages arrive
+  useEffect(() => {
+    if (scrollContainerRef.current && !showScrollBottom) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [messages, showScrollBottom]);
+
+  const scrollToTop = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ 
+        top: scrollContainerRef.current.scrollHeight, 
+        behavior: 'smooth' 
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -37,27 +86,77 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
     );
   }
 
+  const formatTime = (timestamp: string) => {
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return '';
+    }
+  };
+
   return (
-    <div className="space-y-3">
-      {messages.map((message) => (
-        <div 
-          key={`${message.id}-${message.timestamp}`}
-          className={`flex ${message.username === currentUsername ? 'justify-end' : 'justify-start'}`}
-        >
-          <div 
-            className={`max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
-              ${message.username === currentUsername 
-                ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
-                : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
-              }`}
-          >
-            <div className={`text-xs mb-1 ${message.username === currentUsername ? 'text-white/80' : 'text-bookconnect-brown/70'}`}>
-              {message.username}
+    <div className="relative h-full" ref={scrollContainerRef}>
+      <div className="space-y-3 px-1">
+        {messages.map((message) => {
+          const isCurrentUser = message.username === currentUsername;
+          
+          return (
+            <div 
+              key={`${message.id}-${message.timestamp}`}
+              className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+            >
+              <div 
+                className={`max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
+                  ${isCurrentUser 
+                    ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
+                    : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
+                  }`}
+              >
+                <div className={`text-xs mb-1 ${isCurrentUser ? 'text-white/80' : 'text-bookconnect-brown/70'}`}>
+                  {message.username}
+                </div>
+                <div style={{ wordBreak: "break-word" }}>{message.message}</div>
+                <div className="flex justify-end items-center mt-1 space-x-1">
+                  <span className="text-[10px] opacity-70">
+                    {formatTime(message.timestamp)}
+                  </span>
+                  {isCurrentUser && (
+                    <span className="flex">
+                      <Check size={12} className="text-gray-400" />
+                      <Check size={12} className="text-blue-400 -ml-[8px]" />
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-            <div style={{ wordBreak: "break-word" }}>{message.message}</div>
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
+      
+      {/* Scroll navigation arrows */}
+      <div className={`absolute ${isMobile ? 'right-2' : 'right-4'} bottom-4 flex flex-col gap-2`}>
+        {showScrollTop && (
+          <Button 
+            onClick={scrollToTop}
+            size="sm"
+            className="bg-bookconnect-brown/70 hover:bg-bookconnect-brown text-white rounded-full h-8 w-8 p-0 animate-fade-in shadow-md"
+          >
+            <ArrowUp size={16} />
+            <span className="sr-only">Scroll to top</span>
+          </Button>
+        )}
+        {showScrollBottom && (
+          <Button 
+            onClick={scrollToBottom}
+            size="sm"
+            className="bg-bookconnect-brown/70 hover:bg-bookconnect-brown text-white rounded-full h-8 w-8 p-0 animate-fade-in shadow-md"
+          >
+            <ArrowDown size={16} />
+            <span className="sr-only">Scroll to bottom</span>
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

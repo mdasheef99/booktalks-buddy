@@ -7,12 +7,12 @@ import BookDiscussionChat from "@/components/books/BookDiscussionChat";
 import BookDiscussionHeader from "@/components/books/BookDiscussionHeader";
 import BookDiscussionInput from "@/components/books/BookDiscussionInput";
 import * as Sentry from "@sentry/react";
+import { toast } from "sonner";
 
 const BookDiscussion: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const chatContainerRef = useRef<HTMLDivElement>(null);
   
   const title = searchParams.get("title") || "Unknown Book";
   const author = searchParams.get("author") || "Unknown Author";
@@ -20,6 +20,7 @@ const BookDiscussion: React.FC = () => {
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
   
   // Load chat history when component mounts
   useEffect(() => {
@@ -28,10 +29,12 @@ const BookDiscussion: React.FC = () => {
       
       try {
         setLoading(true);
+        setConnectionError(false);
         const chatHistory = await getBookChat(id);
         setMessages(chatHistory);
       } catch (error) {
         console.error("Error loading chat history:", error);
+        setConnectionError(true);
         Sentry.captureException(error, {
           tags: { component: "BookDiscussion", action: "loadChatHistory" },
           extra: { bookId: id }
@@ -50,19 +53,13 @@ const BookDiscussion: React.FC = () => {
     
     const subscription = subscribeToChat(id, (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setConnectionError(false);
     });
     
     return () => {
       subscription.unsubscribe();
     };
   }, [id]);
-  
-  // Scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
   
   const handleSendMessage = async (message: string) => {
     if (!id || !message.trim()) return;
@@ -71,6 +68,7 @@ const BookDiscussion: React.FC = () => {
       await sendChatMessage(message, id, username);
     } catch (error) {
       console.error("Error sending message:", error);
+      toast.error("Failed to send message. Please try again.");
       Sentry.captureException(error, {
         tags: { component: "BookDiscussion", action: "sendMessage" },
         extra: { bookId: id, username }
@@ -90,26 +88,34 @@ const BookDiscussion: React.FC = () => {
         onBack={handleBack} 
       />
       
-      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-3">
-        <div className="flex-1 flex flex-col mb-2 bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20"
+      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-2">
+        {connectionError && (
+          <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 px-3 py-1 rounded font-serif text-center text-sm animate-pulse mb-2">
+            Reconnecting to chat server...
+          </div>
+        )}
+        
+        <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundBlendMode: "overlay",
-            minHeight: "calc(100vh - 120px)"
+            minHeight: "calc(100vh - 100px)"
           }}
         >
-          <ScrollArea className="flex-1 p-4">
+          <div className="flex-1 overflow-auto p-4">
             <BookDiscussionChat 
               messages={messages} 
               loading={loading} 
               currentUsername={username}
             />
-          </ScrollArea>
+          </div>
         </div>
         
-        <BookDiscussionInput onSendMessage={handleSendMessage} />
+        <div className="mt-2">
+          <BookDiscussionInput onSendMessage={handleSendMessage} />
+        </div>
       </div>
     </div>
   );

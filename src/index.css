@@ -125,3 +125,30 @@
 .handwritten {
   font-family: 'Lora', serif;
 }
+
+/* Animation for fading in elements */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Message delivery status animations */
+.message-sent {
+  opacity: 0.7;
+}
+
+.message-delivered {
+  opacity: 0.8;
+}
+
+.message-read {
+  opacity: 1;
+}
