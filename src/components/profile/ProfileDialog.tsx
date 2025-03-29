@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import {
   Dialog,
@@ -66,7 +65,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
         }}
       >
         <ProfileDialogHeader />
-        
         <ProfileDialogContent
           username={username}
           setUsername={setUsername}
@@ -82,7 +80,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           activeChatsCount={activeChatsCount}
           onChatAction={handleChatActionRequest}
         />
-        
         <ProfileDialogFooter
           isLoading={isLoading}
           onSave={handleSaveProfile}
