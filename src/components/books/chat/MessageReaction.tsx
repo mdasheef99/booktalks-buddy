@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { addReaction, getMessageReactions, subscribeToReactions } from "@/services/chatService";
 import { Smile } from "lucide-react";
@@ -55,7 +54,8 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   const handleReact = async (emoji: string) => {
     try {
       await addReaction(messageId, currentUsername, emoji);
-      // Don't close the popover automatically so users can add multiple reactions
+      // Keep popover open after clicking an emoji
+      // Don't call setIsOpen(false) here
     } catch (error) {
       console.error("Error adding reaction:", error);
     }

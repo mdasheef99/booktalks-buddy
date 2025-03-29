@@ -8,27 +8,34 @@ export function useScrollHandlers<T extends HTMLElement>(
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
 
+  // Function to check scroll position and update visibility states
+  const handleScroll = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    setShowScrollTop(scrollTop > 20);
+    setShowScrollBottom(scrollTop < scrollHeight - clientHeight - 20);
+  };
+
+  // Add scroll event listener and run check initially
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      setShowScrollTop(scrollTop > 20);
-      setShowScrollBottom(scrollTop < scrollHeight - clientHeight - 20);
-    };
-
     container.addEventListener('scroll', handleScroll);
-    handleScroll();
+    handleScroll(); // Check initial position
 
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [scrollContainerRef, ...dependencies]);
+  }, [scrollContainerRef]); // Only depend on scrollContainerRef, not the entire dependencies array
 
+  // Scroll to bottom when dependencies change and showScrollBottom is false
   useEffect(() => {
-    if (scrollContainerRef.current && !showScrollBottom) {
+    if (scrollContainerRef.current) {
+      // Always scroll to bottom when new messages arrive
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
-  }, [dependencies, showScrollBottom]);
+  }, [dependencies]); // Only depend on the dependencies array here
 
   const scrollToTop = () => {
     if (scrollContainerRef.current) {
