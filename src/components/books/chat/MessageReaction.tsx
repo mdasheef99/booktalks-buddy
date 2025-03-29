@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { addReaction, getMessageReactions, subscribeToReactions } from "@/services/chatService";
 import { Smile } from "lucide-react";
@@ -54,8 +55,8 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   const handleReact = async (emoji: string) => {
     try {
       await addReaction(messageId, currentUsername, emoji);
-      // Keep popover open after clicking an emoji
-      // Don't call setIsOpen(false) here
+      // We don't close the popover to allow multiple reactions
+      // setIsOpen(false); - This line was causing the issue
     } catch (error) {
       console.error("Error adding reaction:", error);
     }
@@ -73,7 +74,13 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
           <span>React</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-2" align="start" sideOffset={5} sticky="always">
+      <PopoverContent 
+        className="w-auto p-2" 
+        align="start" 
+        sideOffset={5}
+        // Add the "sticky" prop to ensure the popover stays open during interactions
+        sticky="always"
+      >
         <div className="flex space-x-1">
           {availableReactions.map(emoji => (
             <button 
