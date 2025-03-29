@@ -1,10 +1,9 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { ChatMessage } from "@/services/chatService";
-import { Check, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BookDiscussionChatProps {
   messages: ChatMessage[];
@@ -99,11 +98,11 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   return (
     <div className="relative h-full flex flex-col">
       <div 
-        className="flex-1 overflow-auto scrollbar-hide" 
+        className="flex-1 overflow-auto p-4 scrollbar-thin scrollbar-thumb-bookconnect-brown/30 scrollbar-track-transparent" 
         ref={scrollContainerRef}
         style={{ scrollBehavior: 'smooth' }}
       >
-        <div className="space-y-3 px-1 py-2">
+        <div className="space-y-3">
           {messages.map((message) => {
             const isCurrentUser = message.username === currentUsername;
             
@@ -147,6 +146,7 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
           <Button 
             onClick={scrollToTop}
             size="sm"
+            variant="secondary"
             className="bg-bookconnect-brown/70 hover:bg-bookconnect-brown text-white rounded-full h-8 w-8 p-0 animate-fade-in shadow-md"
           >
             <ArrowUp size={16} />
@@ -157,6 +157,7 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
           <Button 
             onClick={scrollToBottom}
             size="sm"
+            variant="secondary"
             className="bg-bookconnect-brown/70 hover:bg-bookconnect-brown text-white rounded-full h-8 w-8 p-0 animate-fade-in shadow-md"
           >
             <ArrowDown size={16} />

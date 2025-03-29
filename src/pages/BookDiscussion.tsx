@@ -107,7 +107,7 @@ const BookDiscussion: React.FC = () => {
         onBack={handleBack} 
       />
       
-      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-2">
+      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 pb-4">
         {connectionError && (
           <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 px-3 py-1 rounded font-serif text-center text-sm animate-pulse mb-2">
             Reconnecting to chat server...
@@ -133,7 +133,7 @@ const BookDiscussion: React.FC = () => {
           </div>
           
           {/* Fixed input at the bottom */}
-          <div className="p-2 bg-white/90 border-t border-bookconnect-brown/20">
+          <div className="sticky bottom-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
             <BookDiscussionInput onSendMessage={handleSendMessage} />
           </div>
         </div>
