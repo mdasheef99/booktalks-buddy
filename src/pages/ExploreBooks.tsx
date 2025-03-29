@@ -53,17 +53,20 @@ const ExploreBooks: React.FC = () => {
     enabled: false,
   });
 
-  // Trending books query
+  // Trending books query with fixed TypeScript error
   const { data: trendingBooks, isLoading: isTrendingLoading, isError: isTrendingError } = useQuery({
     queryKey: ["trendingBooks", genre],
     queryFn: () => fetchTrendingBooks(genre, 5),
-    onError: (error) => {
-      Sentry.captureException(error);
-      toast({
-        title: "Couldn't load trending books",
-        description: "We're having trouble finding the hottest reads right now.",
-        variant: "destructive",
-      });
+    // Using meta.onError instead of direct onError prop
+    meta: {
+      onError: (error: Error) => {
+        Sentry.captureException(error);
+        toast({
+          title: "Couldn't load trending books",
+          description: "We're having trouble finding the hottest reads right now.",
+          variant: "destructive",
+        });
+      }
     }
   });
 
