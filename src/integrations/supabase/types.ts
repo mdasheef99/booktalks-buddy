@@ -40,8 +40,10 @@ export type Database = {
         Row: {
           book_id: string | null
           created_at: string | null
+          deleted_at: string | null
           id: string
           message: string
+          reply_to_id: string | null
           timestamp: string
           user_id: string | null
           username: string
@@ -49,8 +51,10 @@ export type Database = {
         Insert: {
           book_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           message: string
+          reply_to_id?: string | null
           timestamp: string
           user_id?: string | null
           username: string
@@ -58,8 +62,10 @@ export type Database = {
         Update: {
           book_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           message?: string
+          reply_to_id?: string | null
           timestamp?: string
           user_id?: string | null
           username?: string
@@ -70,6 +76,13 @@ export type Database = {
             columns: ["book_id"]
             isOneToOne: false
             referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
             referencedColumns: ["id"]
           },
         ]
@@ -97,6 +110,38 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      message_reactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          message_id: string
+          reaction: string
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message_id: string
+          reaction: string
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message_id?: string
+          reaction?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       private_chats: {
         Row: {

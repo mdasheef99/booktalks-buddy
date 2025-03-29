@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Smile } from "lucide-react";
+import { Send, Smile, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { 
@@ -8,9 +8,12 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { ChatMessage } from "@/services/chatService";
 
 interface BookDiscussionInputProps {
-  onSendMessage: (message: string) => Promise<void>;
+  onSendMessage: (message: string, replyToId?: string) => Promise<void>;
+  replyTo?: ChatMessage | null;
+  onCancelReply: () => void;
 }
 
 // Common emoji categories with a selection of popular emojis
@@ -37,7 +40,11 @@ const emojiCategories = [
   }
 ];
 
-const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage }) => {
+const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ 
+  onSendMessage, 
+  replyTo,
+  onCancelReply 
+}) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
@@ -54,9 +61,13 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
     
     try {
       setIsSubmitting(true);
-      await onSendMessage(message);
+      await onSendMessage(message, replyTo?.id);
       setMessage("");
       toast.dismiss("message-error");
+      
+      if (replyTo) {
+        onCancelReply();
+      }
       
       setTimeout(() => {
         inputRef.current?.focus();
@@ -83,6 +94,25 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
   
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-1 border border-bookconnect-brown/20">
+      {replyTo && (
+        <div className="mx-2 mt-1 p-2 bg-bookconnect-terracotta/10 rounded text-sm font-serif border-l-2 border-bookconnect-brown/50 flex items-start justify-between">
+          <div className="flex-1">
+            <span className="text-xs text-bookconnect-brown/70">Replying to {replyTo.username}:</span>
+            <p className="text-bookconnect-brown/80 text-xs italic truncate">{replyTo.deleted_at ? "Message deleted" : replyTo.message}</p>
+          </div>
+          <Button 
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-5 w-5 p-0 text-bookconnect-brown/50 hover:text-bookconnect-brown hover:bg-transparent -mt-1"
+            onClick={onCancelReply}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Cancel reply</span>
+          </Button>
+        </div>
+      )}
+      
       <div className="flex items-center">
         <DropdownMenu open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
           <DropdownMenuTrigger asChild>
@@ -124,7 +154,7 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Share your thoughts..."
+          placeholder={replyTo ? "Type your reply..." : "Share your thoughts..."}
           disabled={isSubmitting}
           className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7"
           ref={inputRef}

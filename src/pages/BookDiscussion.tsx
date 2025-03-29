@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/services/chatService";
@@ -21,6 +20,7 @@ const BookDiscussion: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
+  const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   
   // Load chat history when component mounts
   useEffect(() => {
@@ -57,7 +57,19 @@ const BookDiscussion: React.FC = () => {
     console.log("Setting up real-time subscription for book:", id);
     const subscription = subscribeToChat(id, (newMessage) => {
       console.log("Received new message in component:", newMessage);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      
+      // Handle both new messages and updates to existing messages (deletions)
+      setMessages((prevMessages) => {
+        // Check if this is an update to an existing message
+        if (prevMessages.some(msg => msg.id === newMessage.id)) {
+          return prevMessages.map(msg => 
+            msg.id === newMessage.id ? newMessage : msg
+          );
+        }
+        // Otherwise it's a new message
+        return [...prevMessages, newMessage];
+      });
+      
       setConnectionError(false);
     });
     
@@ -67,7 +79,7 @@ const BookDiscussion: React.FC = () => {
     };
   }, [id]);
   
-  const handleSendMessage = async (message: string) => {
+  const handleSendMessage = async (message: string, replyToId?: string) => {
     if (!id || !message.trim()) {
       console.error("Missing required data for sending message");
       return;
@@ -76,7 +88,15 @@ const BookDiscussion: React.FC = () => {
     try {
       console.log("Sending message:", message, "for book:", id, "as user:", username);
       // Pass the title and author to ensure the book exists in the database
-      const result = await sendChatMessage(message, id, username, title, author);
+      const result = await sendChatMessage(
+        message, 
+        id, 
+        username, 
+        title, 
+        author, 
+        undefined, 
+        replyToId
+      );
       
       if (!result) {
         console.error("No result returned from sendChatMessage");
@@ -93,6 +113,14 @@ const BookDiscussion: React.FC = () => {
       });
       throw error; // Re-throw so the input component can handle it
     }
+  };
+  
+  const handleReplyToMessage = (message: ChatMessage) => {
+    setReplyTo(message);
+  };
+  
+  const handleCancelReply = () => {
+    setReplyTo(null);
   };
   
   const handleBack = () => {
@@ -129,12 +157,17 @@ const BookDiscussion: React.FC = () => {
               messages={messages} 
               loading={loading} 
               currentUsername={username}
+              onReplyToMessage={handleReplyToMessage}
             />
           </div>
           
           {/* Fixed input at the bottom */}
           <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
-            <BookDiscussionInput onSendMessage={handleSendMessage} />
+            <BookDiscussionInput 
+              onSendMessage={handleSendMessage} 
+              replyTo={replyTo}
+              onCancelReply={handleCancelReply}
+            />
           </div>
         </div>
       </div>
