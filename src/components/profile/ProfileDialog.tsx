@@ -54,7 +54,8 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-md max-h-[90vh] mx-auto bg-bookconnect-cream overflow-hidden" 
+      <DialogContent 
+        className="max-w-xl w-[95%] max-h-[95vh] mx-auto bg-bookconnect-cream overflow-hidden flex flex-col" 
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1528459105426-b9548367069b?q=80&w=1412&auto=format&fit=crop')`,
           backgroundSize: 'cover',

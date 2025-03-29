@@ -29,14 +29,14 @@ const ProfileDialogFooter: React.FC<ProfileDialogFooterProps> = ({
   };
 
   return (
-    <DialogFooter className="mt-6 pt-4 border-t border-bookconnect-brown/20 flex flex-col gap-3 w-full">
+    <DialogFooter className="mt-4 pt-4 border-t border-bookconnect-brown/20 flex-shrink-0">
       {showSavedMessage && (
-        <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-2 flex items-center justify-center">
+        <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-2 flex items-center justify-center w-full">
           <Check className="h-4 w-4 mr-1" /> Changes saved successfully
         </div>
       )}
       
-      <div className="flex flex-col sm:flex-row gap-2 w-full">
+      <div className="flex flex-col sm:flex-row gap-2 w-full mt-2">
         <Button 
           onClick={onSave} 
           className="w-full bg-bookconnect-sage hover:bg-bookconnect-terracotta text-white transition-colors border border-bookconnect-brown/30 shadow-md"

@@ -39,7 +39,7 @@ const ProfileDialogContent: React.FC<ProfileDialogContentProps> = ({
   onChatAction
 }) => {
   return (
-    <ScrollArea className="h-[60vh] pr-4">
+    <ScrollArea className="flex-1 h-full pr-4 max-h-[50vh]">
       <div className="space-y-4 py-2 font-serif px-1">
         <UsernameEditor username={username} setUsername={setUsername} />
 
