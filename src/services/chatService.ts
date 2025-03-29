@@ -34,6 +34,7 @@ function generateBookUuid(googleBooksId: string): string {
   return uuidv5(googleBooksId, NAMESPACE);
 }
 
+// ========== Book Management Functions ==========
 // Create a book record if it doesn't exist yet - this helps solve the foreign key constraint issue
 async function ensureBookExists(googleBooksId: string, title: string, author: string): Promise<string> {
   const dbBookId = generateBookUuid(googleBooksId);
@@ -80,6 +81,7 @@ async function ensureBookExists(googleBooksId: string, title: string, author: st
   return dbBookId;
 }
 
+// ========== Chat Message Functions ==========
 export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(bookId);
@@ -208,6 +210,7 @@ export async function deleteMessage(
   }
 }
 
+// ========== Reaction Functions ==========
 export async function addReaction(
   messageId: string,
   username: string,
@@ -313,6 +316,7 @@ export async function getMessageReactions(messageId: string): Promise<Array<{rea
   }
 }
 
+// ========== Subscription Functions ==========
 export function subscribeToChat(
   bookId: string,
   callback: (message: ChatMessage) => void
