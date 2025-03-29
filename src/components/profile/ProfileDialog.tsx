@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { UserRound, Check } from "lucide-react";
+import { Check } from "lucide-react";
 
 import {
   Dialog,
@@ -56,7 +55,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
 
-  // Load profile data
   useEffect(() => {
     const initializeProfile = async () => {
       if (open) {
@@ -69,7 +67,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
             if (profileData.bio) setBio(profileData.bio);
             if (profileData.allowChats !== null) setAllowChats(profileData.allowChats);
             
-            // Also update localStorage
             if (profileData.username) localStorage.setItem("username", profileData.username);
           }
           
@@ -90,7 +87,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     initializeProfile();
   }, [open]);
 
-  // Set up realtime subscription for chat requests
   useEffect(() => {
     if (!open) return;
 
@@ -158,7 +154,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
       const success = await handleChatAction(chatId, action);
       
       if (success) {
-        // Remove this request from the list
         setChatRequests(prev => prev.filter(req => req.id !== chatId));
         
         if (action === 'accept') {
@@ -203,13 +198,8 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
         }}
       >
         <DialogHeader className="relative">
-          <div className="absolute top-0 left-0 right-0 flex justify-center -mt-12">
-            <div className="bg-bookconnect-cream rounded-full p-3 shadow-md border border-bookconnect-brown/20">
-              <UserRound className="h-10 w-10 text-bookconnect-brown" />
-            </div>
-          </div>
-          <div className="pt-6">
-            <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown mt-2">
+          <div className="pt-2">
+            <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown">
               Profile
             </DialogTitle>
             <div className="mx-auto w-3/4 h-px bg-bookconnect-brown/50 my-2" />
@@ -218,10 +208,8 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
 
         <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-4 py-2 font-serif px-1">
-            {/* Username */}
             <UsernameEditor username={username} setUsername={setUsername} />
 
-            {/* Profile Form */}
             <ProfileForm 
               favoriteAuthor={favoriteAuthor}
               setFavoriteAuthor={setFavoriteAuthor}
@@ -231,14 +219,12 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
               setBio={setBio}
             />
 
-            {/* Chat Settings */}
             <ChatSettings 
               allowChats={allowChats}
               setAllowChats={setAllowChats}
               activeChatsCount={activeChatsCount}
             />
 
-            {/* Chat Requests */}
             {chatRequests.length > 0 && (
               <ChatRequestsList 
                 chatRequests={chatRequests}
@@ -246,20 +232,19 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
               />
             )}
 
-            {/* Previous Chats */}
             <ReadingActivity />
           </div>
         </ScrollArea>
 
-        <DialogFooter className="flex flex-col gap-2 mt-4 pt-4 border-t border-bookconnect-brown/20">
+        <DialogFooter className="mt-6 pt-4 border-t border-bookconnect-brown/20">
           {showSavedMessage && (
-            <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-1 flex items-center justify-center">
+            <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-2 flex items-center justify-center">
               <Check className="h-4 w-4 mr-1" /> Changes saved successfully
             </div>
           )}
           <Button 
             onClick={handleSaveProfile} 
-            className="w-full bg-bookconnect-sage hover:bg-bookconnect-terracotta text-white transition-colors"
+            className="w-full bg-bookconnect-sage hover:bg-bookconnect-terracotta text-white transition-colors border border-bookconnect-brown/30 shadow-md"
             disabled={isLoading}
           >
             {isLoading ? "Saving..." : "Save Changes"}
