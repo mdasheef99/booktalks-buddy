@@ -6,7 +6,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Book, Mail, MessageCircle, User, BookOpen, Award } from "lucide-react";
+import { ArrowLeft, Book, MessageCircle, User, BookOpen, Award } from "lucide-react";
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
 
@@ -68,8 +68,7 @@ const UserProfile = () => {
       
       if (!myUserId) {
         toast("Please log in", {
-          description: "You need to be logged in to start a chat",
-          variant: "destructive"
+          description: "You need to be logged in to start a chat"
         });
         return;
       }
@@ -109,8 +108,7 @@ const UserProfile = () => {
       console.error("Error starting chat:", err);
       Sentry.captureException(err);
       toast("Error", {
-        description: "Unable to start chat. Please try again later.",
-        variant: "destructive"
+        description: "Unable to start chat. Please try again later."
       });
     }
   };

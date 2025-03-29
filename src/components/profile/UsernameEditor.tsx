@@ -53,7 +53,7 @@ const UsernameEditor: React.FC<UsernameEditorProps> = ({ username, setUsername }
     setEditingUsername(false);
     
     toast("Username updated!", {
-      description: `You are now known as ${newUsername}`,
+      description: `You are now known as ${newUsername}`
     });
   };
 
