@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
@@ -18,6 +18,7 @@ export function useExploreBooks() {
   const [selectedBookId, setSelectedBookId] = useState<string>("");
   const [selectedBookTitle, setSelectedBookTitle] = useState<string>("");
   const [showDiscussion, setShowDiscussion] = useState(false);
+  const [lastDiscussionTime, setLastDiscussionTime] = useState<number>(Date.now());
   
   const genreParam = searchParams.get("genre") || "";
   const genres = genreParam.split(',').filter(Boolean);
@@ -113,15 +114,16 @@ export function useExploreBooks() {
     }
   });
 
-  // Recently discussed books query
+  // Recently discussed books query - adding lastDiscussionTime to the query key to force refresh
   const {
     data: discussedBooks,
     isLoading: isDiscussedLoading,
     isError: isDiscussedError,
     refetch: refetchDiscussedBooks
   } = useQuery({
-    queryKey: ["discussedBooks"],
-    queryFn: () => fetchRecentlyDiscussedBooks(4),
+    queryKey: ["discussedBooks", lastDiscussionTime],
+    queryFn: () => fetchRecentlyDiscussedBooks(6),
+    staleTime: 15000, // Consider data stale after 15 seconds
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     meta: {
@@ -142,6 +144,18 @@ export function useExploreBooks() {
     }
   });
 
+  // Enhanced refresh function with feedback
+  const handleRefreshDiscussedBooks = useCallback(() => {
+    setLastDiscussionTime(Date.now()); // Update time to force refresh
+    
+    toast({
+      title: "Refreshing discussions",
+      description: "Finding the latest book discussions...",
+    });
+    
+    refetchDiscussedBooks();
+  }, [refetchDiscussedBooks, toast]);
+
   // Search handler
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -151,7 +165,7 @@ export function useExploreBooks() {
     }
   };
 
-  // Join discussion handler
+  // Join discussion handler with improved refresh logic
   const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string = "") => {
     if (window.innerWidth < 768) {
       navigate(`/books/${bookId}/discussion?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
@@ -160,15 +174,28 @@ export function useExploreBooks() {
       setSelectedBookId(bookId);
       setSelectedBookTitle(bookTitle);
       
+      // Update the last discussion time to trigger a refresh
+      setLastDiscussionTime(Date.now());
+      
+      // Force a refresh after a short delay to allow the chat to be stored
       setTimeout(() => {
         refetchDiscussedBooks();
-      }, 1000);
+      }, 1500);
     }
   };
 
-  // Auto refresh discussed books
+  // Auto refresh discussed books with periodic updates
   useEffect(() => {
+    // Initial fetch
     refetchDiscussedBooks();
+    
+    // Set up interval to refresh every minute
+    const intervalId = setInterval(() => {
+      console.log("Auto-refreshing discussed books");
+      refetchDiscussedBooks();
+    }, 60000);
+    
+    return () => clearInterval(intervalId);
   }, [refetchDiscussedBooks]);
 
   return {
@@ -191,6 +218,6 @@ export function useExploreBooks() {
     showDiscussion,
     handleSearch,
     handleJoinDiscussion,
-    refetchDiscussedBooks
+    refetchDiscussedBooks: handleRefreshDiscussedBooks
   };
 }

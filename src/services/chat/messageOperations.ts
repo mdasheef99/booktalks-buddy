@@ -58,9 +58,10 @@ export async function sendChatMessage(
   bookId: string, 
   username: string, 
   title?: string, 
-  author?: string, 
+  author?: string,
   userId?: string,
-  replyToId?: string
+  replyToId?: string,
+  coverUrl?: string
 ): Promise<ChatMessage | null> {
   if (!message.trim() || !bookId || !username) {
     console.error("Missing required fields for sending message");
@@ -69,7 +70,8 @@ export async function sendChatMessage(
   
   try {
     // Ensure the book exists in the database (solves foreign key constraint issue)
-    const dbBookId = await ensureBookExists(bookId, title || 'Unknown Book', author || 'Unknown Author');
+    // Now passing coverUrl to ensure it gets stored
+    const dbBookId = await ensureBookExists(bookId, title || 'Unknown Book', author || 'Unknown Author', coverUrl);
     
     console.log("Sending message for bookId:", bookId, "converted to UUID:", dbBookId);
     

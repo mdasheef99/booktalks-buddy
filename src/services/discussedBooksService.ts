@@ -1,9 +1,8 @@
-
 import * as Sentry from "@sentry/react";
 import { supabase } from "@/lib/supabase";
 import { BookType } from "@/types/books";
 
-export async function fetchRecentlyDiscussedBooks(limit: number = 4): Promise<BookType[]> {
+export async function fetchRecentlyDiscussedBooks(limit: number = 6): Promise<BookType[]> {
   try {
     console.log('Fetching recently discussed books');
     
@@ -12,7 +11,7 @@ export async function fetchRecentlyDiscussedBooks(limit: number = 4): Promise<Bo
       .from('chat_messages')
       .select('book_id, created_at')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(50);
     
     if (chatError) {
       throw chatError;
@@ -24,15 +23,30 @@ export async function fetchRecentlyDiscussedBooks(limit: number = 4): Promise<Bo
     
     // Count occurrences of each book_id and get the most discussed ones
     const bookCounts: Record<string, number> = {};
+    const recentTimestamps: Record<string, string> = {};
+    
     chatData.forEach(chat => {
       if (chat.book_id) {
         bookCounts[chat.book_id] = (bookCounts[chat.book_id] || 0) + 1;
+        
+        // Keep track of the most recent activity for each book
+        if (!recentTimestamps[chat.book_id] || chat.created_at > recentTimestamps[chat.book_id]) {
+          recentTimestamps[chat.book_id] = chat.created_at;
+        }
       }
     });
     
-    // Get unique book_ids sorted by message count (most active first)
+    // Get unique book_ids sorted by most recent activity first, then by message count
     const uniqueBookIds = Object.keys(bookCounts)
-      .sort((a, b) => bookCounts[b] - bookCounts[a])
+      .sort((a, b) => {
+        // First sort by recency of activity
+        const timeA = new Date(recentTimestamps[a]).getTime();
+        const timeB = new Date(recentTimestamps[b]).getTime();
+        if (timeB !== timeA) return timeB - timeA;
+        
+        // Then by message count if timestamps are the same
+        return bookCounts[b] - bookCounts[a];
+      })
       .slice(0, limit);
     
     if (uniqueBookIds.length === 0) {
@@ -49,12 +63,12 @@ export async function fetchRecentlyDiscussedBooks(limit: number = 4): Promise<Bo
       throw bookError;
     }
     
-    // Map database results to BookType objects
+    // Map database results to BookType objects with correct image URL
     return (bookData || []).map(book => ({
       id: book.id,
       title: book.title,
       author: book.author,
-      description: book.genre || "", // Fix: Use genre as description if description is not available
+      description: book.description || book.genre || "", 
       imageUrl: book.cover_url,
       categories: book.genre ? [book.genre] : []
     }));

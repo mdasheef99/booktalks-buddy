@@ -2,7 +2,7 @@
 import { supabase, generateBookUuid } from '../base/supabaseService';
 
 // Create a book record if it doesn't exist yet - this helps solve the foreign key constraint issue
-export async function ensureBookExists(googleBooksId: string, title: string, author: string): Promise<string> {
+export async function ensureBookExists(googleBooksId: string, title: string, author: string, coverUrl?: string): Promise<string> {
   const dbBookId = generateBookUuid(googleBooksId);
   
   console.log("Ensuring book exists in database:", googleBooksId, "with UUID:", dbBookId);
@@ -10,7 +10,7 @@ export async function ensureBookExists(googleBooksId: string, title: string, aut
   // Check if book exists
   const { data: existingBook, error: checkError } = await supabase
     .from('books')
-    .select('id')
+    .select('id, cover_url')
     .eq('id', dbBookId)
     .single();
     
@@ -30,7 +30,7 @@ export async function ensureBookExists(googleBooksId: string, title: string, aut
           title: title || 'Unknown Book',
           author: author || 'Unknown Author',
           genre: 'Uncategorized', // Required field
-          cover_url: null
+          cover_url: coverUrl || null
         }
       ]);
       
@@ -40,6 +40,19 @@ export async function ensureBookExists(googleBooksId: string, title: string, aut
     }
     
     console.log("Book created successfully with ID:", dbBookId);
+  } 
+  // If book exists but doesn't have a cover URL and we have one now, update it
+  else if (existingBook && !existingBook.cover_url && coverUrl) {
+    console.log("Updating existing book with cover URL:", dbBookId);
+    
+    const { error: updateError } = await supabase
+      .from('books')
+      .update({ cover_url: coverUrl })
+      .eq('id', dbBookId);
+      
+    if (updateError) {
+      console.error("Error updating book cover:", updateError);
+    }
   } else {
     console.log("Book already exists in database with ID:", dbBookId);
   }
