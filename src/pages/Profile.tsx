@@ -1,32 +1,69 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+
+const GENRE_OPTIONS = [
+  "Fiction", "Mystery", "Sci-Fi", "Romance", "Fantasy", 
+  "Thriller", "Non-Fiction", "Biography", "Poetry", 
+  "History", "Young Adult", "Classics"
+];
 
 const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState(user?.username || "");
+  const [favoriteAuthor, setFavoriteAuthor] = useState(user?.favorite_author || "");
+  const [favoriteGenre, setFavoriteGenre] = useState(user?.favorite_genre || "Fiction");
+  const [bio, setBio] = useState(user?.bio || "");
   const [isUpdating, setIsUpdating] = useState(false);
   
   // Redirect if not logged in
-  if (!user) {
-    navigate("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+  
+  // Load user data when component mounts
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username || "");
+      setFavoriteAuthor(user.favorite_author || "");
+      setFavoriteGenre(user.favorite_genre || "Fiction");
+      setBio(user.bio || "");
+    }
+  }, [user]);
   
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
     
     try {
-      // In a real app, we would update the profile here
-      // For now, we'll just show a success message
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          username, 
+          favorite_author: favoriteAuthor,
+          favorite_genre: favoriteGenre,
+          bio
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      
+      // Update local storage for consistency
+      localStorage.setItem("username", username);
+      localStorage.setItem("favorite_genre", favoriteGenre);
+      
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -36,10 +73,14 @@ const Profile = () => {
     }
   };
   
+  if (!user) {
+    return null;
+  }
+  
   return (
     <Layout>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-serif font-bold mb-8">Your Profile</h1>
+        <h1 className="text-4xl font-serif font-bold mb-8 text-bookconnect-brown">Your Profile</h1>
         
         <div className="space-y-6">
           <Card>
@@ -74,10 +115,50 @@ const Profile = () => {
                     onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="favoriteAuthor" className="text-sm font-medium">Favorite Author</label>
+                  <Input
+                    id="favoriteAuthor"
+                    type="text"
+                    value={favoriteAuthor}
+                    onChange={(e) => setFavoriteAuthor(e.target.value)}
+                    placeholder="Favorite Author"
+                    maxLength={50}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="favoriteGenre" className="text-sm font-medium">Favorite Genre</label>
+                  <Select value={favoriteGenre} onValueChange={setFavoriteGenre}>
+                    <SelectTrigger id="favoriteGenre">
+                      <SelectValue placeholder="Select a genre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENRE_OPTIONS.map((genre) => (
+                        <SelectItem key={genre} value={genre}>
+                          {genre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="bio" className="text-sm font-medium">Bio</label>
+                  <Textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="About me"
+                    maxLength={50}
+                  />
+                </div>
                 
                 <Button 
                   type="submit" 
-                  disabled={isUpdating || !username.trim() || username === user.username}
+                  disabled={isUpdating}
+                  className="bg-bookconnect-sage hover:bg-bookconnect-sage/90"
                 >
                   {isUpdating ? "Updating..." : "Update Profile"}
                 </Button>

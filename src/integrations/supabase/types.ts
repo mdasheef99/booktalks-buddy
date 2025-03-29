@@ -98,22 +98,58 @@ export type Database = {
         }
         Relationships: []
       }
-      users: {
+      private_chats: {
         Row: {
           created_at: string | null
+          id: string
+          receiver_id: string
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          receiver_id: string
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          receiver_id?: string
+          requester_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          allow_chats: boolean | null
+          bio: string | null
+          created_at: string | null
           email: string
+          favorite_author: string | null
+          favorite_genre: string | null
           id: string
           username: string | null
         }
         Insert: {
+          allow_chats?: boolean | null
+          bio?: string | null
           created_at?: string | null
           email: string
+          favorite_author?: string | null
+          favorite_genre?: string | null
           id: string
           username?: string | null
         }
         Update: {
+          allow_chats?: boolean | null
+          bio?: string | null
           created_at?: string | null
           email?: string
+          favorite_author?: string | null
+          favorite_genre?: string | null
           id?: string
           username?: string | null
         }

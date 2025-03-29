@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Book } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import ProfileDialog from "./dialogs/ProfileDialog";
 
 const BookConnectHeader = () => {
@@ -19,7 +19,7 @@ const BookConnectHeader = () => {
           className="p-2 rounded-full hover:bg-bookconnect-brown/10 transition-colors"
           aria-label="Open profile"
         >
-          <Book className="h-6 w-6 text-bookconnect-brown" />
+          <BookOpen className="h-6 w-6 text-bookconnect-brown" />
         </button>
 
         <ProfileDialog 
