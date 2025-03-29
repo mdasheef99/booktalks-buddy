@@ -1,9 +1,8 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 const ReadingActivity: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);

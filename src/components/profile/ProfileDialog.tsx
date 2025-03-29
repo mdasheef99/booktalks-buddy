@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Check } from "lucide-react";
+import { UserRound } from "lucide-react";
 
 import {
   Dialog,
@@ -19,6 +19,7 @@ import UsernameEditor from "./UsernameEditor";
 import ProfileForm from "./ProfileForm";
 import ChatRequestsList, { ChatRequest } from "./ChatRequestsList";
 import ChatSettings from "./ChatSettings";
+import ReadingActivity from "./ReadingActivity";
 import { 
   fetchChatRequests, 
   fetchActiveChatsCount, 
@@ -26,7 +27,6 @@ import {
   saveProfile, 
   loadProfileData 
 } from "./profileService";
-import ReadingActivity from "./ReadingActivity";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -60,23 +60,30 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
   useEffect(() => {
     const initializeProfile = async () => {
       if (open) {
-        const profileData = await loadProfileData();
-        if (profileData) {
-          if (profileData.username) setUsername(profileData.username);
-          if (profileData.favoriteAuthor) setFavoriteAuthor(profileData.favoriteAuthor);
-          if (profileData.favoriteGenre) setFavoriteGenre(profileData.favoriteGenre);
-          if (profileData.bio) setBio(profileData.bio);
-          if (profileData.allowChats !== null) setAllowChats(profileData.allowChats);
+        try {
+          const profileData = await loadProfileData();
+          if (profileData) {
+            if (profileData.username) setUsername(profileData.username);
+            if (profileData.favoriteAuthor) setFavoriteAuthor(profileData.favoriteAuthor);
+            if (profileData.favoriteGenre) setFavoriteGenre(profileData.favoriteGenre);
+            if (profileData.bio) setBio(profileData.bio);
+            if (profileData.allowChats !== null) setAllowChats(profileData.allowChats);
+            
+            // Also update localStorage
+            if (profileData.username) localStorage.setItem("username", profileData.username);
+          }
           
-          // Also update localStorage
-          localStorage.setItem("username", profileData.username);
+          const requests = await fetchChatRequests();
+          setChatRequests(requests);
+          
+          const chatsCount = await fetchActiveChatsCount();
+          setActiveChatsCount(chatsCount);
+        } catch (err) {
+          console.error("Error loading profile data:", err);
+          Sentry.captureException(err, {
+            tags: { component: "ProfileDialog", action: "initializeProfile" }
+          });
         }
-        
-        const requests = await fetchChatRequests();
-        setChatRequests(requests);
-        
-        const chatsCount = await fetchActiveChatsCount();
-        setActiveChatsCount(chatsCount);
       }
     };
 
@@ -111,64 +118,80 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
   const handleSaveProfile = async () => {
     setIsLoading(true);
     
-    const success = await saveProfile(
-      username,
-      favoriteAuthor,
-      favoriteGenre,
-      bio,
-      allowChats
-    );
-    
-    if (success) {
-      setShowSavedMessage(true);
-      setTimeout(() => setShowSavedMessage(false), 3000);
+    try {
+      const success = await saveProfile(
+        username,
+        favoriteAuthor,
+        favoriteGenre,
+        bio,
+        allowChats
+      );
+      
+      if (success) {
+        setShowSavedMessage(true);
+        setTimeout(() => setShowSavedMessage(false), 3000);
+      } else {
+        toast({
+          title: "Profile save failed!",
+          description: "We couldn't save your profile changes.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      Sentry.captureException(err, {
+        tags: { component: "ProfileDialog", action: "handleSaveProfile" }
+      });
       
       toast({
-        title: "Profile saved!",
-        description: "Your changes have been saved successfully.",
-      });
-    } else {
-      toast({
         title: "Profile save failed!",
-        description: "We couldn't save your profile changes.",
+        description: "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleChatActionRequest = async (chatId: string, action: 'accept' | 'reject') => {
-    const success = await handleChatAction(chatId, action);
-    
-    if (success) {
-      // Remove this request from the list
-      setChatRequests(prev => prev.filter(req => req.id !== chatId));
+    try {
+      const success = await handleChatAction(chatId, action);
       
-      if (action === 'accept') {
-        setActiveChatsCount(prev => prev + 1);
-        toast({
-          title: "Chat request accepted!",
-          description: "You can now start chatting with this user."
-        });
+      if (success) {
+        // Remove this request from the list
+        setChatRequests(prev => prev.filter(req => req.id !== chatId));
+        
+        if (action === 'accept') {
+          setActiveChatsCount(prev => prev + 1);
+          toast({
+            title: "Chat request accepted!",
+            description: "You can now start chatting with this user."
+          });
+        } else {
+          toast({
+            title: "Chat request rejected",
+            description: "The request has been declined."
+          });
+        }
       } else {
         toast({
-          title: "Chat request rejected",
-          description: "The request has been declined."
+          title: `Couldn't ${action} chat request`,
+          description: "Please try again later.",
+          variant: "destructive"
         });
       }
-    } else {
-      toast({
-        title: `Couldn't ${action} chat request`,
-        description: "Please try again later.",
-        variant: "destructive"
+    } catch (err) {
+      console.error(`Error ${action}ing chat request:`, err);
+      Sentry.captureException(err, {
+        tags: { component: "ProfileDialog", action: `handleChatAction_${action}` },
+        extra: { chatId }
       });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-md mx-auto bg-bookconnect-cream" 
+      <DialogContent className="max-w-md max-h-[90vh] mx-auto bg-bookconnect-cream overflow-hidden" 
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1528459105426-b9548367069b?q=80&w=1412&auto=format&fit=crop')`,
           backgroundSize: 'cover',
@@ -179,15 +202,22 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           boxShadow: '0 4px 30px rgba(0, 0, 0, 0.15)'
         }}
       >
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown">
-            Library Card
-          </DialogTitle>
-          <div className="mx-auto w-3/4 h-px bg-bookconnect-brown/50 my-2" />
+        <DialogHeader className="relative">
+          <div className="absolute top-0 left-0 right-0 flex justify-center -mt-12">
+            <div className="bg-bookconnect-cream rounded-full p-3 shadow-md border border-bookconnect-brown/20">
+              <UserRound className="h-10 w-10 text-bookconnect-brown" />
+            </div>
+          </div>
+          <div className="pt-6">
+            <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown mt-2">
+              Library Card
+            </DialogTitle>
+            <div className="mx-auto w-3/4 h-px bg-bookconnect-brown/50 my-2" />
+          </div>
         </DialogHeader>
 
-        <ScrollArea className="h-[60vh]">
-          <div className="space-y-4 py-2 font-serif px-4">
+        <ScrollArea className="h-[60vh] pr-4">
+          <div className="space-y-4 py-2 font-serif px-1">
             {/* Username */}
             <UsernameEditor username={username} setUsername={setUsername} />
 
@@ -217,18 +247,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
             )}
 
             {/* Previous Chats */}
-            <div className="mb-4">
-              <h3 className="text-sm font-medium text-bookconnect-brown flex items-center justify-between">
-                Previous Chats 
-                <Button variant="ghost" size="icon" className="text-bookconnect-brown/70 hover:text-bookconnect-brown" title="Edit previous chats">
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </h3>
-              <div className="text-center py-8 text-muted-foreground bg-white/70 rounded-md mt-2">
-                <p className="text-sm">No previous chats yet.</p>
-                <p className="text-sm">Join discussions to see your chat history here!</p>
-              </div>
-            </div>
+            <ReadingActivity />
           </div>
         </ScrollArea>
 
@@ -240,10 +259,10 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           )}
           <Button 
             onClick={handleSaveProfile} 
-            className="w-full bg-bookconnect-sage hover:bg-bookconnect-sage/90"
+            className="w-full bg-bookconnect-sage hover:bg-bookconnect-terracotta text-white transition-colors"
             disabled={isLoading}
           >
-            Save Changes
+            {isLoading ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>
