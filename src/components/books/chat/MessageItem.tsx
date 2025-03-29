@@ -93,7 +93,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
         </div>
         
         {/* Place reactions outside and below the message bubble */}
-        <div className={`mt-1 pr-1 ${isCurrentUser ? 'self-end' : 'self-start'}`}>
+        <div className={`mt-1 ${isCurrentUser ? 'self-end' : 'self-start'} w-full max-w-[80%]`}>
           <MessageReactionList
             reactions={message.reactions}
             messageId={message.id}

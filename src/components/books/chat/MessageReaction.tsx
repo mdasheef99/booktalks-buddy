@@ -28,6 +28,7 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   
   const availableReactions = ["👍", "👎", "❤️", "😂", "😮", "🎉", "📚"];
   
+  // Load reactions when component mounts or messageId changes
   useEffect(() => {
     const loadReactions = async () => {
       setIsLoading(true);
@@ -43,7 +44,9 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
     
     loadReactions();
     
+    // Subscribe to reaction updates
     const subscription = subscribeToReactions(messageId, () => {
+      console.log("Reaction update received, reloading reactions");
       loadReactions();
     });
     
@@ -56,6 +59,10 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
     try {
       await addReaction(messageId, currentUsername, emoji);
       // Important: Do NOT close the popover here
+      
+      // Reload reactions after adding a new one
+      const updatedReactions = await getMessageReactions(messageId);
+      setReactions(updatedReactions);
     } catch (error) {
       console.error("Error adding reaction:", error);
     }
