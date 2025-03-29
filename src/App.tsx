@@ -21,13 +21,17 @@ import NotFound from "./pages/NotFound";
 
 // Initialize Sentry
 Sentry.init({
-  // Use an empty string as DSN to disable Sentry in development
+  // Replace this empty string with your Sentry DSN when you have it
+  // You'll get this from Sentry after creating your React project
   dsn: "",
   integrations: [
     Sentry.browserTracingIntegration(),
   ],
   // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring
+  // In production, you might want to set this to a lower value
   tracesSampleRate: 1.0,
+  // Only enable Sentry in production by uncommenting the following line
+  // enabled: import.meta.env.MODE === 'production',
 });
 
 const queryClient = new QueryClient({
