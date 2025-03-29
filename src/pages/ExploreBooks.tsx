@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -142,8 +143,8 @@ const ExploreBooks: React.FC = () => {
     }
   };
 
-  const handleJoinDiscussion = (bookId: string, bookTitle: string) => {
-    navigate(`/books/${bookId}?title=${encodeURIComponent(bookTitle)}`);
+  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor?: string) => {
+    navigate(`/books/${bookId}/discussion?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor || "")}`);
   };
 
   return (
@@ -161,7 +162,7 @@ const ExploreBooks: React.FC = () => {
           searchQuery={searchQuery}
           searchResults={searchResults}
           isSearchError={isSearchError}
-          onJoinDiscussion={handleJoinDiscussion}
+          onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
         />
 
         <TrendingBooksSection
@@ -170,7 +171,7 @@ const ExploreBooks: React.FC = () => {
           isLoading={isTrendingLoading}
           isError={isTrendingError}
           fallbackBooks={FALLBACK_TRENDING_BOOKS}
-          onJoinDiscussion={handleJoinDiscussion}
+          onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
         />
       </ExploreContainer>
       

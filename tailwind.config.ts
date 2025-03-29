@@ -69,7 +69,8 @@ export default {
           brown: "#8B6E4F",
           terracotta: "#C97C5D",
           sage: "#A5B1A2",
-          olive: "#7D8471"
+          olive: "#7D8471",
+          parchment: "#F2EADF"
         }
 			},
 			borderRadius: {
@@ -93,14 +94,19 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'pulse-subtle': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.6' }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			},
       fontFamily: {
-        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        serif: ['Lora', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         sans: ['Inter', 'sans-serif'],
       }
 		}

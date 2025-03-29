@@ -3,6 +3,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookType } from "@/types/books";
+import { useNavigate } from "react-router-dom";
 
 interface BookCardProps {
   book: BookType;

@@ -19,7 +19,8 @@ import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import ChatSelection from "./pages/ChatSelection";
-import ExploreBooks from "./pages/ExploreBooks"; // Add import for new page
+import ExploreBooks from "./pages/ExploreBooks";
+import BookDiscussion from "./pages/BookDiscussion"; // Add import for new page
 
 // Initialize Sentry
 Sentry.init({
@@ -71,8 +72,9 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/home" element={<Index />} />
               <Route path="/books" element={<Books />} />
-              <Route path="/explore-books" element={<ExploreBooks />} /> {/* Add new route */}
+              <Route path="/explore-books" element={<ExploreBooks />} />
               <Route path="/books/:id" element={<BookDetail />} />
+              <Route path="/books/:id/discussion" element={<BookDiscussion />} />
               <Route path="/events" element={<Events />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
