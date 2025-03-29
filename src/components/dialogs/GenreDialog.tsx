@@ -52,8 +52,8 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
         description: `Welcome ${username}, enjoy exploring ${selectedGenre} books!`,
       });
       
-      // Navigate to books filtered by genre
-      navigate(`/books?genre=${selectedGenre}`);
+      // Navigate to the new Explore Books page instead of books filtered by genre
+      navigate(`/explore-books?genre=${selectedGenre}`);
     } catch (error) {
       Sentry.captureException(error);
       toast({
