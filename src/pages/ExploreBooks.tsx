@@ -6,10 +6,12 @@ import * as Sentry from "@sentry/react";
 
 import { useToast } from "@/hooks/use-toast";
 import { fetchBooksByQuery, fetchTrendingBooks } from "@/services/googleBooksService";
-import Layout from "@/components/Layout";
 import BookSearchForm from "@/components/books/BookSearchForm";
 import SearchResults from "@/components/books/SearchResults";
 import TrendingBooksSection from "@/components/books/TrendingBooksSection";
+import BookConnectHeader from "@/components/BookConnectHeader";
+import ProfileDialog from "@/components/dialogs/ProfileDialog";
+import { generateLiteraryUsername } from "@/utils/usernameGenerator";
 
 const FALLBACK_TRENDING_BOOKS = [
   { 
@@ -38,6 +40,7 @@ const FALLBACK_TRENDING_BOOKS = [
 const ExploreBooks: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
   
   // Handle multiple genres from URL or localStorage
   const genreParam = searchParams.get("genre") || "";
@@ -59,6 +62,23 @@ const ExploreBooks: React.FC = () => {
       } catch (error) {
         console.error("Error loading genres from localStorage:", error);
       }
+    }
+    
+    // Check if first time visit and show profile dialog
+    const hasVisitedBefore = localStorage.getItem("has_visited_explore");
+    if (!hasVisitedBefore) {
+      // Generate a username if not already set
+      if (!localStorage.getItem("username")) {
+        const generatedUsername = generateLiteraryUsername();
+        localStorage.setItem("username", generatedUsername);
+      }
+      
+      // Show the profile dialog after a slight delay
+      setTimeout(() => {
+        setShowProfileDialog(true);
+      }, 500);
+      
+      localStorage.setItem("has_visited_explore", "true");
     }
   }, [genreParam]);
   
@@ -136,58 +156,63 @@ const ExploreBooks: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-bookconnect-cream">
-        <div 
-          className="relative py-12 px-6 md:px-8 lg:px-12 max-w-7xl mx-auto"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1524578271613-d550eacf6090?q=80&w=1470&auto=format&fit=crop')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed",
-            backgroundBlendMode: "overlay",
-            backgroundColor: "rgba(248, 243, 230, 0.92)",
-          }}
-        >
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-bookconnect-brown text-center">
-              Explore Books
-            </h1>
-            <p className="text-center text-bookconnect-brown/70 mt-2 font-serif max-w-2xl mx-auto">
-              {genres.length > 1 
-                ? `Discover amazing reads in ${genres.slice(0, 3).join(', ')}${genres.length > 3 ? '...' : ''}`
-                : primaryGenre 
-                  ? `Discover amazing reads in ${primaryGenre}` 
-                  : "Find your next favorite book"}
-            </p>
-          </div>
-
-          {/* Search Section */}
-          <div className="mb-12">
-            <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
-          </div>
-
-          {/* Search Results */}
-          <SearchResults 
-            searchQuery={searchQuery}
-            searchResults={searchResults}
-            isSearchError={isSearchError}
-            onJoinDiscussion={handleJoinDiscussion}
-          />
-
-          {/* Trending Section */}
-          <TrendingBooksSection
-            genre={primaryGenre}
-            books={trendingBooks}
-            isLoading={isTrendingLoading}
-            isError={isTrendingError}
-            fallbackBooks={FALLBACK_TRENDING_BOOKS}
-            onJoinDiscussion={handleJoinDiscussion}
-          />
+    <div className="min-h-screen bg-bookconnect-cream">
+      <BookConnectHeader />
+      <div 
+        className="relative py-12 px-6 md:px-8 lg:px-12 max-w-7xl mx-auto"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1524578271613-d550eacf6090?q=80&w=1470&auto=format&fit=crop')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+          backgroundBlendMode: "overlay",
+          backgroundColor: "rgba(248, 243, 230, 0.92)",
+        }}
+      >
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-bookconnect-brown text-center">
+            Explore Books
+          </h1>
+          <p className="text-center text-bookconnect-brown/70 mt-2 font-serif max-w-2xl mx-auto">
+            {genres.length > 1 
+              ? `Discover amazing reads in ${genres.slice(0, 3).join(', ')}${genres.length > 3 ? '...' : ''}`
+              : primaryGenre 
+                ? `Discover amazing reads in ${primaryGenre}` 
+                : "Find your next favorite book"}
+          </p>
         </div>
+
+        {/* Search Section */}
+        <div className="mb-12">
+          <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
+        </div>
+
+        {/* Search Results */}
+        <SearchResults 
+          searchQuery={searchQuery}
+          searchResults={searchResults}
+          isSearchError={isSearchError}
+          onJoinDiscussion={handleJoinDiscussion}
+        />
+
+        {/* Trending Section */}
+        <TrendingBooksSection
+          genre={primaryGenre}
+          books={trendingBooks}
+          isLoading={isTrendingLoading}
+          isError={isTrendingError}
+          fallbackBooks={FALLBACK_TRENDING_BOOKS}
+          onJoinDiscussion={handleJoinDiscussion}
+        />
       </div>
-    </Layout>
+      
+      {/* Profile Dialog */}
+      <ProfileDialog 
+        open={showProfileDialog} 
+        onClose={() => setShowProfileDialog(false)} 
+      />
+    </div>
   );
 };
 

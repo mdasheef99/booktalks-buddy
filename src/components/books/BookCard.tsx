@@ -12,14 +12,18 @@ interface BookCardProps {
 const BookCard = ({ book, onJoinDiscussion }: BookCardProps) => {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg border-bookconnect-brown/20 book-card bg-white/90">
-      <div className="relative h-80 overflow-hidden">
+      <div className="relative h-96 overflow-hidden bg-white">
         <img
           src={book.imageUrl || "https://images.unsplash.com/photo-1621944190310-e3cca1564bd7?q=80&w=1287&auto=format&fit=crop"}
           alt={`Cover of ${book.title}`}
-          className="w-full h-full object-contain bg-white/90"
+          className="w-full h-full object-contain"
           loading="lazy"
+          style={{
+            maxHeight: "100%",
+            maxWidth: "100%"
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
       </div>
       <CardContent className="p-4">
         <h3 className="font-serif font-bold text-lg text-bookconnect-brown line-clamp-2 mb-2">
