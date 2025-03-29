@@ -38,8 +38,16 @@ const FALLBACK_TRENDING_BOOKS = [
   }
 ];
 
+interface BookWithIdType {
+  id: string;
+  title: string;
+  author: string;
+  imageUrl: string;
+  description: string;
+}
+
 interface BookCardProps {
-  book: BookWithId;
+  book: BookWithIdType;
   onJoinDiscussion: (bookId: string, bookTitle: string, bookAuthor: string) => void;
 }
 
@@ -47,6 +55,10 @@ const ExploreBooks: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfileDialog, setShowProfileDialog] = useState(false);
+  
+  const [selectedBookId, setSelectedBookId] = useState<string>("");
+  const [selectedBookTitle, setSelectedBookTitle] = useState<string>("");
+  const [showDiscussion, setShowDiscussion] = useState(false);
   
   const genreParam = searchParams.get("genre") || "";
   const genres = genreParam.split(',').filter(Boolean);

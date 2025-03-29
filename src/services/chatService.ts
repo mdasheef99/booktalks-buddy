@@ -9,7 +9,7 @@ export interface ChatMessage {
   username: string;
   timestamp: string;
   user_id?: string;
-  created_at?: string;
+  created_at: string; // Changed from optional to required to match usage
   read?: boolean;
 }
 

@@ -1,10 +1,8 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getBookById } from "@/services/bookService";
-import { getBookChat, sendChatMessage, subscribeToChat } from "@/services/chatService";
-import { ChatMessage } from "@/lib/supabase";
+import { getBookChat, sendChatMessage, subscribeToChat, ChatMessage } from "@/services/chatService";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -31,7 +29,7 @@ const BookDetail = () => {
     enabled: !!id,
   });
 
-  // Fetch chat messages - Fix: Replace onSuccess with proper handling
+  // Fetch chat messages
   const { data: initialMessages } = useQuery({
     queryKey: ['bookChat', id],
     queryFn: () => id ? getBookChat(id) : [],
@@ -50,7 +48,7 @@ const BookDetail = () => {
     if (!id) return;
     
     const subscription = subscribeToChat(id, (newMessage) => {
-      setChatMessages((prev) => [...prev, newMessage]);
+      setChatMessages((prev) => [...prev, newMessage as ChatMessage]);
     });
     
     return () => {
