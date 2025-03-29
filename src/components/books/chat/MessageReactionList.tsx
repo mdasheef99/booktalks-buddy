@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { MessageReactionData } from "@/services/chat/models";
 import { addReaction as addReactionService } from "@/services/chat/messageService";
 
@@ -80,9 +80,9 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
         <button
           key={group.emoji}
           onClick={() => handleAddReaction(group.emoji)}
-          className={`text-xs rounded-full px-1.5 py-0.5 flex items-center space-x-1 
+          className={`text-xs rounded-full px-2 py-0.5 flex items-center space-x-1 transition-all duration-200
             ${group.userReacted 
-              ? 'bg-bookconnect-terracotta/20 border border-bookconnect-terracotta/30' 
+              ? 'bg-bookconnect-terracotta/20 border border-bookconnect-terracotta/30 shadow-sm' 
               : 'bg-white/80 hover:bg-bookconnect-terracotta/10 border border-gray-200'
             }`}
         >
