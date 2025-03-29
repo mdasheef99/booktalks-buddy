@@ -1,6 +1,6 @@
 
-import React from "react";
-import { ChatMessage } from "@/services/chat/messageService";
+import React, { useState, useEffect } from "react";
+import { ChatMessage, getMessageReactions } from "@/services/chat/messageService";
 import { Check } from "lucide-react";
 import ReplyPreview from "./ReplyPreview";
 import MessageActions from "./MessageActions";
@@ -28,6 +28,11 @@ const MessageItem: React.FC<MessageItemProps> = ({
   setRef
 }) => {
   const isDeleted = !!message.deleted_at;
+  const [reactions, setReactions] = useState(message.reactions || []);
+  
+  useEffect(() => {
+    setReactions(message.reactions || []);
+  }, [message.reactions]);
   
   const formatTime = (timestamp: string) => {
     try {
@@ -38,9 +43,20 @@ const MessageItem: React.FC<MessageItemProps> = ({
     }
   };
 
+  const handleReactionsUpdated = async (messageId: string) => {
+    try {
+      console.log("Refreshing reactions for message:", messageId);
+      const updatedReactions = await getMessageReactions(messageId);
+      console.log("Updated reactions:", updatedReactions);
+      setReactions(updatedReactions);
+    } catch (error) {
+      console.error("Error refreshing reactions:", error);
+    }
+  };
+
   // Debug: Log reactions for this message
-  if (message.reactions && message.reactions.length > 0) {
-    console.log(`Message ${message.id} has ${message.reactions.length} reactions:`, message.reactions);
+  if (reactions && reactions.length > 0) {
+    console.log(`Message ${message.id} has ${reactions.length} reactions:`, reactions);
   }
 
   return (
@@ -81,6 +97,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
               isCurrentUser={isCurrentUser}
               onReplyToMessage={onReplyToMessage}
               isMobile={isMobile}
+              onReactionsUpdated={handleReactionsUpdated}
             />
           )}
           
@@ -98,12 +115,13 @@ const MessageItem: React.FC<MessageItemProps> = ({
         </div>
         
         {/* Place reactions outside and below the message bubble */}
-        <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'}`}>
+        <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'} mt-2`}>
           <MessageReactionList
-            reactions={message.reactions}
+            reactions={reactions}
             messageId={message.id}
             currentUsername={currentUsername}
             isCurrentUser={isCurrentUser}
+            onReactionsUpdated={handleReactionsUpdated}
           />
         </div>
       </div>

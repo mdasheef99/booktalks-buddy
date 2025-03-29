@@ -14,13 +14,15 @@ interface MessageReactionListProps {
   messageId: string;
   currentUsername: string;
   isCurrentUser: boolean;
+  onReactionsUpdated?: (messageId: string) => void;
 }
 
 const MessageReactionList: React.FC<MessageReactionListProps> = ({ 
   reactions, 
   messageId, 
   currentUsername,
-  isCurrentUser
+  isCurrentUser,
+  onReactionsUpdated = () => {}
 }) => {
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
 
@@ -41,6 +43,21 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
     return acc;
   }, {});
 
+  const handleReactionClick = async (reaction: string) => {
+    try {
+      // Add reaction on click
+      await addReaction(messageId, currentUsername, reaction);
+      
+      // Open dialog to show who reacted
+      setSelectedReaction(reaction);
+      
+      // Notify parent about reaction update
+      onReactionsUpdated(messageId);
+    } catch (error) {
+      console.error("Error handling reaction click:", error);
+    }
+  };
+
   return (
     <>
       <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
@@ -52,12 +69,7 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
                 ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30' 
                 : 'bg-bookconnect-brown/5 border-bookconnect-brown/10 hover:bg-bookconnect-terracotta/10'
             }`}
-            onClick={() => {
-              // Add reaction on click
-              addReaction(messageId, currentUsername, reaction);
-              // Open dialog to show who reacted
-              setSelectedReaction(reaction);
-            }}
+            onClick={() => handleReactionClick(reaction)}
           >
             <span>{reaction}</span>
             <span className="ml-1">{count}</span>

@@ -1,21 +1,10 @@
 
-import React from "react";
-import { deleteMessage } from "@/services/chat/messageService";
-import { ChatMessage } from "@/services/chat/models"; // Import from models file directly
-import { MoreHorizontal, Reply, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import MessageReaction from "./MessageReaction";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu";
+import React, { useState } from "react";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { Reply, Trash2, MoreHorizontal } from "lucide-react";
+import { ChatMessage, deleteMessage } from "@/services/chat/messageService";
 import { toast } from "sonner";
-import * as Sentry from "@sentry/react";
+import MessageReaction from "./MessageReaction";
 
 interface MessageActionsProps {
   message: ChatMessage;
@@ -23,6 +12,7 @@ interface MessageActionsProps {
   isCurrentUser: boolean;
   onReplyToMessage: (message: ChatMessage) => void;
   isMobile: boolean;
+  onReactionsUpdated?: (messageId: string) => void;
 }
 
 const MessageActions: React.FC<MessageActionsProps> = ({
@@ -30,78 +20,73 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   currentUsername,
   isCurrentUser,
   onReplyToMessage,
-  isMobile
+  isMobile,
+  onReactionsUpdated = () => {}
 }) => {
-  const handleDeleteMessage = async (messageId: string, forEveryone: boolean) => {
+  const [showActions, setShowActions] = useState(false);
+  
+  const handleReply = () => {
+    onReplyToMessage(message);
+  };
+  
+  const handleDelete = async () => {
     try {
-      await deleteMessage(messageId, forEveryone);
+      console.log("Deleting message:", message.id);
+      const success = await deleteMessage(message.id);
+      
+      if (success) {
+        console.log("Message deleted successfully");
+        toast.success("Message deleted");
+      }
     } catch (error) {
       console.error("Error deleting message:", error);
-      Sentry.captureException(error);
-      toast.error("Failed to delete message", {
-        description: "Please try again later"
-      });
+      toast.error("Failed to delete message");
     }
   };
-
+  
   return (
-    <div className="absolute top-2 right-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-5 w-5 p-0 text-bookconnect-brown/60 hover:text-bookconnect-brown"
-          >
-            <MoreHorizontal size={12} />
-            <span className="sr-only">Message actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align={isMobile ? "center" : "end"}
-          className="bg-[#f0e6d2] border-bookconnect-brown/20 w-[120px]"
-        >
-          <DropdownMenuItem 
-            className="flex items-center cursor-pointer text-bookconnect-brown"
-            onClick={() => onReplyToMessage(message)}
-          >
-            <Reply size={14} className="mr-2" />
-            <span>Reply</span>
-          </DropdownMenuItem>
-          
-          {isCurrentUser && (
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex items-center text-bookconnect-brown">
-                <Trash2 size={14} className="mr-2" />
-                <span>Delete</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="bg-[#f0e6d2] border-bookconnect-brown/20">
-                <DropdownMenuItem 
-                  className="cursor-pointer text-bookconnect-brown"
-                  onClick={() => handleDeleteMessage(message.id, true)}
-                >
-                  For Everyone
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="cursor-pointer text-bookconnect-brown"
-                  onClick={() => handleDeleteMessage(message.id, false)}
-                >
-                  For Me Only
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          )}
-          
-          <DropdownMenuItem 
-            className="flex items-center cursor-pointer text-bookconnect-brown"
-          >
-            <MessageReaction 
-              messageId={message.id} 
-              currentUsername={currentUsername} 
-            />
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div
+      className={`absolute -bottom-7 ${isCurrentUser ? 'right-0' : 'left-0'} flex items-center gap-1`}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      {/* Always show reaction button */}
+      <MessageReaction 
+        messageId={message.id} 
+        currentUsername={currentUsername}
+        onReactionsUpdated={onReactionsUpdated}
+      />
+      
+      {/* Reply button */}
+      <button
+        className={`${
+          showActions || isMobile ? 'opacity-100' : 'opacity-0'
+        } flex items-center text-xs text-bookconnect-brown/50 hover:bg-bookconnect-terracotta/10 hover:text-bookconnect-brown px-1.5 py-0 rounded transition-opacity`}
+        onClick={handleReply}
+      >
+        <Reply size={14} className="mr-1.5" />
+        <span>Reply</span>
+      </button>
+      
+      {/* Delete button (only for user's own messages) */}
+      {isCurrentUser && (
+        <HoverCard openDelay={300}>
+          <HoverCardTrigger asChild>
+            <button
+              className={`${
+                showActions || isMobile ? 'opacity-100' : 'opacity-0'
+              } flex items-center text-xs text-bookconnect-brown/50 hover:bg-red-100 hover:text-red-500 px-1.5 py-0 rounded transition-opacity`}
+              onClick={handleDelete}
+            >
+              <Trash2 size={14} className="mr-1.5" />
+              <span>Delete</span>
+            </button>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-auto px-3 py-1.5">
+            <p className="text-xs">This will delete the message for everyone</p>
+          </HoverCardContent>
+        </HoverCard>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 // Re-export all message-related functionality from the smaller modules
 export * from './messageOperations';
 export * from './reactions';
-export * from './models'; // Add this line to export the ChatMessage type
+export * from './models'; // This now properly exports the ChatMessage type
 
 // Keep other imported and exported functionality for backward compatibility
 import { supabase, generateBookUuid } from '../base/supabaseService';

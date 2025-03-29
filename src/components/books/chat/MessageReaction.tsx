@@ -12,6 +12,7 @@ import {
 interface MessageReactionProps { 
   messageId: string; 
   currentUsername: string;
+  onReactionsUpdated: (messageId: string) => void;
 }
 
 export interface ReactionData {
@@ -21,7 +22,7 @@ export interface ReactionData {
   username: string;
 }
 
-export const MessageReaction = ({ messageId, currentUsername }: MessageReactionProps) => {
+export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated }: MessageReactionProps) => {
   const [reactions, setReactions] = useState<ReactionData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -65,6 +66,9 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
       const updatedReactions = await getMessageReactions(messageId);
       console.log("Updated reactions after adding:", updatedReactions);
       setReactions(updatedReactions);
+      
+      // Notify parent components that reactions were updated
+      onReactionsUpdated(messageId);
     } catch (error) {
       console.error("Error adding reaction:", error);
     }
@@ -81,14 +85,7 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
     <Popover 
       open={isOpen} 
       onOpenChange={(open) => {
-        // Only allow manual opening/closing through the trigger button
-        // This prevents closing when clicking inside the popover content
-        if (!open) {
-          // Only close if clicked outside
-          setIsOpen(false);
-        } else {
-          setIsOpen(true);
-        }
+        setIsOpen(open);
       }}
     >
       <PopoverTrigger asChild>
@@ -109,7 +106,6 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
         className="w-auto p-2" 
         align="start" 
         sideOffset={5}
-        sticky="always"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
