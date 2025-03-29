@@ -58,8 +58,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     if (username) {
       localStorage.setItem("anon_username", username);
       localStorage.setItem("username", username);
-      toast({
-        title: "Username updated",
+      toast("Username updated", {
         description: "Your username has been updated throughout the app.",
       });
     }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Edit, X } from "lucide-react";
 import * as Sentry from "@sentry/react";
+import { toast } from "sonner";
 
 interface UsernameEditorProps {
   username: string;
@@ -13,7 +14,7 @@ interface UsernameEditorProps {
 }
 
 const UsernameEditor: React.FC<UsernameEditorProps> = ({ username, setUsername }) => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [editingUsername, setEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState("");
 
@@ -24,7 +25,7 @@ const UsernameEditor: React.FC<UsernameEditorProps> = ({ username, setUsername }
 
   const handleSaveUsername = () => {
     if (!validateUsername(newUsername)) {
-      toast({
+      uiToast({
         title: "Username invalid!",
         description: "Username must be at least 3 characters and contain no special characters.",
         variant: "destructive",
@@ -51,8 +52,7 @@ const UsernameEditor: React.FC<UsernameEditorProps> = ({ username, setUsername }
     
     setEditingUsername(false);
     
-    toast({
-      title: "Username updated!",
+    toast("Username updated!", {
       description: `You are now known as ${newUsername}`,
     });
   };
