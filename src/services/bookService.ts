@@ -2,7 +2,7 @@
 import { apiCall, supabase, Book } from '@/lib/supabase';
 
 export async function getBooks(): Promise<Book[]> {
-  const result = await apiCall(
+  const result = await apiCall<Book[]>(
     supabase.from('books').select('*').order('title'),
     'Failed to load books'
   );
@@ -10,14 +10,14 @@ export async function getBooks(): Promise<Book[]> {
 }
 
 export async function getBookById(id: string): Promise<Book | null> {
-  return await apiCall(
+  return await apiCall<Book>(
     supabase.from('books').select('*').eq('id', id).single(),
     'Failed to load book details'
   );
 }
 
 export async function searchBooks(query: string): Promise<Book[]> {
-  const result = await apiCall(
+  const result = await apiCall<Book[]>(
     supabase
       .from('books')
       .select('*')

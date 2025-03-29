@@ -2,7 +2,7 @@
 import { apiCall, supabase, Event } from '@/lib/supabase';
 
 export async function getEvents(): Promise<Event[]> {
-  const result = await apiCall(
+  const result = await apiCall<Event[]>(
     supabase.from('events').select('*').order('date'),
     'Failed to load events'
   );
@@ -10,7 +10,7 @@ export async function getEvents(): Promise<Event[]> {
 }
 
 export async function getEventById(id: string): Promise<Event | null> {
-  return await apiCall(
+  return await apiCall<Event>(
     supabase.from('events').select('*').eq('id', id).single(),
     'Failed to load event details'
   );
