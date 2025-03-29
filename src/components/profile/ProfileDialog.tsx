@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Edit, Check } from "lucide-react";
 
 import {
   Dialog,
@@ -12,6 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import UsernameEditor from "./UsernameEditor";
 import ProfileForm from "./ProfileForm";
@@ -52,6 +54,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
   const [chatRequests, setChatRequests] = useState<ChatRequest[]>([]);
   const [activeChatsCount, setActiveChatsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSavedMessage, setShowSavedMessage] = useState(false);
 
   // Load profile data
   useEffect(() => {
@@ -117,12 +120,13 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     );
     
     if (success) {
+      setShowSavedMessage(true);
+      setTimeout(() => setShowSavedMessage(false), 3000);
+      
       toast({
         title: "Profile saved!",
         description: "Your changes have been saved successfully.",
       });
-      
-      onClose();
     } else {
       toast({
         title: "Profile save failed!",
@@ -182,46 +186,64 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           <div className="mx-auto w-3/4 h-px bg-bookconnect-brown/50 my-2" />
         </DialogHeader>
 
-        <div className="space-y-4 py-2 font-serif">
-          {/* Username */}
-          <UsernameEditor username={username} setUsername={setUsername} />
+        <ScrollArea className="h-[60vh]">
+          <div className="space-y-4 py-2 font-serif px-4">
+            {/* Username */}
+            <UsernameEditor username={username} setUsername={setUsername} />
 
-          {/* Profile Form */}
-          <ProfileForm 
-            favoriteAuthor={favoriteAuthor}
-            setFavoriteAuthor={setFavoriteAuthor}
-            favoriteGenre={favoriteGenre}
-            setFavoriteGenre={setFavoriteGenre}
-            bio={bio}
-            setBio={setBio}
-          />
-
-          {/* Chat Settings */}
-          <ChatSettings 
-            allowChats={allowChats}
-            setAllowChats={setAllowChats}
-            activeChatsCount={activeChatsCount}
-          />
-
-          {/* Chat Requests */}
-          {chatRequests.length > 0 && (
-            <ChatRequestsList 
-              chatRequests={chatRequests}
-              onChatAction={handleChatActionRequest}
+            {/* Profile Form */}
+            <ProfileForm 
+              favoriteAuthor={favoriteAuthor}
+              setFavoriteAuthor={setFavoriteAuthor}
+              favoriteGenre={favoriteGenre}
+              setFavoriteGenre={setFavoriteGenre}
+              bio={bio}
+              setBio={setBio}
             />
+
+            {/* Chat Settings */}
+            <ChatSettings 
+              allowChats={allowChats}
+              setAllowChats={setAllowChats}
+              activeChatsCount={activeChatsCount}
+            />
+
+            {/* Chat Requests */}
+            {chatRequests.length > 0 && (
+              <ChatRequestsList 
+                chatRequests={chatRequests}
+                onChatAction={handleChatActionRequest}
+              />
+            )}
+
+            {/* Previous Chats */}
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-bookconnect-brown flex items-center justify-between">
+                Previous Chats 
+                <Button variant="ghost" size="icon" className="text-bookconnect-brown/70 hover:text-bookconnect-brown" title="Edit previous chats">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </h3>
+              <div className="text-center py-8 text-muted-foreground bg-white/70 rounded-md mt-2">
+                <p className="text-sm">No previous chats yet.</p>
+                <p className="text-sm">Join discussions to see your chat history here!</p>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+
+        <DialogFooter className="flex flex-col gap-2">
+          {showSavedMessage && (
+            <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-1 flex items-center justify-center">
+              <Check className="h-4 w-4 mr-1" /> Changes saved successfully
+            </div>
           )}
-
-          {/* Reading Activity */}
-          <ReadingActivity />
-        </div>
-
-        <DialogFooter>
           <Button 
             onClick={handleSaveProfile} 
             className="w-full bg-bookconnect-sage hover:bg-bookconnect-sage/90"
             disabled={isLoading}
           >
-            Save & Close
+            Save Changes
           </Button>
         </DialogFooter>
       </DialogContent>
