@@ -39,6 +39,7 @@ const BookDiscussion: React.FC = () => {
           tags: { component: "BookDiscussion", action: "loadChatHistory" },
           extra: { bookId: id }
         });
+        toast.error("Couldn't load chat history. Please try refreshing the page.");
       } finally {
         setLoading(false);
       }
@@ -65,7 +66,10 @@ const BookDiscussion: React.FC = () => {
     if (!id || !message.trim()) return;
     
     try {
-      await sendChatMessage(message, id, username);
+      const result = await sendChatMessage(message, id, username);
+      if (!result) {
+        toast.error("Failed to send message. Please try again.");
+      }
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again.");
@@ -73,6 +77,7 @@ const BookDiscussion: React.FC = () => {
         tags: { component: "BookDiscussion", action: "sendMessage" },
         extra: { bookId: id, username }
       });
+      throw error; // Re-throw so the input component can handle it
     }
   };
   
