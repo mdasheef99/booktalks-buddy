@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -157,10 +156,13 @@ const ExploreBooks: React.FC = () => {
   const {
     data: discussedBooks,
     isLoading: isDiscussedLoading,
-    isError: isDiscussedError
+    isError: isDiscussedError,
+    refetch: refetchDiscussedBooks
   } = useQuery({
     queryKey: ["discussedBooks"],
     queryFn: () => fetchRecentlyDiscussedBooks(4),
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
     meta: {
       onError: (error: Error) => {
         Sentry.captureException(error, {
@@ -187,15 +189,23 @@ const ExploreBooks: React.FC = () => {
     }
   };
 
-  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string) => {
+  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string = "") => {
     if (window.innerWidth < 768) {
       navigate(`/books/${bookId}/discussion?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
     } else {
       setShowDiscussion(true);
       setSelectedBookId(bookId);
       setSelectedBookTitle(bookTitle);
+      
+      setTimeout(() => {
+        refetchDiscussedBooks();
+      }, 1000);
     }
   };
+
+  useEffect(() => {
+    refetchDiscussedBooks();
+  }, [refetchDiscussedBooks]);
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
@@ -212,14 +222,14 @@ const ExploreBooks: React.FC = () => {
           searchQuery={searchQuery}
           searchResults={searchResults}
           isSearchError={isSearchError}
-          onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
+          onJoinDiscussion={handleJoinDiscussion}
         />
         
         <DiscussedBooksSection 
           books={discussedBooks}
           isLoading={isDiscussedLoading}
           isError={isDiscussedError}
-          onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
+          onJoinDiscussion={handleJoinDiscussion}
         />
 
         <TrendingBooksSection
@@ -228,7 +238,7 @@ const ExploreBooks: React.FC = () => {
           isLoading={isTrendingLoading}
           isError={isTrendingError}
           fallbackBooks={FALLBACK_TRENDING_BOOKS}
-          onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
+          onJoinDiscussion={handleJoinDiscussion}
         />
       </ExploreContainer>
       
