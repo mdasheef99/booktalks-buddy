@@ -15,6 +15,14 @@ export interface ChatMessage {
   deleted_at?: string;
 }
 
+// Message reaction type
+export interface MessageReactionData {
+  id: string;
+  message_id: string;
+  username: string;
+  reaction: string;
+}
+
 // Generate a proper UUID from a Google Books ID using UUID v5
 // This ensures the same Google Books ID always produces the same valid UUID
 function generateBookUuid(googleBooksId: string): string {
@@ -326,7 +334,7 @@ export function subscribeToChat(
 
 export function subscribeToReactions(
   messageId: string,
-  callback: (reaction: { id: string, message_id: string, username: string, reaction: string }) => void
+  callback: (reaction: MessageReactionData) => void
 ) {
   console.log("Subscribing to reactions for messageId:", messageId);
   
@@ -342,7 +350,11 @@ export function subscribeToReactions(
       },
       (payload) => {
         console.log("Reaction change:", payload);
-        callback(payload.new || payload.old);
+        if (payload.new) {
+          callback(payload.new as MessageReactionData);
+        } else if (payload.old) {
+          callback(payload.old as MessageReactionData);
+        }
       }
     )
     .subscribe((status) => {

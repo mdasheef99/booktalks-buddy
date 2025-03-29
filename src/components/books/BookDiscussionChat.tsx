@@ -1,6 +1,7 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { ChatMessage, deleteMessage, addReaction, getMessageReactions, subscribeToReactions } from "@/services/chatService";
-import { ArrowUp, ArrowDown, Check, MoreVertical, Reply, Trash2, ChevronRight } from "lucide-react";
+import { ArrowUp, ArrowDown, Check, MoreHorizontal, Reply, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -323,18 +324,25 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
                   
                   {originalMessage && (
                     <div 
-                      className={`text-xs mb-1 italic cursor-pointer ${
-                        isCurrentUser ? 'text-white/70' : 'text-bookconnect-brown/60'
+                      className={`mb-2 rounded px-2 py-1 cursor-pointer ${
+                        isCurrentUser ? 'bg-white/10' : 'bg-bookconnect-brown/10'
                       }`}
                       onClick={() => scrollToMessage(originalMessage.id)}
                     >
-                      Replying to {originalMessage.username}: {
-                        originalMessage.deleted_at 
+                      <div className={`text-xs font-medium ${
+                        isCurrentUser ? 'text-white/90' : 'text-bookconnect-brown/90'
+                      }`}>
+                        Replying to {originalMessage.username}
+                      </div>
+                      <div className={`text-xs italic truncate ${
+                        isCurrentUser ? 'text-white/70' : 'text-bookconnect-brown/70'
+                      }`}>
+                        {originalMessage.deleted_at 
                           ? "Message deleted" 
                           : originalMessage.message.length > 30
                             ? `${originalMessage.message.substring(0, 30)}...`
-                            : originalMessage.message
-                      }
+                            : originalMessage.message}
+                      </div>
                     </div>
                   )}
                   
@@ -355,7 +363,7 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
                             size="sm" 
                             className="h-5 w-5 p-0 text-bookconnect-brown/60 hover:text-bookconnect-brown"
                           >
-                            <MoreVertical size={12} />
+                            <MoreHorizontal size={12} />
                             <span className="sr-only">Message actions</span>
                           </Button>
                         </DropdownMenuTrigger>
@@ -395,26 +403,28 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
                           )}
                           
                           <DropdownMenuSeparator className="bg-bookconnect-brown/10" />
-                          
-                          <MessageReactions 
-                            messageId={message.id} 
-                            currentUsername={currentUsername} 
-                          />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   )}
                   
-                  <div className="flex justify-end items-center mt-1 space-x-1">
-                    <span className="text-[10px] opacity-70">
-                      {formatTime(message.timestamp)}
-                    </span>
-                    {isCurrentUser && (
-                      <span className="flex">
-                        <Check size={12} className="text-gray-400" />
-                        <Check size={12} className="text-blue-400 -ml-[8px]" />
+                  <div className="flex flex-col items-start space-y-1 mt-1">
+                    <div className="flex justify-end items-center w-full space-x-1">
+                      <span className="text-[10px] opacity-70">
+                        {formatTime(message.timestamp)}
                       </span>
-                    )}
+                      {isCurrentUser && (
+                        <span className="flex">
+                          <Check size={12} className="text-gray-400" />
+                          <Check size={12} className="text-blue-400 -ml-[8px]" />
+                        </span>
+                      )}
+                    </div>
+                    
+                    <MessageReactions 
+                      messageId={message.id} 
+                      currentUsername={currentUsername} 
+                    />
                   </div>
                 </div>
               </div>

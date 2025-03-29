@@ -102,8 +102,12 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
       {replyTo && (
         <div className="mx-2 mt-1 p-2 bg-bookconnect-terracotta/10 rounded text-sm font-serif border-l-2 border-bookconnect-brown/50 flex items-start justify-between">
           <div className="flex-1">
-            <span className="text-xs text-bookconnect-brown/70">Replying to {replyTo.username}:</span>
-            <p className="text-bookconnect-brown/80 text-xs italic truncate">{replyTo.deleted_at ? "Message deleted" : replyTo.message}</p>
+            <div className="text-xs font-medium text-bookconnect-brown">
+              Replying to {replyTo.username}
+            </div>
+            <p className="text-bookconnect-brown/80 text-xs italic truncate">
+              {replyTo.deleted_at ? "Message deleted" : replyTo.message}
+            </p>
           </div>
           <Button 
             type="button"
