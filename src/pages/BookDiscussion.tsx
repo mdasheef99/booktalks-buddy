@@ -53,11 +53,13 @@ const BookDiscussion: React.FC = () => {
     if (!id) return;
     
     const subscription = subscribeToChat(id, (newMessage) => {
+      console.log("Received new message in component:", newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setConnectionError(false);
     });
     
     return () => {
+      console.log("Unsubscribing from chat");
       subscription.unsubscribe();
     };
   }, [id]);
@@ -66,9 +68,15 @@ const BookDiscussion: React.FC = () => {
     if (!id || !message.trim()) return;
     
     try {
+      console.log("Sending message:", message, "for book:", id);
       const result = await sendChatMessage(message, id, username);
+      
       if (!result) {
+        console.error("No result returned from sendChatMessage");
         toast.error("Failed to send message. Please try again.");
+        throw new Error("Failed to send message - empty result");
+      } else {
+        console.log("Message sent successfully:", result);
       }
     } catch (error) {
       console.error("Error sending message:", error);

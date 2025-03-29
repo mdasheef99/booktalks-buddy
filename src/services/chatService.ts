@@ -29,35 +29,63 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
   
   console.log("Fetching chat for bookId:", bookId, "converted to UUID:", dbBookId);
   
-  const result = await apiCall<ChatMessage[]>(
-    supabase
+  try {
+    const { data, error } = await supabase
       .from('chat_messages')
       .select('*')
       .eq('book_id', dbBookId)
-      .order('timestamp', { ascending: true }),
-    'Failed to load chat messages'
-  );
-  return result || [];
+      .order('timestamp', { ascending: true });
+      
+    if (error) {
+      console.error("Error fetching chat messages:", error);
+      throw error;
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error("Failed to load chat messages:", error);
+    return [];
+  }
 }
 
 export async function sendChatMessage(message: string, bookId: string, username: string, userId?: string): Promise<ChatMessage | null> {
+  if (!message.trim() || !bookId || !username) {
+    console.error("Missing required fields for sending message");
+    return null;
+  }
+  
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(bookId);
   
   console.log("Sending message for bookId:", bookId, "converted to UUID:", dbBookId);
   
-  return await apiCall<ChatMessage>(
-    supabase.from('chat_messages').insert([
-      {
-        message,
-        book_id: dbBookId,
-        username,
-        timestamp: new Date().toISOString(),
-        user_id: userId
-      }
-    ]).select().single(),
-    'Failed to send message'
-  );
+  try {
+    const timestamp = new Date().toISOString();
+    
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .insert([
+        {
+          message,
+          book_id: dbBookId,
+          username,
+          timestamp,
+          user_id: userId
+        }
+      ])
+      .select()
+      .single();
+      
+    if (error) {
+      console.error("Error sending message:", error);
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Failed to send message:", error);
+    throw error;
+  }
 }
 
 export function subscribeToChat(
@@ -80,8 +108,11 @@ export function subscribeToChat(
         filter: `book_id=eq.${dbBookId}`
       },
       (payload) => {
+        console.log("Received new message:", payload);
         callback(payload.new as ChatMessage);
       }
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log("Subscription status:", status);
+    });
 }
