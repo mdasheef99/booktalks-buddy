@@ -21,9 +21,14 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
       setIsSubmitting(true);
       await onSendMessage(message);
       setMessage("");
+      // Clear any previous error toast
+      toast.dismiss("message-error");
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Failed to send message. Please try again.");
+      toast.error("Failed to send message. Please try again.", {
+        id: "message-error",
+        duration: 3000,
+      });
     } finally {
       setIsSubmitting(false);
     }

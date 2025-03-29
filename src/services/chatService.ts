@@ -1,5 +1,6 @@
 
 import { apiCall, supabase } from '@/lib/supabase';
+import { v5 as uuidv5 } from 'uuid';
 
 // Export ChatMessage type for use in other components
 export interface ChatMessage {
@@ -13,24 +14,20 @@ export interface ChatMessage {
   read?: boolean;
 }
 
-// Create a helper function to generate a deterministic UUID from a Google Books ID
+// Generate a proper UUID from a Google Books ID using UUID v5
+// This ensures the same Google Books ID always produces the same valid UUID
 function generateBookUuid(googleBooksId: string): string {
-  // Convert Google Books ID to a consistent UUID format
-  // This uses a simple pattern to ensure the same Google Books ID always maps to the same UUID
-  const normalizedId = googleBooksId.replace(/[^a-zA-Z0-9]/g, '');
-  const segments = [
-    normalizedId.substring(0, 8).padEnd(8, 'a'),
-    normalizedId.substring(8, 12).padEnd(4, 'b'),
-    '4' + normalizedId.substring(12, 15).padEnd(3, 'c'), // UUID v4 format
-    '8' + normalizedId.substring(15, 18).padEnd(3, 'd'), // UUID v4 variant
-    normalizedId.substring(18, 30).padEnd(12, 'e')
-  ];
-  return segments.join('-');
+  // Use UUID v5 with a namespace to create consistent UUIDs
+  // We'll use a fixed namespace UUID (just for BookConnect application)
+  const NAMESPACE = '85f520c1-fff4-4a1d-a543-8ce459b4bd91';
+  return uuidv5(googleBooksId, NAMESPACE);
 }
 
 export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(bookId);
+  
+  console.log("Fetching chat for bookId:", bookId, "converted to UUID:", dbBookId);
   
   const result = await apiCall<ChatMessage[]>(
     supabase
@@ -46,6 +43,8 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
 export async function sendChatMessage(message: string, bookId: string, username: string, userId?: string): Promise<ChatMessage | null> {
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(bookId);
+  
+  console.log("Sending message for bookId:", bookId, "converted to UUID:", dbBookId);
   
   return await apiCall<ChatMessage>(
     supabase.from('chat_messages').insert([
@@ -67,6 +66,8 @@ export function subscribeToChat(
 ) {
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(bookId);
+  
+  console.log("Subscribing to chat for bookId:", bookId, "converted to UUID:", dbBookId);
   
   return supabase
     .channel(`chat:${bookId}`)

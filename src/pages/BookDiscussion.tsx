@@ -72,7 +72,6 @@ const BookDiscussion: React.FC = () => {
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Failed to send message. Please try again.");
       Sentry.captureException(error, {
         tags: { component: "BookDiscussion", action: "sendMessage" },
         extra: { bookId: id, username }
