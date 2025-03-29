@@ -45,7 +45,7 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
 
   const handleReactionClick = async (reaction: string) => {
     try {
-      // Add reaction on click
+      // Toggle reaction on click
       await addReaction(messageId, currentUsername, reaction);
       
       // Open dialog to show who reacted
@@ -60,26 +60,26 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
 
   return (
     <>
-      <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+      <div className={`flex flex-wrap gap-1.5 mt-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
         {reactions.map(({ reaction, count, userReacted }) => (
           <button
             key={reaction}
-            className={`px-1.5 py-0.5 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
+            className={`px-2 py-0.5 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
               userReacted 
-                ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30' 
+                ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30 shadow-sm' 
                 : 'bg-bookconnect-brown/5 border-bookconnect-brown/10 hover:bg-bookconnect-terracotta/10'
             }`}
             onClick={() => handleReactionClick(reaction)}
           >
             <span>{reaction}</span>
-            <span className="ml-1">{count}</span>
+            <span className="ml-1 font-medium">{count}</span>
           </button>
         ))}
       </div>
       
       {/* Dialog to show who reacted with which emoji */}
       <Dialog open={selectedReaction !== null} onOpenChange={() => setSelectedReaction(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="text-xl">{selectedReaction}</span>

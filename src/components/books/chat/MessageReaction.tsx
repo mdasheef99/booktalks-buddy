@@ -59,6 +59,16 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
   const handleReact = async (emoji: string) => {
     try {
       console.log("Adding reaction:", emoji, "to message:", messageId);
+      
+      // Check if user already reacted with a different emoji
+      const existingReaction = reactions.find(r => r.userReacted);
+      
+      // If so, toggle that reaction off first before adding new one (ensuring one reaction per user)
+      if (existingReaction && existingReaction.reaction !== emoji) {
+        await addReaction(messageId, currentUsername, existingReaction.reaction);
+      }
+      
+      // Then add the new reaction
       await addReaction(messageId, currentUsername, emoji);
       
       // Immediately reload reactions after adding a new one
@@ -90,7 +100,7 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
     >
       <PopoverTrigger asChild>
         <button 
-          className="p-1 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/60"
+          className="p-1 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/60 transition-colors duration-200"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -101,16 +111,16 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
         </button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-2 bg-white" 
+        className="w-auto p-2.5 bg-white shadow-lg rounded-xl border-bookconnect-brown/10" 
         align="start" 
         sideOffset={5}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
           {availableReactions.map(emoji => (
             <button 
               key={emoji}
-              className="text-lg p-1 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
+              className="text-lg p-1.5 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
               onClick={(e) => handleEmojiClick(emoji, e)}
             >
               {emoji}

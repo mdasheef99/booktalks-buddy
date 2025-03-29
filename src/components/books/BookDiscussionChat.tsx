@@ -52,6 +52,13 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
     }
   }, [highlightedMessageId]);
   
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages.length > 0 && scrollContainerRef.current) {
+      scrollToBottom();
+    }
+  }, [messages.length]);
+  
   const scrollToMessage = (messageId: string) => {
     setHighlightedMessageId(messageId);
   };
@@ -65,8 +72,8 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bookconnect-terracotta mx-auto mb-2"></div>
-          <p className="text-bookconnect-brown/70 font-serif">Loading conversation...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-bookconnect-terracotta mx-auto mb-3"></div>
+          <p className="text-bookconnect-brown/80 font-serif">Loading conversation...</p>
         </div>
       </div>
     );
@@ -74,10 +81,10 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
 
   if (messages.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center max-w-md">
-          <h3 className="font-serif text-xl font-medium mb-2 text-bookconnect-brown">Start the conversation</h3>
-          <p className="text-bookconnect-brown/70 font-serif">
+      <div className="flex items-center justify-center h-full bg-white/40 backdrop-blur-sm">
+        <div className="text-center max-w-md px-8 py-12 rounded-xl bg-white/70 shadow-sm border border-bookconnect-brown/10">
+          <h3 className="font-serif text-2xl font-medium mb-3 text-bookconnect-brown">Start the conversation</h3>
+          <p className="text-bookconnect-brown/80 font-serif">
             Be the first to share your thoughts on this book. What did you enjoy most about it?
           </p>
         </div>
@@ -89,11 +96,11 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
     <TooltipProvider>
       <div className="relative h-full flex flex-col">
         <div 
-          className="flex-1 overflow-auto p-4 scrollbar-thin scrollbar-thumb-bookconnect-brown/30 scrollbar-track-transparent" 
+          className="flex-1 overflow-auto p-5 scrollbar-thin scrollbar-thumb-bookconnect-brown/30 scrollbar-track-transparent" 
           ref={scrollContainerRef}
           style={{ scrollBehavior: 'smooth' }}
         >
-          <div className="space-y-3">
+          <div className="space-y-1">
             {messages.map((message) => {
               const isCurrentUser = message.username === currentUsername;
               const originalMessage = findOriginalMessage(message.reply_to_id);

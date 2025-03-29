@@ -131,21 +131,21 @@ const BookDiscussion: React.FC = () => {
   
   return (
     <TooltipProvider>
-      <div className="min-h-screen flex flex-col bg-bookconnect-cream">
+      <div className="min-h-screen flex flex-col bg-bookconnect-parchment bg-opacity-60">
         <BookDiscussionHeader 
           title={title} 
           author={author} 
           onBack={handleBack} 
         />
         
-        <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 pb-4">
+        <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4 pb-4">
           {connectionError && (
-            <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 px-3 py-1 rounded font-serif text-center text-sm animate-pulse mb-2">
+            <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 px-3 py-2 rounded-md font-serif text-center text-sm animate-pulse mb-3">
               Reconnecting to chat server...
             </div>
           )}
           
-          <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20 overflow-hidden relative"
+          <div className="flex-1 flex flex-col bg-white/95 rounded-xl shadow-lg border border-bookconnect-brown/10 overflow-hidden relative"
             style={{
               backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
               backgroundSize: "cover",
@@ -165,7 +165,7 @@ const BookDiscussion: React.FC = () => {
             </div>
             
             {/* Fixed input at the bottom */}
-            <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
+            <div className="absolute bottom-0 left-0 right-0 p-3 bg-white/95 border-t border-bookconnect-brown/20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
               <BookDiscussionInput 
                 onSendMessage={handleSendMessage} 
                 replyTo={replyTo}
