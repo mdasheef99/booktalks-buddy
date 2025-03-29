@@ -79,6 +79,7 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
     e.preventDefault();
     e.stopPropagation();
     handleReact(emoji);
+    setIsOpen(false); // Close the popover after selecting an emoji
   };
 
   return (
@@ -89,21 +90,20 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
       }}
     >
       <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="flex items-center px-1.5 py-0 text-xs text-bookconnect-brown/50 hover:bg-bookconnect-terracotta/10 hover:text-bookconnect-brown"
+        <div 
+          className="flex items-center text-xs text-bookconnect-brown/80 hover:text-bookconnect-brown cursor-pointer w-full"
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             setIsOpen(true);
           }}
         >
           <Smile size={14} className="mr-1.5" />
           <span>React</span>
-        </Button>
+        </div>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-2" 
+        className="w-auto p-2 bg-white" 
         align="start" 
         sideOffset={5}
         onClick={(e) => e.stopPropagation()}
