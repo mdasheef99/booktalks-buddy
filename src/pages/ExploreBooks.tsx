@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -5,9 +6,11 @@ import * as Sentry from "@sentry/react";
 
 import { useToast } from "@/hooks/use-toast";
 import { fetchBooksByQuery, fetchTrendingBooks } from "@/services/googleBooksService";
+import { fetchRecentlyDiscussedBooks } from "@/services/discussedBooksService";
 import BookSearchForm from "@/components/books/BookSearchForm";
 import SearchResults from "@/components/books/SearchResults";
 import TrendingBooksSection from "@/components/books/TrendingBooksSection";
+import DiscussedBooksSection from "@/components/books/DiscussedBooksSection";
 import BookConnectHeader from "@/components/BookConnectHeader";
 import { ProfileDialog } from "@/components/profile";
 import { generateLiteraryUsername } from "@/utils/usernameGenerator";
@@ -151,6 +154,31 @@ const ExploreBooks: React.FC = () => {
     }
   });
 
+  const {
+    data: discussedBooks,
+    isLoading: isDiscussedLoading,
+    isError: isDiscussedError
+  } = useQuery({
+    queryKey: ["discussedBooks"],
+    queryFn: () => fetchRecentlyDiscussedBooks(4),
+    meta: {
+      onError: (error: Error) => {
+        Sentry.captureException(error, {
+          tags: {
+            component: "ExploreBooks",
+            action: "fetchDiscussedBooks"
+          }
+        });
+        
+        toast({
+          title: "Couldn't load discussed books",
+          description: "We're having trouble loading books currently being discussed.",
+          variant: "destructive",
+        });
+      }
+    }
+  });
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim()) {
@@ -184,6 +212,13 @@ const ExploreBooks: React.FC = () => {
           searchQuery={searchQuery}
           searchResults={searchResults}
           isSearchError={isSearchError}
+          onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
+        />
+        
+        <DiscussedBooksSection 
+          books={discussedBooks}
+          isLoading={isDiscussedLoading}
+          isError={isDiscussedError}
           onJoinDiscussion={(bookId, bookTitle, bookAuthor) => handleJoinDiscussion(bookId, bookTitle, bookAuthor)}
         />
 
