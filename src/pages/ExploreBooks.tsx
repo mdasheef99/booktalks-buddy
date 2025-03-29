@@ -10,7 +10,7 @@ import BookSearchForm from "@/components/books/BookSearchForm";
 import SearchResults from "@/components/books/SearchResults";
 import TrendingBooksSection from "@/components/books/TrendingBooksSection";
 import BookConnectHeader from "@/components/BookConnectHeader";
-import ProfileDialog from "@/components/dialogs/ProfileDialog";
+import { ProfileDialog } from "@/components/profile";
 import { generateLiteraryUsername } from "@/utils/usernameGenerator";
 
 const FALLBACK_TRENDING_BOOKS = [

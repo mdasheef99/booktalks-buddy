@@ -5,17 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
-const GENRE_OPTIONS = [
-  "Fiction", "Mystery", "Sci-Fi", "Romance", "Fantasy", 
-  "Thriller", "Non-Fiction", "Biography", "Poetry", 
-  "History", "Young Adult", "Classics"
-];
+import AccountInfoForm from "@/components/profile/AccountInfoForm";
+import { ProfileForm } from "@/components/profile";
+import ReadingActivity from "@/components/profile/ReadingActivity";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -91,95 +85,36 @@ const Profile = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">Email</label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={user.email}
-                    disabled
-                    className="bg-muted/50"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Email cannot be changed
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="username" className="text-sm font-medium">Username</label>
-                  <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="favoriteAuthor" className="text-sm font-medium">Favorite Author</label>
-                  <Input
-                    id="favoriteAuthor"
-                    type="text"
-                    value={favoriteAuthor}
-                    onChange={(e) => setFavoriteAuthor(e.target.value)}
-                    placeholder="Favorite Author"
-                    maxLength={50}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="favoriteGenre" className="text-sm font-medium">Favorite Genre</label>
-                  <Select value={favoriteGenre} onValueChange={setFavoriteGenre}>
-                    <SelectTrigger id="favoriteGenre">
-                      <SelectValue placeholder="Select a genre" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GENRE_OPTIONS.map((genre) => (
-                        <SelectItem key={genre} value={genre}>
-                          {genre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="bio" className="text-sm font-medium">Bio</label>
-                  <Textarea
-                    id="bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    placeholder="About me"
-                    maxLength={50}
-                  />
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  disabled={isUpdating}
-                  className="bg-bookconnect-sage hover:bg-bookconnect-sage/90"
-                >
-                  {isUpdating ? "Updating..." : "Update Profile"}
-                </Button>
-              </form>
+              <AccountInfoForm 
+                email={user.email} 
+                username={username} 
+                setUsername={setUsername}
+                isUpdating={isUpdating}
+                onSubmit={handleUpdateProfile}
+              />
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle>Reading Activity</CardTitle>
+              <CardTitle>Profile Details</CardTitle>
               <CardDescription>
-                Track your reading progress and discussions
+                Tell the community about yourself
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No reading activity yet.</p>
-                <p>Join discussions on book pages to see your activity here!</p>
-              </div>
+              <ProfileForm
+                favoriteAuthor={favoriteAuthor}
+                setFavoriteAuthor={setFavoriteAuthor}
+                favoriteGenre={favoriteGenre}
+                setFavoriteGenre={setFavoriteGenre}
+                bio={bio}
+                setBio={setBio}
+              />
             </CardContent>
           </Card>
+          
+          <ReadingActivity />
         </div>
       </div>
     </Layout>

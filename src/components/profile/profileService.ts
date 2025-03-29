@@ -8,36 +8,53 @@ export const fetchChatRequests = async (): Promise<ChatRequest[]> => {
     const userId = localStorage.getItem("user_id");
     if (!userId) return [];
 
+    // First, get the chat requests
     const { data, error } = await supabase
       .from('private_chats')
-      .select(`
-        id, 
-        requester_id,
-        receiver_id, 
-        status, 
-        created_at,
-        users!private_chats_requester_id_fkey (username)
-      `)
+      .select('id, requester_id, receiver_id, status, created_at')
       .eq('receiver_id', userId)
       .eq('status', 'pending');
     
     if (error) throw error;
-
-    if (data) {
-      // Format the data to extract the username from the joined users table
-      const formattedRequests: ChatRequest[] = data.map(item => ({
-        id: item.id,
-        requester_id: item.requester_id,
-        requester_username: item.users?.username || 'Anonymous',
-        receiver_id: item.receiver_id,
+    
+    if (!data || data.length === 0) return [];
+    
+    // Then, get the usernames for each requester
+    const chatRequests: ChatRequest[] = [];
+    
+    for (const request of data) {
+      // Get requester username
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('username')
+        .eq('id', request.requester_id)
+        .single();
+      
+      if (userError) {
+        console.error("Error fetching username:", userError);
+        // Still add the request but with default username
+        chatRequests.push({
+          id: request.id,
+          requester_id: request.requester_id,
+          requester_username: 'Anonymous',
+          receiver_id: request.receiver_id,
+          status: 'pending',
+          created_at: request.created_at
+        });
+        continue;
+      }
+      
+      chatRequests.push({
+        id: request.id,
+        requester_id: request.requester_id,
+        requester_username: userData?.username || 'Anonymous',
+        receiver_id: request.receiver_id,
         status: 'pending',
-        created_at: item.created_at
-      }));
-
-      return formattedRequests;
+        created_at: request.created_at
+      });
     }
     
-    return [];
+    return chatRequests;
   } catch (error) {
     console.error("Error fetching chat requests:", error);
     Sentry.captureException(error, {
