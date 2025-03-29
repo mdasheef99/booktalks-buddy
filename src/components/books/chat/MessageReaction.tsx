@@ -55,7 +55,7 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   const handleReact = async (emoji: string) => {
     try {
       await addReaction(messageId, currentUsername, emoji);
-      setIsOpen(false);
+      // Don't close the popover automatically so users can add multiple reactions
     } catch (error) {
       console.error("Error adding reaction:", error);
     }

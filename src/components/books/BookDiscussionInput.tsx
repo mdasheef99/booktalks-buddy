@@ -16,6 +16,11 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 
+interface EmojiCategory {
+  name: string;
+  emojis: string[];
+}
+
 interface BookDiscussionInputProps {
   onSendMessage: (message: string, replyToId?: string) => Promise<void>;
   replyTo?: ChatMessage | null;
@@ -23,7 +28,7 @@ interface BookDiscussionInputProps {
 }
 
 // Common emoji categories with a selection of popular emojis
-const emojiCategories = [
+const emojiCategories: EmojiCategory[] = [
   {
     name: "Smileys",
     emojis: ["😀", "😁", "😂", "🥰", "😊", "😎", "🙂", "😍", "😘", "🤔", "🙄", "😴", "😮", "🥺"]
