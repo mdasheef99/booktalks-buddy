@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import EmojiPicker from "./EmojiPicker";
 import { MessageReactionData } from "@/services/chat/models";
 import { addReaction as addReactionService } from "@/services/chat/messageService";
@@ -24,6 +24,8 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
   isCurrentUser,
   onReactionsUpdated
 }) => {
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+
   const handleAddReaction = async (emoji: string) => {
     try {
       // Check if user already has a reaction
@@ -92,7 +94,11 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
         </button>
       ))}
       
-      <EmojiPicker onEmojiSelect={handleAddReaction} />
+      <EmojiPicker 
+        onEmojiSelect={handleAddReaction} 
+        isOpen={emojiPickerOpen}
+        onOpenChange={setEmojiPickerOpen}
+      />
     </div>
   );
 };
