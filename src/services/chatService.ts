@@ -1,5 +1,5 @@
 
-import { apiCall, supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { v5 as uuidv5 } from 'uuid';
 
 // Export ChatMessage type for use in other components
@@ -34,13 +34,15 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
       .from('chat_messages')
       .select('*')
       .eq('book_id', dbBookId)
-      .order('timestamp', { ascending: true });
+      .order('timestamp', { ascending: true })
+      .limit(50); // Limiting to 50 messages initially as per requirement
       
     if (error) {
       console.error("Error fetching chat messages:", error);
       throw error;
     }
     
+    console.log("Retrieved messages:", data);
     return data || [];
   } catch (error) {
     console.error("Failed to load chat messages:", error);
@@ -62,25 +64,28 @@ export async function sendChatMessage(message: string, bookId: string, username:
   try {
     const timestamp = new Date().toISOString();
     
+    const newMessage = {
+      message: message.trim(),
+      book_id: dbBookId,
+      username,
+      timestamp,
+      user_id: userId || null
+    };
+    
+    console.log("Inserting message:", newMessage);
+    
     const { data, error } = await supabase
       .from('chat_messages')
-      .insert([
-        {
-          message,
-          book_id: dbBookId,
-          username,
-          timestamp,
-          user_id: userId
-        }
-      ])
-      .select()
+      .insert([newMessage])
+      .select('*')
       .single();
       
     if (error) {
-      console.error("Error sending message:", error);
+      console.error("Supabase error sending message:", error);
       throw error;
     }
     
+    console.log("Message sent successfully, response:", data);
     return data;
   } catch (error) {
     console.error("Failed to send message:", error);

@@ -30,7 +30,9 @@ const BookDiscussion: React.FC = () => {
       try {
         setLoading(true);
         setConnectionError(false);
+        console.log("Loading chat history for book:", id);
         const chatHistory = await getBookChat(id);
+        console.log("Got chat history:", chatHistory);
         setMessages(chatHistory);
       } catch (error) {
         console.error("Error loading chat history:", error);
@@ -52,6 +54,7 @@ const BookDiscussion: React.FC = () => {
   useEffect(() => {
     if (!id) return;
     
+    console.log("Setting up real-time subscription for book:", id);
     const subscription = subscribeToChat(id, (newMessage) => {
       console.log("Received new message in component:", newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -65,10 +68,13 @@ const BookDiscussion: React.FC = () => {
   }, [id]);
   
   const handleSendMessage = async (message: string) => {
-    if (!id || !message.trim()) return;
+    if (!id || !message.trim()) {
+      console.error("Missing required data for sending message");
+      return;
+    }
     
     try {
-      console.log("Sending message:", message, "for book:", id);
+      console.log("Sending message:", message, "for book:", id, "as user:", username);
       const result = await sendChatMessage(message, id, username);
       
       if (!result) {
