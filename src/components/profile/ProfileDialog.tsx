@@ -1,24 +1,17 @@
+
 import React, { useState, useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Check } from "lucide-react";
 
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
-import UsernameEditor from "./UsernameEditor";
-import ProfileForm from "./ProfileForm";
-import ChatRequestsList, { ChatRequest } from "./ChatRequestsList";
-import ChatSettings from "./ChatSettings";
-import ReadingActivity from "./ReadingActivity";
+import ProfileDialogHeader from "./ProfileDialogHeader";
+import ProfileDialogContent from "./ProfileDialogContent";
+import ProfileDialogFooter from "./ProfileDialogFooter";
 import { 
   fetchChatRequests, 
   fetchActiveChatsCount, 
@@ -26,6 +19,7 @@ import {
   saveProfile, 
   loadProfileData 
 } from "./profileService";
+import { ChatRequest } from "./ChatRequestsList";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -197,59 +191,29 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           boxShadow: '0 4px 30px rgba(0, 0, 0, 0.15)'
         }}
       >
-        <DialogHeader className="relative">
-          <div className="pt-2">
-            <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown">
-              Profile
-            </DialogTitle>
-            <div className="mx-auto w-3/4 h-px bg-bookconnect-brown/50 my-2" />
-          </div>
-        </DialogHeader>
-
-        <ScrollArea className="h-[60vh] pr-4">
-          <div className="space-y-4 py-2 font-serif px-1">
-            <UsernameEditor username={username} setUsername={setUsername} />
-
-            <ProfileForm 
-              favoriteAuthor={favoriteAuthor}
-              setFavoriteAuthor={setFavoriteAuthor}
-              favoriteGenre={favoriteGenre}
-              setFavoriteGenre={setFavoriteGenre}
-              bio={bio}
-              setBio={setBio}
-            />
-
-            <ChatSettings 
-              allowChats={allowChats}
-              setAllowChats={setAllowChats}
-              activeChatsCount={activeChatsCount}
-            />
-
-            {chatRequests.length > 0 && (
-              <ChatRequestsList 
-                chatRequests={chatRequests}
-                onChatAction={handleChatActionRequest}
-              />
-            )}
-
-            <ReadingActivity />
-          </div>
-        </ScrollArea>
-
-        <DialogFooter className="mt-6 pt-4 border-t border-bookconnect-brown/20">
-          {showSavedMessage && (
-            <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-2 flex items-center justify-center">
-              <Check className="h-4 w-4 mr-1" /> Changes saved successfully
-            </div>
-          )}
-          <Button 
-            onClick={handleSaveProfile} 
-            className="w-full bg-bookconnect-sage hover:bg-bookconnect-terracotta text-white transition-colors border border-bookconnect-brown/30 shadow-md"
-            disabled={isLoading}
-          >
-            {isLoading ? "Saving..." : "Save Changes"}
-          </Button>
-        </DialogFooter>
+        <ProfileDialogHeader />
+        
+        <ProfileDialogContent
+          username={username}
+          setUsername={setUsername}
+          favoriteAuthor={favoriteAuthor}
+          setFavoriteAuthor={setFavoriteAuthor}
+          favoriteGenre={favoriteGenre}
+          setFavoriteGenre={setFavoriteGenre}
+          bio={bio}
+          setBio={setBio}
+          allowChats={allowChats}
+          setAllowChats={setAllowChats}
+          chatRequests={chatRequests}
+          activeChatsCount={activeChatsCount}
+          onChatAction={handleChatActionRequest}
+        />
+        
+        <ProfileDialogFooter
+          isLoading={isLoading}
+          showSavedMessage={showSavedMessage}
+          onSave={handleSaveProfile}
+        />
       </DialogContent>
     </Dialog>
   );
