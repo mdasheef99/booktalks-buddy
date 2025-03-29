@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { UserRound } from "lucide-react";
+import { UserRound, Check } from "lucide-react";
 
 import {
   Dialog,
@@ -210,7 +210,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           </div>
           <div className="pt-6">
             <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown mt-2">
-              Library Card
+              Profile
             </DialogTitle>
             <div className="mx-auto w-3/4 h-px bg-bookconnect-brown/50 my-2" />
           </div>
@@ -251,7 +251,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           </div>
         </ScrollArea>
 
-        <DialogFooter className="flex flex-col gap-2">
+        <DialogFooter className="flex flex-col gap-2 mt-4 pt-4 border-t border-bookconnect-brown/20">
           {showSavedMessage && (
             <div className="text-center text-sm text-green-600 bg-green-50 rounded-md p-1 mb-1 flex items-center justify-center">
               <Check className="h-4 w-4 mr-1" /> Changes saved successfully
