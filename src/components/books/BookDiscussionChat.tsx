@@ -38,14 +38,14 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {messages.map((message) => (
         <div 
           key={`${message.id}-${message.timestamp}`}
           className={`flex ${message.username === currentUsername ? 'justify-end' : 'justify-start'}`}
         >
           <div 
-            className={`max-w-[80%] px-4 py-2 rounded-lg font-serif
+            className={`max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
               ${message.username === currentUsername 
                 ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
                 : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'

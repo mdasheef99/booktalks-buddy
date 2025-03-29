@@ -19,21 +19,21 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
   };
   
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-2 border border-bookconnect-brown/20">
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-1 border border-bookconnect-brown/20">
       <div className="flex items-center">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Share your thoughts..."
-          className="flex-1 p-2 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown"
+          className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm"
         />
         <Button 
           type="submit" 
           disabled={!message.trim()} 
-          className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
+          className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-8 w-8 p-0"
         >
-          <Send className="h-4 w-4" />
+          <Send className="h-3.5 w-3.5" />
         </Button>
       </div>
     </form>

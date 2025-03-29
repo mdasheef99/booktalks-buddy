@@ -1,9 +1,7 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Users } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/services/chatService";
 import BookDiscussionChat from "@/components/books/BookDiscussionChat";
 import BookDiscussionHeader from "@/components/books/BookDiscussionHeader";
@@ -14,6 +12,7 @@ const BookDiscussion: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   
   const title = searchParams.get("title") || "Unknown Book";
   const author = searchParams.get("author") || "Unknown Author";
@@ -58,6 +57,13 @@ const BookDiscussion: React.FC = () => {
     };
   }, [id]);
   
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+  
   const handleSendMessage = async (message: string) => {
     if (!id || !message.trim()) return;
     
@@ -84,13 +90,14 @@ const BookDiscussion: React.FC = () => {
         onBack={handleBack} 
       />
       
-      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-4">
-        <div className="flex-1 flex flex-col mb-4 bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20"
+      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-3">
+        <div className="flex-1 flex flex-col mb-2 bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            backgroundBlendMode: "overlay"
+            backgroundBlendMode: "overlay",
+            minHeight: "calc(100vh - 120px)"
           }}
         >
           <ScrollArea className="flex-1 p-4">

@@ -1,5 +1,15 @@
 
-import { apiCall, supabase, ChatMessage } from '@/lib/supabase';
+import { apiCall, supabase } from '@/lib/supabase';
+
+// Export ChatMessage type for use in other components
+export interface ChatMessage {
+  id: string;
+  book_id: string;
+  message: string;
+  username: string;
+  timestamp: string;
+  user_id?: string;
+}
 
 export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
   const result = await apiCall<ChatMessage[]>(
