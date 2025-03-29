@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import * as Sentry from '@sentry/react';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
 
 // Supabase types based on our schema
 export type Book = {
@@ -38,12 +39,8 @@ export type User = {
   created_at?: string;
 };
 
-// Initialize Supabase client
-// Replace with your actual Supabase URL and anon key
-const supabaseUrl = 'https://your-project-url.supabase.co';
-const supabaseAnonKey = 'your-anon-key';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Export the supabase client from the integrated client
+export const supabase = supabaseClient;
 
 // Wrapper function for API calls with error handling
 export async function apiCall<T>(
