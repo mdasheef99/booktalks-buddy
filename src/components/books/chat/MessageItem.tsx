@@ -56,18 +56,18 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
   return (
     <div 
-      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}
+      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-3`}
       ref={setRef}
     >
-      <div className="flex flex-col max-w-[85%]">
+      <div className={`flex flex-col max-w-[80%] min-w-[180px]`}>
         <div 
-          className={`relative px-4 py-3 rounded-2xl font-serif text-sm shadow-md
+          className={`relative px-3 py-2 rounded-2xl font-serif text-sm shadow-md
             ${isCurrentUser 
               ? 'bg-bookconnect-sage/95 text-white rounded-br-none' 
-              : 'bg-bookconnect-terracotta/40 text-bookconnect-brown rounded-bl-none'
-            } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out min-w-[160px]`}
+              : 'bg-bookconnect-terracotta/50 text-white rounded-bl-none'
+            } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out`}
         >
-          <div className={`text-xs mb-2 font-medium ${isCurrentUser ? 'text-white/90' : 'text-bookconnect-brown/80'}`}>
+          <div className={`text-xs mb-1 font-medium ${isCurrentUser ? 'text-white/90' : 'text-white/90'}`}>
             {message.username}
           </div>
           
@@ -77,7 +77,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             onScrollToMessage={onScrollToMessage}
           />
           
-          <div className="whitespace-pre-wrap break-words pt-1">
+          <div className="whitespace-pre-wrap break-words">
             {isDeleted ? (
               <span className="italic opacity-75">Message deleted</span>
             ) : (
@@ -96,13 +96,13 @@ const MessageItem: React.FC<MessageItemProps> = ({
             />
           )}
           
-          <div className="flex justify-between items-center w-full mt-2">
-            <span className="text-[10px] opacity-70 ml-auto flex items-center">
+          <div className="flex justify-between items-center w-full mt-1">
+            <span className="text-[10px] opacity-80 ml-auto flex items-center">
               {formatTime(message.timestamp)}
               {isCurrentUser && (
                 <span className="flex ml-1">
-                  <Check size={12} className="text-white/70" />
-                  <Check size={12} className="text-white -ml-[8px]" />
+                  <Check size={10} className="text-white/80" />
+                  <Check size={10} className="text-white -ml-[7px]" />
                 </span>
               )}
             </span>
@@ -110,7 +110,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
         </div>
         
         {/* Place reactions outside and below the message bubble */}
-        <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'} mt-1.5`}>
+        <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'} mt-1`}>
           <MessageReactionList
             reactions={reactions}
             messageId={message.id}

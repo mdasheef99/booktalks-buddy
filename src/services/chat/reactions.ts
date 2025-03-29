@@ -66,7 +66,7 @@ export async function addReaction(
   try {
     console.log("Adding/toggling reaction:", reaction, "for message:", messageId, "by user:", username);
     
-    // First check if user already reacted with ANY emoji (not just this specific one)
+    // First check if user already reacted with ANY emoji
     const { data: userReactions, error: userCheckError } = await supabase
       .from('message_reactions')
       .select('id, reaction')
@@ -99,7 +99,7 @@ export async function addReaction(
         return true;
       }
       
-      // If the user has other reactions but not this one, remove all other reactions first
+      // If the user has other reactions but not this one, remove all other reactions
       for (const r of userReactions) {
         console.log("Removing user's other reaction:", r.id);
         const { error: deleteError } = await supabase
@@ -114,19 +114,21 @@ export async function addReaction(
       }
     }
     
-    // Add the new reaction
-    console.log("Adding new reaction");
-    const { error: insertError } = await supabase
-      .from('message_reactions')
-      .insert([{
-        message_id: messageId,
-        username,
-        reaction
-      }]);
-      
-    if (insertError) {
-      console.error("Error adding reaction:", insertError);
-      throw insertError;
+    // Add the new reaction (only if we're not toggling off an existing one)
+    if (!userReactions || userReactions.length === 0 || userReactions[0].reaction !== reaction) {
+      console.log("Adding new reaction");
+      const { error: insertError } = await supabase
+        .from('message_reactions')
+        .insert([{
+          message_id: messageId,
+          username,
+          reaction
+        }]);
+        
+      if (insertError) {
+        console.error("Error adding reaction:", insertError);
+        throw insertError;
+      }
     }
     
     console.log("Reaction added successfully");

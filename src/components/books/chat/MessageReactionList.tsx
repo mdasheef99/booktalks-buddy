@@ -43,9 +43,13 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
     return acc;
   }, {});
 
+  // Find if current user has already reacted with any emoji
+  const userCurrentReaction = reactions.find(r => r.userReacted)?.reaction;
+
   const handleReactionClick = async (reaction: string) => {
     try {
-      // Toggle reaction on click
+      // If user clicked on same reaction they already added, it will toggle off
+      // If different, it will replace their old reaction
       await addReaction(messageId, currentUsername, reaction);
       
       // Open dialog to show who reacted
@@ -64,12 +68,13 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
         {reactions.map(({ reaction, count, userReacted }) => (
           <button
             key={reaction}
-            className={`px-2.5 py-1 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
+            className={`px-2 py-0.5 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
               userReacted 
                 ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30 shadow-sm' 
                 : 'bg-bookconnect-brown/5 border-bookconnect-brown/10 hover:bg-bookconnect-terracotta/10'
             }`}
             onClick={() => handleReactionClick(reaction)}
+            title={userReacted ? "Remove reaction" : "Add reaction"}
           >
             <span>{reaction}</span>
             <span className="ml-1 font-medium">{count}</span>

@@ -94,7 +94,7 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="relative h-full flex flex-col">
+      <div className="relative h-full flex flex-col bg-white/10 backdrop-blur-sm">
         <div 
           className="flex-1 overflow-auto p-5 scrollbar-thin scrollbar-thumb-bookconnect-brown/30 scrollbar-track-transparent" 
           ref={scrollContainerRef}

@@ -20,16 +20,16 @@ const ScrollButtons: React.FC<ScrollButtonsProps> = ({
   return (
     <>
       {showScrollTop && (
-        <div className="absolute left-1/2 top-4 -translate-x-1/2 z-10">
+        <div className="absolute left-1/2 top-6 -translate-x-1/2 z-10">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={onScrollTop}
-                className="h-8 w-8 rounded-full bg-white/40 backdrop-blur-sm shadow-md hover:bg-white/60"
+                className="h-10 w-10 rounded-full bg-white/60 backdrop-blur-sm shadow-md hover:bg-white/80"
               >
-                <ArrowUp className="h-4 w-4 text-bookconnect-brown" />
+                <ArrowUp className="h-5 w-5 text-bookconnect-brown" />
                 <span className="sr-only">Scroll to top</span>
               </Button>
             </TooltipTrigger>
@@ -39,16 +39,16 @@ const ScrollButtons: React.FC<ScrollButtonsProps> = ({
       )}
 
       {showScrollBottom && (
-        <div className="absolute left-1/2 bottom-20 -translate-x-1/2 z-10">
+        <div className="absolute left-1/2 bottom-24 -translate-x-1/2 z-10">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={onScrollBottom}
-                className="h-8 w-8 rounded-full bg-white/40 backdrop-blur-sm shadow-md hover:bg-white/60"
+                className="h-10 w-10 rounded-full bg-white/60 backdrop-blur-sm shadow-md hover:bg-white/80"
               >
-                <ArrowDown className="h-4 w-4 text-bookconnect-brown" />
+                <ArrowDown className="h-5 w-5 text-bookconnect-brown" />
                 <span className="sr-only">Scroll to bottom</span>
               </Button>
             </TooltipTrigger>
