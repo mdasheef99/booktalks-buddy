@@ -9,6 +9,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { ChatMessage } from "@/services/chatService";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 interface BookDiscussionInputProps {
   onSendMessage: (message: string, replyToId?: string) => Promise<void>;
@@ -160,17 +165,22 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
           ref={inputRef}
         />
         
-        <Button 
-          type="submit" 
-          disabled={!message.trim() || isSubmitting} 
-          className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0"
-        >
-          {isSubmitting ? (
-            <div className="h-3 w-3 border-t-transparent border-solid animate-spin rounded-full border-white border"></div>
-          ) : (
-            <Send className="h-3 w-3" />
-          )}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              type="submit" 
+              disabled={!message.trim() || isSubmitting} 
+              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0"
+            >
+              {isSubmitting ? (
+                <div className="h-3 w-3 border-t-transparent border-solid animate-spin rounded-full border-white border"></div>
+              ) : (
+                <Send className="h-3 w-3" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Send message</TooltipContent>
+        </Tooltip>
       </div>
     </form>
   );

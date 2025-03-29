@@ -36,25 +36,8 @@ import {
   SidebarTrigger 
 } from "./sidebar-utils"
 
-/**
- * Combined sidebar provider with tooltip provider
- */
-const CombinedSidebarProvider = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof SidebarProvider>
->(({ children, ...props }, ref) => {
-  return (
-    <SidebarProvider ref={ref} {...props}>
-      <TooltipProvider delayDuration={0}>
-        <SidebarWrapper>{children}</SidebarWrapper>
-      </TooltipProvider>
-    </SidebarProvider>
-  )
-})
-CombinedSidebarProvider.displayName = "CombinedSidebarProvider"
-
-// Export top-level component and context hook
-export { useSidebar, CombinedSidebarProvider as SidebarProvider }
+// Export top-level components and context hook
+export { useSidebar, SidebarProvider, TooltipProvider }
 
 // Export all sidebar components
 export {
@@ -80,4 +63,5 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarWrapper
 }

@@ -20,7 +20,7 @@ import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import ChatSelection from "./pages/ChatSelection";
 import ExploreBooks from "./pages/ExploreBooks";
-import BookDiscussion from "./pages/BookDiscussion"; // Add import for new page
+import BookDiscussion from "./pages/BookDiscussion"; 
 
 // Initialize Sentry
 Sentry.init({
