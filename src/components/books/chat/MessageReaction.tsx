@@ -34,6 +34,7 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
       setIsLoading(true);
       try {
         const data = await getMessageReactions(messageId);
+        console.log("Loaded reactions:", data);
         setReactions(data);
       } catch (error) {
         console.error("Error loading reactions:", error);
@@ -57,11 +58,13 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   
   const handleReact = async (emoji: string) => {
     try {
+      console.log("Adding reaction:", emoji);
       await addReaction(messageId, currentUsername, emoji);
       // Important: Do NOT close the popover here
       
       // Reload reactions after adding a new one
       const updatedReactions = await getMessageReactions(messageId);
+      console.log("Updated reactions:", updatedReactions);
       setReactions(updatedReactions);
     } catch (error) {
       console.error("Error adding reaction:", error);

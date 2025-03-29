@@ -24,7 +24,10 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
 }) => {
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
 
+  // If there are no reactions, don't render anything
   if (!reactions || reactions.length === 0) return null;
+
+  console.log("Rendering reactions:", reactions);
 
   // Group reactions by emoji for the dialog display
   const reactionsByType = reactions.reduce<Record<string, string[]>>((acc, { reaction, username }) => {
