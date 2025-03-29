@@ -56,18 +56,18 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
   return (
     <div 
-      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-3.5`}
+      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}
       ref={setRef}
     >
       <div className="flex flex-col max-w-[85%]">
         <div 
-          className={`relative px-4 py-2.5 rounded-2xl font-serif text-sm shadow-sm
+          className={`relative px-4 py-3 rounded-2xl font-serif text-sm shadow-md
             ${isCurrentUser 
               ? 'bg-bookconnect-sage/95 text-white rounded-br-none' 
-              : 'bg-bookconnect-terracotta/30 text-bookconnect-brown rounded-bl-none'
-            } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out`}
+              : 'bg-bookconnect-terracotta/40 text-bookconnect-brown rounded-bl-none'
+            } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out min-w-[160px]`}
         >
-          <div className={`text-xs mb-1.5 font-medium ${isCurrentUser ? 'text-white/90' : 'text-bookconnect-brown/80'}`}>
+          <div className={`text-xs mb-2 font-medium ${isCurrentUser ? 'text-white/90' : 'text-bookconnect-brown/80'}`}>
             {message.username}
           </div>
           
@@ -77,7 +77,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             onScrollToMessage={onScrollToMessage}
           />
           
-          <div className="whitespace-pre-wrap break-words">
+          <div className="whitespace-pre-wrap break-words pt-1">
             {isDeleted ? (
               <span className="italic opacity-75">Message deleted</span>
             ) : (
@@ -96,7 +96,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             />
           )}
           
-          <div className="flex justify-between items-center w-full mt-1.5">
+          <div className="flex justify-between items-center w-full mt-2">
             <span className="text-[10px] opacity-70 ml-auto flex items-center">
               {formatTime(message.timestamp)}
               {isCurrentUser && (

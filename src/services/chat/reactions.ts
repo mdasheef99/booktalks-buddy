@@ -1,3 +1,4 @@
+
 import { supabase } from '../base/supabaseService';
 
 // ========== Reaction Functions ==========
@@ -65,37 +66,55 @@ export async function addReaction(
   try {
     console.log("Adding/toggling reaction:", reaction, "for message:", messageId, "by user:", username);
     
-    // First check if user already reacted with this emoji
-    const { data: existingReaction, error: checkError } = await supabase
+    // First check if user already reacted with ANY emoji (not just this specific one)
+    const { data: userReactions, error: userCheckError } = await supabase
       .from('message_reactions')
-      .select('id')
+      .select('id, reaction')
       .eq('message_id', messageId)
-      .eq('username', username)
-      .eq('reaction', reaction)
-      .maybeSingle();
+      .eq('username', username);
       
-    if (checkError) {
-      console.error("Error checking existing reaction:", checkError);
-      throw checkError;
+    if (userCheckError) {
+      console.error("Error checking user reactions:", userCheckError);
+      throw userCheckError;
     }
     
-    // If reaction already exists, remove it (toggle behavior)
-    if (existingReaction) {
-      console.log("Removing existing reaction:", existingReaction.id);
-      const { error: deleteError } = await supabase
-        .from('message_reactions')
-        .delete()
-        .eq('id', existingReaction.id);
+    // If user has any reactions, we need to handle them
+    if (userReactions && userReactions.length > 0) {
+      // Check if the current reaction already exists
+      const existingReaction = userReactions.find(r => r.reaction === reaction);
+      
+      // If this specific reaction exists, we toggle it off (remove it)
+      if (existingReaction) {
+        console.log("Removing existing reaction:", existingReaction.id);
+        const { error: deleteError } = await supabase
+          .from('message_reactions')
+          .delete()
+          .eq('id', existingReaction.id);
+          
+        if (deleteError) {
+          console.error("Error removing reaction:", deleteError);
+          throw deleteError;
+        }
         
-      if (deleteError) {
-        console.error("Error removing reaction:", deleteError);
-        throw deleteError;
+        return true;
       }
       
-      return true;
+      // If the user has other reactions but not this one, remove all other reactions first
+      for (const r of userReactions) {
+        console.log("Removing user's other reaction:", r.id);
+        const { error: deleteError } = await supabase
+          .from('message_reactions')
+          .delete()
+          .eq('id', r.id);
+          
+        if (deleteError) {
+          console.error("Error removing user's other reaction:", deleteError);
+          throw deleteError;
+        }
+      }
     }
     
-    // Otherwise, add the reaction
+    // Add the new reaction
     console.log("Adding new reaction");
     const { error: insertError } = await supabase
       .from('message_reactions')

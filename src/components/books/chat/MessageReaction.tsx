@@ -60,16 +60,20 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
     try {
       console.log("Adding reaction:", emoji, "to message:", messageId);
       
-      // Check if user already reacted with a different emoji
+      // Check if user already reacted with any emoji
+      const userHasReacted = reactions.some(r => r.userReacted);
       const existingReaction = reactions.find(r => r.userReacted);
       
-      // If so, toggle that reaction off first before adding new one (ensuring one reaction per user)
-      if (existingReaction && existingReaction.reaction !== emoji) {
+      // If user already reacted with any emoji, remove that reaction first
+      if (userHasReacted && existingReaction) {
+        console.log("User already reacted with:", existingReaction.reaction, "removing that first");
         await addReaction(messageId, currentUsername, existingReaction.reaction);
       }
       
-      // Then add the new reaction
-      await addReaction(messageId, currentUsername, emoji);
+      // Add the new reaction if it's different from the existing one
+      if (!userHasReacted || (existingReaction && existingReaction.reaction !== emoji)) {
+        await addReaction(messageId, currentUsername, emoji);
+      }
       
       // Immediately reload reactions after adding a new one
       const updatedReactions = await getMessageReactions(messageId);
@@ -100,27 +104,27 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
     >
       <PopoverTrigger asChild>
         <button 
-          className="p-1 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/60 transition-colors duration-200"
+          className="p-1.5 rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown/80 transition-colors duration-200"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setIsOpen(true);
           }}
         >
-          <Smile size={14} />
+          <Smile size={16} />
         </button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-2.5 bg-white shadow-lg rounded-xl border-bookconnect-brown/10" 
+        className="w-auto p-3 bg-white shadow-lg rounded-xl border-bookconnect-brown/10" 
         align="start" 
         sideOffset={5}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex space-x-2.5" onClick={(e) => e.stopPropagation()}>
           {availableReactions.map(emoji => (
             <button 
               key={emoji}
-              className="text-lg p-1.5 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
+              className="text-xl p-2 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
               onClick={(e) => handleEmojiClick(emoji, e)}
             >
               {emoji}
