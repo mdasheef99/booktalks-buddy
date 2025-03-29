@@ -114,7 +114,7 @@ const BookDiscussion: React.FC = () => {
           </div>
         )}
         
-        <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20 overflow-hidden"
+        <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20 overflow-hidden relative"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
             backgroundSize: "cover",
@@ -123,8 +123,8 @@ const BookDiscussion: React.FC = () => {
             minHeight: "calc(100vh - 180px)"
           }}
         >
-          {/* Fixed-height, scrollable chat area */}
-          <div className="flex-1 overflow-hidden">
+          {/* Chat area with fixed height to allow scrolling */}
+          <div className="absolute top-0 left-0 right-0 bottom-16 overflow-hidden">
             <BookDiscussionChat 
               messages={messages} 
               loading={loading} 
@@ -133,7 +133,7 @@ const BookDiscussion: React.FC = () => {
           </div>
           
           {/* Fixed input at the bottom */}
-          <div className="sticky bottom-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
+          <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
             <BookDiscussionInput onSendMessage={handleSendMessage} />
           </div>
         </div>
