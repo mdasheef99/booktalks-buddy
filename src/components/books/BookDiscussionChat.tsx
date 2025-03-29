@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { ChatMessage } from "@/services/chatService";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
