@@ -1,13 +1,29 @@
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet";
 import { BookOpen, Calendar, Users } from "lucide-react";
+import { UsernameDialog } from "@/components/dialogs/UsernameDialog";
+import { GenreDialog } from "@/components/dialogs/GenreDialog";
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [usernameDialogOpen, setUsernameDialogOpen] = useState(false);
+  const [genreDialogOpen, setGenreDialogOpen] = useState(false);
+  const [currentUsername, setCurrentUsername] = useState("");
+
+  const handleUsernameComplete = (username: string) => {
+    setCurrentUsername(username);
+    setUsernameDialogOpen(false);
+    setGenreDialogOpen(true);
+  };
+
+  const handleStartChatting = () => {
+    setUsernameDialogOpen(true);
+  };
 
   const handleBookClubsClick = () => {
     if (user) {
@@ -54,7 +70,7 @@ const Landing = () => {
             Join our community of book lovers and connect anonymously through your shared passion for reading
           </p>
           <Button 
-            onClick={() => navigate("/chat-selection")}
+            onClick={handleStartChatting}
             size="lg"
             className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white px-8 py-6 text-xl rounded-md"
           >
@@ -129,6 +145,19 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Dialogs */}
+      <UsernameDialog 
+        open={usernameDialogOpen} 
+        onOpenChange={setUsernameDialogOpen}
+        onComplete={handleUsernameComplete}
+      />
+      
+      <GenreDialog 
+        open={genreDialogOpen} 
+        onOpenChange={setGenreDialogOpen}
+        username={currentUsername}
+      />
     </div>
   );
 };
