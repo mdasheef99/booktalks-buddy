@@ -1,15 +1,46 @@
+
 import React, { useState, useRef, useEffect } from "react";
-import { Send } from "lucide-react";
+import { Send, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 interface BookDiscussionInputProps {
   onSendMessage: (message: string) => Promise<void>;
 }
 
+// Common emoji categories with a selection of popular emojis
+const emojiCategories = [
+  {
+    name: "Smileys",
+    emojis: ["😀", "😁", "😂", "🥰", "😊", "😎", "🙂", "😍", "😘", "🤔", "🙄", "😴", "😮", "🥺"]
+  },
+  {
+    name: "Gestures",
+    emojis: ["👍", "👎", "👌", "✌️", "🤞", "👏", "🙌", "👋", "🤝", "✋", "👇", "👆", "👉", "👈"]
+  },
+  {
+    name: "Objects",
+    emojis: ["📚", "🔍", "📝", "📖", "🏆", "🎵", "🎬", "📱", "💻", "⌚", "🎁", "💡", "🔑", "🔒"]
+  },
+  {
+    name: "Nature",
+    emojis: ["🌸", "🌹", "🌈", "☀️", "🌙", "⭐", "🌟", "🍀", "🍁", "🌲", "🐶", "🐱", "🦋", "🐢"]
+  },
+  {
+    name: "Food",
+    emojis: ["☕", "🍔", "🍕", "🍰", "🍩", "🍦", "🍫", "🍪", "🥗", "🍷", "🥂", "🧁", "🍎", "🍓"]
+  }
+];
+
 const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
@@ -41,9 +72,54 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
     }
   };
   
+  const addEmoji = (emoji: string) => {
+    setMessage(prev => prev + emoji);
+    setIsEmojiPickerOpen(false);
+    // Focus the input after adding emoji
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+  
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-1 border border-bookconnect-brown/20">
       <div className="flex items-center">
+        <DropdownMenu open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-bookconnect-brown/70 hover:text-bookconnect-brown hover:bg-transparent"
+              onClick={() => setIsEmojiPickerOpen(true)}
+            >
+              <Smile className="h-4 w-4" />
+              <span className="sr-only">Add emoji</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="p-2 max-h-[300px] overflow-y-auto w-[250px]">
+            <div className="grid grid-cols-1 gap-2">
+              {emojiCategories.map((category) => (
+                <div key={category.name} className="space-y-1">
+                  <p className="text-xs font-medium text-bookconnect-brown/70 px-1">{category.name}</p>
+                  <div className="grid grid-cols-7 gap-1">
+                    {category.emojis.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => addEmoji(emoji)}
+                        className="text-lg hover:bg-bookconnect-terracotta/10 rounded p-1 transition-colors"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
         <input
           type="text"
           value={message}
@@ -53,6 +129,7 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
           className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7"
           ref={inputRef}
         />
+        
         <Button 
           type="submit" 
           disabled={!message.trim() || isSubmitting} 
