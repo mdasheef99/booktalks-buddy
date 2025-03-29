@@ -14,7 +14,10 @@ import { ChatRequest } from "@/components/profile/ChatRequestsList";
 
 export function useProfileData() {
   const { toast } = useToast();
-  const [username, setUsername] = useState<string>(() => localStorage.getItem("username") || "");
+  // Use anon_username as primary source, fall back to username
+  const [username, setUsername] = useState<string>(() => 
+    localStorage.getItem("anon_username") || localStorage.getItem("username") || ""
+  );
   const [favoriteAuthor, setFavoriteAuthor] = useState("");
   const [favoriteGenre, setFavoriteGenre] = useState<string>(() => {
     try {
@@ -44,7 +47,10 @@ export function useProfileData() {
         if (profileData.bio) setBio(profileData.bio);
         if (profileData.allowChats !== null) setAllowChats(profileData.allowChats);
         
-        if (profileData.username) localStorage.setItem("username", profileData.username);
+        if (profileData.username) {
+          localStorage.setItem("username", profileData.username);
+          localStorage.setItem("anon_username", profileData.username);
+        }
       }
       
       const requests = await fetchChatRequests();

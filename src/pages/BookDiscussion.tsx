@@ -16,7 +16,8 @@ const BookDiscussion: React.FC = () => {
   
   const title = searchParams.get("title") || "Unknown Book";
   const author = searchParams.get("author") || "Unknown Author";
-  const username = localStorage.getItem("username") || "Anonymous Reader";
+  // Use anon_username if available, otherwise fall back to username, then Anonymous Reader
+  const username = localStorage.getItem("anon_username") || localStorage.getItem("username") || "Anonymous Reader";
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);

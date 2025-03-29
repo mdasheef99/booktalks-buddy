@@ -19,7 +19,9 @@ export const UsernameDialog = ({ open, onOpenChange, onComplete }: UsernameDialo
 
   const handleNext = () => {
     if (username.trim() && validateUsername(username)) {
+      // Store username in both localStorage keys for consistency
       localStorage.setItem("anon_username", username);
+      localStorage.setItem("username", username);
       onComplete(username);
     } else if (username.trim()) {
       Sentry.captureMessage("Invalid name used", {
@@ -42,7 +44,9 @@ export const UsernameDialog = ({ open, onOpenChange, onComplete }: UsernameDialo
 
   const handleSkip = () => {
     const randomUsername = generateLiteraryUsername();
+    // Store username in both localStorage keys for consistency
     localStorage.setItem("anon_username", randomUsername);
+    localStorage.setItem("username", randomUsername);
     toast({
       title: "Random username generated",
       description: `You'll be known as ${randomUsername}`,

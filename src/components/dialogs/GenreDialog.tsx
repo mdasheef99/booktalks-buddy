@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface GenreDialogProps {
   open: boolean;
@@ -61,6 +61,9 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
         description: `Welcome ${username}, enjoy exploring ${selectedGenres.length > 1 ? 'your selected genres' : primaryGenre} books!`,
       });
       
+      // Store the username in localStorage for consistent usage across the app
+      localStorage.setItem("anon_username", username);
+      
       // Navigate to the Explore Books page with a comma-separated list of genres
       navigate(`/explore-books?genre=${selectedGenres.join(',')}`);
     } catch (error) {
@@ -75,53 +78,57 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl bg-bookconnect-cream border-bookconnect-brown/30 shadow-md">
+      <DialogContent className="sm:max-w-xl bg-bookconnect-cream border-bookconnect-brown/30 shadow-md max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif text-bookconnect-brown text-center">
             Choose Genres
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 pt-2">
-          <p className="text-center text-bookconnect-brown/80 mb-4">
-            What kind of books would you like to explore? Select multiple genres if you want!
-          </p>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {genres.map((genre) => (
-              <button
-                key={genre.name}
-                className={`${genre.color} rounded-lg p-3 h-16 text-white font-medium transition-transform hover:scale-105 ${
-                  selectedGenres.includes(genre.name) ? "ring-4 ring-white ring-offset-2 ring-offset-bookconnect-brown/20" : ""
-                }`}
-                onClick={() => handleGenreToggle(genre.name)}
-              >
-                {genre.name}
-                {selectedGenres.includes(genre.name) && (
-                  <span className="ml-1 text-xs">✓</span>
-                )}
-              </button>
-            ))}
+        <ScrollArea className="flex-1 overflow-auto pr-4">
+          <div className="space-y-4 pt-2">
+            <p className="text-center text-bookconnect-brown/80 mb-4">
+              What kind of books would you like to explore? Select multiple genres if you want!
+            </p>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {genres.map((genre) => (
+                <button
+                  key={genre.name}
+                  className={`${genre.color} rounded-lg p-3 h-16 text-white font-medium transition-transform hover:scale-105 ${
+                    selectedGenres.includes(genre.name) ? "ring-4 ring-white ring-offset-2 ring-offset-bookconnect-brown/20" : ""
+                  }`}
+                  onClick={() => handleGenreToggle(genre.name)}
+                >
+                  {genre.name}
+                  {selectedGenres.includes(genre.name) && (
+                    <span className="ml-1 text-xs">✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            <div className="flex items-center justify-center space-x-2 pt-4">
+              <Switch
+                id="location"
+                checked={locationEnabled}
+                onCheckedChange={setLocationEnabled}
+              />
+              <Label htmlFor="location" className="text-bookconnect-brown/80 text-sm">
+                Enable Location? (Optional)
+              </Label>
+            </div>
+            <p className="text-center text-xs text-bookconnect-brown/70">
+              Turn on location for a bookstore experience
+            </p>
           </div>
-          
-          <div className="flex items-center justify-center space-x-2 pt-4">
-            <Switch
-              id="location"
-              checked={locationEnabled}
-              onCheckedChange={setLocationEnabled}
-            />
-            <Label htmlFor="location" className="text-bookconnect-brown/80 text-sm">
-              Enable Location? (Optional)
-            </Label>
-          </div>
-          <p className="text-center text-xs text-bookconnect-brown/70">
-            Turn on location for a bookstore experience
-          </p>
-          
+        </ScrollArea>
+        
+        <div className="mt-4 pt-4 border-t border-bookconnect-brown/20">
           <Button 
             onClick={handleExplore}
             disabled={selectedGenres.length === 0}
-            className="w-full mt-4 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
+            className="w-full bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
           >
             Explore Books ({selectedGenres.length} {selectedGenres.length === 1 ? 'genre' : 'genres'} selected)
           </Button>

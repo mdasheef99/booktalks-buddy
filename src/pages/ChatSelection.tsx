@@ -35,8 +35,9 @@ const ChatSelection = () => {
       return;
     }
 
-    // Store the username and genre in localStorage
+    // Store the username consistently in both localStorage keys
     localStorage.setItem("anon_username", username);
+    localStorage.setItem("username", username);
     localStorage.setItem("selected_genre", genre);
     
     // Navigate to books filtered by genre
