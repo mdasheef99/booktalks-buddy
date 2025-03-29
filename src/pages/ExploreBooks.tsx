@@ -1,19 +1,15 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
-import { BookOpen, Loader2, Search, TrendingUp } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { fetchBooksByQuery, fetchTrendingBooks } from "@/services/googleBooksService";
-import BookCard from "@/components/books/BookCard";
-import TrendingBookCard from "@/components/books/TrendingBookCard";
 import Layout from "@/components/Layout";
+import BookSearchForm from "@/components/books/BookSearchForm";
+import SearchResults from "@/components/books/SearchResults";
+import TrendingBooksSection from "@/components/books/TrendingBooksSection";
 
 const FALLBACK_TRENDING_BOOKS = [
   { 
@@ -53,7 +49,7 @@ const ExploreBooks: React.FC = () => {
     enabled: false,
   });
 
-  // Trending books query with fixed TypeScript error
+  // Trending books query
   const { data: trendingBooks, isLoading: isTrendingLoading, isError: isTrendingError } = useQuery({
     queryKey: ["trendingBooks", genre],
     queryFn: () => fetchTrendingBooks(genre, 5),
@@ -70,11 +66,9 @@ const ExploreBooks: React.FC = () => {
     }
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim().length > 0) {
-      searchBooks();
-    }
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    searchBooks();
   };
 
   const handleJoinDiscussion = (bookId: string, bookTitle: string) => {
@@ -107,110 +101,26 @@ const ExploreBooks: React.FC = () => {
 
           {/* Search Section */}
           <div className="mb-12">
-            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-              <div className="flex items-center p-3 bg-white border-2 border-bookconnect-brown/40 rounded-lg shadow-md" 
-                   style={{
-                     backgroundImage: "url('https://images.unsplash.com/photo-1519677584237-752f8853252e?q=80&w=1470&auto=format&fit=crop')",
-                     backgroundSize: "cover",
-                     backgroundPosition: "center",
-                     backgroundBlendMode: "overlay",
-                     backgroundColor: "rgba(255, 255, 255, 0.9)",
-                   }}>
-                <Input
-                  type="text"
-                  placeholder="Search by title, author, or keyword..."
-                  className="flex-grow border-none bg-transparent focus-visible:ring-0 text-bookconnect-brown placeholder:text-bookconnect-brown/50 font-serif"
-                  style={{ fontFamily: "Georgia, serif" }}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Button 
-                  type="submit" 
-                  className="ml-2 bg-bookconnect-brown hover:bg-bookconnect-brown/80"
-                >
-                  {isSearching ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Search className="h-5 w-5" />
-                  )}
-                  <span className="ml-1">Search</span>
-                </Button>
-              </div>
-            </form>
+            <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
           </div>
 
           {/* Search Results */}
-          {searchQuery && searchResults && (
-            <div className="mb-12">
-              <h2 className="text-2xl font-serif font-semibold text-bookconnect-brown mb-4">
-                Search Results
-              </h2>
-              {isSearchError ? (
-                <div className="text-center p-6 bg-white/80 border border-bookconnect-brown/20 rounded-lg shadow">
-                  <p className="text-bookconnect-terracotta font-serif">
-                    We couldn't find what you're looking for. Try a different search?
-                  </p>
-                </div>
-              ) : searchResults.length === 0 ? (
-                <div className="text-center p-6 bg-white/80 border border-bookconnect-brown/20 rounded-lg shadow">
-                  <p className="text-bookconnect-brown/70 font-serif">
-                    No books found for "{searchQuery}". Try a different search term.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {searchResults.map(book => (
-                    <BookCard
-                      key={book.id}
-                      book={book}
-                      onJoinDiscussion={() => handleJoinDiscussion(book.id, book.title)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          <SearchResults 
+            searchQuery={searchQuery}
+            searchResults={searchResults}
+            isSearchError={isSearchError}
+            onJoinDiscussion={handleJoinDiscussion}
+          />
 
           {/* Trending Section */}
-          <div>
-            <div className="flex items-center mb-4">
-              <h2 className="text-2xl font-serif font-semibold text-bookconnect-brown">
-                Trending in {genre}
-              </h2>
-              <TrendingUp className="ml-2 h-5 w-5 text-bookconnect-terracotta" />
-            </div>
-            
-            {isTrendingLoading ? (
-              <div className="flex justify-center items-center h-60">
-                <div className="relative">
-                  <Loader2 className="h-12 w-12 animate-spin text-bookconnect-brown" />
-                  <span className="absolute -bottom-8 text-bookconnect-brown font-serif whitespace-nowrap">
-                    Finding trending books...
-                  </span>
-                </div>
-              </div>
-            ) : isTrendingError || !trendingBooks || trendingBooks.length === 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {FALLBACK_TRENDING_BOOKS.map(book => (
-                  <TrendingBookCard
-                    key={book.id}
-                    book={book}
-                    onJoinDiscussion={() => handleJoinDiscussion(book.id, book.title)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trendingBooks.map(book => (
-                  <TrendingBookCard
-                    key={book.id}
-                    book={book}
-                    onJoinDiscussion={() => handleJoinDiscussion(book.id, book.title)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          <TrendingBooksSection
+            genre={genre}
+            books={trendingBooks}
+            isLoading={isTrendingLoading}
+            isError={isTrendingError}
+            fallbackBooks={FALLBACK_TRENDING_BOOKS}
+            onJoinDiscussion={handleJoinDiscussion}
+          />
         </div>
       </div>
     </Layout>
