@@ -1,8 +1,7 @@
 
 import React from "react";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ScrollButtonsProps {
   showScrollTop: boolean;
@@ -15,51 +14,31 @@ const ScrollButtons: React.FC<ScrollButtonsProps> = ({
   showScrollTop,
   showScrollBottom,
   onScrollTop,
-  onScrollBottom
+  onScrollBottom,
 }) => {
-  // Debug visibility
-  console.log("ScrollButtons - showScrollTop:", showScrollTop, "showScrollBottom:", showScrollBottom);
-  
   return (
-    <>
+    <div className="absolute right-4 bottom-24 flex flex-col gap-2">
       {showScrollTop && (
-        <div className="absolute left-1/2 top-6 -translate-x-1/2 z-10">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={onScrollTop}
-                className="h-12 w-12 rounded-full bg-transparent backdrop-blur-sm shadow-md hover:bg-white/20 border border-white/30 transition-all duration-200"
-              >
-                <ArrowUp className="h-5 w-5 text-bookconnect-brown" />
-                <span className="sr-only">Scroll to top</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Scroll to top</TooltipContent>
-          </Tooltip>
-        </div>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={onScrollTop}
+          className="h-8 w-8 rounded-full bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-200"
+        >
+          <ChevronUp className="h-4 w-4 text-bookconnect-brown" />
+        </Button>
       )}
-
       {showScrollBottom && (
-        <div className="absolute left-1/2 bottom-24 -translate-x-1/2 z-10">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={onScrollBottom}
-                className="h-12 w-12 rounded-full bg-transparent backdrop-blur-sm shadow-md hover:bg-white/20 border border-white/30 transition-all duration-200"
-              >
-                <ArrowDown className="h-5 w-5 text-bookconnect-brown" />
-                <span className="sr-only">Scroll to bottom</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Scroll to bottom</TooltipContent>
-          </Tooltip>
-        </div>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={onScrollBottom}
+          className="h-8 w-8 rounded-full bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-200"
+        >
+          <ChevronDown className="h-4 w-4 text-bookconnect-brown" />
+        </Button>
       )}
-    </>
+    </div>
   );
 };
 

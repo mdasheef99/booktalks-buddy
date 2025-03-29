@@ -44,7 +44,6 @@ export const UsernameDialog = ({ open, onOpenChange, onComplete }: UsernameDialo
 
   const handleSkip = () => {
     const randomUsername = generateLiteraryUsername();
-    // Store username in both localStorage keys for consistency
     localStorage.setItem("anon_username", randomUsername);
     localStorage.setItem("username", randomUsername);
     toast({
@@ -56,36 +55,42 @@ export const UsernameDialog = ({ open, onOpenChange, onComplete }: UsernameDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-bookconnect-cream border-bookconnect-brown/30 shadow-md">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-bookconnect-cream to-white border-bookconnect-brown/30 shadow-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-serif text-bookconnect-brown text-center">
-            Pick a Username
+          <DialogTitle className="text-3xl font-serif text-bookconnect-brown text-center font-bold">
+            Join the Discussion
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 pt-2">
-          <p className="text-center text-bookconnect-brown/80">
-            Choose a username to identify yourself in book discussions
-          </p>
+        <div className="space-y-6 pt-4">
+          <div className="space-y-2">
+            <p className="text-center text-bookconnect-brown/80 font-serif text-lg">
+              Choose a username to identify yourself
+            </p>
+            <p className="text-center text-bookconnect-brown/60 text-sm">
+              Maximum 8 characters
+            </p>
+          </div>
           
           <Input
-            placeholder="Enter a username (min 3 characters)"
+            placeholder="Enter username..."
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="border-bookconnect-brown/30 focus-visible:ring-bookconnect-terracotta"
+            onChange={(e) => setUsername(e.target.value.slice(0, 8))}
+            className="border-2 border-bookconnect-brown/30 focus-visible:ring-bookconnect-terracotta text-lg font-serif text-center tracking-wide"
+            maxLength={8}
           />
           
           <div className="flex justify-between space-x-4 pt-2">
             <Button 
               variant="outline"
               onClick={handleSkip}
-              className="flex-1 border-bookconnect-brown/30 text-bookconnect-brown hover:bg-bookconnect-brown/10"
+              className="flex-1 border-2 border-bookconnect-brown/30 text-bookconnect-brown hover:bg-bookconnect-brown/10 font-medium"
             >
               Skip
             </Button>
             <Button 
               onClick={handleNext}
-              className="flex-1 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
+              className="flex-1 bg-gradient-to-r from-bookconnect-terracotta to-bookconnect-terracotta/90 hover:from-bookconnect-terracotta/90 hover:to-bookconnect-terracotta text-white font-medium shadow-md"
             >
               Next
             </Button>

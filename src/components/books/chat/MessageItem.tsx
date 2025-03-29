@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ChatMessage, getMessageReactions } from "@/services/chat/messageService";
 import { Check } from "lucide-react";
@@ -59,7 +58,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
       className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}
       ref={setRef}
     >
-      <div className={`flex flex-col max-w-[75%] min-w-[150px]`}>
+      <div className={`flex flex-col max-w-[75%] min-w-[150px] w-[300px]`}>
         <div 
           className={`relative px-3.5 py-2 rounded-2xl font-serif text-sm shadow-md
             ${isCurrentUser 
@@ -67,8 +66,18 @@ const MessageItem: React.FC<MessageItemProps> = ({
               : 'bg-gradient-to-br from-bookconnect-terracotta/60 to-bookconnect-terracotta/50 text-white rounded-bl-none border border-bookconnect-terracotta/20'
             } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out backdrop-blur-sm`}
         >
-          <div className={`text-xs mb-1 font-medium ${isCurrentUser ? 'text-white/90' : 'text-white/90'}`}>
-            {message.username}
+          <div className="flex items-center justify-between mb-1">
+            <span className={`text-xs font-medium ${isCurrentUser ? 'text-white/90' : 'text-white/90'}`}>
+              {message.username}
+            </span>
+            <MessageActions 
+              message={message}
+              currentUsername={currentUsername}
+              isCurrentUser={isCurrentUser}
+              onReplyToMessage={onReplyToMessage}
+              isMobile={isMobile}
+              onReactionsUpdated={handleReactionsUpdated}
+            />
           </div>
           
           <ReplyPreview 
@@ -85,17 +94,6 @@ const MessageItem: React.FC<MessageItemProps> = ({
             )}
           </div>
           
-          {!isDeleted && (
-            <MessageActions 
-              message={message}
-              currentUsername={currentUsername}
-              isCurrentUser={isCurrentUser}
-              onReplyToMessage={onReplyToMessage}
-              isMobile={isMobile}
-              onReactionsUpdated={handleReactionsUpdated}
-            />
-          )}
-          
           <div className="flex justify-between items-center w-full mt-1.5">
             <span className="text-[10px] opacity-80 ml-auto flex items-center">
               {formatTime(message.timestamp)}
@@ -109,7 +107,6 @@ const MessageItem: React.FC<MessageItemProps> = ({
           </div>
         </div>
         
-        {/* Place reactions outside and below the message bubble */}
         <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'} mt-1`}>
           <MessageReactionList
             reactions={reactions}
