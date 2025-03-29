@@ -9,9 +9,10 @@ import { BookType } from "@/types/books";
 interface TrendingBookCardProps {
   book: BookType;
   onJoinDiscussion: () => void;
+  badge?: React.ReactNode;
 }
 
-const TrendingBookCard = ({ book, onJoinDiscussion }: TrendingBookCardProps) => {
+const TrendingBookCard = ({ book, onJoinDiscussion, badge }: TrendingBookCardProps) => {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg border-bookconnect-brown/20 book-card bg-white/90">
       <div className="relative h-80 overflow-hidden">
@@ -22,16 +23,18 @@ const TrendingBookCard = ({ book, onJoinDiscussion }: TrendingBookCardProps) => 
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-        <Badge 
-          className="absolute top-3 right-3 bg-bookconnect-terracotta text-white shadow-lg flex items-center gap-1 px-2.5 py-1"
-          style={{ 
-            boxShadow: "0 0 15px rgba(201, 124, 93, 0.7)",
-            border: "1px solid rgba(255,255,255,0.2)"
-          }}
-        >
-          <TrendingUp className="h-4 w-4" /> 
-          Trending
-        </Badge>
+        {badge || (
+          <Badge 
+            className="absolute top-3 right-3 bg-bookconnect-terracotta text-white shadow-lg flex items-center gap-1 px-2.5 py-1"
+            style={{ 
+              boxShadow: "0 0 15px rgba(201, 124, 93, 0.7)",
+              border: "1px solid rgba(255,255,255,0.2)"
+            }}
+          >
+            <TrendingUp className="h-4 w-4" /> 
+            Trending
+          </Badge>
+        )}
       </div>
       <CardContent className="p-4">
         <h3 className="font-serif font-bold text-lg text-bookconnect-brown line-clamp-2 mb-2">

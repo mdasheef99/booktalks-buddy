@@ -51,7 +51,8 @@ const ExploreBooks: React.FC = () => {
     showProfileDialog,
     setShowProfileDialog,
     handleSearch,
-    handleJoinDiscussion
+    handleJoinDiscussion,
+    refetchDiscussedBooks
   } = useExploreBooks();
 
   return (
@@ -77,6 +78,7 @@ const ExploreBooks: React.FC = () => {
           isLoading={isDiscussedLoading}
           isError={isDiscussedError}
           onJoinDiscussion={handleJoinDiscussion}
+          onRefresh={refetchDiscussedBooks}
         />
 
         <TrendingBooksSection
