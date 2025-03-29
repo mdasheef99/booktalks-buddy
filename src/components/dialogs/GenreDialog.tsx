@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface GenreDialogProps {
   open: boolean;
@@ -30,18 +31,26 @@ const genres = [
 ];
 
 export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) => {
-  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [locationEnabled, setLocationEnabled] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleGenreSelect = (genre: string) => {
-    setSelectedGenre(genre);
+  const handleGenreToggle = (genre: string) => {
+    setSelectedGenres(prev => {
+      if (prev.includes(genre)) {
+        return prev.filter(g => g !== genre);
+      } else {
+        return [...prev, genre];
+      }
+    });
   };
 
   const handleExplore = () => {
     try {
-      localStorage.setItem("selected_genre", selectedGenre);
+      const primaryGenre = selectedGenres.length > 0 ? selectedGenres[0] : "Fiction";
+      localStorage.setItem("selected_genres", JSON.stringify(selectedGenres));
+      localStorage.setItem("selected_genre", primaryGenre); // For backward compatibility
       
       if (locationEnabled) {
         localStorage.setItem("location_enabled", "true");
@@ -49,11 +58,11 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
       
       toast({
         title: "Ready to explore!",
-        description: `Welcome ${username}, enjoy exploring ${selectedGenre} books!`,
+        description: `Welcome ${username}, enjoy exploring ${selectedGenres.length > 1 ? 'your selected genres' : primaryGenre} books!`,
       });
       
-      // Navigate to the new Explore Books page instead of books filtered by genre
-      navigate(`/explore-books?genre=${selectedGenre}`);
+      // Navigate to the Explore Books page with a comma-separated list of genres
+      navigate(`/explore-books?genre=${selectedGenres.join(',')}`);
     } catch (error) {
       Sentry.captureException(error);
       toast({
@@ -69,13 +78,13 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
       <DialogContent className="sm:max-w-xl bg-bookconnect-cream border-bookconnect-brown/30 shadow-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif text-bookconnect-brown text-center">
-            Choose a Genre
+            Choose Genres
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 pt-2">
           <p className="text-center text-bookconnect-brown/80 mb-4">
-            What kind of books would you like to explore?
+            What kind of books would you like to explore? Select multiple genres if you want!
           </p>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -83,11 +92,14 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
               <button
                 key={genre.name}
                 className={`${genre.color} rounded-lg p-3 h-16 text-white font-medium transition-transform hover:scale-105 ${
-                  selectedGenre === genre.name ? "ring-4 ring-white ring-offset-2 ring-offset-bookconnect-brown/20" : ""
+                  selectedGenres.includes(genre.name) ? "ring-4 ring-white ring-offset-2 ring-offset-bookconnect-brown/20" : ""
                 }`}
-                onClick={() => handleGenreSelect(genre.name)}
+                onClick={() => handleGenreToggle(genre.name)}
               >
                 {genre.name}
+                {selectedGenres.includes(genre.name) && (
+                  <span className="ml-1 text-xs">✓</span>
+                )}
               </button>
             ))}
           </div>
@@ -108,10 +120,10 @@ export const GenreDialog = ({ open, onOpenChange, username }: GenreDialogProps) 
           
           <Button 
             onClick={handleExplore}
-            disabled={!selectedGenre}
+            disabled={selectedGenres.length === 0}
             className="w-full mt-4 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
           >
-            Explore Books
+            Explore Books ({selectedGenres.length} {selectedGenres.length === 1 ? 'genre' : 'genres'} selected)
           </Button>
         </div>
       </DialogContent>

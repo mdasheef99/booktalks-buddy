@@ -38,7 +38,30 @@ const FALLBACK_TRENDING_BOOKS = [
 const ExploreBooks: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const genre = searchParams.get("genre") || localStorage.getItem("selected_genre") || "Fiction";
+  
+  // Handle multiple genres from URL or localStorage
+  const genreParam = searchParams.get("genre") || "";
+  const genres = genreParam.split(',').filter(Boolean);
+  const primaryGenre = genres[0] || localStorage.getItem("selected_genre") || "Fiction";
+  
+  // Load all selected genres from localStorage if not in URL
+  useEffect(() => {
+    if (!genreParam) {
+      try {
+        const savedGenres = localStorage.getItem("selected_genres");
+        if (savedGenres) {
+          const parsedGenres = JSON.parse(savedGenres);
+          if (Array.isArray(parsedGenres) && parsedGenres.length > 0) {
+            // We don't update the URL here to avoid navigation loops
+            console.log("Loaded genres from localStorage:", parsedGenres);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading genres from localStorage:", error);
+      }
+    }
+  }, [genreParam]);
+  
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -78,8 +101,8 @@ const ExploreBooks: React.FC = () => {
     isLoading: isTrendingLoading, 
     isError: isTrendingError 
   } = useQuery({
-    queryKey: ["trendingBooks", genre],
-    queryFn: () => fetchTrendingBooks(genre, 5),
+    queryKey: ["trendingBooks", primaryGenre],
+    queryFn: () => fetchTrendingBooks(primaryGenre, 5),
     meta: {
       onError: (error: Error) => {
         // Log error to Sentry 
@@ -88,7 +111,7 @@ const ExploreBooks: React.FC = () => {
             component: "ExploreBooks", 
             action: "fetchTrendingBooks" 
           },
-          extra: { genre }
+          extra: { genre: primaryGenre, allGenres: genres }
         });
         
         toast({
@@ -132,7 +155,11 @@ const ExploreBooks: React.FC = () => {
               Explore Books
             </h1>
             <p className="text-center text-bookconnect-brown/70 mt-2 font-serif max-w-2xl mx-auto">
-              {genre ? `Discover amazing reads in ${genre}` : "Find your next favorite book"}
+              {genres.length > 1 
+                ? `Discover amazing reads in ${genres.slice(0, 3).join(', ')}${genres.length > 3 ? '...' : ''}`
+                : primaryGenre 
+                  ? `Discover amazing reads in ${primaryGenre}` 
+                  : "Find your next favorite book"}
             </p>
           </div>
 
@@ -151,7 +178,7 @@ const ExploreBooks: React.FC = () => {
 
           {/* Trending Section */}
           <TrendingBooksSection
-            genre={genre}
+            genre={primaryGenre}
             books={trendingBooks}
             isLoading={isTrendingLoading}
             isError={isTrendingError}
