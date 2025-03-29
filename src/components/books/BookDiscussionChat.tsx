@@ -4,6 +4,7 @@ import { ChatMessage } from "@/services/chatService";
 import { Check, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BookDiscussionChatProps {
   messages: ChatMessage[];
@@ -96,46 +97,52 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   };
 
   return (
-    <div className="relative h-full" ref={scrollContainerRef}>
-      <div className="space-y-3 px-1">
-        {messages.map((message) => {
-          const isCurrentUser = message.username === currentUsername;
-          
-          return (
-            <div 
-              key={`${message.id}-${message.timestamp}`}
-              className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-            >
+    <div className="relative h-full flex flex-col">
+      <div 
+        className="flex-1 overflow-auto scrollbar-hide" 
+        ref={scrollContainerRef}
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        <div className="space-y-3 px-1 py-2">
+          {messages.map((message) => {
+            const isCurrentUser = message.username === currentUsername;
+            
+            return (
               <div 
-                className={`max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
-                  ${isCurrentUser 
-                    ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
-                    : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
-                  }`}
+                key={`${message.id}-${message.timestamp}`}
+                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`text-xs mb-1 ${isCurrentUser ? 'text-white/80' : 'text-bookconnect-brown/70'}`}>
-                  {message.username}
-                </div>
-                <div style={{ wordBreak: "break-word" }}>{message.message}</div>
-                <div className="flex justify-end items-center mt-1 space-x-1">
-                  <span className="text-[10px] opacity-70">
-                    {formatTime(message.timestamp)}
-                  </span>
-                  {isCurrentUser && (
-                    <span className="flex">
-                      <Check size={12} className="text-gray-400" />
-                      <Check size={12} className="text-blue-400 -ml-[8px]" />
+                <div 
+                  className={`max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
+                    ${isCurrentUser 
+                      ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
+                      : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
+                    }`}
+                >
+                  <div className={`text-xs mb-1 ${isCurrentUser ? 'text-white/80' : 'text-bookconnect-brown/70'}`}>
+                    {message.username}
+                  </div>
+                  <div style={{ wordBreak: "break-word" }}>{message.message}</div>
+                  <div className="flex justify-end items-center mt-1 space-x-1">
+                    <span className="text-[10px] opacity-70">
+                      {formatTime(message.timestamp)}
                     </span>
-                  )}
+                    {isCurrentUser && (
+                      <span className="flex">
+                        <Check size={12} className="text-gray-400" />
+                        <Check size={12} className="text-blue-400 -ml-[8px]" />
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
       
       {/* Scroll navigation arrows */}
-      <div className={`absolute ${isMobile ? 'right-2' : 'right-4'} bottom-4 flex flex-col gap-2`}>
+      <div className={`absolute ${isMobile ? 'right-2' : 'right-4'} bottom-4 flex flex-col gap-2 z-10`}>
         {showScrollTop && (
           <Button 
             onClick={scrollToTop}

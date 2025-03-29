@@ -1,7 +1,6 @@
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/services/chatService";
 import BookDiscussionChat from "@/components/books/BookDiscussionChat";
 import BookDiscussionHeader from "@/components/books/BookDiscussionHeader";
@@ -115,26 +114,28 @@ const BookDiscussion: React.FC = () => {
           </div>
         )}
         
-        <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20"
+        <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20 overflow-hidden"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundBlendMode: "overlay",
-            minHeight: "calc(100vh - 100px)"
+            minHeight: "calc(100vh - 180px)"
           }}
         >
-          <div className="flex-1 overflow-auto p-4">
+          {/* Fixed-height, scrollable chat area */}
+          <div className="flex-1 overflow-hidden">
             <BookDiscussionChat 
               messages={messages} 
               loading={loading} 
               currentUsername={username}
             />
           </div>
-        </div>
-        
-        <div className="mt-2">
-          <BookDiscussionInput onSendMessage={handleSendMessage} />
+          
+          {/* Fixed input at the bottom */}
+          <div className="p-2 bg-white/90 border-t border-bookconnect-brown/20">
+            <BookDiscussionInput onSendMessage={handleSendMessage} />
+          </div>
         </div>
       </div>
     </div>
