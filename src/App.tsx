@@ -9,6 +9,7 @@ import * as Sentry from "@sentry/react";
 import { useEffect } from "react";
 
 // Pages
+import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Books from "./pages/Books";
 import BookDetail from "./pages/BookDetail";
@@ -18,6 +19,7 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
+import ChatSelection from "./pages/ChatSelection";
 
 // Initialize Sentry
 Sentry.init({
@@ -66,7 +68,8 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <SentryRoutes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/home" element={<Index />} />
               <Route path="/books" element={<Books />} />
               <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/events" element={<Events />} />
@@ -74,6 +77,7 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/chat-selection" element={<ChatSelection />} />
               <Route path="*" element={<NotFound />} />
             </SentryRoutes>
           </AuthProvider>
