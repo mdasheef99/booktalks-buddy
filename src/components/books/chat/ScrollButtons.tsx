@@ -22,7 +22,7 @@ const ScrollButtons: React.FC<ScrollButtonsProps> = ({
   onScrollBottom,
 }) => {
   return (
-    <div className="absolute inset-y-0 right-0 flex flex-col items-center justify-center pointer-events-none">
+    <div className="absolute inset-y-0 right-1/2 flex flex-col items-center justify-center pointer-events-none translate-x-1/2">
       <div className="flex flex-col gap-20 pointer-events-auto">
         {showScrollTop && (
           <Tooltip>
@@ -31,7 +31,7 @@ const ScrollButtons: React.FC<ScrollButtonsProps> = ({
                 onClick={onScrollTop}
                 size="sm"
                 variant="secondary"
-                className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
+                className="bg-bookconnect-brown/20 hover:bg-bookconnect-brown/40 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
               >
                 <ArrowUp size={18} />
                 <span className="sr-only">Scroll to top</span>
@@ -48,7 +48,7 @@ const ScrollButtons: React.FC<ScrollButtonsProps> = ({
                 onClick={onScrollBottom}
                 size="sm"
                 variant="secondary"
-                className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
+                className="bg-bookconnect-brown/20 hover:bg-bookconnect-brown/40 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
               >
                 <ArrowDown size={18} />
                 <span className="sr-only">Scroll to bottom</span>

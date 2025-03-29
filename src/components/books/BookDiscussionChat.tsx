@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MessageItem from "./chat/MessageItem";
 import ScrollButtons from "./chat/ScrollButtons";
+import { useScrollHandlers } from "@/hooks/use-scroll-handlers";
 
 interface BookDiscussionChatProps {
   messages: ChatMessage[];
@@ -20,34 +21,16 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   onReplyToMessage
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const messageRefs = useRef<Record<string, HTMLDivElement>>({});
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
   const isMobile = useIsMobile();
   
-  const messageRefs = useRef<Record<string, HTMLDivElement>>({});
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      setShowScrollTop(scrollTop > 20);
-      setShowScrollBottom(scrollTop < scrollHeight - clientHeight - 20);
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    handleScroll();
-
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [messages]);
-
-  useEffect(() => {
-    if (scrollContainerRef.current && !showScrollBottom) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-    }
-  }, [messages, showScrollBottom]);
+  const { 
+    showScrollTop, 
+    showScrollBottom, 
+    scrollToTop, 
+    scrollToBottom 
+  } = useScrollHandlers(scrollContainerRef, messages);
 
   useEffect(() => {
     if (highlightedMessageId && messageRefs.current[highlightedMessageId]) {
@@ -68,21 +51,6 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
       return () => clearTimeout(timer);
     }
   }, [highlightedMessageId]);
-
-  const scrollToTop = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const scrollToBottom = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ 
-        top: scrollContainerRef.current.scrollHeight, 
-        behavior: 'smooth' 
-      });
-    }
-  };
   
   const scrollToMessage = (messageId: string) => {
     setHighlightedMessageId(messageId);
