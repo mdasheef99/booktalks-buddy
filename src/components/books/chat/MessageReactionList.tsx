@@ -1,133 +1,99 @@
 
-import React, { useState } from "react";
-import { addReaction } from "@/services/chat/messageService";
-import { ReactionData } from "./MessageReaction";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
+import React from "react";
+import { EmojiPicker } from "./EmojiPicker";
+import { MessageReactionData } from "@/services/chat/models";
+import { addReaction as addReactionService } from "@/services/chat/messageService";
 
 interface MessageReactionListProps {
-  reactions: ReactionData[] | undefined;
+  reactions: Array<{
+    reaction: string;
+    count: number;
+    userReacted: boolean;
+    username: string;
+  }>;
   messageId: string;
   currentUsername: string;
   isCurrentUser: boolean;
-  onReactionsUpdated?: (messageId: string) => void;
+  onReactionsUpdated: (messageId: string) => void;
 }
 
-const MessageReactionList: React.FC<MessageReactionListProps> = ({ 
-  reactions, 
-  messageId, 
+const MessageReactionList: React.FC<MessageReactionListProps> = ({
+  reactions,
+  messageId,
   currentUsername,
   isCurrentUser,
-  onReactionsUpdated = () => {}
+  onReactionsUpdated
 }) => {
-  const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
-
-  // If there are no reactions, don't render anything
-  if (!reactions || reactions.length === 0) {
-    console.log("No reactions for message:", messageId);
-    return null;
-  }
-
-  console.log("Rendering reactions:", reactions);
-
-  // Group reactions by emoji for the dialog display
-  const reactionsByType = reactions.reduce<Record<string, string[]>>((acc, { reaction, username }) => {
-    if (!acc[reaction]) {
-      acc[reaction] = [];
-    }
-    acc[reaction].push(username);
-    return acc;
-  }, {});
-
-  // Find if current user has already reacted with any emoji
-  const userCurrentReaction = reactions.find(r => r.userReacted)?.reaction;
-
-  const handleReactionClick = async (reaction: string) => {
+  const handleAddReaction = async (emoji: string) => {
     try {
-      // Check if user already has this reaction
-      const hasThisReaction = reactions.some(r => r.userReacted && r.reaction === reaction);
+      // Check if user already has a reaction
+      const userExistingReaction = reactions.find(r => 
+        r.username === currentUsername && r.userReacted
+      );
       
-      // Check if user has any other reaction
-      const hasOtherReaction = reactions.some(r => r.userReacted && r.reaction !== reaction);
-
-      if (hasThisReaction) {
-        // Toggle off the reaction if clicking the same one
-        await addReaction(messageId, currentUsername, reaction, true);
-        toast.info("Reaction removed");
-      } else if (hasOtherReaction) {
-        // Replace existing reaction with the new one
-        // First remove the old reaction
-        const oldReaction = reactions.find(r => r.userReacted)?.reaction;
-        if (oldReaction) {
-          await addReaction(messageId, currentUsername, oldReaction, true);
-        }
-        // Then add the new one
-        await addReaction(messageId, currentUsername, reaction);
-        toast.success("Reaction changed");
-      } else {
-        // Add new reaction
-        await addReaction(messageId, currentUsername, reaction);
-        toast.success("Reaction added");
+      // If user already has a reaction that's the same as the new one, do nothing
+      if (userExistingReaction && userExistingReaction.reaction === emoji) {
+        return;
       }
       
-      // Open dialog to show who reacted
-      setSelectedReaction(reaction);
+      console.log("Adding reaction:", emoji, "to message:", messageId);
       
-      // Notify parent about reaction update
+      // Add the new reaction (the API will handle replacing existing reactions)
+      await addReactionService(messageId, emoji, currentUsername);
+      
+      // Refresh the reactions
       onReactionsUpdated(messageId);
     } catch (error) {
-      console.error("Error handling reaction click:", error);
-      toast.error("Failed to update reaction");
+      console.error("Error adding reaction:", error);
     }
   };
-
+  
+  // Group reactions by emoji
+  const groupedReactions = reactions.reduce((acc, reaction) => {
+    // Skip reactions without emoji
+    if (!reaction.reaction) return acc;
+    
+    if (!acc[reaction.reaction]) {
+      acc[reaction.reaction] = {
+        emoji: reaction.reaction,
+        count: 0,
+        userReacted: false,
+        users: []
+      };
+    }
+    
+    acc[reaction.reaction].count++;
+    
+    if (reaction.username === currentUsername) {
+      acc[reaction.reaction].userReacted = true;
+    }
+    
+    if (!acc[reaction.reaction].users.includes(reaction.username)) {
+      acc[reaction.reaction].users.push(reaction.username);
+    }
+    
+    return acc;
+  }, {} as Record<string, { emoji: string, count: number, userReacted: boolean, users: string[] }>);
+  
   return (
-    <>
-      <div className={`flex flex-wrap gap-1.5 mt-1 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-        {reactions.map(({ reaction, count, userReacted }) => (
-          <button
-            key={reaction}
-            className={`px-2 py-0.5 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
-              userReacted 
-                ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30 shadow-sm' 
-                : 'bg-bookconnect-brown/5 border-bookconnect-brown/10 hover:bg-bookconnect-terracotta/10'
+    <div className="flex flex-wrap gap-1">
+      {Object.values(groupedReactions).map((group) => (
+        <button
+          key={group.emoji}
+          onClick={() => handleAddReaction(group.emoji)}
+          className={`text-xs rounded-full px-1.5 py-0.5 flex items-center space-x-1 
+            ${group.userReacted 
+              ? 'bg-bookconnect-terracotta/20 border border-bookconnect-terracotta/30' 
+              : 'bg-white/80 hover:bg-bookconnect-terracotta/10 border border-gray-200'
             }`}
-            onClick={() => handleReactionClick(reaction)}
-            title={userReacted ? "Remove reaction" : "Add reaction"}
-          >
-            <span>{reaction}</span>
-            <span className="ml-1 font-medium">{count}</span>
-          </button>
-        ))}
-      </div>
+        >
+          <span>{group.emoji}</span>
+          <span className="text-xs">{group.count}</span>
+        </button>
+      ))}
       
-      {/* Dialog to show who reacted with which emoji */}
-      <Dialog open={selectedReaction !== null} onOpenChange={() => setSelectedReaction(null)}>
-        <DialogContent className="max-w-sm rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="text-xl">{selectedReaction}</span>
-              <span className="text-base font-normal">
-                {selectedReaction && reactionsByType[selectedReaction]?.length} {' '}
-                {selectedReaction && reactionsByType[selectedReaction]?.length === 1 ? 'reaction' : 'reactions'}
-              </span>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="max-h-60 overflow-y-auto">
-            {selectedReaction && reactionsByType[selectedReaction]?.map((username, index) => (
-              <div key={`${username}-${index}`} className="py-2 border-b border-gray-100 last:border-b-0">
-                <p className="text-sm font-medium">{username}</p>
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+      <EmojiPicker onEmojiSelect={handleAddReaction} />
+    </div>
   );
 };
 

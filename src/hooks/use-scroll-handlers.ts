@@ -15,9 +15,10 @@ export function useScrollHandlers<T extends HTMLElement>(
 
     const { scrollTop, scrollHeight, clientHeight } = container;
     
-    // Set thresholds for showing buttons
-    const scrollThreshold = 20;
+    // Reduced threshold to show buttons more aggressively
+    const scrollThreshold = 10;
     const isScrolledFromTop = scrollTop > scrollThreshold;
+    // Make it more sensitive to show the bottom button
     const isNotScrolledToBottom = scrollTop < scrollHeight - clientHeight - scrollThreshold;
     
     setShowScrollTop(isScrolledFromTop);
@@ -47,21 +48,28 @@ export function useScrollHandlers<T extends HTMLElement>(
     return () => container.removeEventListener('scroll', handleScroll);
   }, [scrollContainerRef]);
 
-  // Scroll to bottom when dependencies change
+  // Run scroll check when dependencies change
+  useEffect(() => {
+    // Force check buttons visibility after deps change
+    setTimeout(() => {
+      handleScroll();
+    }, 100);
+  }, [dependencies]);
+  
+  // Separate effect just for scrolling to bottom when messages change
   useEffect(() => {
     if (scrollContainerRef.current) {
+      // Scroll to bottom on new messages
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-      
-      // Check button visibility after scrolling
-      setTimeout(() => {
-        handleScroll();
-      }, 50);
     }
   }, [dependencies]);
 
   const scrollToTop = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Update button visibility after scrolling
+      setTimeout(handleScroll, 300);
     }
   };
 
@@ -71,6 +79,9 @@ export function useScrollHandlers<T extends HTMLElement>(
         top: scrollContainerRef.current.scrollHeight, 
         behavior: 'smooth' 
       });
+      
+      // Update button visibility after scrolling
+      setTimeout(handleScroll, 300);
     }
   };
 

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   Popover,
   PopoverContent,
@@ -22,9 +23,16 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
   onlineUsers = [] 
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const navigate = useNavigate();
   
   const uniqueUsers = [...new Set(onlineUsers)];
   const onlineCount = uniqueUsers.length;
+  
+  const handleUserClick = (username: string) => {
+    // Navigate to the user's profile page
+    navigate(`/profile/${username}`);
+    setIsPopoverOpen(false);
+  };
   
   return (
     <header className="sticky top-0 z-10 bg-bookconnect-brown shadow-md py-1.5 px-3">
@@ -64,18 +72,22 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
             </PopoverTrigger>
             <PopoverContent className="w-64 p-2" align="end">
               <div className="space-y-1">
-                <h4 className="text-sm font-medium mb-2">Online Users</h4>
+                <h4 className="text-sm font-medium mb-2 font-serif text-bookconnect-brown">Online Users</h4>
                 {uniqueUsers.length > 0 ? (
                   <div className="max-h-48 overflow-y-auto">
                     {uniqueUsers.map((username, idx) => (
-                      <div key={`user-${idx}`} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50">
+                      <button
+                        key={`user-${idx}`}
+                        className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-bookconnect-cream w-full text-left"
+                        onClick={() => handleUserClick(username)}
+                      >
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                        <span className="text-sm">{username}</span>
-                      </div>
+                        <span className="text-sm font-serif text-bookconnect-brown">{username}</span>
+                      </button>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 italic">No users currently online</p>
+                  <p className="text-sm text-gray-500 italic font-serif">No users currently online</p>
                 )}
               </div>
             </PopoverContent>
