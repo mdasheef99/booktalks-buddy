@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        // BookConnect theme colors
+        bookconnect: {
+          cream: "#F8F3E6",
+          brown: "#8B6E4F",
+          terracotta: "#C97C5D",
+          sage: "#A5B1A2",
+          olive: "#7D8471"
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -89,7 +98,11 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+			},
+      fontFamily: {
+        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        sans: ['Inter', 'sans-serif'],
+      }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
