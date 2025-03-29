@@ -87,6 +87,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           isLoading={isLoading}
           showSavedMessage={showSavedMessage}
           onSave={handleSaveProfile}
+          onClose={onClose}
         />
       </DialogContent>
     </Dialog>
