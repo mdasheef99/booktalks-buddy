@@ -19,6 +19,13 @@ const BookSearchForm: React.FC<BookSearchFormProps> = ({ onSearch, isSearching }
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && searchQuery.trim().length > 0) {
+      e.preventDefault();
+      onSearch(searchQuery);
+    }
+  };
+
   return (
     <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
       <div className="flex items-center p-3 bg-white border-2 border-bookconnect-brown/40 rounded-lg shadow-md" 
@@ -36,10 +43,12 @@ const BookSearchForm: React.FC<BookSearchFormProps> = ({ onSearch, isSearching }
           style={{ fontFamily: "Georgia, serif" }}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <Button 
           type="submit" 
           className="ml-2 bg-bookconnect-brown hover:bg-bookconnect-brown/80"
+          aria-label="Search for books"
         >
           {isSearching ? (
             <Loader2 className="h-5 w-5 animate-spin" />

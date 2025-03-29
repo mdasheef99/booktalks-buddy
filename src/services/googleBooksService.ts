@@ -48,6 +48,34 @@ const FALLBACK_BOOKS = [
     imageUrl: "https://images.unsplash.com/photo-1558901357-ca41e027e43a?q=80&w=1289&auto=format&fit=crop",
     publishedDate: "1956",
     categories: ["Fiction", "Historical Fiction"]
+  },
+  // Adding Harry Potter books to the fallback data
+  { 
+    id: "fallback-6",
+    title: "Harry Potter and the Philosopher's Stone", 
+    author: "J.K. Rowling", 
+    description: "The first novel in the Harry Potter series, featuring a young wizard's adventures at Hogwarts School of Witchcraft and Wizardry",
+    imageUrl: "https://images.unsplash.com/photo-1626618012641-bfbca5a31239?q=80&w=1064&auto=format&fit=crop",
+    publishedDate: "1997",
+    categories: ["Fiction", "Fantasy", "Young Adult"]
+  },
+  { 
+    id: "fallback-7",
+    title: "Harry Potter and the Chamber of Secrets", 
+    author: "J.K. Rowling", 
+    description: "The second novel in the Harry Potter series, in which Harry must face a monster unleashed in the Chamber of Secrets",
+    imageUrl: "https://images.unsplash.com/photo-1618666012174-83b441c0bc76?q=80&w=1287&auto=format&fit=crop",
+    publishedDate: "1998",
+    categories: ["Fiction", "Fantasy", "Young Adult"]
+  },
+  { 
+    id: "fallback-8",
+    title: "Harry Potter and the Prisoner of Azkaban", 
+    author: "J.K. Rowling", 
+    description: "The third novel in the Harry Potter series, featuring Harry's encounter with an escaped prisoner who may have ties to his past",
+    imageUrl: "https://images.unsplash.com/photo-1610466025839-a609baf94ae1?q=80&w=1051&auto=format&fit=crop",
+    publishedDate: "1999",
+    categories: ["Fiction", "Fantasy", "Young Adult"]
   }
 ];
 

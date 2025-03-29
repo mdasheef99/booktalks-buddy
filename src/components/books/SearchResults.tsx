@@ -21,7 +21,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   return (
     <div className="mb-12">
       <h2 className="text-2xl font-serif font-semibold text-bookconnect-brown mb-4">
-        Search Results
+        Search Results for "{searchQuery}"
       </h2>
       {isSearchError ? (
         <div className="text-center p-6 bg-white/80 border border-bookconnect-brown/20 rounded-lg shadow">
