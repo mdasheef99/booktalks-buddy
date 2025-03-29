@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import {
   Dialog,
@@ -8,6 +9,7 @@ import ProfileDialogHeader from "./ProfileDialogHeader";
 import ProfileDialogContent from "./ProfileDialogContent";
 import ProfileDialogFooter from "./ProfileDialogFooter";
 import { useProfileData } from "@/hooks/useProfileData";
+import { toast } from "sonner";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -50,6 +52,19 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     return setupRealtimeSubscription();
   }, [open]);
 
+  const handleSaveProfileAndRefresh = async () => {
+    await handleSaveProfile();
+    // Force a refresh of both localStorage values
+    if (username) {
+      localStorage.setItem("anon_username", username);
+      localStorage.setItem("username", username);
+      toast({
+        title: "Username updated",
+        description: "Your username has been updated throughout the app.",
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent 
@@ -82,7 +97,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
         />
         <ProfileDialogFooter
           isLoading={isLoading}
-          onSave={handleSaveProfile}
+          onSave={handleSaveProfileAndRefresh}
           onClose={onClose}
         />
       </DialogContent>

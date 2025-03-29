@@ -29,8 +29,8 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
   const onlineCount = uniqueUsers.length;
   
   const handleUserClick = (username: string) => {
-    // Navigate to the user's profile page
-    navigate(`/profile/${username}`);
+    // Navigate to the user's profile page with the correct URL
+    navigate(`/profile/${encodeURIComponent(username)}`);
     setIsPopoverOpen(false);
   };
   

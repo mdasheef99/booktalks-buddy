@@ -25,7 +25,7 @@ const UsernameEditor: React.FC<UsernameEditorProps> = ({ username, setUsername }
   const handleSaveUsername = () => {
     if (!validateUsername(newUsername)) {
       toast({
-        title: "Name too short!",
+        title: "Username invalid!",
         description: "Username must be at least 3 characters and contain no special characters.",
         variant: "destructive",
       });
@@ -44,7 +44,11 @@ const UsernameEditor: React.FC<UsernameEditorProps> = ({ username, setUsername }
     }
 
     setUsername(newUsername);
+    
+    // Update all username instances in localStorage for consistency
     localStorage.setItem("username", newUsername);
+    localStorage.setItem("anon_username", newUsername);
+    
     setEditingUsername(false);
     
     toast({
