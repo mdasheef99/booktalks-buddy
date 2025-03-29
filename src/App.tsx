@@ -21,7 +21,8 @@ import NotFound from "./pages/NotFound";
 
 // Initialize Sentry
 Sentry.init({
-  dsn: "your-sentry-dsn-here",
+  // Use an empty string as DSN to disable Sentry in development
+  dsn: "",
   integrations: [
     Sentry.browserTracingIntegration(),
   ],

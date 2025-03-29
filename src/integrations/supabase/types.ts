@@ -9,7 +9,116 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      books: {
+        Row: {
+          author: string
+          cover_url: string | null
+          created_at: string | null
+          genre: string
+          id: string
+          title: string
+        }
+        Insert: {
+          author: string
+          cover_url?: string | null
+          created_at?: string | null
+          genre: string
+          id?: string
+          title: string
+        }
+        Update: {
+          author?: string
+          cover_url?: string | null
+          created_at?: string | null
+          genre?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          book_id: string | null
+          created_at: string | null
+          id: string
+          message: string
+          timestamp: string
+          user_id: string | null
+          username: string
+        }
+        Insert: {
+          book_id?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          timestamp: string
+          user_id?: string | null
+          username: string
+        }
+        Update: {
+          book_id?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          timestamp?: string
+          user_id?: string | null
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          date: string
+          description: string
+          id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          description: string
+          id?: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          description?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
