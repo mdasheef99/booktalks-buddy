@@ -1,6 +1,6 @@
 
 import React from "react";
-import { EmojiPicker } from "./EmojiPicker";
+import EmojiPicker from "./EmojiPicker";
 import { MessageReactionData } from "@/services/chat/models";
 import { addReaction as addReactionService } from "@/services/chat/messageService";
 
