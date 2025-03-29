@@ -23,6 +23,7 @@ const BookDiscussion: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([username]); // Current user is always online
   
   // Load chat history when component mounts
   useEffect(() => {
@@ -36,6 +37,22 @@ const BookDiscussion: React.FC = () => {
         const chatHistory = await getBookChat(id);
         console.log("Got chat history:", chatHistory);
         setMessages(chatHistory);
+        
+        // Extract unique usernames from chat history
+        const uniqueUsernames = new Set<string>();
+        chatHistory.forEach(msg => {
+          if (msg.username) uniqueUsernames.add(msg.username);
+        });
+        
+        // Add current user to online users
+        setOnlineUsers(prev => {
+          const newUsers = Array.from(uniqueUsernames);
+          if (!newUsers.includes(username)) {
+            newUsers.push(username);
+          }
+          return newUsers;
+        });
+        
       } catch (error) {
         console.error("Error loading chat history:", error);
         setConnectionError(true);
@@ -50,7 +67,7 @@ const BookDiscussion: React.FC = () => {
     };
     
     loadChatHistory();
-  }, [id]);
+  }, [id, username]);
   
   // Subscribe to real-time chat updates
   useEffect(() => {
@@ -71,6 +88,16 @@ const BookDiscussion: React.FC = () => {
         // Otherwise it's a new message
         return [...prevMessages, newMessage];
       });
+      
+      // Add user to online users list if not already there
+      if (newMessage.username) {
+        setOnlineUsers(prev => {
+          if (!prev.includes(newMessage.username)) {
+            return [...prev, newMessage.username];
+          }
+          return prev;
+        });
+      }
       
       setConnectionError(false);
     });
@@ -135,7 +162,8 @@ const BookDiscussion: React.FC = () => {
         <BookDiscussionHeader 
           title={title} 
           author={author} 
-          onBack={handleBack} 
+          onBack={handleBack}
+          onlineUsers={onlineUsers}
         />
         
         <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4 pb-4">

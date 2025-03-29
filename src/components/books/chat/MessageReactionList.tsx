@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface MessageReactionListProps {
   reactions: ReactionData[] | undefined;
@@ -48,9 +49,31 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
 
   const handleReactionClick = async (reaction: string) => {
     try {
-      // If user clicked on same reaction they already added, it will toggle off
-      // If different, it will replace their old reaction
-      await addReaction(messageId, currentUsername, reaction);
+      // Check if user already has this reaction
+      const hasThisReaction = reactions.some(r => r.userReacted && r.reaction === reaction);
+      
+      // Check if user has any other reaction
+      const hasOtherReaction = reactions.some(r => r.userReacted && r.reaction !== reaction);
+
+      if (hasThisReaction) {
+        // Toggle off the reaction if clicking the same one
+        await addReaction(messageId, currentUsername, reaction, true);
+        toast.info("Reaction removed");
+      } else if (hasOtherReaction) {
+        // Replace existing reaction with the new one
+        // First remove the old reaction
+        const oldReaction = reactions.find(r => r.userReacted)?.reaction;
+        if (oldReaction) {
+          await addReaction(messageId, currentUsername, oldReaction, true);
+        }
+        // Then add the new one
+        await addReaction(messageId, currentUsername, reaction);
+        toast.success("Reaction changed");
+      } else {
+        // Add new reaction
+        await addReaction(messageId, currentUsername, reaction);
+        toast.success("Reaction added");
+      }
       
       // Open dialog to show who reacted
       setSelectedReaction(reaction);
@@ -59,6 +82,7 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
       onReactionsUpdated(messageId);
     } catch (error) {
       console.error("Error handling reaction click:", error);
+      toast.error("Failed to update reaction");
     }
   };
 

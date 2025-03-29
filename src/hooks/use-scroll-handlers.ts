@@ -14,8 +14,22 @@ export function useScrollHandlers<T extends HTMLElement>(
     if (!container) return;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
-    setShowScrollTop(scrollTop > 20);
-    setShowScrollBottom(scrollTop < scrollHeight - clientHeight - 20);
+    
+    // Set thresholds for showing buttons
+    const scrollThreshold = 20;
+    const isScrolledFromTop = scrollTop > scrollThreshold;
+    const isNotScrolledToBottom = scrollTop < scrollHeight - clientHeight - scrollThreshold;
+    
+    setShowScrollTop(isScrolledFromTop);
+    setShowScrollBottom(isNotScrolledToBottom);
+    
+    console.log("Scroll position:", { 
+      scrollTop, 
+      scrollHeight, 
+      clientHeight,
+      showTop: isScrolledFromTop,
+      showBottom: isNotScrolledToBottom
+    });
   };
 
   // Add scroll event listener and run check initially
@@ -24,18 +38,26 @@ export function useScrollHandlers<T extends HTMLElement>(
     if (!container) return;
 
     container.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial position
+    
+    // Force an initial check after a small delay to ensure DOM is ready
+    setTimeout(() => {
+      handleScroll();
+    }, 100);
 
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [scrollContainerRef]); // Only depend on scrollContainerRef, not the entire dependencies array
+  }, [scrollContainerRef]);
 
-  // Scroll to bottom when dependencies change and showScrollBottom is false
+  // Scroll to bottom when dependencies change
   useEffect(() => {
     if (scrollContainerRef.current) {
-      // Always scroll to bottom when new messages arrive
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      
+      // Check button visibility after scrolling
+      setTimeout(() => {
+        handleScroll();
+      }, 50);
     }
-  }, [dependencies]); // Only depend on the dependencies array here
+  }, [dependencies]);
 
   const scrollToTop = () => {
     if (scrollContainerRef.current) {
