@@ -55,20 +55,42 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
   const handleReact = async (emoji: string) => {
     try {
       await addReaction(messageId, currentUsername, emoji);
-      // We don't close the popover to allow multiple reactions
-      // setIsOpen(false); - This line was causing the issue
+      // Important: Do NOT close the popover here
     } catch (error) {
       console.error("Error adding reaction:", error);
     }
   };
 
+  // Prevent event bubbling that might close the popover
+  const handleEmojiClick = (emoji: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleReact(emoji);
+  };
+
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        // Only allow manual opening/closing through the trigger button
+        // This prevents closing when clicking inside the popover content
+        if (!open) {
+          // Only close if clicked outside
+          setIsOpen(false);
+        } else {
+          setIsOpen(true);
+        }
+      }}
+    >
       <PopoverTrigger asChild>
         <Button 
           variant="ghost" 
           size="sm" 
           className="flex items-center px-1.5 py-0 text-xs text-bookconnect-brown/50 hover:bg-bookconnect-terracotta/10 hover:text-bookconnect-brown"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(true);
+          }}
         >
           <Smile size={14} className="mr-1.5" />
           <span>React</span>
@@ -78,15 +100,26 @@ export const MessageReaction = ({ messageId, currentUsername }: MessageReactionP
         className="w-auto p-2" 
         align="start" 
         sideOffset={5}
-        // Add the "sticky" prop to ensure the popover stays open during interactions
         sticky="always"
+        onInteractOutside={(e) => {
+          e.preventDefault();
+          // Only close when clicking outside the popover
+        }}
+        onEscapeKeyDown={(e) => {
+          e.preventDefault();
+          // Prevent closing on Escape key
+        }}
+        onPointerDownOutside={(e) => {
+          e.preventDefault();
+          // Prevent closing when clicking outside
+        }}
       >
-        <div className="flex space-x-1">
+        <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
           {availableReactions.map(emoji => (
             <button 
               key={emoji}
               className="text-lg p-1 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
-              onClick={() => handleReact(emoji)}
+              onClick={(e) => handleEmojiClick(emoji, e)}
             >
               {emoji}
             </button>
