@@ -31,7 +31,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     chatRequests,
     activeChatsCount,
     isLoading,
-    showSavedMessage,
     
     // Methods
     initialize,
@@ -55,7 +54,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent 
-        className="max-w-xl w-[95%] h-[80vh] mx-auto bg-bookconnect-cream overflow-hidden flex flex-col" 
+        className="max-w-xl w-[95%] h-[85vh] mx-auto bg-bookconnect-cream overflow-hidden flex flex-col" 
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1528459105426-b9548367069b?q=80&w=1412&auto=format&fit=crop')`,
           backgroundSize: 'cover',
@@ -86,7 +85,6 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
         
         <ProfileDialogFooter
           isLoading={isLoading}
-          showSavedMessage={showSavedMessage}
           onSave={handleSaveProfile}
           onClose={onClose}
         />

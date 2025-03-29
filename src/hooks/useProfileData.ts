@@ -33,7 +33,6 @@ export function useProfileData() {
   const [chatRequests, setChatRequests] = useState<ChatRequest[]>([]);
   const [activeChatsCount, setActiveChatsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSavedMessage, setShowSavedMessage] = useState(false);
 
   const initialize = async () => {
     try {
@@ -99,8 +98,10 @@ export function useProfileData() {
       );
       
       if (success) {
-        setShowSavedMessage(true);
-        setTimeout(() => setShowSavedMessage(false), 3000);
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
       } else {
         toast({
           title: "Profile save failed!",
@@ -174,7 +175,6 @@ export function useProfileData() {
     chatRequests,
     activeChatsCount,
     isLoading,
-    showSavedMessage,
     
     // Methods
     initialize,

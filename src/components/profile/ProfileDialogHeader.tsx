@@ -4,8 +4,8 @@ import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ProfileDialogHeader: React.FC = () => {
   return (
-    <DialogHeader className="relative">
-      <div className="pt-2">
+    <DialogHeader className="relative py-3">
+      <div>
         <DialogTitle className="text-2xl text-center font-serif text-bookconnect-brown">
           Profile
         </DialogTitle>
