@@ -39,35 +39,37 @@ const ProfileDialogContent: React.FC<ProfileDialogContentProps> = ({
   onChatAction
 }) => {
   return (
-    <ScrollArea className="flex-1 h-full pr-4 max-h-[50vh]">
-      <div className="space-y-4 py-2 font-serif px-1">
-        <UsernameEditor username={username} setUsername={setUsername} />
+    <div className="flex-1 overflow-hidden">
+      <ScrollArea className="h-full pr-4">
+        <div className="space-y-4 py-2 font-serif px-1">
+          <UsernameEditor username={username} setUsername={setUsername} />
 
-        <ProfileForm 
-          favoriteAuthor={favoriteAuthor}
-          setFavoriteAuthor={setFavoriteAuthor}
-          favoriteGenre={favoriteGenre}
-          setFavoriteGenre={setFavoriteGenre}
-          bio={bio}
-          setBio={setBio}
-        />
-
-        <ChatSettings 
-          allowChats={allowChats}
-          setAllowChats={setAllowChats}
-          activeChatsCount={activeChatsCount}
-        />
-
-        {chatRequests.length > 0 && (
-          <ChatRequestsList 
-            chatRequests={chatRequests}
-            onChatAction={onChatAction}
+          <ProfileForm 
+            favoriteAuthor={favoriteAuthor}
+            setFavoriteAuthor={setFavoriteAuthor}
+            favoriteGenre={favoriteGenre}
+            setFavoriteGenre={setFavoriteGenre}
+            bio={bio}
+            setBio={setBio}
           />
-        )}
 
-        <ReadingActivity />
-      </div>
-    </ScrollArea>
+          <ChatSettings 
+            allowChats={allowChats}
+            setAllowChats={setAllowChats}
+            activeChatsCount={activeChatsCount}
+          />
+
+          {chatRequests.length > 0 && (
+            <ChatRequestsList 
+              chatRequests={chatRequests}
+              onChatAction={onChatAction}
+            />
+          )}
+
+          <ReadingActivity />
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 
