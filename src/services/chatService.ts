@@ -2,7 +2,7 @@
 import { apiCall, supabase, ChatMessage } from '@/lib/supabase';
 
 export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
-  const data = await apiCall(
+  const result = await apiCall(
     supabase
       .from('chat_messages')
       .select('*')
@@ -10,7 +10,7 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
       .order('timestamp', { ascending: true }),
     'Failed to load chat messages'
   );
-  return data || [];
+  return result || [];
 }
 
 export async function sendChatMessage(message: string, bookId: string, username: string, userId?: string): Promise<ChatMessage | null> {

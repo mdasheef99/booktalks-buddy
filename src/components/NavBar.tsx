@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Book } from "@/lib/book";
 import { searchBooks } from "@/services/bookService";
 
 const NavBar = () => {
