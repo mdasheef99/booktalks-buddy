@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { v5 as uuidv5 } from 'uuid';
 
@@ -13,6 +14,7 @@ export interface ChatMessage {
   read?: boolean;
   reply_to_id?: string;
   deleted_at?: string;
+  reactions?: Array<{reaction: string, count: number, userReacted: boolean, username: string}>;
 }
 
 // Message reaction type
@@ -98,7 +100,28 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
     }
     
     console.log("Retrieved messages:", data);
-    return data || [];
+    
+    // Process messages to include reactions
+    const messages = data || [];
+    const currentUsername = localStorage.getItem('anon_username') || 
+                          localStorage.getItem('username') || 
+                          'Anonymous Reader';
+                          
+    // Load reactions for each message
+    const messagesWithReactions = await Promise.all(messages.map(async (message) => {
+      try {
+        const reactions = await getMessageReactions(message.id);
+        return {
+          ...message,
+          reactions
+        };
+      } catch (e) {
+        console.error("Error loading reactions for message:", message.id, e);
+        return message;
+      }
+    }));
+    
+    return messagesWithReactions;
   } catch (error) {
     console.error("Failed to load chat messages:", error);
     return [];

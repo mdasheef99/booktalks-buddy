@@ -1,7 +1,6 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { ChatMessage, deleteMessage, addReaction, getMessageReactions, subscribeToReactions } from "@/services/chatService";
-import { ArrowUp, ArrowDown, Check, MoreHorizontal, Reply, Trash2, ChevronRight } from "lucide-react";
+import { ArrowUp, ArrowDown, Check, MoreHorizontal, Reply, Trash2, Heart, ThumbsUp, ThumbsDown, Star, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -21,6 +20,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface BookDiscussionChatProps {
   messages: ChatMessage[];
@@ -82,78 +87,33 @@ const MessageReactions = ({
       toast.error("Failed to react to message");
     }
   };
-  
-  if (reactions.length === 0 && !isOpen) {
-    return (
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-6 px-1.5 text-xs text-bookconnect-brown/50 hover:bg-bookconnect-terracotta/10 hover:text-bookconnect-brown"
-          >
-            React
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-2" align="start">
-          <div className="flex space-x-1">
-            {availableReactions.map(emoji => (
-              <button 
-                key={emoji}
-                className="text-lg p-1 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
-                onClick={() => handleReact(emoji)}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
-  }
-  
+
   return (
-    <div className="mt-1.5 flex flex-wrap items-center gap-1">
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-6 px-1.5 text-xs text-bookconnect-brown/50 hover:bg-bookconnect-terracotta/10 hover:text-bookconnect-brown"
-          >
-            React
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-2" align="start">
-          <div className="flex space-x-1">
-            {availableReactions.map(emoji => (
-              <button 
-                key={emoji}
-                className="text-lg p-1 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
-                onClick={() => handleReact(emoji)}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
-      
-      {reactions.map(({ reaction, count, userReacted }) => (
-        <button
-          key={reaction}
-          className={`px-1.5 py-0.5 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
-            userReacted 
-              ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30' 
-              : 'bg-bookconnect-brown/5 border-bookconnect-brown/10 hover:bg-bookconnect-terracotta/10'
-          }`}
-          onClick={() => handleReact(reaction)}
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center px-1.5 py-0 text-xs text-bookconnect-brown/50 hover:bg-bookconnect-terracotta/10 hover:text-bookconnect-brown"
         >
-          <span>{reaction}</span>
-          <span>{count}</span>
-        </button>
-      ))}
-    </div>
+          <Smile size={14} className="mr-1.5" />
+          <span>React</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-2" align="start">
+        <div className="flex space-x-1">
+          {availableReactions.map(emoji => (
+            <button 
+              key={emoji}
+              className="text-lg p-1 hover:bg-bookconnect-terracotta/10 rounded-full transition-transform hover:scale-110"
+              onClick={() => handleReact(emoji)}
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 
@@ -289,178 +249,208 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   }
 
   return (
-    <div className="relative h-full flex flex-col">
-      <div 
-        className="flex-1 overflow-auto p-4 scrollbar-thin scrollbar-thumb-bookconnect-brown/30 scrollbar-track-transparent" 
-        ref={scrollContainerRef}
-        style={{ scrollBehavior: 'smooth' }}
-      >
-        <div className="space-y-3">
-          {messages.map((message) => {
-            const isCurrentUser = message.username === currentUsername;
-            const originalMessage = findOriginalMessage(message.reply_to_id);
-            const isDeleted = !!message.deleted_at;
-            
-            return (
-              <div 
-                key={`${message.id}-${message.timestamp}`}
-                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                ref={el => {
-                  if (el) {
-                    messageRefs.current[message.id] = el;
-                  }
-                }}
-              >
+    <TooltipProvider>
+      <div className="relative h-full flex flex-col">
+        <div 
+          className="flex-1 overflow-auto p-4 scrollbar-thin scrollbar-thumb-bookconnect-brown/30 scrollbar-track-transparent" 
+          ref={scrollContainerRef}
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          <div className="space-y-3">
+            {messages.map((message) => {
+              const isCurrentUser = message.username === currentUsername;
+              const originalMessage = findOriginalMessage(message.reply_to_id);
+              const isDeleted = !!message.deleted_at;
+              
+              return (
                 <div 
-                  className={`relative max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
-                    ${isCurrentUser 
-                      ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
-                      : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
-                    } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out`}
+                  key={`${message.id}-${message.timestamp}`}
+                  className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                  ref={el => {
+                    if (el) {
+                      messageRefs.current[message.id] = el;
+                    }
+                  }}
                 >
-                  <div className={`text-xs mb-1 ${isCurrentUser ? 'text-white/80' : 'text-bookconnect-brown/70'}`}>
-                    {message.username}
-                  </div>
-                  
-                  {originalMessage && (
-                    <div 
-                      className={`mb-2 rounded px-2 py-1 cursor-pointer ${
-                        isCurrentUser ? 'bg-white/10' : 'bg-bookconnect-brown/10'
-                      }`}
-                      onClick={() => scrollToMessage(originalMessage.id)}
-                    >
-                      <div className={`text-xs font-medium ${
-                        isCurrentUser ? 'text-white/90' : 'text-bookconnect-brown/90'
-                      }`}>
-                        Replying to {originalMessage.username}
-                      </div>
-                      <div className={`text-xs italic truncate ${
-                        isCurrentUser ? 'text-white/70' : 'text-bookconnect-brown/70'
-                      }`}>
-                        {originalMessage.deleted_at 
-                          ? "Message deleted" 
-                          : originalMessage.message.length > 30
-                            ? `${originalMessage.message.substring(0, 30)}...`
-                            : originalMessage.message}
-                      </div>
+                  <div 
+                    className={`relative max-w-[80%] px-3 py-2 rounded-lg font-serif text-sm
+                      ${isCurrentUser 
+                        ? 'bg-bookconnect-sage/80 text-white rounded-tr-none' 
+                        : 'bg-bookconnect-terracotta/20 text-bookconnect-brown rounded-tl-none'
+                      } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out`}
+                  >
+                    <div className={`text-xs mb-1 ${isCurrentUser ? 'text-white/80' : 'text-bookconnect-brown/70'}`}>
+                      {message.username}
                     </div>
-                  )}
-                  
-                  <div style={{ wordBreak: "break-word" }}>
-                    {isDeleted ? (
-                      <span className="italic opacity-75">Message deleted</span>
-                    ) : (
-                      message.message
+                    
+                    {originalMessage && (
+                      <div 
+                        className={`mb-2 rounded px-2 py-1 cursor-pointer ${
+                          isCurrentUser ? 'bg-white/10' : 'bg-bookconnect-brown/10'
+                        }`}
+                        onClick={() => scrollToMessage(originalMessage.id)}
+                      >
+                        <div className={`text-xs font-medium ${
+                          isCurrentUser ? 'text-white/90' : 'text-bookconnect-brown/90'
+                        }`}>
+                          {originalMessage.username}
+                        </div>
+                        <div className={`text-xs italic truncate ${
+                          isCurrentUser ? 'text-white/70' : 'text-bookconnect-brown/70'
+                        }`}>
+                          {originalMessage.deleted_at 
+                            ? "Message deleted" 
+                            : originalMessage.message.length > 30
+                              ? `${originalMessage.message.substring(0, 30)}...`
+                              : originalMessage.message}
+                        </div>
+                      </div>
                     )}
-                  </div>
-                  
-                  {!isDeleted && (
-                    <div className="absolute top-2 right-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-5 w-5 p-0 text-bookconnect-brown/60 hover:text-bookconnect-brown"
-                          >
-                            <MoreHorizontal size={12} />
-                            <span className="sr-only">Message actions</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent 
-                          align={isMobile ? "center" : "end"}
-                          className="bg-[#f0e6d2] border-bookconnect-brown/20 w-[120px]"
-                        >
-                          <DropdownMenuItem 
-                            className="flex items-center cursor-pointer text-bookconnect-brown"
-                            onClick={() => onReplyToMessage(message)}
-                          >
-                            <Reply size={14} className="mr-2" />
-                            <span>Reply</span>
-                          </DropdownMenuItem>
-                          
-                          {isCurrentUser && (
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="flex items-center text-bookconnect-brown">
-                                <Trash2 size={14} className="mr-2" />
-                                <span>Delete</span>
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="bg-[#f0e6d2] border-bookconnect-brown/20">
-                                <DropdownMenuItem 
-                                  className="cursor-pointer text-bookconnect-brown"
-                                  onClick={() => handleDeleteMessage(message.id, true)}
-                                >
-                                  For Everyone
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="cursor-pointer text-bookconnect-brown"
-                                  onClick={() => handleDeleteMessage(message.id, false)}
-                                >
-                                  For Me Only
-                                </DropdownMenuItem>
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                          )}
-                          
-                          <DropdownMenuSeparator className="bg-bookconnect-brown/10" />
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
-                  
-                  <div className="flex flex-col items-start space-y-1 mt-1">
-                    <div className="flex justify-end items-center w-full space-x-1">
-                      <span className="text-[10px] opacity-70">
-                        {formatTime(message.timestamp)}
-                      </span>
-                      {isCurrentUser && (
-                        <span className="flex">
-                          <Check size={12} className="text-gray-400" />
-                          <Check size={12} className="text-blue-400 -ml-[8px]" />
-                        </span>
+                    
+                    <div style={{ wordBreak: "break-word" }}>
+                      {isDeleted ? (
+                        <span className="italic opacity-75">Message deleted</span>
+                      ) : (
+                        message.message
                       )}
                     </div>
                     
-                    <MessageReactions 
-                      messageId={message.id} 
-                      currentUsername={currentUsername} 
-                    />
+                    {!isDeleted && (
+                      <div className="absolute top-2 right-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-5 w-5 p-0 text-bookconnect-brown/60 hover:text-bookconnect-brown"
+                            >
+                              <MoreHorizontal size={12} />
+                              <span className="sr-only">Message actions</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent 
+                            align={isMobile ? "center" : "end"}
+                            className="bg-[#f0e6d2] border-bookconnect-brown/20 w-[120px]"
+                          >
+                            <DropdownMenuItem 
+                              className="flex items-center cursor-pointer text-bookconnect-brown"
+                              onClick={() => onReplyToMessage(message)}
+                            >
+                              <Reply size={14} className="mr-2" />
+                              <span>Reply</span>
+                            </DropdownMenuItem>
+                            
+                            {isCurrentUser && (
+                              <DropdownMenuSub>
+                                <DropdownMenuSubTrigger className="flex items-center text-bookconnect-brown">
+                                  <Trash2 size={14} className="mr-2" />
+                                  <span>Delete</span>
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent className="bg-[#f0e6d2] border-bookconnect-brown/20">
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-bookconnect-brown"
+                                    onClick={() => handleDeleteMessage(message.id, true)}
+                                  >
+                                    For Everyone
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-bookconnect-brown"
+                                    onClick={() => handleDeleteMessage(message.id, false)}
+                                  >
+                                    For Me Only
+                                  </DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                              </DropdownMenuSub>
+                            )}
+                            
+                            <DropdownMenuItem 
+                              className="flex items-center cursor-pointer text-bookconnect-brown"
+                            >
+                              <MessageReactions 
+                                messageId={message.id} 
+                                currentUsername={currentUsername} 
+                              />
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-col items-start space-y-1 mt-1">
+                      <div className="flex justify-between items-center w-full">
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {message.reactions?.map(({ reaction, count, userReacted }) => (
+                            <button
+                              key={reaction}
+                              className={`px-1.5 py-0.5 rounded-full text-xs border flex items-center space-x-1 transition-colors ${
+                                userReacted 
+                                  ? 'bg-bookconnect-terracotta/20 border-bookconnect-terracotta/30' 
+                                  : 'bg-bookconnect-brown/5 border-bookconnect-brown/10 hover:bg-bookconnect-terracotta/10'
+                              }`}
+                              onClick={() => addReaction(message.id, currentUsername, reaction)}
+                            >
+                              <span>{reaction}</span>
+                              <span>{count}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <span className="text-[10px] opacity-70 ml-auto flex items-center">
+                          {formatTime(message.timestamp)}
+                          {isCurrentUser && (
+                            <span className="flex ml-1">
+                              <Check size={12} className="text-gray-400" />
+                              <Check size={12} className="text-blue-400 -ml-[8px]" />
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+        
+        <div className="absolute inset-y-0 right-0 flex flex-col items-center justify-center pointer-events-none">
+          <div className="flex flex-col gap-20 pointer-events-auto">
+            {showScrollTop && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    onClick={scrollToTop}
+                    size="sm"
+                    variant="secondary"
+                    className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
+                  >
+                    <ArrowUp size={18} />
+                    <span className="sr-only">Scroll to top</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Scroll to top</TooltipContent>
+              </Tooltip>
+            )}
+            
+            {showScrollBottom && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    onClick={scrollToBottom}
+                    size="sm"
+                    variant="secondary"
+                    className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
+                  >
+                    <ArrowDown size={18} />
+                    <span className="sr-only">Scroll to bottom</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Scroll to bottom</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
-      
-      <div className="absolute inset-y-0 right-0 flex flex-col items-center justify-center pointer-events-none">
-        <div className="flex flex-col gap-20 pointer-events-auto">
-          {showScrollTop && (
-            <Button 
-              onClick={scrollToTop}
-              size="sm"
-              variant="secondary"
-              className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
-            >
-              <ArrowUp size={18} />
-              <span className="sr-only">Scroll to top</span>
-            </Button>
-          )}
-          
-          {showScrollBottom && (
-            <Button 
-              onClick={scrollToBottom}
-              size="sm"
-              variant="secondary"
-              className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
-            >
-              <ArrowDown size={18} />
-              <span className="sr-only">Scroll to bottom</span>
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

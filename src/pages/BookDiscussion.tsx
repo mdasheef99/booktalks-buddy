@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/services/chatService";
@@ -6,6 +7,7 @@ import BookDiscussionHeader from "@/components/books/BookDiscussionHeader";
 import BookDiscussionInput from "@/components/books/BookDiscussionInput";
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const BookDiscussion: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -128,50 +130,52 @@ const BookDiscussion: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col bg-bookconnect-cream">
-      <BookDiscussionHeader 
-        title={title} 
-        author={author} 
-        onBack={handleBack} 
-      />
-      
-      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 pb-4">
-        {connectionError && (
-          <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 px-3 py-1 rounded font-serif text-center text-sm animate-pulse mb-2">
-            Reconnecting to chat server...
-          </div>
-        )}
+    <TooltipProvider>
+      <div className="min-h-screen flex flex-col bg-bookconnect-cream">
+        <BookDiscussionHeader 
+          title={title} 
+          author={author} 
+          onBack={handleBack} 
+        />
         
-        <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20 overflow-hidden relative"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundBlendMode: "overlay",
-            minHeight: "calc(100vh - 180px)"
-          }}
-        >
-          {/* Chat area with fixed height to allow scrolling */}
-          <div className="absolute top-0 left-0 right-0 bottom-16 overflow-hidden">
-            <BookDiscussionChat 
-              messages={messages} 
-              loading={loading} 
-              currentUsername={username}
-              onReplyToMessage={handleReplyToMessage}
-            />
-          </div>
+        <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 pb-4">
+          {connectionError && (
+            <div className="bg-yellow-50 border border-yellow-100 text-yellow-800 px-3 py-1 rounded font-serif text-center text-sm animate-pulse mb-2">
+              Reconnecting to chat server...
+            </div>
+          )}
           
-          {/* Fixed input at the bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
-            <BookDiscussionInput 
-              onSendMessage={handleSendMessage} 
-              replyTo={replyTo}
-              onCancelReply={handleCancelReply}
-            />
+          <div className="flex-1 flex flex-col bg-white/80 rounded-lg shadow-md border border-bookconnect-brown/20 overflow-hidden relative"
+            style={{
+              backgroundImage: "url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1470&auto=format&fit=crop')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundBlendMode: "overlay",
+              minHeight: "calc(100vh - 180px)"
+            }}
+          >
+            {/* Chat area with fixed height to allow scrolling */}
+            <div className="absolute top-0 left-0 right-0 bottom-16 overflow-hidden">
+              <BookDiscussionChat 
+                messages={messages} 
+                loading={loading} 
+                currentUsername={username}
+                onReplyToMessage={handleReplyToMessage}
+              />
+            </div>
+            
+            {/* Fixed input at the bottom */}
+            <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/90 border-t border-bookconnect-brown/20">
+              <BookDiscussionInput 
+                onSendMessage={handleSendMessage} 
+                replyTo={replyTo}
+                onCancelReply={handleCancelReply}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

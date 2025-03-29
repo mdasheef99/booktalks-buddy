@@ -12,6 +12,7 @@ import { ChatMessage } from "@/services/chatService";
 import { 
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
 
@@ -98,95 +99,97 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
   };
   
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-1 border border-bookconnect-brown/20">
-      {replyTo && (
-        <div className="mx-2 mt-1 p-2 bg-bookconnect-terracotta/10 rounded text-sm font-serif border-l-2 border-bookconnect-brown/50 flex items-start justify-between">
-          <div className="flex-1">
-            <div className="text-xs font-medium text-bookconnect-brown">
-              Replying to {replyTo.username}
+    <TooltipProvider>
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-1 border border-bookconnect-brown/20">
+        {replyTo && (
+          <div className="mx-2 mt-1 p-2 bg-bookconnect-terracotta/10 rounded text-sm font-serif border-l-2 border-bookconnect-brown/50 flex items-start justify-between">
+            <div className="flex-1">
+              <div className="text-xs font-medium text-bookconnect-brown">
+                {replyTo.username}
+              </div>
+              <p className="text-bookconnect-brown/80 text-xs italic truncate">
+                {replyTo.deleted_at ? "Message deleted" : replyTo.message}
+              </p>
             </div>
-            <p className="text-bookconnect-brown/80 text-xs italic truncate">
-              {replyTo.deleted_at ? "Message deleted" : replyTo.message}
-            </p>
-          </div>
-          <Button 
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-5 w-5 p-0 text-bookconnect-brown/50 hover:text-bookconnect-brown hover:bg-transparent -mt-1"
-            onClick={onCancelReply}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Cancel reply</span>
-          </Button>
-        </div>
-      )}
-      
-      <div className="flex items-center">
-        <DropdownMenu open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
+            <Button 
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0 text-bookconnect-brown/70 hover:text-bookconnect-brown hover:bg-transparent"
-              onClick={() => setIsEmojiPickerOpen(true)}
+              className="h-5 w-5 p-0 text-bookconnect-brown/50 hover:text-bookconnect-brown hover:bg-transparent -mt-1"
+              onClick={onCancelReply}
             >
-              <Smile className="h-4 w-4" />
-              <span className="sr-only">Add emoji</span>
+              <X className="h-4 w-4" />
+              <span className="sr-only">Cancel reply</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="p-2 max-h-[300px] overflow-y-auto w-[250px]">
-            <div className="grid grid-cols-1 gap-2">
-              {emojiCategories.map((category) => (
-                <div key={category.name} className="space-y-1">
-                  <p className="text-xs font-medium text-bookconnect-brown/70 px-1">{category.name}</p>
-                  <div className="grid grid-cols-7 gap-1">
-                    {category.emojis.map((emoji) => (
-                      <button
-                        key={emoji}
-                        type="button"
-                        onClick={() => addEmoji(emoji)}
-                        className="text-lg hover:bg-bookconnect-terracotta/10 rounded p-1 transition-colors"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
+          </div>
+        )}
+        
+        <div className="flex items-center">
+          <DropdownMenu open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-bookconnect-brown/70 hover:text-bookconnect-brown hover:bg-transparent"
+                onClick={() => setIsEmojiPickerOpen(true)}
+              >
+                <Smile className="h-4 w-4" />
+                <span className="sr-only">Add emoji</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="p-2 max-h-[300px] overflow-y-auto w-[250px]">
+              <div className="grid grid-cols-1 gap-2">
+                {emojiCategories.map((category) => (
+                  <div key={category.name} className="space-y-1">
+                    <p className="text-xs font-medium text-bookconnect-brown/70 px-1">{category.name}</p>
+                    <div className="grid grid-cols-7 gap-1">
+                      {category.emojis.map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => addEmoji(emoji)}
+                          className="text-lg hover:bg-bookconnect-terracotta/10 rounded p-1 transition-colors"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder={replyTo ? "Type your reply..." : "Share your thoughts..."}
-          disabled={isSubmitting}
-          className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7"
-          ref={inputRef}
-        />
-        
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              type="submit" 
-              disabled={!message.trim() || isSubmitting} 
-              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0"
-            >
-              {isSubmitting ? (
-                <div className="h-3 w-3 border-t-transparent border-solid animate-spin rounded-full border-white border"></div>
-              ) : (
-                <Send className="h-3 w-3" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Send message</TooltipContent>
-        </Tooltip>
-      </div>
-    </form>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder={replyTo ? "Type your reply..." : "Share your thoughts..."}
+            disabled={isSubmitting}
+            className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7"
+            ref={inputRef}
+          />
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                type="submit" 
+                disabled={!message.trim() || isSubmitting} 
+                className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0"
+              >
+                {isSubmitting ? (
+                  <div className="h-3 w-3 border-t-transparent border-solid animate-spin rounded-full border-white border"></div>
+                ) : (
+                  <Send className="h-3 w-3" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Send message</TooltipContent>
+          </Tooltip>
+        </div>
+      </form>
+    </TooltipProvider>
   );
 };
 
