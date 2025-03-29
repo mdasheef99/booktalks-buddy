@@ -2,7 +2,10 @@
 import * as Sentry from "@sentry/react";
 import { BookType } from "@/types/books";
 
-// Since the API key isn't working, we'll use fallback data
+// Google Books API endpoint
+const BASE_URL = "https://www.googleapis.com/books/v1/volumes";
+
+// Fallback data for when the API fails
 const FALLBACK_BOOKS = [
   { 
     id: "fallback-1",
@@ -83,69 +86,70 @@ export async function fetchBooksByQuery(query: string, maxResults: number = 10):
   try {
     if (!query) return [];
     
-    // For now, return fallback data since the API key doesn't work
-    console.log(`Searching for books with query: ${query} (using fallbacks)`);
+    console.log(`Searching for books with query: ${query}`);
     
-    // Filter fallbacks that match the search query
+    // Attempt to fetch from the Google Books API first
+    const response = await fetch(
+      `${BASE_URL}?q=${encodeURIComponent(query)}&maxResults=${maxResults}`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Google Books API returned ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.items || data.items.length === 0) {
+      return [];
+    }
+    
+    console.log(`Found ${data.items.length} books from Google API`);
+    
+    return data.items.map((item: any) => ({
+      id: item.id,
+      title: item.volumeInfo.title,
+      author: item.volumeInfo.authors ? item.volumeInfo.authors.join(", ") : "Unknown Author",
+      description: item.volumeInfo.description || "No description available",
+      imageUrl: item.volumeInfo.imageLinks?.thumbnail || null,
+      publishedDate: item.volumeInfo.publishedDate,
+      pageCount: item.volumeInfo.pageCount,
+      categories: item.volumeInfo.categories || []
+    }));
+  } catch (error) {
+    // Log the error to Sentry
+    Sentry.captureException(error, {
+      tags: {
+        source: "googleBooksService",
+        action: "fetchBooksByQuery"
+      },
+      extra: {
+        query,
+        maxResults
+      }
+    });
+    
+    console.error("Error fetching books from Google Books API:", error);
+    
+    // Only use fallback data after API failure
+    console.log("Falling back to local data");
     return FALLBACK_BOOKS.filter(book => 
       book.title.toLowerCase().includes(query.toLowerCase()) || 
       book.author.toLowerCase().includes(query.toLowerCase()) ||
       book.description.toLowerCase().includes(query.toLowerCase())
     ).slice(0, maxResults);
-    
-    /* Original API code - commented out since API key doesn't work
-    const response = await fetch(
-      `${BASE_URL}?q=${encodeURIComponent(query)}&maxResults=${maxResults}&key=${API_KEY}`
-    );
-    
-    if (!response.ok) {
-      throw new Error(`Google Books API returned ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data.items || data.items.length === 0) {
-      return [];
-    }
-    
-    return data.items.map((item: any) => ({
-      id: item.id,
-      title: item.volumeInfo.title,
-      author: item.volumeInfo.authors ? item.volumeInfo.authors.join(", ") : "Unknown Author",
-      description: item.volumeInfo.description || "No description available",
-      imageUrl: item.volumeInfo.imageLinks?.thumbnail || null,
-      publishedDate: item.volumeInfo.publishedDate,
-      pageCount: item.volumeInfo.pageCount,
-      categories: item.volumeInfo.categories || []
-    }));
-    */
-  } catch (error) {
-    Sentry.captureException(error);
-    console.error("Error fetching books from Google Books API:", error);
-    return [];
   }
 }
 
 export async function fetchTrendingBooks(genre: string, maxResults: number = 5): Promise<BookType[]> {
   try {
-    // Return filtered fallback data based on genre
-    console.log(`Fetching trending books for genre: ${genre} (using fallbacks)`);
+    // Add relevance to the genre
+    const query = `${genre} subject:${genre} relevance:high`;
     
-    // Filter by genre if specified, otherwise return all fallbacks
-    const filtered = genre 
-      ? FALLBACK_BOOKS.filter(book => 
-          book.categories.some(cat => cat.toLowerCase().includes(genre.toLowerCase()))
-        )
-      : FALLBACK_BOOKS;
-      
-    return filtered.slice(0, maxResults);
+    console.log(`Fetching trending books for genre: ${genre}`);
     
-    /* Original API code - commented out since API key doesn't work
-    // Add relevance to India and the specified genre
-    const query = `${genre} subject:${genre} inauthor:indian relevance:high`;
-    
+    // Attempt to fetch from the Google Books API first
     const response = await fetch(
-      `${BASE_URL}?q=${encodeURIComponent(query)}&maxResults=${maxResults}&orderBy=relevance&key=${API_KEY}`
+      `${BASE_URL}?q=${encodeURIComponent(query)}&maxResults=${maxResults}&orderBy=relevance`
     );
     
     if (!response.ok) {
@@ -155,7 +159,7 @@ export async function fetchTrendingBooks(genre: string, maxResults: number = 5):
     const data = await response.json();
     
     if (!data.items || data.items.length === 0) {
-      return [];
+      throw new Error("No trending books found");
     }
     
     return data.items.map((item: any) => ({
@@ -168,10 +172,29 @@ export async function fetchTrendingBooks(genre: string, maxResults: number = 5):
       pageCount: item.volumeInfo.pageCount,
       categories: item.volumeInfo.categories || []
     }));
-    */
   } catch (error) {
-    Sentry.captureException(error);
+    // Log the error to Sentry
+    Sentry.captureException(error, {
+      tags: {
+        source: "googleBooksService",
+        action: "fetchTrendingBooks"
+      },
+      extra: {
+        genre,
+        maxResults
+      }
+    });
+    
     console.error("Error fetching trending books:", error);
-    return FALLBACK_BOOKS.slice(0, maxResults);
+    
+    // Only use fallback data after API failure
+    console.log("Falling back to local trending books data");
+    const filtered = genre 
+      ? FALLBACK_BOOKS.filter(book => 
+          book.categories.some(cat => cat.toLowerCase().includes(genre.toLowerCase()))
+        )
+      : FALLBACK_BOOKS;
+    
+    return filtered.slice(0, maxResults);
   }
 }

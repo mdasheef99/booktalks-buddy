@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
@@ -42,21 +42,55 @@ const ExploreBooks: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Search query handling
-  const { data: searchResults, isLoading: isSearching, refetch: searchBooks, isError: isSearchError } = useQuery({
+  // Search query handling with enabled set to true when searchQuery has content
+  const { 
+    data: searchResults, 
+    isLoading: isSearching, 
+    refetch: searchBooks, 
+    isError: isSearchError 
+  } = useQuery({
     queryKey: ["bookSearch", searchQuery],
     queryFn: () => fetchBooksByQuery(searchQuery, 8),
-    enabled: false,
+    enabled: searchQuery.length > 0,
+    meta: {
+      onError: (error: Error) => {
+        // Log error to Sentry
+        Sentry.captureException(error, {
+          tags: { 
+            component: "ExploreBooks",
+            action: "searchBooks" 
+          },
+          extra: { searchQuery }
+        });
+        
+        toast({
+          title: "Search Error",
+          description: "We couldn't find what you're looking for. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   });
 
   // Trending books query
-  const { data: trendingBooks, isLoading: isTrendingLoading, isError: isTrendingError } = useQuery({
+  const { 
+    data: trendingBooks, 
+    isLoading: isTrendingLoading, 
+    isError: isTrendingError 
+  } = useQuery({
     queryKey: ["trendingBooks", genre],
     queryFn: () => fetchTrendingBooks(genre, 5),
-    // Using meta.onError instead of direct onError prop
     meta: {
       onError: (error: Error) => {
-        Sentry.captureException(error);
+        // Log error to Sentry 
+        Sentry.captureException(error, {
+          tags: { 
+            component: "ExploreBooks", 
+            action: "fetchTrendingBooks" 
+          },
+          extra: { genre }
+        });
+        
         toast({
           title: "Couldn't load trending books",
           description: "We're having trouble finding the hottest reads right now.",
@@ -68,7 +102,10 @@ const ExploreBooks: React.FC = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    searchBooks();
+    if (query.trim()) {
+      console.log("Performing search for:", query);
+      searchBooks();
+    }
   };
 
   const handleJoinDiscussion = (bookId: string, bookTitle: string) => {

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface BookSearchFormProps {
   onSearch: (query: string) => void;
@@ -11,7 +12,9 @@ interface BookSearchFormProps {
 
 const BookSearchForm: React.FC<BookSearchFormProps> = ({ onSearch, isSearching }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedQuery = useDebounce(searchQuery, 500);
 
+  // Handle form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim().length > 0) {
@@ -19,12 +22,20 @@ const BookSearchForm: React.FC<BookSearchFormProps> = ({ onSearch, isSearching }
     }
   };
 
+  // Handle Enter key press
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && searchQuery.trim().length > 0) {
       e.preventDefault();
       onSearch(searchQuery);
     }
   };
+
+  // Trigger search on debounced query change
+  React.useEffect(() => {
+    if (debouncedQuery && debouncedQuery.trim().length > 2) {
+      onSearch(debouncedQuery);
+    }
+  }, [debouncedQuery, onSearch]);
 
   return (
     <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
@@ -49,6 +60,7 @@ const BookSearchForm: React.FC<BookSearchFormProps> = ({ onSearch, isSearching }
           type="submit" 
           className="ml-2 bg-bookconnect-brown hover:bg-bookconnect-brown/80"
           aria-label="Search for books"
+          disabled={isSearching || searchQuery.trim().length === 0}
         >
           {isSearching ? (
             <Loader2 className="h-5 w-5 animate-spin" />
