@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { addReaction, getMessageReactions, subscribeToReactions } from "@/services/chatService";
+import { addReaction, getMessageReactions, subscribeToReactions } from "@/services/chat/messageService";
 import { Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

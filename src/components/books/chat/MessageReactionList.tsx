@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { addReaction } from "@/services/chatService";
+import { addReaction } from "@/services/chat/messageService";
 import { ReactionData } from "./MessageReaction";
 import {
   Dialog,
