@@ -16,7 +16,7 @@ export const supabase = supabaseClient;
 
 // Wrapper function for API calls with error handling
 export async function apiCall<T>(
-  promise: Promise<{ data: T | null; error: any }>,
+  promise: any, // Allow any type for flexibility with Supabase's return types
   errorMessage: string = 'An error occurred. Please try again later.'
 ): Promise<T | null> {
   try {
