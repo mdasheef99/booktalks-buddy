@@ -140,30 +140,33 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
         </div>
       </div>
       
-      {/* Scroll navigation arrows */}
-      <div className={`absolute ${isMobile ? 'right-2' : 'right-4'} bottom-4 flex flex-col gap-2 z-10`}>
-        {showScrollTop && (
-          <Button 
-            onClick={scrollToTop}
-            size="sm"
-            variant="secondary"
-            className="bg-bookconnect-brown/70 hover:bg-bookconnect-brown text-white rounded-full h-8 w-8 p-0 animate-fade-in shadow-md"
-          >
-            <ArrowUp size={16} />
-            <span className="sr-only">Scroll to top</span>
-          </Button>
-        )}
-        {showScrollBottom && (
-          <Button 
-            onClick={scrollToBottom}
-            size="sm"
-            variant="secondary"
-            className="bg-bookconnect-brown/70 hover:bg-bookconnect-brown text-white rounded-full h-8 w-8 p-0 animate-fade-in shadow-md"
-          >
-            <ArrowDown size={16} />
-            <span className="sr-only">Scroll to bottom</span>
-          </Button>
-        )}
+      {/* Scroll navigation buttons - centered and transparent */}
+      <div className="absolute inset-y-0 right-0 flex flex-col items-center justify-center pointer-events-none">
+        <div className="flex flex-col gap-20 pointer-events-auto">
+          {showScrollTop && (
+            <Button 
+              onClick={scrollToTop}
+              size="sm"
+              variant="secondary"
+              className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
+            >
+              <ArrowUp size={18} />
+              <span className="sr-only">Scroll to top</span>
+            </Button>
+          )}
+          
+          {showScrollBottom && (
+            <Button 
+              onClick={scrollToBottom}
+              size="sm"
+              variant="secondary"
+              className="bg-bookconnect-brown/30 hover:bg-bookconnect-brown/50 text-white rounded-full h-10 w-10 p-0 animate-fade-in shadow-md transition-all duration-300"
+            >
+              <ArrowDown size={18} />
+              <span className="sr-only">Scroll to bottom</span>
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

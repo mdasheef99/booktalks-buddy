@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -11,6 +10,11 @@ interface BookDiscussionInputProps {
 const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,8 +25,11 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
       setIsSubmitting(true);
       await onSendMessage(message);
       setMessage("");
-      // Clear any previous error toast
       toast.dismiss("message-error");
+      
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again.", {
@@ -44,6 +51,7 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ onSendMessage
           placeholder="Share your thoughts..."
           disabled={isSubmitting}
           className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7"
+          ref={inputRef}
         />
         <Button 
           type="submit" 
