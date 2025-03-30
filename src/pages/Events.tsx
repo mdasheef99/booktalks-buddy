@@ -111,6 +111,15 @@ const EventSkeleton = () => (
   </Card>
 );
 
+// Sample event that will be shown when there are no events from the database
+const sampleEvent: Event = {
+  id: "sample-event-id",
+  title: "Book Club Meeting - The Great Gatsby",
+  date: "2025-04-15T18:00:00Z",
+  description: "Join us for a lively discussion about F. Scott Fitzgerald's classic novel. Bring your insights and favorite passages to share!\n\nLocation: Central Library, Meeting Room 3\nGuests: All book club members welcome",
+  created_at: new Date().toISOString()
+};
+
 const Events = () => {
   const { data: events, isLoading, isError, refetch } = useQuery({
     queryKey: ['events'],
@@ -123,6 +132,9 @@ const Events = () => {
     refetch();
     console.log("Events page mounted, refetching events");
   }, [refetch]);
+
+  // Combine fetched events with our sample event if there are no events
+  const displayEvents = (events && events.length > 0) ? events : [sampleEvent];
 
   return (
     <Layout>
@@ -140,16 +152,11 @@ const Events = () => {
             <div className="text-center py-12">
               <p className="text-lg text-red-500">Failed to load events. Please try again later.</p>
             </div>
-          ) : events && events.length > 0 ? (
+          ) : (
             <div className="space-y-6">
-              {events.map((event) => (
+              {displayEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-bookconnect-cream rounded-xl">
-              <h3 className="text-xl font-serif mb-2">No upcoming events</h3>
-              <p className="text-muted-foreground">Check back later for new events!</p>
             </div>
           )}
           
