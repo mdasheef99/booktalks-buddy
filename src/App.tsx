@@ -28,8 +28,8 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/interactive-chat" element={<InteractiveChatEntry />} /> {/* Add this route */}
-          <Route element={<Layout />}>
+          <Route path="/interactive-chat" element={<InteractiveChatEntry />} /> 
+          <Route element={<Layout children={undefined} />}> {/* Fix the TypeScript error by passing children prop */}
             <Route path="/profile" element={<Profile />} />
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/books" element={<Books />} />
