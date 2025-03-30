@@ -1,6 +1,4 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { BookOpen, BookIcon, Library, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

@@ -20,11 +20,15 @@ const InteractiveBookSection = ({ showInteractiveBook }: InteractiveBookSectionP
           </p>
         </div>
         
-        {/* 3D Interactive Book */}
-        <InteractiveBook />
+        <div className="my-12 min-h-[500px]">
+          {/* 3D Interactive Book */}
+          <InteractiveBook />
+        </div>
         
         {/* Accessible Alternative */}
-        <AccessibleGenreSelector />
+        <div className="mt-8">
+          <AccessibleGenreSelector />
+        </div>
       </div>
     </div>
   );
