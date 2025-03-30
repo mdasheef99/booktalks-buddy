@@ -42,8 +42,8 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       toast.success("Welcome to Book Club!");
       navigate("/book-club");
     } catch (error: any) {
-      toast.error(error.message || "Failed to login. Please try again.");
       console.error("Login error:", error);
+      toast.error(error.message || "Failed to login. Please try again.");
     } finally {
       setIsLoading(false);
     }
