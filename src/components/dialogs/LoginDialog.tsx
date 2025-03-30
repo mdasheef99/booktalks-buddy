@@ -48,6 +48,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     }, 3000);
 
     try {
+      console.log("Dialog login attempt with:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -59,6 +60,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
         throw error;
       }
 
+      console.log("Dialog login successful, user:", data.user);
       toast.success("Welcome to Book Club!");
       navigate("/book-club");
       onOpenChange(false); // Close dialog on successful login
@@ -130,15 +132,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               Login is taking longer than usual. Please wait while we authenticate you...
             </div>
           )}
-          
-          <div className="text-xs text-[#5c4033]/70 mt-4">
-            <p className="font-medium mb-2">Sample Logins:</p>
-            <ul className="space-y-1">
-              <li>kafka@bookconnect.com / kafka</li>
-              <li>darcy456@bookconnect.com / darcy456</li>
-              <li>admin@bookconnect.com / admin123</li>
-            </ul>
-          </div>
         </form>
       </DialogContent>
     </Dialog>

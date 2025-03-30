@@ -26,6 +26,7 @@ const Login = () => {
     setIsLoading(true);
     
     try {
+      console.log("Attempting login with:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -35,6 +36,7 @@ const Login = () => {
         throw error;
       }
 
+      console.log("Login successful, user:", data.user);
       toast.success("Successfully signed in!");
       navigate("/book-club");
     } catch (error: any) {
@@ -93,15 +95,6 @@ const Login = () => {
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
-              
-              <div className="text-xs text-muted-foreground mt-4">
-                <p className="font-medium mb-2">Sample Logins:</p>
-                <ul className="space-y-1">
-                  <li>kafka@bookconnect.com / kafka</li>
-                  <li>darcy456@bookconnect.com / darcy456</li>
-                  <li>admin@bookconnect.com / admin123</li>
-                </ul>
-              </div>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col">
