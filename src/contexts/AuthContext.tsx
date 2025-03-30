@@ -25,17 +25,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const fetchSession = async () => {
+      console.log("Fetching initial session...");
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("Initial session:", session);
       setSession(session);
       
       if (session?.user) {
-        const { data } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        
-        setUser(data as User);
+        console.log("Session user found, fetching profile...");
+        try {
+          const { data } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          console.log("User profile:", data);
+          setUser(data as User);
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
       }
       
       setLoading(false);
@@ -44,17 +52,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        console.log("Auth state changed:", event, session);
         setSession(session);
         
         if (session?.user) {
-          const { data } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-          
-          setUser(data as User);
+          try {
+            console.log("Fetching user profile after auth state change...");
+            const { data } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            console.log("Updated user profile:", data);
+            setUser(data as User);
+          } catch (error) {
+            console.error("Error fetching user profile after auth state change:", error);
+          }
         } else {
           setUser(null);
         }
@@ -64,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
+      console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
   }, []);

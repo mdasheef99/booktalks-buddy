@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -16,7 +17,6 @@ import { MagnifyingGlass } from '@/components/icons/MagnifyingGlass';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import * as Sentry from "@sentry/react";
-import { supabase } from '@/lib/supabase';
 
 // Book type definition
 interface Book {
@@ -39,51 +39,65 @@ const BookClub: React.FC = () => {
   const { user, session, signOut } = useAuth();
   const navigate = useNavigate();
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!session) {
-      navigate('/');
-      return;
-    }
+    console.log("BookClub component mounted, checking auth state");
+    console.log("Current session:", session);
+    console.log("Current user:", user);
+    
+    // Allow a brief moment for auth state to be retrieved
+    const authCheckTimer = setTimeout(() => {
+      if (!session) {
+        console.log("No session found, redirecting to login");
+        toast.error("Please login to access the Book Club");
+        navigate('/login');
+        return;
+      } else {
+        console.log("Session found, initializing clubs");
+        setLoading(false);
+        
+        // Initialize clubs with hardcoded data
+        setClubs([
+          {
+            id: 'mystery',
+            name: 'Mystery Club',
+            icon: <MagnifyingGlass className="h-5 w-5" />,
+            color: '#4a3a2b',
+            books: [
+              { id: 'sherlock', title: 'Sherlock Holmes', author: 'Arthur Conan Doyle', votes: 5 },
+              { id: 'orient', title: 'Murder on the Orient Express', author: 'Agatha Christie', votes: 3 },
+              { id: 'davinci', title: 'The Da Vinci Code', author: 'Dan Brown', votes: 2 },
+            ]
+          },
+          {
+            id: 'scifi',
+            name: 'Sci-Fi Club',
+            icon: <Rocket className="h-5 w-5" />,
+            color: '#2b4a5c',
+            books: [
+              { id: 'dune', title: 'Dune', author: 'Frank Herbert', votes: 7 },
+              { id: '1984', title: '1984', author: 'George Orwell', votes: 4 },
+              { id: 'neuromancer', title: 'Neuromancer', author: 'William Gibson', votes: 2 },
+            ]
+          },
+          {
+            id: 'classics',
+            name: 'Classics Club',
+            icon: <Feather className="h-5 w-5" />,
+            color: '#d9c8a9',
+            books: [
+              { id: 'janeeyre', title: 'Jane Eyre', author: 'Charlotte Brontë', votes: 6 },
+              { id: 'pride', title: 'Pride and Prejudice', author: 'Jane Austen', votes: 5 },
+              { id: 'gatsby', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', votes: 3 },
+            ]
+          },
+        ]);
+      }
+    }, 500); // Small delay to allow auth state to update
 
-    // Initialize clubs with hardcoded data
-    setClubs([
-      {
-        id: 'mystery',
-        name: 'Mystery Club',
-        icon: <MagnifyingGlass className="h-5 w-5" />,
-        color: '#4a3a2b',
-        books: [
-          { id: 'sherlock', title: 'Sherlock Holmes', author: 'Arthur Conan Doyle', votes: 5 },
-          { id: 'orient', title: 'Murder on the Orient Express', author: 'Agatha Christie', votes: 3 },
-          { id: 'davinci', title: 'The Da Vinci Code', author: 'Dan Brown', votes: 2 },
-        ]
-      },
-      {
-        id: 'scifi',
-        name: 'Sci-Fi Club',
-        icon: <Rocket className="h-5 w-5" />,
-        color: '#2b4a5c',
-        books: [
-          { id: 'dune', title: 'Dune', author: 'Frank Herbert', votes: 7 },
-          { id: '1984', title: '1984', author: 'George Orwell', votes: 4 },
-          { id: 'neuromancer', title: 'Neuromancer', author: 'William Gibson', votes: 2 },
-        ]
-      },
-      {
-        id: 'classics',
-        name: 'Classics Club',
-        icon: <Feather className="h-5 w-5" />,
-        color: '#d9c8a9',
-        books: [
-          { id: 'janeeyre', title: 'Jane Eyre', author: 'Charlotte Brontë', votes: 6 },
-          { id: 'pride', title: 'Pride and Prejudice', author: 'Jane Austen', votes: 5 },
-          { id: 'gatsby', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', votes: 3 },
-        ]
-      },
-    ]);
-  }, [session, navigate]);
+    return () => clearTimeout(authCheckTimer);
+  }, [session, navigate, user]);
 
   const handleLogout = async () => {
     try {
@@ -135,8 +149,28 @@ const BookClub: React.FC = () => {
     return [...books].sort((a, b) => b.votes - a.votes)[0];
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f5f0e6] flex items-center justify-center">
+        <div className="text-center p-8 bg-white/80 rounded-lg shadow-lg border border-[#5c4033]/20">
+          <div className="animate-pulse mb-4">
+            <div className="h-12 w-12 mx-auto rounded-full bg-[#5c4033]/30"></div>
+          </div>
+          <p className="font-serif text-[#5c4033]">Loading Book Club...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-[#f5f0e6] flex items-center justify-center">
+        <div className="text-center p-8 bg-white/80 rounded-lg shadow-lg border border-[#5c4033]/20">
+          <p className="font-serif text-[#5c4033] mb-4">Please log in to view the Book Club</p>
+          <Button onClick={() => navigate('/login')}>Go to Login</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -167,7 +201,7 @@ const BookClub: React.FC = () => {
             </div>
             
             <div className="bg-[#fff]/60 p-6 rounded-lg mb-8 border border-[#5c4033]/10">
-              <h2 className="text-2xl font-serif text-[#5c4033] mb-4">Welcome to the BookConnect Book Clubs!</h2>
+              <h2 className="text-2xl font-serif text-[#5c4033] mb-4">Welcome {user.email}!</h2>
               <p className="text-[#5c4033]/80">
                 Join our exclusive book clubs to discuss your favorite genres with fellow readers. 
                 Vote on books you'd like to discuss next and join the conversations!
