@@ -22,6 +22,7 @@ import ChatSelection from "./pages/ChatSelection";
 import ExploreBooks from "./pages/ExploreBooks";
 import BookDiscussion from "./pages/BookDiscussion"; 
 import UserProfile from "./pages/UserProfile";
+import BookClub from "./pages/BookClub";
 
 // Initialize Sentry
 Sentry.init({
@@ -83,6 +84,7 @@ const App = () => (
               <Route path="/profile/:username" element={<UserProfile />} />
               <Route path="/search" element={<Search />} />
               <Route path="/chat-selection" element={<ChatSelection />} />
+              <Route path="/book-club" element={<BookClub />} />
               <Route path="*" element={<NotFound />} />
             </SentryRoutes>
           </AuthProvider>

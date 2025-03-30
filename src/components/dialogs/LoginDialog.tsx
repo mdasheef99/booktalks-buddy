@@ -1,0 +1,116 @@
+
+import { useState } from "react";
+import { Book } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+interface LoginDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Welcome to Book Club!");
+      navigate("/book-club");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to login. Please try again.");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md bg-[#f0e6d2] border-[#5c4033]">
+        <DialogHeader>
+          <DialogTitle className="text-center text-[#5c4033] flex items-center justify-center gap-2 text-2xl font-serif">
+            <Book className="h-6 w-6" />
+            Book Club Login
+          </DialogTitle>
+          <DialogDescription className="text-center text-[#5c4033]/80">
+            Login to access the Book Club feature
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleLogin} className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-[#5c4033]">
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@example.com"
+              required
+              className="bg-[#f0e6d2] border-[#5c4033]/40 text-[#5c4033]"
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-medium text-[#5c4033]">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="bg-[#f0e6d2] border-[#5c4033]/40 text-[#5c4033]"
+            />
+          </div>
+          
+          <div className="pt-2">
+            <Button 
+              type="submit" 
+              className="w-full bg-[#5c4033] hover:bg-[#5c4033]/80"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
+          </div>
+          
+          <div className="text-xs text-[#5c4033]/70 mt-4">
+            <p className="font-medium mb-2">Sample Logins:</p>
+            <ul className="space-y-1">
+              <li>kafka@bookconnect.com / kafka</li>
+              <li>darcy456@bookconnect.com / darcy456</li>
+              <li>admin@bookconnect.com / admin123</li>
+            </ul>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

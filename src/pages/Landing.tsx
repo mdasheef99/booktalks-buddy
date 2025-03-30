@@ -4,15 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet";
-import { BookOpen, Calendar, Users } from "lucide-react";
+import { BookOpen, Calendar, Users, BookIcon } from "lucide-react";
 import { UsernameDialog } from "@/components/dialogs/UsernameDialog";
 import { GenreDialog } from "@/components/dialogs/GenreDialog";
+import { LoginDialog } from "@/components/dialogs/LoginDialog";
+import { supabase } from "@/lib/supabase";
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [usernameDialogOpen, setUsernameDialogOpen] = useState(false);
   const [genreDialogOpen, setGenreDialogOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [currentUsername, setCurrentUsername] = useState("");
 
   const handleUsernameComplete = (username: string) => {
@@ -23,6 +26,15 @@ const Landing = () => {
 
   const handleStartChatting = () => {
     setUsernameDialogOpen(true);
+  };
+
+  const handleBookClubClick = async () => {
+    if (user) {
+      navigate("/book-club");
+    } else {
+      // Show login dialog for non-authenticated users
+      setLoginDialogOpen(true);
+    }
   };
 
   const handleBookClubsClick = () => {
@@ -69,14 +81,25 @@ const Landing = () => {
           <p className="text-lg md:text-xl text-white/90 mb-8">
             Join our community of book lovers and connect anonymously through your shared passion for reading
           </p>
-          <Button 
-            onClick={handleStartChatting}
-            size="lg"
-            className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white px-8 py-6 text-xl rounded-md"
-          >
-            <BookOpen className="mr-2" /> 
-            Start Chatting Anonymously
-          </Button>
+          <div className="space-y-4">
+            <Button 
+              onClick={handleStartChatting}
+              size="lg"
+              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white px-8 py-6 text-xl rounded-md"
+            >
+              <BookOpen className="mr-2" /> 
+              Start Chatting Anonymously
+            </Button>
+            
+            <Button 
+              onClick={handleBookClubClick}
+              size="lg"
+              className="bg-[#5c4033] hover:bg-[#5c4033]/90 text-white px-8 py-6 text-xl rounded-md"
+            >
+              <BookIcon className="mr-2 h-6 w-6" /> 
+              Book Club
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -157,6 +180,11 @@ const Landing = () => {
         open={genreDialogOpen} 
         onOpenChange={setGenreDialogOpen}
         username={currentUsername}
+      />
+      
+      <LoginDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
       />
     </div>
   );
