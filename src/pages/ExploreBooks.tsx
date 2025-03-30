@@ -73,6 +73,14 @@ const ExploreBooks: React.FC = () => {
           onJoinDiscussion={handleJoinDiscussion}
         />
         
+        <DiscussedBooksSection 
+          books={discussedBooks}
+          isLoading={isDiscussedLoading}
+          isError={isDiscussedError}
+          onJoinDiscussion={handleJoinDiscussion}
+          onRefresh={refetchDiscussedBooks}
+        />
+
         <TrendingBooksSection
           genre={primaryGenre}
           books={trendingBooks}
@@ -80,14 +88,6 @@ const ExploreBooks: React.FC = () => {
           isError={isTrendingError}
           fallbackBooks={FALLBACK_TRENDING_BOOKS}
           onJoinDiscussion={handleJoinDiscussion}
-        />
-
-        <DiscussedBooksSection 
-          books={discussedBooks}
-          isLoading={isDiscussedLoading}
-          isError={isDiscussedError}
-          onJoinDiscussion={handleJoinDiscussion}
-          onRefresh={refetchDiscussedBooks}
         />
       </ExploreContainer>
       
