@@ -1,5 +1,4 @@
 
-import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +29,7 @@ const Index = () => {
   });
 
   return (
-    <Layout>
+    <div>
       {/* Hero Section */}
       <section className="relative py-20 px-4 my-8 rounded-xl bg-bookconnect-cream">
         <div className="max-w-4xl mx-auto text-center">
@@ -173,7 +172,7 @@ const Index = () => {
           </Button>
         </div>
       </section>
-    </Layout>
+    </div>
   );
 };
 

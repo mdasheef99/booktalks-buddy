@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
@@ -72,52 +71,50 @@ const Profile = () => {
   }
   
   return (
-    <Layout>
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-serif font-bold mb-8 text-bookconnect-brown">Your Profile</h1>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-4xl font-serif font-bold mb-8 text-bookconnect-brown">Your Profile</h1>
+      
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Information</CardTitle>
+            <CardDescription>
+              Update your account details
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AccountInfoForm 
+              email={user.email} 
+              username={username} 
+              setUsername={setUsername}
+              isUpdating={isUpdating}
+              onSubmit={handleUpdateProfile}
+            />
+          </CardContent>
+        </Card>
         
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-              <CardDescription>
-                Update your account details
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AccountInfoForm 
-                email={user.email} 
-                username={username} 
-                setUsername={setUsername}
-                isUpdating={isUpdating}
-                onSubmit={handleUpdateProfile}
-              />
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Details</CardTitle>
-              <CardDescription>
-                Tell the community about yourself
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProfileForm
-                favoriteAuthor={favoriteAuthor}
-                setFavoriteAuthor={setFavoriteAuthor}
-                favoriteGenre={favoriteGenre}
-                setFavoriteGenre={setFavoriteGenre}
-                bio={bio}
-                setBio={setBio}
-              />
-            </CardContent>
-          </Card>
-          
-          <ReadingActivity />
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Details</CardTitle>
+            <CardDescription>
+              Tell the community about yourself
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ProfileForm
+              favoriteAuthor={favoriteAuthor}
+              setFavoriteAuthor={setFavoriteAuthor}
+              favoriteGenre={favoriteGenre}
+              setFavoriteGenre={setFavoriteGenre}
+              bio={bio}
+              setBio={setBio}
+            />
+          </CardContent>
+        </Card>
+        
+        <ReadingActivity />
       </div>
-    </Layout>
+    </div>
   );
 };
 

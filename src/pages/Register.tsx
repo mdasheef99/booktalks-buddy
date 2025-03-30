@@ -5,7 +5,6 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Layout from "@/components/Layout";
 import { toast } from "sonner";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
@@ -42,99 +41,97 @@ const Register = () => {
   };
 
   return (
-    <Layout>
-      <div className="flex justify-center items-center min-h-[80vh]">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                className="p-0 mr-2" 
-                onClick={() => navigate('/login')}
-                title="Back to login page"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <CardTitle className="text-3xl font-serif">Create an Account</CardTitle>
+    <div className="flex justify-center items-center min-h-[80vh]">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              className="p-0 mr-2" 
+              onClick={() => navigate('/login')}
+              title="Back to login page"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <CardTitle className="text-3xl font-serif">Create an Account</CardTitle>
+          </div>
+          <CardDescription>
+            Join BookConnect to connect with other book lovers
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">Email</label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-            <CardDescription>
-              Join BookConnect to connect with other book lovers
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="username" className="text-sm font-medium">Username</label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Choose a username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">Password</label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-500" />
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters long
-                </p>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-              >
-                {isLoading ? "Creating account..." : "Create Account"}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex flex-col">
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <Link to="/login" className="text-primary hover:underline">
-                Sign In
-              </Link>
+            <div className="space-y-2">
+              <label htmlFor="username" className="text-sm font-medium">Username</label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Choose a username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
             </div>
-          </CardFooter>
-        </Card>
-      </div>
-    </Layout>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">Password</label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 6 characters long
+              </p>
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating account..." : "Create Account"}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col">
+          <div className="text-center text-sm">
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary hover:underline">
+              Sign In
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

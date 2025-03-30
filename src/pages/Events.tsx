@@ -1,6 +1,5 @@
 
 import { useEffect } from "react";
-import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -146,41 +145,39 @@ const Events = () => {
   console.log("Display events:", displayEvents);
 
   return (
-    <Layout>
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-serif font-bold mb-8">Upcoming Events</h1>
-          
-          {isLoading ? (
-            <div className="space-y-6">
-              {[...Array(3)].map((_, i) => (
-                <EventSkeleton key={i} />
-              ))}
-            </div>
-          ) : isError ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-red-500">Failed to load events. Please try again later.</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {displayEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-          )}
-          
-          <div className="mt-6 text-center">
-            <Button 
-              onClick={() => refetch()} 
-              variant="outline"
-              className="text-bookconnect-terracotta hover:bg-bookconnect-terracotta/10"
-            >
-              Refresh events
-            </Button>
+    <div className="container mx-auto py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-serif font-bold mb-8">Upcoming Events</h1>
+        
+        {isLoading ? (
+          <div className="space-y-6">
+            {[...Array(3)].map((_, i) => (
+              <EventSkeleton key={i} />
+            ))}
           </div>
+        ) : isError ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-red-500">Failed to load events. Please try again later.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {displayEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        )}
+        
+        <div className="mt-6 text-center">
+          <Button 
+            onClick={() => refetch()} 
+            variant="outline"
+            className="text-bookconnect-terracotta hover:bg-bookconnect-terracotta/10"
+          >
+            Refresh events
+          </Button>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
