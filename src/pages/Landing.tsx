@@ -45,6 +45,10 @@ const Landing = () => {
     }
   };
 
+  const handleAdminClick = () => {
+    navigate("/admin-dashboard");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
@@ -158,7 +162,7 @@ const Landing = () => {
               </div>
               <div className="mt-2 text-right">
                 <button 
-                  onClick={() => navigate("/admin")}
+                  onClick={handleAdminClick}
                   className="text-xs text-white/50 hover:text-white/70"
                 >
                   Admin

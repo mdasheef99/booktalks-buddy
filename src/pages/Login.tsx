@@ -43,10 +43,6 @@ const Login = () => {
     }
   };
 
-  const handleAdminDashboard = () => {
-    navigate("/admin-dashboard");
-  };
-
   return (
     <Layout>
       <div className="flex justify-center items-center min-h-[80vh]">
@@ -122,20 +118,13 @@ const Login = () => {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="text-center text-sm">
+          <CardFooter>
+            <div className="text-center text-sm w-full">
               Don't have an account?{" "}
               <Link to="/register" className="text-primary hover:underline">
                 Register
               </Link>
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleAdminDashboard}
-            >
-              Access Admin Dashboard
-            </Button>
           </CardFooter>
         </Card>
       </div>
