@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Book } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
@@ -23,11 +23,29 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loginTimeout, setLoginTimeout] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Reset timeout when dialog opens/closes
+    setLoginTimeout(false);
+    
+    // Clear any timeout when the component unmounts or dialog state changes
+    return () => clearTimeout(timeoutId);
+  }, [open]);
+
+  let timeoutId: number;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginTimeout(false);
+    
+    // Set a timeout to display a message if login takes too long
+    timeoutId = window.setTimeout(() => {
+      setLoginTimeout(true);
+      // Don't set isLoading to false so the user knows the process is still ongoing
+    }, 3000);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -35,13 +53,17 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
         password,
       });
 
+      clearTimeout(timeoutId);
+
       if (error) {
         throw error;
       }
 
       toast.success("Welcome to Book Club!");
       navigate("/book-club");
+      onOpenChange(false); // Close dialog on successful login
     } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error("Login error:", error);
       toast.error(error.message || "Failed to login. Please try again.");
     } finally {
@@ -74,6 +96,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               placeholder="email@example.com"
               required
               className="bg-[#f0e6d2] border-[#5c4033]/40 text-[#5c4033]"
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -88,6 +111,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               placeholder="••••••••"
               required
               className="bg-[#f0e6d2] border-[#5c4033]/40 text-[#5c4033]"
+              disabled={isLoading}
             />
           </div>
           
@@ -100,6 +124,12 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </div>
+
+          {loginTimeout && (
+            <div className="text-amber-600 text-xs mt-2 text-center">
+              Login is taking longer than usual. Please wait while we authenticate you...
+            </div>
+          )}
           
           <div className="text-xs text-[#5c4033]/70 mt-4">
             <p className="font-medium mb-2">Sample Logins:</p>
