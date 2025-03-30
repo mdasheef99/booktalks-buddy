@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -65,22 +66,27 @@ const AdminDashboard = () => {
       
       console.log("Submitting event with date:", formattedDate);
       
-      const newEvent = await createEvent({ 
+      const eventData = { 
         title: values.title,
         date: formattedDate,
         description: values.description + `\n\nLocation: ${values.location}\nGuests: ${values.guests}`,
-      });
+      };
+      
+      const newEvent = await createEvent(eventData);
       
       if (newEvent) {
         console.log("Event created:", newEvent);
         form.reset();
         setShowEventForm(false);
+        toast.success("Event created successfully!");
         
+        // Navigate to events page after a short delay to show the toast
         setTimeout(() => {
-          router('/events');
-        }, 1500);
+          navigate('/events');
+        }, 1000);
       } else {
         console.error("Failed to create event: newEvent is null");
+        toast.error("Failed to create event. Please try again.");
       }
     } catch (error: any) {
       console.error("Error creating event:", error);
