@@ -24,8 +24,8 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/lib/supabase";
 import { useNavigate as useRouter } from "react-router-dom";
+import { createEvent } from "@/services/eventService";
 
 // Define the form schema using Zod
 const eventFormSchema = z.object({
@@ -67,29 +67,22 @@ const AdminDashboard = () => {
       // Format the date and time to store in the database
       const formattedDate = `${values.date} ${values.time}`;
       
-      // Insert the event into the database
-      const { data, error } = await supabase
-        .from('events')
-        .insert([
-          { 
-            title: values.title,
-            date: formattedDate,
-            description: values.description + `\n\nLocation: ${values.location}\nGuests: ${values.guests}`,
-          }
-        ]);
+      // Use the eventService instead of direct Supabase call
+      const newEvent = await createEvent({ 
+        title: values.title,
+        date: formattedDate,
+        description: values.description + `\n\nLocation: ${values.location}\nGuests: ${values.guests}`,
+      });
       
-      if (error) {
-        throw error;
+      if (newEvent) {
+        form.reset();
+        setShowEventForm(false);
+        
+        // Redirect to events page after successful creation with a short delay
+        setTimeout(() => {
+          router('/events');
+        }, 1500);
       }
-      
-      toast.success("Event created successfully!");
-      form.reset();
-      setShowEventForm(false);
-      
-      // Redirect to events page after successful creation
-      setTimeout(() => {
-        router('/events');
-      }, 1500);
     } catch (error: any) {
       console.error("Error creating event:", error);
       toast.error(error.message || "Failed to create event");

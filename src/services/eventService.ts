@@ -31,10 +31,12 @@ export const getEvents = async (): Promise<Event[]> => {
  * Creates a new event in the database
  */
 export const createEvent = async (eventData: Partial<Event>): Promise<Event | null> => {
+  console.log("Creating event with data:", eventData);
   try {
+    // The error is happening here - we need to pass the object directly, not in an array
     const { data, error } = await supabase
       .from('events')
-      .insert([eventData])
+      .insert(eventData) // Fix: removed the array brackets
       .select()
       .single();
     
@@ -44,6 +46,7 @@ export const createEvent = async (eventData: Partial<Event>): Promise<Event | nu
       return null;
     }
     
+    console.log("Event created successfully:", data);
     toast.success("Event created successfully");
     return data;
   } catch (error) {
