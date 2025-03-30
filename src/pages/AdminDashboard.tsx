@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, MapPin, Users, Image, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Image, ArrowLeft, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,6 +41,7 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showEventForm, setShowEventForm] = useState(false);
   
   // Set up form with default values
   const form = useForm<EventFormValues>({
@@ -81,12 +82,17 @@ const AdminDashboard = () => {
       
       toast.success("Event created successfully!");
       form.reset();
+      setShowEventForm(false);
     } catch (error: any) {
       console.error("Error creating event:", error);
       toast.error(error.message || "Failed to create event");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleEventForm = () => {
+    setShowEventForm(!showEventForm);
   };
 
   return (
@@ -105,189 +111,223 @@ const AdminDashboard = () => {
             </Button>
             <h1 className="text-2xl font-serif font-bold">Admin Dashboard</h1>
           </div>
-          <div>
-            <p className="text-sm opacity-80">Manage Your BookConnect Events</p>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={toggleEventForm}
+              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Create Event
+            </Button>
+            <p className="text-sm opacity-80 hidden md:block">Manage Your BookConnect Events</p>
           </div>
         </div>
       </header>
       
       <main className="container mx-auto py-8 px-4">
-        <section className="mb-8">
-          <h2 className="text-2xl font-serif font-bold mb-4">Create New Event</h2>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Event Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Event Title */}
+        {showEventForm ? (
+          <section className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-serif font-bold">Create New Event</h2>
+              <Button 
+                variant="ghost" 
+                onClick={toggleEventForm}
+                className="text-muted-foreground"
+              >
+                Cancel
+              </Button>
+            </div>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Event Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Event Title */}
+                      <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event Title</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                  placeholder="Book Club Launch Party" 
+                                  className="pl-10" 
+                                  {...field} 
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Date */}
+                      <FormField
+                        control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Date</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                  type="date" 
+                                  className="pl-10" 
+                                  {...field} 
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Time */}
+                      <FormField
+                        control={form.control}
+                        name="time"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Time</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                  type="time" 
+                                  className="pl-10" 
+                                  {...field} 
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Location */}
+                      <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Location</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                  placeholder="City Library, Main Room" 
+                                  className="pl-10" 
+                                  {...field} 
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Guests */}
+                      <FormField
+                        control={form.control}
+                        name="guests"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Guests</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                  placeholder="Local authors, Book Club members" 
+                                  className="pl-10" 
+                                  {...field} 
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Image URL */}
+                      <FormField
+                        control={form.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Background Image URL (Optional)</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                  placeholder="https://example.com/image.jpg" 
+                                  className="pl-10" 
+                                  {...field} 
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    {/* Description */}
                     <FormField
                       control={form.control}
-                      name="title"
+                      name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Event Title</FormLabel>
+                          <FormLabel>Event Description</FormLabel>
                           <FormControl>
-                            <div className="relative">
-                              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                placeholder="Book Club Launch Party" 
-                                className="pl-10" 
-                                {...field} 
-                              />
-                            </div>
+                            <Textarea 
+                              placeholder="Provide details about the event..." 
+                              className="min-h-[120px]" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                     
-                    {/* Date */}
-                    <FormField
-                      control={form.control}
-                      name="date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                type="date" 
-                                className="pl-10" 
-                                {...field} 
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Time */}
-                    <FormField
-                      control={form.control}
-                      name="time"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Time</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                type="time" 
-                                className="pl-10" 
-                                {...field} 
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Location */}
-                    <FormField
-                      control={form.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Location</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                placeholder="City Library, Main Room" 
-                                className="pl-10" 
-                                {...field} 
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Guests */}
-                    <FormField
-                      control={form.control}
-                      name="guests"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Guests</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                placeholder="Local authors, Book Club members" 
-                                className="pl-10" 
-                                {...field} 
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Image URL */}
-                    <FormField
-                      control={form.control}
-                      name="imageUrl"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Background Image URL (Optional)</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                placeholder="https://example.com/image.jpg" 
-                                className="pl-10" 
-                                {...field} 
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  {/* Description */}
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Event Description</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Provide details about the event..." 
-                            className="min-h-[120px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  {/* Submit Button */}
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating..." : "Create Event"}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </section>
+                    {/* Submit Button */}
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Creating..." : "Create Event"}
+                    </Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </section>
+        ) : (
+          <section className="mb-8">
+            <div className="text-center p-8 bg-bookconnect-cream rounded-lg">
+              <h2 className="text-2xl font-serif font-bold mb-4">Admin Dashboard</h2>
+              <p className="text-muted-foreground mb-6">
+                Welcome to the admin dashboard. Click the "Create Event" button in the header to start creating a new event.
+              </p>
+              <Button
+                onClick={toggleEventForm}
+                className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+              >
+                <Plus className="mr-1 h-4 w-4" />
+                Create Event
+              </Button>
+            </div>
+          </section>
+        )}
         
         {/* Additional admin sections could be added here */}
       </main>
