@@ -9,6 +9,9 @@ import { apiCall } from "@/lib/supabase";
  */
 export const getEvents = async (): Promise<Event[]> => {
   try {
+    // Let's add debugging here to see what's happening
+    console.log("Fetching events from database");
+    
     const { data, error } = await supabase
       .from('events')
       .select('*')
@@ -20,6 +23,7 @@ export const getEvents = async (): Promise<Event[]> => {
       return [];
     }
     
+    console.log("Events fetched successfully:", data);
     return data || [];
   } catch (error) {
     console.error("Error in getEvents:", error);

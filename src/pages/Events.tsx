@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
@@ -112,10 +112,17 @@ const EventSkeleton = () => (
 );
 
 const Events = () => {
-  const { data: events, isLoading, isError } = useQuery({
+  const { data: events, isLoading, isError, refetch } = useQuery({
     queryKey: ['events'],
-    queryFn: getEvents
+    queryFn: getEvents,
+    staleTime: 0 // This ensures fresh data each time
   });
+
+  useEffect(() => {
+    // Refetch events when the component mounts
+    refetch();
+    console.log("Events page mounted, refetching events");
+  }, [refetch]);
 
   return (
     <Layout>
@@ -145,6 +152,15 @@ const Events = () => {
               <p className="text-muted-foreground">Check back later for new events!</p>
             </div>
           )}
+          
+          <div className="mt-6 text-center">
+            <button 
+              onClick={() => refetch()} 
+              className="text-bookconnect-terracotta hover:text-bookconnect-terracotta/80 underline"
+            >
+              Refresh events
+            </button>
+          </div>
         </div>
       </div>
     </Layout>

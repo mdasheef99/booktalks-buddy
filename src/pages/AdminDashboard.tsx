@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate as useRouter } from "react-router-dom";
 import { createEvent } from "@/services/eventService";
 
 const eventFormSchema = z.object({
@@ -41,7 +40,6 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   
@@ -72,18 +70,21 @@ const AdminDashboard = () => {
         description: values.description + `\n\nLocation: ${values.location}\nGuests: ${values.guests}`,
       };
       
+      console.log("About to call createEvent with data:", eventData);
+      
       const newEvent = await createEvent(eventData);
       
       if (newEvent) {
-        console.log("Event created:", newEvent);
+        console.log("Event created successfully with ID:", newEvent.id);
         form.reset();
         setShowEventForm(false);
         toast.success("Event created successfully!");
         
         // Navigate to events page after a short delay to show the toast
         setTimeout(() => {
+          console.log("Navigating to /events page");
           navigate('/events');
-        }, 1000);
+        }, 1500);
       } else {
         console.error("Failed to create event: newEvent is null");
         toast.error("Failed to create event. Please try again.");
