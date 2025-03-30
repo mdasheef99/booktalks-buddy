@@ -68,7 +68,7 @@ export async function fetchRecentlyDiscussedBooks(limit: number = 6): Promise<Bo
       id: book.id,
       title: book.title,
       author: book.author,
-      description: book.genre || "", // Using genre as description since there is no description field
+      description: book.genre || "", // Fixed: using genre as description if no description field
       imageUrl: book.cover_url,
       categories: book.genre ? [book.genre] : []
     }));

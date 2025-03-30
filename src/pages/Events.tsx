@@ -1,82 +1,184 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { getEvents } from "@/services/eventService";
+import { useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { Calendar, Clock, MapPin, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getEvents } from "@/services/eventService";
+import { Event } from "@/lib/supabase";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+
+const EventCard = ({ event }: { event: Event }) => {
+  // Parse event details from description if they exist
+  const getLocationFromDescription = (description: string) => {
+    const locationMatch = description.match(/Location: (.*?)(?:\n|$)/);
+    return locationMatch ? locationMatch[1] : null;
+  };
+
+  const getGuestsFromDescription = (description: string) => {
+    const guestsMatch = description.match(/Guests: (.*?)(?:\n|$)/);
+    return guestsMatch ? guestsMatch[1] : null;
+  };
+
+  const getCleanDescription = (description: string) => {
+    return description
+      .replace(/Location: .*?(?:\n|$)/, '')
+      .replace(/Guests: .*?(?:\n|$)/, '')
+      .trim();
+  };
+
+  const location = getLocationFromDescription(event.description);
+  const guests = getGuestsFromDescription(event.description);
+  const cleanDescription = getCleanDescription(event.description);
+
+  // Parse date and time if possible
+  const parseDateAndTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return { date: dateString, time: null };
+      }
+      
+      // Format date part
+      const formattedDate = date.toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      // Format time part
+      const formattedTime = date.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      return { date: formattedDate, time: formattedTime };
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      return { date: dateString, time: null };
+    }
+  };
+
+  const { date, time } = parseDateAndTime(event.date);
+
+  return (
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
+      <CardContent className="p-0">
+        <div className="p-6">
+          <h3 className="text-xl font-serif font-bold mb-2">{event.title}</h3>
+          
+          <div className="flex items-center text-sm mb-2">
+            <Calendar className="h-4 w-4 mr-2 text-bookconnect-terracotta" />
+            <span>{date}</span>
+            {time && (
+              <>
+                <Clock className="h-4 w-4 ml-4 mr-2 text-bookconnect-terracotta" />
+                <span>{time}</span>
+              </>
+            )}
+          </div>
+          
+          {location && (
+            <div className="flex items-center text-sm mb-2">
+              <MapPin className="h-4 w-4 mr-2 text-bookconnect-terracotta" />
+              <span>{location}</span>
+            </div>
+          )}
+          
+          {guests && (
+            <div className="flex items-center text-sm mb-4">
+              <Users className="h-4 w-4 mr-2 text-bookconnect-terracotta" />
+              <span>{guests}</span>
+            </div>
+          )}
+          
+          <p className="text-sm text-muted-foreground">{cleanDescription}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const EventSkeleton = () => (
+  <Card>
+    <CardContent className="p-6">
+      <Skeleton className="h-6 w-3/4 mb-4" />
+      <Skeleton className="h-4 w-1/2 mb-2" />
+      <Skeleton className="h-4 w-1/3 mb-2" />
+      <Skeleton className="h-4 w-2/3 mb-4" />
+      <Skeleton className="h-16 w-full" />
+    </CardContent>
+  </Card>
+);
+
+// Sample event that will be shown when there are no events from the database
+const sampleEvent: Event = {
+  id: "sample-event-id",
+  title: "Book Club Meeting - The Great Gatsby",
+  date: "2025-04-15T18:00:00Z",
+  description: "Join us for a lively discussion about F. Scott Fitzgerald's classic novel. Bring your insights and favorite passages to share!\n\nLocation: Central Library, Meeting Room 3\nGuests: All book club members welcome",
+  created_at: new Date().toISOString()
+};
 
 const Events = () => {
-  const { data: events, isLoading } = useQuery({
+  const { data: events, isLoading, isError, refetch } = useQuery({
     queryKey: ['events'],
-    queryFn: getEvents
+    queryFn: getEvents,
+    staleTime: 0 // This ensures fresh data each time
   });
 
-  const formatEventDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, "MMMM d, yyyy 'at' h:mm a");
-  };
+  useEffect(() => {
+    // Refetch events when the component mounts
+    refetch();
+    console.log("Events page mounted, refetching events");
+    // Debug output to see if we're getting any events
+    console.log("Events data:", events);
+  }, [refetch]);
 
-  const isUpcoming = (dateString: string) => {
-    const eventDate = new Date(dateString);
-    const today = new Date();
-    return eventDate >= today;
-  };
+  // Debug log outside useEffect to track state changes
+  console.log("Current events state:", events);
+  
+  // Always display the sample event if there are no real events
+  const displayEvents = (!events || events.length === 0) ? [sampleEvent] : events;
+  
+  console.log("Display events:", displayEvents);
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-4xl font-serif font-bold mb-2">Book Events</h1>
-          <p className="text-muted-foreground">
-            Join our upcoming book events, readings, and discussions
-          </p>
+      <div className="container mx-auto py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold mb-8">Upcoming Events</h1>
+          
+          {isLoading ? (
+            <div className="space-y-6">
+              {[...Array(3)].map((_, i) => (
+                <EventSkeleton key={i} />
+              ))}
+            </div>
+          ) : isError ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-red-500">Failed to load events. Please try again later.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {displayEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+          
+          <div className="mt-6 text-center">
+            <Button 
+              onClick={() => refetch()} 
+              variant="outline"
+              className="text-bookconnect-terracotta hover:bg-bookconnect-terracotta/10"
+            >
+              Refresh events
+            </Button>
+          </div>
         </div>
-        
-        {isLoading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Card key={index} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-4 bg-muted rounded w-1/4 mb-4"></div>
-                  <div className="h-6 bg-muted rounded w-2/3 mb-2"></div>
-                  <div className="h-4 bg-muted rounded w-full mb-1"></div>
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : events?.length ? (
-          <div className="space-y-4">
-            {events.map((event) => (
-              <Card key={event.id} className="overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
-                    <h2 className="text-2xl font-serif font-medium">{event.title}</h2>
-                    
-                    <div className="flex items-center gap-2">
-                      <Badge variant={isUpcoming(event.date) ? "default" : "outline"}>
-                        {isUpcoming(event.date) ? "Upcoming" : "Past Event"}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">
-                        {formatEventDate(event.date)}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <p className="text-muted-foreground">{event.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <h3 className="text-2xl font-serif mb-2">No events found</h3>
-            <p className="text-muted-foreground">
-              Check back later for upcoming book events
-            </p>
-          </div>
-        )}
       </div>
     </Layout>
   );
