@@ -1,126 +1,297 @@
 
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Layout from "@/components/Layout";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen, Users, Calendar, MessageSquare, BarChart2 } from "lucide-react";
+import { 
+  Button, 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar, Clock, MapPin, Users, Image, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/lib/supabase";
+
+// Define the form schema using Zod
+const eventFormSchema = z.object({
+  title: z.string().min(3, { message: "Event title must be at least 3 characters" }),
+  date: z.string().min(1, { message: "Date is required" }),
+  time: z.string().min(1, { message: "Time is required" }),
+  location: z.string().min(3, { message: "Location must be at least 3 characters" }),
+  guests: z.string().min(1, { message: "Guests information is required" }),
+  description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+  imageUrl: z.string().url({ message: "Please enter a valid image URL" }).or(z.string().length(0))
+});
+
+type EventFormValues = z.infer<typeof eventFormSchema>;
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Set up form with default values
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(eventFormSchema),
+    defaultValues: {
+      title: "",
+      date: "",
+      time: "",
+      location: "",
+      guests: "",
+      description: "",
+      imageUrl: ""
+    }
+  });
 
-  const stats = [
-    { name: "Total Books", value: "1,248", icon: BookOpen, color: "bg-blue-100" },
-    { name: "Active Users", value: "843", icon: Users, color: "bg-green-100" },
-    { name: "Events", value: "32", icon: Calendar, color: "bg-yellow-100" },
-    { name: "Discussions", value: "1,156", icon: MessageSquare, color: "bg-purple-100" },
-  ];
+  const onSubmit = async (values: EventFormValues) => {
+    setIsLoading(true);
+    
+    try {
+      // Format the date and time to store in the database
+      const formattedDate = `${values.date} ${values.time}`;
+      
+      // Insert the event into the database
+      const { data, error } = await supabase
+        .from('events')
+        .insert([
+          { 
+            title: values.title,
+            date: formattedDate,
+            description: values.description + `\n\nLocation: ${values.location}\nGuests: ${values.guests}`,
+            // If we had an image column, we could store the image URL here
+          }
+        ]);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Event created successfully!");
+      form.reset();
+    } catch (error: any) {
+      console.error("Error creating event:", error);
+      toast.error(error.message || "Failed to create event");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <Layout>
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-bookconnect-brown text-white p-4 shadow-md">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2">
             <Button 
               variant="ghost" 
-              className="mr-4" 
-              onClick={() => navigate('/login')}
+              size="icon" 
+              onClick={() => navigate('/')}
+              className="text-white hover:bg-bookconnect-brown/80"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="text-3xl font-serif">Admin Dashboard</h1>
-              <p className="text-muted-foreground">Overview of BookConnect statistics</p>
-            </div>
+            <h1 className="text-2xl font-serif font-bold">Admin Dashboard</h1>
           </div>
-          <Button>Generate Report</Button>
+          <div>
+            <p className="text-sm opacity-80">Manage Your BookConnect Events</p>
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat) => (
-            <Card key={stat.name}>
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
-                    <p className="text-3xl font-bold mt-1">{stat.value}</p>
-                  </div>
-                  <div className={`${stat.color} p-3 rounded-full`}>
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-xl">Monthly Activity</CardTitle>
-            <CardDescription>Book discussions and user registrations</CardDescription>
-          </CardHeader>
-          <CardContent className="h-80 bg-muted/20 flex items-center justify-center">
-            <div className="flex items-center">
-              <BarChart2 className="h-10 w-10 text-muted mr-2" />
-              <p className="text-muted-foreground">Chart visualization would appear here</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      </header>
+      
+      <main className="container mx-auto py-8 px-4">
+        <section className="mb-8">
+          <h2 className="text-2xl font-serif font-bold mb-4">Create New Event</h2>
+          
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Recent Books</CardTitle>
-              <CardDescription>Newly added books</CardDescription>
+              <CardTitle>Event Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <li key={i} className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Book Title {i + 1}</p>
-                      <p className="text-sm text-muted-foreground">Author Name</p>
-                    </div>
-                    <span className="text-xs bg-muted px-2 py-1 rounded">New</span>
-                  </li>
-                ))}
-              </ul>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Event Title */}
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event Title</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                placeholder="Book Club Launch Party" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Date */}
+                    <FormField
+                      control={form.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                type="date" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Time */}
+                    <FormField
+                      control={form.control}
+                      name="time"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Time</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                type="time" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Location */}
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Location</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                placeholder="City Library, Main Room" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Guests */}
+                    <FormField
+                      control={form.control}
+                      name="guests"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Guests</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                placeholder="Local authors, Book Club members" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Image URL */}
+                    <FormField
+                      control={form.control}
+                      name="imageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Background Image URL (Optional)</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                placeholder="https://example.com/image.jpg" 
+                                className="pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  {/* Description */}
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Event Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Provide details about the event..." 
+                            className="min-h-[120px]" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Submit Button */}
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating..." : "Create Event"}
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
-            <CardFooter>
-              <Button variant="outline" size="sm" className="ml-auto">View All Books</Button>
-            </CardFooter>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Recent Users</CardTitle>
-              <CardDescription>Latest user registrations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <li key={i} className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-muted mr-3 flex items-center justify-center">
-                        <Users className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-medium">User {i + 1}</p>
-                        <p className="text-xs text-muted-foreground">user{i + 1}@example.com</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground">2 days ago</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" size="sm" className="ml-auto">View All Users</Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-    </Layout>
+        </section>
+        
+        {/* Additional admin sections could be added here */}
+      </main>
+    </div>
   );
 };
 
