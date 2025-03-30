@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { BookOpen } from "lucide-react";
 
 const ChatSelection = () => {
@@ -14,7 +14,6 @@ const ChatSelection = () => {
   const [username, setUsername] = useState("");
   const [genre, setGenre] = useState(initialGenre || "");
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const genres = ["Fiction", "Mystery", "Romance", "Sci-Fi", "Fantasy", "Non-Fiction", "Biography", "History"];
 
@@ -30,9 +29,15 @@ const ChatSelection = () => {
         'nonfiction': 'Non-Fiction'
       };
       
-      if (genreMap[initialGenre]) {
-        setGenre(genreMap[initialGenre]);
+      if (genreMap[initialGenre.toLowerCase()]) {
+        setGenre(genreMap[initialGenre.toLowerCase()]);
       }
+    }
+    
+    // Check if username is already in localStorage
+    const savedUsername = localStorage.getItem("anon_username") || localStorage.getItem("username");
+    if (savedUsername) {
+      setUsername(savedUsername);
     }
   }, [initialGenre]);
 
@@ -40,20 +45,12 @@ const ChatSelection = () => {
     e.preventDefault();
     
     if (!username.trim()) {
-      toast({
-        title: "Username required",
-        description: "Please enter a username to continue",
-        variant: "destructive",
-      });
+      toast.error("Username required. Please enter a username to continue.");
       return;
     }
     
     if (!genre) {
-      toast({
-        title: "Genre required",
-        description: "Please select a genre to continue",
-        variant: "destructive",
-      });
+      toast.error("Genre required. Please select a genre to continue.");
       return;
     }
 
@@ -62,8 +59,10 @@ const ChatSelection = () => {
     localStorage.setItem("username", username);
     localStorage.setItem("selected_genre", genre);
     
+    console.log("Chat selection complete, username:", username, "genre:", genre);
+    
     // Navigate to books filtered by genre
-    navigate(`/books?genre=${genre}`);
+    navigate(`/books?genre=${encodeURIComponent(genre)}`);
   };
 
   return (

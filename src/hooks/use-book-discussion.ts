@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/services/chatService";
 import * as Sentry from "@sentry/react";
@@ -18,7 +19,7 @@ export function useBookDiscussion(id: string, title: string, author: string, use
       try {
         setLoading(true);
         setConnectionError(false);
-        console.log("Loading chat history for book:", id);
+        console.log("Loading chat history for book:", id, "with username:", username);
         const chatHistory = await getBookChat(id);
         console.log("Got chat history:", chatHistory);
         setMessages(chatHistory);

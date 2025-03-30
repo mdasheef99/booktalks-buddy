@@ -30,6 +30,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/interactive-chat" element={<InteractiveChatEntry />} /> 
+            <Route path="/chat-selection" element={<ChatSelection />} />
             <Route element={<Layout />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/user/:username" element={<UserProfile />} />
@@ -38,7 +39,6 @@ function App() {
               <Route path="/book/:id" element={<BookDetail />} />
               <Route path="/book-discussion/:id" element={<BookDiscussion />} />
               <Route path="/explore-books" element={<ExploreBooks />} />
-              <Route path="/chat-selection" element={<ChatSelection />} />
               <Route path="/book-club" element={<BookClub />} />
               <Route path="/book-clubs" element={<BookClub />} />
               <Route path="/events" element={<Events />} />
