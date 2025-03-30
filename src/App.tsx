@@ -32,8 +32,9 @@ function App() {
             <Route path="/interactive-chat" element={<InteractiveChatEntry />} /> 
             <Route element={<Layout />}>
               <Route path="/profile" element={<Profile />} />
-              <Route path="/user/:id" element={<UserProfile />} />
+              <Route path="/user/:username" element={<UserProfile />} />
               <Route path="/books" element={<Books />} />
+              <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/book/:id" element={<BookDetail />} />
               <Route path="/book-discussion/:id" element={<BookDiscussion />} />
               <Route path="/explore-books" element={<ExploreBooks />} />
