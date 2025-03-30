@@ -93,7 +93,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@example.com"
+              placeholder="email@bookconnect.com"
               required
               className="bg-[#f0e6d2] border-[#5c4033]/40 text-[#5c4033]"
               disabled={isLoading}

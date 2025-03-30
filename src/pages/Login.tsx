@@ -1,18 +1,20 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Redirect if already logged in
   if (user) {
@@ -24,10 +26,20 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      await signIn(email, password);
-    } catch (error) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Successfully signed in!");
+      navigate("/book-club");
+    } catch (error: any) {
       console.error("Error during login:", error);
-      toast.error("Failed to sign in. Please try again.");
+      toast.error(error.message || "Failed to sign in. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -54,6 +66,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -70,6 +83,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
               <Button 
@@ -79,6 +93,15 @@ const Login = () => {
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
+              
+              <div className="text-xs text-muted-foreground mt-4">
+                <p className="font-medium mb-2">Sample Logins:</p>
+                <ul className="space-y-1">
+                  <li>kafka@bookconnect.com / kafka</li>
+                  <li>darcy456@bookconnect.com / darcy456</li>
+                  <li>admin@bookconnect.com / admin123</li>
+                </ul>
+              </div>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col">
