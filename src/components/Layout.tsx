@@ -1,18 +1,14 @@
 
 import React from 'react';
 import NavBar from '@/components/NavBar';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Outlet } from 'react-router-dom';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
-        {children}
+        <Outlet />
       </main>
       <footer className="bg-card border-t py-6">
         <div className="container mx-auto px-4">
