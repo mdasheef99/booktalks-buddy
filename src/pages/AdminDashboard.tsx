@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -27,7 +26,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate as useRouter } from "react-router-dom";
 import { createEvent } from "@/services/eventService";
 
-// Define the form schema using Zod
 const eventFormSchema = z.object({
   title: z.string().min(3, { message: "Event title must be at least 3 characters" }),
   date: z.string().min(1, { message: "Date is required" }),
@@ -46,7 +44,6 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   
-  // Set up form with default values
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
@@ -64,10 +61,10 @@ const AdminDashboard = () => {
     setIsLoading(true);
     
     try {
-      // Format the date and time to store in the database
       const formattedDate = `${values.date} ${values.time}`;
       
-      // Use the eventService instead of direct Supabase call
+      console.log("Submitting event with date:", formattedDate);
+      
       const newEvent = await createEvent({ 
         title: values.title,
         date: formattedDate,
@@ -75,13 +72,15 @@ const AdminDashboard = () => {
       });
       
       if (newEvent) {
+        console.log("Event created:", newEvent);
         form.reset();
         setShowEventForm(false);
         
-        // Redirect to events page after successful creation with a short delay
         setTimeout(() => {
           router('/events');
         }, 1500);
+      } else {
+        console.error("Failed to create event: newEvent is null");
       }
     } catch (error: any) {
       console.error("Error creating event:", error);
@@ -97,7 +96,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="bg-bookconnect-brown text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -149,7 +147,6 @@ const AdminDashboard = () => {
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Event Title */}
                       <FormField
                         control={form.control}
                         name="title"
@@ -171,7 +168,6 @@ const AdminDashboard = () => {
                         )}
                       />
                       
-                      {/* Date */}
                       <FormField
                         control={form.control}
                         name="date"
@@ -302,13 +298,19 @@ const AdminDashboard = () => {
                         className="flex-1 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Creating..." : "Create Event"}
+                        {isLoading ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                            Creating...
+                          </div>
+                        ) : "Create Event"}
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
                         onClick={toggleEventForm}
                         className="flex-1"
+                        disabled={isLoading}
                       >
                         Cancel
                       </Button>
@@ -320,7 +322,6 @@ const AdminDashboard = () => {
           </section>
         ) : (
           <section>
-            {/* Enhanced Dashboard Content with Book Club Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card>
                 <CardHeader className="pb-2">
@@ -359,7 +360,6 @@ const AdminDashboard = () => {
               </Card>
             </div>
             
-            {/* Book Club & Chat Statistics */}
             <h2 className="text-2xl font-serif font-bold mb-4">Community Analytics</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -464,7 +464,6 @@ const AdminDashboard = () => {
               </Card>
             </div>
             
-            {/* Create Event Button for Dashboard View */}
             <div className="text-center p-8 bg-bookconnect-cream rounded-lg">
               <h2 className="text-2xl font-serif font-bold mb-4">Event Management</h2>
               <p className="text-muted-foreground mb-6">
