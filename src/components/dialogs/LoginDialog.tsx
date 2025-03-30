@@ -137,3 +137,4 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     </Dialog>
   );
 }
+
