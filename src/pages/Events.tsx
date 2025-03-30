@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getEvents } from "@/services/eventService";
 import { Event } from "@/lib/supabase";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 const EventCard = ({ event }: { event: Event }) => {
   // Parse event details from description if they exist
@@ -55,6 +56,7 @@ const EventCard = ({ event }: { event: Event }) => {
       
       return { date: formattedDate, time: formattedTime };
     } catch (error) {
+      console.error("Error parsing date:", error);
       return { date: dateString, time: null };
     }
   };
@@ -131,10 +133,17 @@ const Events = () => {
     // Refetch events when the component mounts
     refetch();
     console.log("Events page mounted, refetching events");
+    // Debug output to see if we're getting any events
+    console.log("Events data:", events);
   }, [refetch]);
 
-  // Combine fetched events with our sample event if there are no events
-  const displayEvents = (events && events.length > 0) ? events : [sampleEvent];
+  // Debug log outside useEffect to track state changes
+  console.log("Current events state:", events);
+  
+  // Always display the sample event if there are no real events
+  const displayEvents = (!events || events.length === 0) ? [sampleEvent] : events;
+  
+  console.log("Display events:", displayEvents);
 
   return (
     <Layout>
@@ -161,12 +170,13 @@ const Events = () => {
           )}
           
           <div className="mt-6 text-center">
-            <button 
+            <Button 
               onClick={() => refetch()} 
-              className="text-bookconnect-terracotta hover:text-bookconnect-terracotta/80 underline"
+              variant="outline"
+              className="text-bookconnect-terracotta hover:bg-bookconnect-terracotta/10"
             >
               Refresh events
-            </button>
+            </Button>
           </div>
         </div>
       </div>
