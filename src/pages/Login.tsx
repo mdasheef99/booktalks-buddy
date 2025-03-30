@@ -8,18 +8,25 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Layout from "@/components/Layout";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const { user, signIn } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
   if (user) {
-    return <Navigate to="/" />;
+    console.log("User already logged in, redirecting to /book-club", user);
+    return <Navigate to="/book-club" />;
   }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,21 +34,10 @@ const Login = () => {
     
     try {
       console.log("Attempting login with:", email);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      console.log("Login successful, user:", data.user);
-      toast.success("Successfully signed in!");
-      navigate("/book-club");
+      await signIn(email, password);
+      // The redirect will be handled by the signIn function in AuthContext
     } catch (error: any) {
       console.error("Error during login:", error);
-      toast.error(error.message || "Failed to sign in. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -52,8 +48,18 @@ const Login = () => {
       <div className="flex justify-center items-center min-h-[80vh]">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-serif text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
+            <div className="flex items-center">
+              <Button 
+                variant="ghost" 
+                className="p-0 mr-2" 
+                onClick={() => navigate('/')}
+                title="Back to home page"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <CardTitle className="text-3xl font-serif">Welcome Back</CardTitle>
+            </div>
+            <CardDescription>
               Sign in to your BookConnect account
             </CardDescription>
           </CardHeader>
@@ -78,15 +84,30 @@ const Login = () => {
                     Forgot password?
                   </Link>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </button>
+                </div>
               </div>
               <Button 
                 type="submit" 
