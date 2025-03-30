@@ -5,7 +5,8 @@ import {
   Card, 
   CardContent, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, MapPin, Users, Image, ArrowLeft, Plus } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Image, ArrowLeft, Plus, BarChart, Calendar as CalendarIcon, Users as UsersIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -112,13 +113,15 @@ const AdminDashboard = () => {
             <h1 className="text-2xl font-serif font-bold">Admin Dashboard</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={toggleEventForm}
-              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
-            >
-              <Plus className="mr-1 h-4 w-4" />
-              Create Event
-            </Button>
+            {!showEventForm && (
+              <Button
+                onClick={toggleEventForm}
+                className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+              >
+                <Plus className="mr-1 h-4 w-4" />
+                Create Event
+              </Button>
+            )}
             <p className="text-sm opacity-80 hidden md:block">Manage Your BookConnect Events</p>
           </div>
         </div>
@@ -132,9 +135,10 @@ const AdminDashboard = () => {
               <Button 
                 variant="ghost" 
                 onClick={toggleEventForm}
-                className="text-muted-foreground"
+                className="text-muted-foreground flex items-center gap-1"
               >
-                Cancel
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
               </Button>
             </div>
             
@@ -190,7 +194,6 @@ const AdminDashboard = () => {
                         )}
                       />
                       
-                      {/* Time */}
                       <FormField
                         control={form.control}
                         name="time"
@@ -212,7 +215,6 @@ const AdminDashboard = () => {
                         )}
                       />
                       
-                      {/* Location */}
                       <FormField
                         control={form.control}
                         name="location"
@@ -234,7 +236,6 @@ const AdminDashboard = () => {
                         )}
                       />
                       
-                      {/* Guests */}
                       <FormField
                         control={form.control}
                         name="guests"
@@ -256,7 +257,6 @@ const AdminDashboard = () => {
                         )}
                       />
                       
-                      {/* Image URL */}
                       <FormField
                         control={form.control}
                         name="imageUrl"
@@ -279,7 +279,6 @@ const AdminDashboard = () => {
                       />
                     </div>
                     
-                    {/* Description */}
                     <FormField
                       control={form.control}
                       name="description"
@@ -298,25 +297,74 @@ const AdminDashboard = () => {
                       )}
                     />
                     
-                    {/* Submit Button */}
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Creating..." : "Create Event"}
-                    </Button>
+                    <div className="flex gap-3">
+                      <Button 
+                        type="submit" 
+                        className="flex-1 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Creating..." : "Create Event"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={toggleEventForm}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
                   </form>
                 </Form>
               </CardContent>
             </Card>
           </section>
         ) : (
-          <section className="mb-8">
+          <section>
+            {/* Dummy Dashboard Content */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Total Events</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">12</div>
+                    <BarChart className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Upcoming Events</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">5</div>
+                    <CalendarIcon className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Total Participants</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">124</div>
+                    <UsersIcon className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Create Event Button for Dashboard View */}
             <div className="text-center p-8 bg-bookconnect-cream rounded-lg">
-              <h2 className="text-2xl font-serif font-bold mb-4">Admin Dashboard</h2>
+              <h2 className="text-2xl font-serif font-bold mb-4">Event Management</h2>
               <p className="text-muted-foreground mb-6">
-                Welcome to the admin dashboard. Click the "Create Event" button in the header to start creating a new event.
+                Use the "Create Event" button to add new events to your BookConnect calendar.
               </p>
               <Button
                 onClick={toggleEventForm}
@@ -328,8 +376,6 @@ const AdminDashboard = () => {
             </div>
           </section>
         )}
-        
-        {/* Additional admin sections could be added here */}
       </main>
     </div>
   );
