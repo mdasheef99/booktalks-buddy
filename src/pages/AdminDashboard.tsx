@@ -19,12 +19,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, MapPin, Users, Image, ArrowLeft, Plus, BarChart, Calendar as CalendarIcon, Users as UsersIcon } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Image, ArrowLeft, Plus, BarChart, Calendar as CalendarIcon, Users as UsersIcon, Book, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/lib/supabase";
+import { useNavigate as useRouter } from "react-router-dom";
 
 // Define the form schema using Zod
 const eventFormSchema = z.object({
@@ -41,6 +42,7 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   
@@ -73,7 +75,6 @@ const AdminDashboard = () => {
             title: values.title,
             date: formattedDate,
             description: values.description + `\n\nLocation: ${values.location}\nGuests: ${values.guests}`,
-            // If we had an image column, we could store the image URL here
           }
         ]);
       
@@ -84,6 +85,11 @@ const AdminDashboard = () => {
       toast.success("Event created successfully!");
       form.reset();
       setShowEventForm(false);
+      
+      // Redirect to events page after successful creation
+      setTimeout(() => {
+        router('/events');
+      }, 1500);
     } catch (error: any) {
       console.error("Error creating event:", error);
       toast.error(error.message || "Failed to create event");
@@ -321,7 +327,7 @@ const AdminDashboard = () => {
           </section>
         ) : (
           <section>
-            {/* Dummy Dashboard Content */}
+            {/* Enhanced Dashboard Content with Book Club Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card>
                 <CardHeader className="pb-2">
@@ -356,6 +362,111 @@ const AdminDashboard = () => {
                     <div className="text-3xl font-bold">124</div>
                     <UsersIcon className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Book Club & Chat Statistics */}
+            <h2 className="text-2xl font-serif font-bold mb-4">Community Analytics</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Popular Book Discussions</CardTitle>
+                  <CardDescription>Most active discussion topics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <Book className="h-5 w-5 text-bookconnect-terracotta" />
+                        <div>
+                          <p className="font-medium">The Great Gatsby</p>
+                          <p className="text-xs text-muted-foreground">Classic Literature</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <Users className="h-4 w-4" />
+                        <span>47 readers</span>
+                      </div>
+                    </li>
+                    <li className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <Book className="h-5 w-5 text-bookconnect-terracotta" />
+                        <div>
+                          <p className="font-medium">To Kill a Mockingbird</p>
+                          <p className="text-xs text-muted-foreground">Fiction</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <Users className="h-4 w-4" />
+                        <span>38 readers</span>
+                      </div>
+                    </li>
+                    <li className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <Book className="h-5 w-5 text-bookconnect-terracotta" />
+                        <div>
+                          <p className="font-medium">1984</p>
+                          <p className="text-xs text-muted-foreground">Dystopian</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <Users className="h-4 w-4" />
+                        <span>29 readers</span>
+                      </div>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Active Book Clubs</CardTitle>
+                  <CardDescription>Member engagement by group</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-bookconnect-terracotta" />
+                        <div>
+                          <p className="font-medium">Mystery Readers Club</p>
+                          <p className="text-xs text-muted-foreground">Weekly meetings</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <Users className="h-4 w-4" />
+                        <span>32 members</span>
+                      </div>
+                    </li>
+                    <li className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-bookconnect-terracotta" />
+                        <div>
+                          <p className="font-medium">Fantasy Book Club</p>
+                          <p className="text-xs text-muted-foreground">Bi-weekly meetings</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <Users className="h-4 w-4" />
+                        <span>28 members</span>
+                      </div>
+                    </li>
+                    <li className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-bookconnect-terracotta" />
+                        <div>
+                          <p className="font-medium">Non-Fiction Explorers</p>
+                          <p className="text-xs text-muted-foreground">Monthly meetings</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium">
+                        <Users className="h-4 w-4" />
+                        <span>19 members</span>
+                      </div>
+                    </li>
+                  </ul>
                 </CardContent>
               </Card>
             </div>

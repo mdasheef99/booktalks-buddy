@@ -1,17 +1,54 @@
 
-import { apiCall, supabase, Event } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
+import { Event } from "@/lib/supabase";
+import { toast } from "sonner";
 
-export async function getEvents(): Promise<Event[]> {
-  const result = await apiCall<Event[]>(
-    supabase.from('events').select('*').order('date'),
-    'Failed to load events'
-  );
-  return result || [];
-}
+/**
+ * Fetches all events from the database, sorted by date
+ */
+export const getEvents = async (): Promise<Event[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error("Error fetching events:", error);
+      toast.error("Failed to load events");
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error("Error in getEvents:", error);
+    toast.error("An unexpected error occurred");
+    return [];
+  }
+};
 
-export async function getEventById(id: string): Promise<Event | null> {
-  return await apiCall<Event>(
-    supabase.from('events').select('*').eq('id', id).single(),
-    'Failed to load event details'
-  );
-}
+/**
+ * Creates a new event in the database
+ */
+export const createEvent = async (eventData: Partial<Event>): Promise<Event | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .insert([eventData])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error("Error creating event:", error);
+      toast.error("Failed to create event");
+      return null;
+    }
+    
+    toast.success("Event created successfully");
+    return data;
+  } catch (error) {
+    console.error("Error in createEvent:", error);
+    toast.error("An unexpected error occurred");
+    return null;
+  }
+};
