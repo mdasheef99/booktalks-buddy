@@ -9,6 +9,7 @@ import { ProfileDialog } from "@/components/profile";
 import ExploreHeader from "@/components/books/ExploreHeader";
 import ExploreContainer from "@/components/books/ExploreContainer";
 import { useExploreBooks } from "@/hooks/useExploreBooks";
+import { BookType } from "@/types/books";
 
 const FALLBACK_TRENDING_BOOKS = [
   { 
@@ -70,7 +71,7 @@ const ExploreBooks: React.FC = () => {
           searchQuery={searchQuery}
           searchResults={searchResults}
           isSearchError={isSearchError}
-          onJoinDiscussion={(book) => handleJoinDiscussion(book.id, book.title, book.author)}
+          onJoinDiscussion={(book: BookType) => handleJoinDiscussion(book.id, book.title, book.author)}
         />
         
         <TrendingBooksSection
@@ -79,14 +80,14 @@ const ExploreBooks: React.FC = () => {
           isLoading={isTrendingLoading}
           isError={isTrendingError}
           fallbackBooks={FALLBACK_TRENDING_BOOKS}
-          onJoinDiscussion={(book) => handleJoinDiscussion(book.id, book.title, book.author)}
+          onJoinDiscussion={(book: BookType) => handleJoinDiscussion(book.id, book.title, book.author)}
         />
 
         <DiscussedBooksSection 
           books={discussedBooks}
           isLoading={isDiscussedLoading}
           isError={isDiscussedError}
-          onJoinDiscussion={(book) => handleJoinDiscussion(book.id, book.title, book.author)}
+          onJoinDiscussion={(book: BookType) => handleJoinDiscussion(book.id, book.title, book.author)}
           onRefresh={refetchDiscussedBooks}
         />
       </ExploreContainer>

@@ -11,7 +11,7 @@ interface DiscussedBooksSectionProps {
   books: BookType[] | undefined;
   isLoading: boolean;
   isError: boolean;
-  onJoinDiscussion: (bookId: string, bookTitle: string, bookAuthor?: string) => void;
+  onJoinDiscussion: (book: BookType) => void;
   onRefresh: () => void;
 }
 
@@ -65,7 +65,7 @@ const DiscussedBooksSection: React.FC<DiscussedBooksSectionProps> = ({
             <TrendingBookCard
               key={book.id}
               book={book}
-              onJoinDiscussion={() => onJoinDiscussion(book.id, book.title, book.author)}
+              onJoinDiscussion={() => onJoinDiscussion(book)}
               badge={
                 <Badge className="bg-bookconnect-sage text-white shadow-lg flex items-center gap-1 px-2.5 py-1">
                   <MessageCircle className="h-4 w-4" /> Active Discussion

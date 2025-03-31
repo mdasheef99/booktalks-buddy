@@ -10,7 +10,7 @@ interface TrendingBooksSectionProps {
   isLoading: boolean;
   isError: boolean;
   fallbackBooks: BookType[];
-  onJoinDiscussion: (bookId: string, bookTitle: string, bookAuthor?: string) => void;
+  onJoinDiscussion: (book: BookType) => void;
 }
 
 const TrendingBooksSection: React.FC<TrendingBooksSectionProps> = ({ 
@@ -45,7 +45,7 @@ const TrendingBooksSection: React.FC<TrendingBooksSectionProps> = ({
             <TrendingBookCard
               key={book.id}
               book={book}
-              onJoinDiscussion={() => onJoinDiscussion(book.id, book.title, book.author)}
+              onJoinDiscussion={() => onJoinDiscussion(book)}
             />
           ))}
         </div>
@@ -55,7 +55,7 @@ const TrendingBooksSection: React.FC<TrendingBooksSectionProps> = ({
             <TrendingBookCard
               key={book.id}
               book={book}
-              onJoinDiscussion={() => onJoinDiscussion(book.id, book.title, book.author)}
+              onJoinDiscussion={() => onJoinDiscussion(book)}
             />
           ))}
         </div>

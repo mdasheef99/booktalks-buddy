@@ -7,7 +7,7 @@ interface SearchResultsProps {
   searchQuery: string;
   searchResults: BookType[] | undefined;
   isSearchError: boolean;
-  onJoinDiscussion: (bookId: string, bookTitle: string, bookAuthor?: string) => void;
+  onJoinDiscussion: (book: BookType) => void;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ 
@@ -41,7 +41,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <BookCard
               key={book.id}
               book={book}
-              onJoinDiscussion={() => onJoinDiscussion(book.id, book.title, book.author)}
+              onJoinDiscussion={() => onJoinDiscussion(book)}
             />
           ))}
         </div>
