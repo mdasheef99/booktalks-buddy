@@ -70,7 +70,7 @@ const ExploreBooks: React.FC = () => {
           searchQuery={searchQuery}
           searchResults={searchResults}
           isSearchError={isSearchError}
-          onJoinDiscussion={handleJoinDiscussion}
+          onJoinDiscussion={(book) => handleJoinDiscussion(book.id, book.title, book.author)}
         />
         
         <TrendingBooksSection
@@ -79,14 +79,14 @@ const ExploreBooks: React.FC = () => {
           isLoading={isTrendingLoading}
           isError={isTrendingError}
           fallbackBooks={FALLBACK_TRENDING_BOOKS}
-          onJoinDiscussion={handleJoinDiscussion}
+          onJoinDiscussion={(book) => handleJoinDiscussion(book.id, book.title, book.author)}
         />
 
         <DiscussedBooksSection 
           books={discussedBooks}
           isLoading={isDiscussedLoading}
           isError={isDiscussedError}
-          onJoinDiscussion={handleJoinDiscussion}
+          onJoinDiscussion={(book) => handleJoinDiscussion(book.id, book.title, book.author)}
           onRefresh={refetchDiscussedBooks}
         />
       </ExploreContainer>

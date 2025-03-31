@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +26,6 @@ export function useExploreBooks() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Initialize user profile
   useEffect(() => {
     if (!genreParam) {
       try {
@@ -58,7 +56,6 @@ export function useExploreBooks() {
     }
   }, [genreParam]);
 
-  // Book search query
   const { 
     data: searchResults, 
     isLoading: isSearching, 
@@ -87,7 +84,6 @@ export function useExploreBooks() {
     }
   });
 
-  // Trending books query
   const { 
     data: trendingBooks, 
     isLoading: isTrendingLoading, 
@@ -114,7 +110,6 @@ export function useExploreBooks() {
     }
   });
 
-  // Recently discussed books query - adding lastDiscussionTime to the query key to force refresh
   const {
     data: discussedBooks,
     isLoading: isDiscussedLoading,
@@ -123,7 +118,7 @@ export function useExploreBooks() {
   } = useQuery({
     queryKey: ["discussedBooks", lastDiscussionTime],
     queryFn: () => fetchRecentlyDiscussedBooks(6),
-    staleTime: 15000, // Consider data stale after 15 seconds
+    staleTime: 15000,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     meta: {
@@ -144,9 +139,8 @@ export function useExploreBooks() {
     }
   });
 
-  // Enhanced refresh function with feedback
   const handleRefreshDiscussedBooks = useCallback(() => {
-    setLastDiscussionTime(Date.now()); // Update time to force refresh
+    setLastDiscussionTime(Date.now());
     
     toast({
       title: "Refreshing discussions",
@@ -156,7 +150,6 @@ export function useExploreBooks() {
     refetchDiscussedBooks();
   }, [refetchDiscussedBooks, toast]);
 
-  // Search handler
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim()) {
@@ -165,31 +158,27 @@ export function useExploreBooks() {
     }
   };
 
-  // Join discussion handler with improved refresh logic
   const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string = "") => {
+    console.log("Joining discussion for book:", bookId, bookTitle);
+    
     if (window.innerWidth < 768) {
-      navigate(`/books/${bookId}/discussion?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
+      navigate(`/book-discussion/${bookId}?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
     } else {
       setShowDiscussion(true);
       setSelectedBookId(bookId);
       setSelectedBookTitle(bookTitle);
       
-      // Update the last discussion time to trigger a refresh
       setLastDiscussionTime(Date.now());
       
-      // Force a refresh after a short delay to allow the chat to be stored
       setTimeout(() => {
         refetchDiscussedBooks();
       }, 1500);
     }
   };
 
-  // Auto refresh discussed books with periodic updates
   useEffect(() => {
-    // Initial fetch
     refetchDiscussedBooks();
     
-    // Set up interval to refresh every minute
     const intervalId = setInterval(() => {
       console.log("Auto-refreshing discussed books");
       refetchDiscussedBooks();
