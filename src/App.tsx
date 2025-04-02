@@ -35,7 +35,8 @@ function App() {
               <Route path="/books" element={<Books />} />
               <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/book/:id" element={<BookDetail />} />
-              <Route path="/book-discussion/:id" element={<BookDiscussion />} />
+            </Route>
+            <Route path="/book-discussion/:id" element={<BookDiscussion />} />
               <Route path="/explore-books" element={<ExploreBooks />} />
               <Route path="/book-club" element={<BookClub />} />
               <Route path="/book-clubs" element={<BookClub />} />
@@ -43,7 +44,6 @@ function App() {
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/search" element={<Search />} />
               <Route path="*" element={<NotFound />} />
-            </Route>
           </Routes>
         </AuthProvider>
         <Toaster />

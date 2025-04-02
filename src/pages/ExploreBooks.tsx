@@ -58,8 +58,6 @@ const ExploreBooks: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
-      
       <ExploreContainer>
         <ExploreHeader genres={genres} primaryGenre={primaryGenre} />
 

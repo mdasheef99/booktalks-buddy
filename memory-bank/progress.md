@@ -10,7 +10,7 @@
 
 ## What's left to build:
 - Frontend application development (UI components, pages, routing, state management)
-  - Explore Books page functionality (requires React Query fix)
+  - Explore Books page functionality (requires React Query fix and UI fixes)
 - Backend API development (controllers, services, data access)
 - Database schema design and implementation
 - User authentication and authorization
@@ -21,12 +21,13 @@
 - Testing and deployment
 
 ## Current status:
-- Debugging errors on the landing page (`Could not load /textures/book-cover.jpg`, `<ForwardRef(Canvas)>` error) related to the removal of the 3D interactive book feature.
-- The React Query issue investigation is paused until these landing page errors are resolved.
+- Landing page errors resolved.
+- Investigating and resolving UI issues on the Explore page: duplicate headers with identical design and missing back button.
+- The React Query issue investigation is paused until these Explore page UI issues are resolved.
 
 ## Known issues:
-- **Landing Page Errors:** Errors like `Could not load /textures/book-cover.jpg` and errors within `<ForwardRef(Canvas)>` occur on the landing page, likely due to leftover code from the removed 3D interactive book feature.
-- **React Query Error:** "No QueryClient set, use QueryClientProvider to set one" when accessing features using React Query hooks (e.g., ExploreBooks page). Requires setting up `QueryClientProvider` at the application root (to be addressed after landing page errors).
+- **Explore Page UI Issues:** Duplicate headers with identical design and a missing back button on the Explore page.
+- **React Query Error:** "No QueryClient set, use QueryClientProvider to set one" when accessing features using React Query hooks (e.g., ExploreBooks page). Requires setting up `QueryClientProvider` at the application root (to be addressed after Explore page UI issues).
 
 ## Evolution of project decisions:
 - Initially considered using a different backend framework, but decided to go with Node.js and Express.js (or Supabase Functions).

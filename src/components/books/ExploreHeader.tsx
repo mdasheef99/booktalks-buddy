@@ -9,7 +9,17 @@ interface ExploreHeaderProps {
 
 const ExploreHeader: React.FC<ExploreHeaderProps> = ({ genres, primaryGenre }) => {
   return (
-    <div className="mb-12 text-center">
+    <div className="mb-12 text-center relative">
+      <button
+        onClick={() => window.history.back()}
+        className="absolute left-0 top-0 flex items-center gap-1 text-bookconnect-brown hover:text-bookconnect-terracotta transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back
+      </button>
       <div className="flex items-center justify-center gap-2 mb-2">
         <Sparkles className="h-6 w-6 text-bookconnect-terracotta" />
         <span className="text-sm font-medium uppercase tracking-wider text-bookconnect-terracotta">Discover</span>

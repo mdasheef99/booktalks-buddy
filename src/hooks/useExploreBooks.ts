@@ -161,18 +161,25 @@ export function useExploreBooks() {
   const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string = "") => {
     console.log("Joining discussion for book:", bookId, bookTitle);
     
-    if (window.innerWidth < 768) {
+    try {
       navigate(`/book-discussion/${bookId}?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
-    } else {
+      
+      // Update state for desktop view if needed
       setShowDiscussion(true);
       setSelectedBookId(bookId);
       setSelectedBookTitle(bookTitle);
-      
       setLastDiscussionTime(Date.now());
       
       setTimeout(() => {
         refetchDiscussedBooks();
       }, 1500);
+    } catch (error) {
+      console.error("Navigation failed:", error);
+      toast({
+        title: "Couldn't open discussion",
+        description: "Please try again later",
+        variant: "destructive",
+      });
     }
   };
 

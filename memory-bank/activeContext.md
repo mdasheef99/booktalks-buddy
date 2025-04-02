@@ -1,7 +1,7 @@
 # Active Context
 
 ## Current Work Focus:
-Debugging errors (`Could not load /textures/book-cover.jpg`, `<ForwardRef(Canvas)>` error) occurring on the landing page, likely due to incomplete removal of the 3D interactive book feature. These errors manifest when interacting with elements like the "Start anonymous chat" button.
+Resolving UI issues on the Explore page: duplicate headers with identical design and missing back button.
 
 ## Recent Changes:
 - Removed the entire 3D interactive book feature based on user request.
@@ -17,15 +17,15 @@ Debugging errors (`Could not load /textures/book-cover.jpg`, `<ForwardRef(Canvas
   - Passed the handler to `HeroSection`.
 
 ## Next Steps:
-- Investigate `src/pages/Landing.tsx` and its child components (e.g., `HeroSection`) for any remaining references to the deleted 3D book components (`InteractiveBook`, `InteractiveBookSection`, `Canvas`) or assets (`/textures/book-cover.jpg`).
-- Remove any leftover code, imports, or state related to the 3D feature.
-- Test the landing page interactions (like clicking "Start anonymous chat") to ensure the errors are resolved.
+- Investigate and resolve UI issues on the Explore page: duplicate headers with identical design and missing back button.
+- Test the Explore page functionality to ensure the issues are resolved.
 - Re-evaluate the React Query issue mentioned previously once the landing page errors are fixed.
 
 ## Active Decisions and Considerations:
 - **Thorough Cleanup:** Ensure all traces of the removed 3D feature are eliminated to prevent residual errors.
 - **Error Boundaries:** Reiterate the need for error boundaries, especially around complex UI sections, to gracefully handle unexpected issues.
 - **React Query Setup:** Keep the previous note about `QueryClientProvider` setup, as it will likely be the next focus after fixing the current errors.
+- **Explore Page UI:** Prioritize fixing the duplicate headers and missing back button on the Explore page.
 
 ## Important Patterns and Preferences:
 - **Centralized Providers:** Keep context providers (like AuthProvider, QueryClientProvider) near the application root (`main.tsx` or `App.tsx`) for clarity and proper scoping.
