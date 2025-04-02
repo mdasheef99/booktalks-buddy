@@ -18,7 +18,6 @@ import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
-import InteractiveChatEntry from "./pages/InteractiveChatEntry";
 
 function App() {
   return (
@@ -29,7 +28,6 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/interactive-chat" element={<InteractiveChatEntry />} /> 
             <Route path="/chat-selection" element={<ChatSelection />} />
             <Route element={<Layout />}>
               <Route path="/profile" element={<Profile />} />

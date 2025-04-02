@@ -9,7 +9,6 @@ import { LoginDialog } from "@/components/dialogs/LoginDialog";
 
 // Import the new component sections
 import HeroSection from "@/components/landing/HeroSection";
-import InteractiveBookSection from "@/components/landing/InteractiveBookSection";
 import EventsSection from "@/components/landing/EventsSection";
 import BookClubsSection from "@/components/landing/BookClubsSection";
 import QuoteSection from "@/components/landing/QuoteSection";
@@ -22,7 +21,6 @@ const Landing = () => {
   const [genreDialogOpen, setGenreDialogOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [currentUsername, setCurrentUsername] = useState("");
-  const [showInteractiveBook, setShowInteractiveBook] = useState(false);
 
   const handleUsernameComplete = (username: string) => {
     setCurrentUsername(username);
@@ -30,16 +28,9 @@ const Landing = () => {
     setGenreDialogOpen(true);
   };
 
-  const handleStartChatting = () => {
-    setShowInteractiveBook(true);
-    // Smooth scroll to the interactive book section
-    setTimeout(() => {
-      document.getElementById('interactive-book-section')?.scrollIntoView({ 
-        behavior: 'smooth' 
-      });
-    }, 100);
+  const handleOpenUsernameDialog = () => {
+    setUsernameDialogOpen(true);
   };
-
   const handleBookClubClick = async () => {
     if (user) {
       navigate("/book-club");
@@ -85,10 +76,7 @@ const Landing = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <HeroSection handleStartChatting={handleStartChatting} />
-      
-      {/* Interactive Book Section */}
-      <InteractiveBookSection showInteractiveBook={showInteractiveBook} />
+      <HeroSection handleStartChatting={handleOpenUsernameDialog} />
 
       {/* Events Section */}
       <EventsSection handleEventsClick={handleEventsClick} />
