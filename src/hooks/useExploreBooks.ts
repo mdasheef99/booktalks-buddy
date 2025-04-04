@@ -13,16 +13,16 @@ export function useExploreBooks() {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfileDialog, setShowProfileDialog] = useState(false);
-  
+
   const [selectedBookId, setSelectedBookId] = useState<string>("");
   const [selectedBookTitle, setSelectedBookTitle] = useState<string>("");
   const [showDiscussion, setShowDiscussion] = useState(false);
   const [lastDiscussionTime, setLastDiscussionTime] = useState<number>(Date.now());
-  
+
   const genreParam = searchParams.get("genre") || "";
   const genres = genreParam.split(',').filter(Boolean);
   const primaryGenre = genres[0] || localStorage.getItem("selected_genre") || "Fiction";
-  
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -40,27 +40,27 @@ export function useExploreBooks() {
         console.error("Error loading genres from localStorage:", error);
       }
     }
-    
+
     const hasVisitedBefore = localStorage.getItem("has_visited_explore");
     if (!hasVisitedBefore) {
       if (!localStorage.getItem("username")) {
         const generatedUsername = generateLiteraryUsername();
         localStorage.setItem("username", generatedUsername);
       }
-      
+
       setTimeout(() => {
         setShowProfileDialog(true);
       }, 500);
-      
+
       localStorage.setItem("has_visited_explore", "true");
     }
   }, [genreParam]);
 
-  const { 
-    data: searchResults, 
-    isLoading: isSearching, 
-    refetch: searchBooks, 
-    isError: isSearchError 
+  const {
+    data: searchResults,
+    isLoading: isSearching,
+    refetch: searchBooks,
+    isError: isSearchError
   } = useQuery({
     queryKey: ["bookSearch", searchQuery],
     queryFn: () => fetchBooksByQuery(searchQuery, 8),
@@ -68,13 +68,13 @@ export function useExploreBooks() {
     meta: {
       onError: (error: Error) => {
         Sentry.captureException(error, {
-          tags: { 
+          tags: {
             component: "ExploreBooks",
-            action: "searchBooks" 
+            action: "searchBooks"
           },
           extra: { searchQuery }
         });
-        
+
         toast({
           title: "Search Error",
           description: "We couldn't find what you're looking for. Please try again.",
@@ -84,23 +84,23 @@ export function useExploreBooks() {
     }
   });
 
-  const { 
-    data: trendingBooks, 
-    isLoading: isTrendingLoading, 
-    isError: isTrendingError 
+  const {
+    data: trendingBooks,
+    isLoading: isTrendingLoading,
+    isError: isTrendingError
   } = useQuery({
     queryKey: ["trendingBooks", primaryGenre],
     queryFn: () => fetchTrendingBooks(primaryGenre, 5),
     meta: {
       onError: (error: Error) => {
         Sentry.captureException(error, {
-          tags: { 
-            component: "ExploreBooks", 
-            action: "fetchTrendingBooks" 
+          tags: {
+            component: "ExploreBooks",
+            action: "fetchTrendingBooks"
           },
           extra: { genre: primaryGenre, allGenres: genres }
         });
-        
+
         toast({
           title: "Couldn't load trending books",
           description: "We're having trouble finding the hottest reads right now.",
@@ -129,7 +129,7 @@ export function useExploreBooks() {
             action: "fetchDiscussedBooks"
           }
         });
-        
+
         toast({
           title: "Couldn't load discussed books",
           description: "We're having trouble loading books currently being discussed.",
@@ -141,12 +141,12 @@ export function useExploreBooks() {
 
   const handleRefreshDiscussedBooks = useCallback(() => {
     setLastDiscussionTime(Date.now());
-    
+
     toast({
       title: "Refreshing discussions",
       description: "Finding the latest book discussions...",
     });
-    
+
     refetchDiscussedBooks();
   }, [refetchDiscussedBooks, toast]);
 
@@ -158,18 +158,18 @@ export function useExploreBooks() {
     }
   };
 
-  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string = "") => {
-    console.log("Joining discussion for book:", bookId, bookTitle);
-    
+  const handleJoinDiscussion = (bookId: string, bookTitle: string, bookAuthor: string = "", bookCoverUrl: string = "") => {
+    console.log("Joining discussion for book:", bookId, bookTitle, "with cover URL:", bookCoverUrl);
+
     try {
-      navigate(`/book-discussion/${bookId}?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}`);
-      
+      navigate(`/book-discussion/${bookId}?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(bookAuthor)}&coverUrl=${encodeURIComponent(bookCoverUrl || "")}`);
+
       // Update state for desktop view if needed
       setShowDiscussion(true);
       setSelectedBookId(bookId);
       setSelectedBookTitle(bookTitle);
       setLastDiscussionTime(Date.now());
-      
+
       setTimeout(() => {
         refetchDiscussedBooks();
       }, 1500);
@@ -185,12 +185,12 @@ export function useExploreBooks() {
 
   useEffect(() => {
     refetchDiscussedBooks();
-    
+
     const intervalId = setInterval(() => {
       console.log("Auto-refreshing discussed books");
       refetchDiscussedBooks();
     }, 60000);
-    
+
     return () => clearInterval(intervalId);
   }, [refetchDiscussedBooks]);
 

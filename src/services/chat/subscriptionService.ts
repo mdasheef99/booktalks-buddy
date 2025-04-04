@@ -1,5 +1,5 @@
 
-import { supabase, generateBookUuid } from '../base/supabaseService';
+import { supabase, generateBookUuid, getBookDiscussionId, isUuid } from '../base/supabaseService';
 import { ChatMessage, MessageReactionData } from './models';
 
 // ========== Subscription Functions ==========
@@ -7,11 +7,14 @@ export function subscribeToChat(
   bookId: string,
   callback: (message: ChatMessage) => void
 ) {
+  // Ensure we're using the original Google Books ID
+  const originalId = isUuid(bookId) ? getBookDiscussionId(bookId) : bookId;
+
   // Convert Google Books ID to UUID format for Supabase
-  const dbBookId = generateBookUuid(bookId);
-  
-  console.log("Subscribing to chat for bookId:", bookId, "converted to UUID:", dbBookId);
-  
+  const dbBookId = generateBookUuid(originalId);
+
+  console.log("Subscribing to chat for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId);
+
   return supabase
     .channel(`chat:${bookId}`)
     .on(
@@ -50,7 +53,7 @@ export function subscribeToReactions(
   callback: (reaction: MessageReactionData) => void
 ) {
   console.log("Subscribing to reactions for messageId:", messageId);
-  
+
   return supabase
     .channel(`reactions:${messageId}`)
     .on(

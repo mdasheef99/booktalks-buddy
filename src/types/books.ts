@@ -1,6 +1,7 @@
 
 export interface BookType {
-  id: string;
+  id: string;       // Original Google Books ID or other source ID
+  uuid?: string;    // Database UUID (if available)
   title: string;
   author?: string;
   description?: string;

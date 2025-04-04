@@ -4,7 +4,8 @@ import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/se
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
 
-export function useBookDiscussion(id: string, title: string, author: string, username: string) {
+export function useBookDiscussion(id: string, title: string, author: string, username: string, coverUrl: string = "") {
+  console.log("useBookDiscussion - Book ID:", id, "Title:", title, "Author:", author, "Cover URL:", coverUrl);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
@@ -15,7 +16,7 @@ export function useBookDiscussion(id: string, title: string, author: string, use
   useEffect(() => {
     const loadChatHistory = async () => {
       if (!id) return;
-      
+
       try {
         setLoading(true);
         setConnectionError(false);
@@ -23,13 +24,13 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         const chatHistory = await getBookChat(id);
         console.log("Got chat history:", chatHistory);
         setMessages(chatHistory);
-        
+
         // Extract unique usernames from chat history
         const uniqueUsernames = new Set<string>();
         chatHistory.forEach(msg => {
           if (msg.username) uniqueUsernames.add(msg.username);
         });
-        
+
         // Add current user to online users
         setOnlineUsers(prev => {
           const newUsers = Array.from(uniqueUsernames);
@@ -38,7 +39,7 @@ export function useBookDiscussion(id: string, title: string, author: string, use
           }
           return newUsers;
         });
-        
+
       } catch (error) {
         console.error("Error loading chat history:", error);
         setConnectionError(true);
@@ -51,30 +52,30 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         setLoading(false);
       }
     };
-    
+
     loadChatHistory();
   }, [id, username]);
-  
+
   // Subscribe to real-time chat updates
   useEffect(() => {
     if (!id) return;
-    
+
     console.log("Setting up real-time subscription for book:", id);
     const subscription = subscribeToChat(id, (newMessage) => {
       console.log("Received new message in component:", newMessage);
-      
+
       // Handle both new messages and updates to existing messages (deletions)
       setMessages((prevMessages) => {
         // Check if this is an update to an existing message
         if (prevMessages.some(msg => msg.id === newMessage.id)) {
-          return prevMessages.map(msg => 
+          return prevMessages.map(msg =>
             msg.id === newMessage.id ? newMessage : msg
           );
         }
         // Otherwise it's a new message
         return [...prevMessages, newMessage];
       });
-      
+
       // Add user to online users list if not already there
       if (newMessage.username) {
         setOnlineUsers(prev => {
@@ -84,35 +85,36 @@ export function useBookDiscussion(id: string, title: string, author: string, use
           return prev;
         });
       }
-      
+
       setConnectionError(false);
     });
-    
+
     return () => {
       console.log("Unsubscribing from chat");
       subscription.unsubscribe();
     };
   }, [id]);
-  
+
   const handleSendMessage = async (message: string, replyToId?: string) => {
     if (!id || !message.trim()) {
       console.error("Missing required data for sending message");
       return;
     }
-    
+
     try {
       console.log("Sending message:", message, "for book:", id, "as user:", username);
       // Pass the title and author to ensure the book exists in the database
       const result = await sendChatMessage(
-        message, 
-        id, 
-        username, 
-        title, 
-        author, 
-        undefined, 
-        replyToId
+        message,
+        id,
+        username,
+        title,
+        author,
+        undefined,
+        replyToId,
+        coverUrl
       );
-      
+
       if (!result) {
         console.error("No result returned from sendChatMessage");
         toast.error("Failed to send message. Please try again.");
