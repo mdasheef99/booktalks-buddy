@@ -1,17 +1,18 @@
 
 import React from "react";
+import { Link, useNavigate } from "react-router-dom"; // Import Link and useNavigate
 import { BookOpen, Sparkles } from "lucide-react";
 
 interface ExploreHeaderProps {
   genres: string[];
   primaryGenre: string;
 }
-
 const ExploreHeader: React.FC<ExploreHeaderProps> = ({ genres, primaryGenre }) => {
+  const navigate = useNavigate();
   return (
     <div className="mb-12 text-center relative">
-      <button
-        onClick={() => window.history.back()}
+      <Link
+        to="/"
         className="absolute left-0 top-0 flex items-center gap-1 text-bookconnect-brown hover:text-bookconnect-terracotta transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -19,7 +20,7 @@ const ExploreHeader: React.FC<ExploreHeaderProps> = ({ genres, primaryGenre }) =
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
         Back
-      </button>
+      </Link>
       <div className="flex items-center justify-center gap-2 mb-2">
         <Sparkles className="h-6 w-6 text-bookconnect-terracotta" />
         <span className="text-sm font-medium uppercase tracking-wider text-bookconnect-terracotta">Discover</span>
@@ -36,25 +37,12 @@ const ExploreHeader: React.FC<ExploreHeaderProps> = ({ genres, primaryGenre }) =
       </div>
       
       <p className="text-center text-bookconnect-brown/80 mt-2 font-serif max-w-2xl mx-auto text-lg">
-        {genres.length > 1 
+        {genres.length > 1
           ? `Discover amazing reads in ${genres.slice(0, 3).join(', ')}${genres.length > 3 ? '...' : ''}`
-          : primaryGenre 
-            ? `Discover amazing reads in ${primaryGenre}` 
+          : primaryGenre
+            ? `Discover amazing reads in ${primaryGenre}`
             : "Find your next favorite book"}
       </p>
-      
-      {genres.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-2 mt-4">
-          {genres.map(genre => (
-            <span 
-              key={genre} 
-              className="px-3 py-1.5 bg-bookconnect-terracotta/10 text-bookconnect-brown text-sm rounded-full border border-bookconnect-terracotta/20"
-            >
-              {genre}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
