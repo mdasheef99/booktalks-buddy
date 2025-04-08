@@ -65,13 +65,22 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-        // BookConnect theme colors
+        /**
+         * BookConnect Design Tokens
+         * Use these semantic colors for consistent theming across the app
+         */
         bookconnect: {
+          /** Soft background, paper-like */
           cream: "#F8F3E6",
+          /** Primary brand accent */
           brown: "#8B6E4F",
+          /** Secondary accent, highlights */
           terracotta: "#C97C5D",
+          /** Muted green, backgrounds or accents */
           sage: "#A5B1A2",
+          /** Darker green, buttons or text */
           olive: "#7D8471",
+          /** Light neutral background */
           parchment: "#F2EADF"
         }
 			},

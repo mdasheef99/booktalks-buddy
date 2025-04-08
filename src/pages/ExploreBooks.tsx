@@ -1,15 +1,24 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import * as Sentry from "@sentry/react";
 
-import React from "react";
 import BookConnectHeader from "@/components/BookConnectHeader";
 import BookSearchForm from "@/components/books/BookSearchForm";
-import SearchResults from "@/components/books/SearchResults";
-import TrendingBooksSection from "@/components/books/TrendingBooksSection";
-import DiscussedBooksSection from "@/components/books/DiscussedBooksSection";
 import { ProfileDialog } from "@/components/profile";
-import ExploreHeader from "@/components/books/ExploreHeader";
-import ExploreContainer from "@/components/books/ExploreContainer";
-import { useExploreBooks } from "@/hooks/useExploreBooks";
-import { BookType } from "@/types/books";
+
+// New components
+import NewSearchResults from "@/components/explore/SearchResults";
+import NewTrendingBooksSection from "@/components/explore/TrendingBooksSection";
+import NewDiscussedBooksSection from "@/components/explore/DiscussedBooksSection";
+import NewExploreHeader from "@/components/explore/ExploreHeader";
+import NewExploreContainer from "@/components/explore/ExploreContainer";
+
+import { useToast } from "@/hooks/use-toast";
+import { useSearchBooks } from "@/hooks/explore/useSearchBooks";
+import { useTrendingBooks } from "@/hooks/explore/useTrendingBooks";
+import { useDiscussedBooks } from "@/hooks/explore/useDiscussedBooks";
+import { generateLiteraryUsername } from "@/utils/usernameGenerator";
+import { Book } from "@/types/books";
 
 const FALLBACK_TRENDING_BOOKS = [
   {
@@ -36,65 +45,131 @@ const FALLBACK_TRENDING_BOOKS = [
 ];
 
 const ExploreBooks: React.FC = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
+
+  const genreParam = searchParams.get("genre") || "";
+  const genres = genreParam.split(",").filter(Boolean);
+  const primaryGenre = genres[0] || localStorage.getItem("selected_genre") || "Fiction";
+
+  const [lastDiscussionTime, setLastDiscussionTime] = useState<number>(Date.now());
+
+  useEffect(() => {
+    const hasVisitedBefore = localStorage.getItem("has_visited_explore");
+    if (!hasVisitedBefore) {
+      if (!localStorage.getItem("username")) {
+        const generatedUsername = generateLiteraryUsername();
+        localStorage.setItem("username", generatedUsername);
+      }
+
+      setTimeout(() => {
+        setShowProfileDialog(true);
+      }, 500);
+
+      localStorage.setItem("has_visited_explore", "true");
+    }
+  }, []);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleJoinDiscussion = useCallback(
+    (bookId: string, bookTitle: string, bookAuthor: string = "", bookCoverUrl: string = "") => {
+      try {
+        navigate(
+          `/book-discussion/${bookId}?title=${encodeURIComponent(bookTitle)}&author=${encodeURIComponent(
+            bookAuthor
+          )}&coverUrl=${encodeURIComponent(bookCoverUrl || "")}`
+        );
+        setLastDiscussionTime(Date.now());
+      } catch (error) {
+        console.error("Navigation failed:", error);
+        toast({
+          title: "Couldn't open discussion",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+      }
+    },
+    [navigate, toast]
+  );
+
   const {
-    searchQuery,
-    genres,
-    primaryGenre,
-    searchResults,
-    isSearching,
-    isSearchError,
-    trendingBooks,
-    isTrendingLoading,
-    isTrendingError,
-    discussedBooks,
-    isDiscussedLoading,
-    isDiscussedError,
-    showProfileDialog,
-    setShowProfileDialog,
-    handleSearch,
-    handleJoinDiscussion,
-    refetchDiscussedBooks
-  } = useExploreBooks();
+    data: searchResults,
+    isLoading: isSearching,
+    isError: isSearchError,
+  } = useSearchBooks(searchQuery);
+
+  const {
+    data: trendingBooks,
+    isLoading: isTrendingLoading,
+    isError: isTrendingError,
+  } = useTrendingBooks(primaryGenre);
+
+  const {
+    data: discussedBooks,
+    isLoading: isDiscussedLoading,
+    isError: isDiscussedError,
+    refetch: refetchDiscussedBooks,
+  } = useDiscussedBooks();
+
+  const isNewExploreEnabled = import.meta.env.VITE_NEW_EXPLORE_ENABLED === 'true';
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
       <BookConnectHeader
         externalProfileDialog={{
           isOpen: showProfileDialog,
-          setOpen: setShowProfileDialog
+          setOpen: setShowProfileDialog,
         }}
       />
-      <ExploreContainer>
-        <ExploreHeader genres={genres} primaryGenre={primaryGenre} />
+        <NewExploreContainer>
+          <NewExploreHeader genres={genres} primaryGenre={primaryGenre} />
 
-        <div className="mb-12">
-          <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
-        </div>
+          <div className="mb-12">
+            <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
+          </div>
 
-        <SearchResults
-          searchQuery={searchQuery}
-          searchResults={searchResults}
-          isSearchError={isSearchError}
-          onJoinDiscussion={(book: BookType) => handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")}
-        />
+          <NewSearchResults
+            searchQuery={searchQuery}
+            searchResults={searchResults || []}
+            isSearchError={isSearchError}
+            isLoading={isSearching}
+            isError={isSearchError}
+            onJoinDiscussion={(book: Book) =>
+              handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")
+            }
+          />
 
-        <TrendingBooksSection
-          genre={primaryGenre}
-          books={trendingBooks}
-          isLoading={isTrendingLoading}
-          isError={isTrendingError}
-          fallbackBooks={FALLBACK_TRENDING_BOOKS}
-          onJoinDiscussion={(book: BookType) => handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")}
-        />
+          <NewTrendingBooksSection
+            genre={primaryGenre}
+            books={trendingBooks || []}
+            isLoading={isTrendingLoading}
+            isError={isTrendingError}
+            fallbackBooks={FALLBACK_TRENDING_BOOKS}
+            onJoinDiscussion={(book: Book) =>
+              handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")
+            }
+          />
 
-        <DiscussedBooksSection
-          books={discussedBooks}
-          isLoading={isDiscussedLoading}
-          isError={isDiscussedError}
-          onJoinDiscussion={(book: BookType) => handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")}
-          onRefresh={refetchDiscussedBooks}
-        />
-      </ExploreContainer>
+          <NewDiscussedBooksSection
+            books={discussedBooks || []}
+            isLoading={isDiscussedLoading}
+            isError={isDiscussedError}
+            onJoinDiscussion={(book: Book) =>
+              handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")
+            }
+            onRefresh={() => {
+              setLastDiscussionTime(Date.now());
+              refetchDiscussedBooks();
+            }}
+          />
+        </NewExploreContainer>
     </div>
   );
 };
