@@ -25,18 +25,7 @@ const BookConnectHeader: React.FC<BookConnectHeaderProps> = ({ externalProfileDi
           <span className="font-serif text-2xl font-bold text-bookconnect-brown">BookConnect</span>
         </Link>
 
-        <button
-          onClick={() => setProfileOpen(true)}
-          className="p-2 rounded-full hover:bg-bookconnect-brown/10 transition-colors"
-          aria-label="Open profile"
-        >
-          <UserRound className="h-6 w-6 text-bookconnect-brown" />
-        </button>
-
-        <ProfileDialog
-          open={profileOpen}
-          onClose={() => setProfileOpen(false)}
-        />
+        {/* Profile icon and dialog removed for authenticated Book Club */}
       </div>
     </div>
   );

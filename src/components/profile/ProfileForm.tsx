@@ -45,7 +45,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           value={favoriteAuthor}
           onChange={(e) => setFavoriteAuthor(e.target.value)}
           placeholder="Favorite Author"
-          className="font-serif"
+          className="font-serif rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-bookconnect-sage transition"
           maxLength={50}
           style={{ borderColor: '#B8A088' }}
         />
@@ -57,7 +57,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           Favorite Genre
         </label>
         <Select value={favoriteGenre} onValueChange={setFavoriteGenre}>
-          <SelectTrigger className="font-serif" style={{ borderColor: '#B8A088' }}>
+          <SelectTrigger className="font-serif rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-bookconnect-sage transition" style={{ borderColor: '#B8A088' }}>
             <SelectValue placeholder="Select a genre" />
           </SelectTrigger>
           <SelectContent>
@@ -80,7 +80,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           placeholder="About me"
-          className="font-serif"
+          className="font-serif rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-bookconnect-sage transition"
           maxLength={50}
           style={{ borderColor: '#B8A088' }}
         />

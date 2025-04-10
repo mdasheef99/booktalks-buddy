@@ -27,7 +27,7 @@ const AccountInfoForm: React.FC<AccountInfoFormProps> = ({
           type="email"
           value={email}
           disabled
-          className="bg-muted/50"
+          className="bg-muted/50 rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-bookconnect-sage transition"
         />
         <p className="text-xs text-muted-foreground">
           Email cannot be changed
@@ -41,13 +41,14 @@ const AccountInfoForm: React.FC<AccountInfoFormProps> = ({
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          className="rounded-md px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-bookconnect-sage transition"
         />
       </div>
 
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         disabled={isUpdating}
-        className="bg-bookconnect-sage hover:bg-bookconnect-sage/90"
+        className="bg-bookconnect-sage hover:bg-bookconnect-sage/90 rounded-md transition duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-bookconnect-sage"
       >
         {isUpdating ? "Updating..." : "Update Profile"}
       </Button>

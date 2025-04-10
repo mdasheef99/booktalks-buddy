@@ -1,5 +1,6 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AdminRouteGuard from "./components/routeguards/AdminRouteGuard";
+import MemberRouteGuard from "./components/routeguards/MemberRouteGuard";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
@@ -14,6 +15,7 @@ import ExploreBooks from "./pages/ExploreBooks";
 import BookDiscussion from "./pages/BookDiscussion";
 import ChatSelection from "./pages/ChatSelection";
 import BookClub from "./pages/BookClub";
+import { BookClubDetails } from "./components/bookclubs/BookClubDetails"; // Import BookClubDetails
 import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -40,6 +42,34 @@ function App() {
               <Route path="/explore-books" element={<ExploreBooks />} />
               <Route path="/book-club" element={<BookClub />} />
               <Route path="/book-clubs" element={<BookClub />} />
+              {/* Book Club Routes */}
+              <Route path="/book-club/new" element={<div>Create New Book Club Form</div>} /> {/* Placeholder */}
+              <Route path="/book-club/:clubId" element={<BookClubDetails />} />
+              <Route
+                path="/book-club/:clubId/discussions"
+                element={
+                  <MemberRouteGuard>
+                    <div>Book Club Discussions</div>
+                  </MemberRouteGuard>
+                }
+              />
+              <Route
+                path="/book-club/:clubId/members"
+                element={
+                  <AdminRouteGuard>
+                    <div>Book Club Members</div>
+                  </AdminRouteGuard>
+                }
+              />
+              <Route
+                path="/book-club/:clubId/settings"
+                element={
+                  <AdminRouteGuard>
+                    <div>Book Club Settings</div>
+                  </AdminRouteGuard>
+                }
+              />
+
               <Route path="/events" element={<Events />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/search" element={<Search />} />

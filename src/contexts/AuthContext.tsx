@@ -1,6 +1,8 @@
 
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase, User, apiCall } from '@/lib/supabase';
+import { supabase, apiCall } from '@/lib/supabase';
+import type { User } from '@supabase/supabase-js';
 import { useToast } from '@/components/ui/use-toast';
 import { Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -13,16 +15,54 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
+
+  // New: club membership info
+  clubRoles: Record<string, string>; // clubId -> role
+  fetchClubRoles: () => Promise<void>;
+  isAdmin: (clubId: string) => boolean;
+  isMember: (clubId: string) => boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Session['user'] | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [clubRoles, setClubRoles] = useState<Record<string, string>>({});
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
+
+  const fetchClubRoles = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('club_members')
+        .select('club_id, role')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching club roles:', error);
+        return;
+      }
+
+      const rolesMap: Record<string, string> = {};
+      data?.forEach((row: any) => {
+        rolesMap[row.club_id] = row.role;
+      });
+      setClubRoles(rolesMap);
+    } catch (err) {
+      console.error('Unexpected error fetching club roles:', err);
+    }
+  };
+
+  const isAdmin = (clubId: string) => {
+    return clubRoles[clubId] === 'admin';
+  };
+
+  const isMember = (clubId: string) => {
+    return clubRoles.hasOwnProperty(clubId);
+  };
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -32,19 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       
       if (session?.user) {
-        console.log("Session user found, fetching profile...");
-        try {
-          const { data } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-          
-          console.log("User profile:", data);
-          setUser(data as User);
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-        }
+        console.log("Session user found, skipping profile fetch. Using Supabase Auth user object directly.");
+        setUser(session?.user);
       }
       
       setLoading(false);
@@ -58,28 +87,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         
         if (session?.user) {
-          try {
-            console.log("Fetching user profile after auth state change...");
-            const { data } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-            
-            console.log("Updated user profile:", data);
-            setUser(data as User);
-            
-            // If authenticated, ensure we navigate to the book club page
-            if (event === 'SIGNED_IN') {
-              console.log("User signed in, redirecting to book club");
-              toast.success(`Welcome ${data?.username || 'back'}!`);
-              navigate('/book-club');
-            }
-          } catch (error) {
-            console.error("Error fetching user profile after auth state change:", error);
+          console.log("Skipping profile fetch. Using Supabase Auth user object directly.");
+          setUser(session?.user);
+          await fetchClubRoles();
+          
+          if (event === 'SIGNED_IN') {
+            console.log("User signed in, redirecting to book club");
+            toast.success(`Welcome back!`);
+            navigate('/book-club');
           }
         } else {
           setUser(null);
+          setClubRoles({});
         }
         
         setLoading(false);
@@ -90,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, user?.id]);
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
@@ -142,9 +161,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error: profileError } = await supabase
           .from('users')
           .insert([
-            { 
-              id: data.user.id, 
-              email, 
+            {
+              id: data.user.id,
+              email,
               username
             }
           ]);
@@ -182,7 +201,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{
+      user,
+      session,
+      loading,
+      signIn,
+      signUp,
+      signOut,
+      clubRoles,
+      fetchClubRoles,
+      isAdmin,
+      isMember
+    }}>
       {children}
     </AuthContext.Provider>
   );
