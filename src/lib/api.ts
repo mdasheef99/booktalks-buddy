@@ -77,16 +77,35 @@ async function isClubMember(userId: string, clubId: string): Promise<boolean> {
 export async function createBookClub(userId: string, club: { name: string; description?: string; privacy?: string }) {
   if (!club.name) throw new Error('Club name is required');
 
+  console.log('Creating book club with data:', { name: club.name, description: club.description, privacy: club.privacy });
+
+  // Remove created_by if it doesn't exist in the schema
   const { data, error } = await supabase
     .from('book_clubs')
-    .insert([{ ...club, created_by: userId }])
+    .insert([{
+      name: club.name,
+      description: club.description,
+      privacy: club.privacy
+    }])
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error creating book club:', error);
+    throw error;
+  }
+
+  console.log('Book club created successfully:', data);
 
   // Add creator as admin member
-  await supabase.from('club_members').insert([{ user_id: userId, club_id: data.id, role: 'admin' }]);
+  const { error: memberError } = await supabase
+    .from('club_members')
+    .insert([{ user_id: userId, club_id: data.id, role: 'admin' }]);
+
+  if (memberError) {
+    console.error('Error adding creator as admin:', memberError);
+    throw memberError;
+  }
 
   return data;
 }
@@ -108,8 +127,74 @@ export async function updateBookClub(userId: string, clubId: string, updates: { 
 export async function deleteBookClub(userId: string, clubId: string) {
   if (!(await isClubAdmin(userId, clubId))) throw new Error('Unauthorized');
 
-  const { error } = await supabase.from('book_clubs').delete().eq('id', clubId);
-  if (error) throw error;
+  console.log('Deleting book club:', clubId);
+
+  // First delete all members
+  console.log('Deleting club members first...');
+  const { error: memberError } = await supabase
+    .from('club_members')
+    .delete()
+    .eq('club_id', clubId);
+
+  if (memberError) {
+    console.error('Error deleting club members:', memberError);
+    throw memberError;
+  }
+
+  // Then delete any discussion topics and posts
+  console.log('Deleting discussion topics and posts...');
+  try {
+    // Get all topic IDs for this club
+    const { data: topics } = await supabase
+      .from('discussion_topics')
+      .select('id')
+      .eq('club_id', clubId);
+
+    if (topics && topics.length > 0) {
+      const topicIds = topics.map(t => t.id);
+
+      // Delete all posts for these topics
+      await supabase
+        .from('discussion_posts')
+        .delete()
+        .in('topic_id', topicIds);
+
+      // Delete the topics
+      await supabase
+        .from('discussion_topics')
+        .delete()
+        .eq('club_id', clubId);
+    }
+  } catch (error) {
+    console.error('Error deleting topics/posts:', error);
+    // Continue with deletion even if this fails
+  }
+
+  // Delete current book if exists
+  console.log('Deleting current book if exists...');
+  try {
+    await supabase
+      .from('current_books')
+      .delete()
+      .eq('club_id', clubId);
+  } catch (error) {
+    console.error('Error deleting current book:', error);
+    // Continue with deletion even if this fails
+  }
+
+  // Finally delete the club
+  console.log('Deleting the book club...');
+  const { error } = await supabase
+    .from('book_clubs')
+    .delete()
+    .eq('id', clubId);
+
+  if (error) {
+    console.error('Error deleting book club:', error);
+    throw error;
+  }
+
+  console.log('Book club deleted successfully');
   return { success: true };
 }
 
@@ -255,7 +340,7 @@ export async function inviteMember(adminId: string, clubId: string, inviteeEmail
   return { success: true, message: 'Invite sent (placeholder)' };
 }
 
-/* 
+/*
 // --- handleJoinRequest removed due to Supabase type errors ---
 // Uncomment and fix Supabase types if 'join_requests' table is added to types
 // export async function handleJoinRequest(...) { ... }
@@ -337,12 +422,36 @@ export const createPost = replyToTopic;
 
 // Get current book for a club
 export async function getCurrentBook(clubId: string) {
-  const { data, error } = await supabase
-    .from('current_books')
-    .select('*')
-    .eq('club_id', clubId)
-    .single();
+  console.log('Getting current book for club:', clubId);
 
-  if (error) throw error;
-  return data;
+  try {
+    // First check if the current_books table exists and has the expected structure
+    const { error: tableError } = await supabase
+      .from('current_books')
+      .select('count')
+      .limit(1);
+
+    if (tableError) {
+      console.error('Error checking current_books table:', tableError);
+      // Return null instead of throwing an error
+      return null;
+    }
+
+    // Now try to get the current book
+    const { data, error } = await supabase
+      .from('current_books')
+      .select('*')
+      .eq('club_id', clubId)
+      .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no record exists
+
+    if (error) {
+      console.error('Error getting current book:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Unexpected error getting current book:', error);
+    return null; // Return null instead of throwing to avoid breaking the UI
+  }
 }

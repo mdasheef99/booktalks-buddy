@@ -15,11 +15,18 @@ import ExploreBooks from "./pages/ExploreBooks";
 import BookDiscussion from "./pages/BookDiscussion";
 import ChatSelection from "./pages/ChatSelection";
 import BookClub from "./pages/BookClub";
-import { BookClubDetails } from "./components/bookclubs/BookClubDetails"; // Import BookClubDetails
+import { BookClubDetails } from "./components/bookclubs/BookClubDetails";
+import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
+import CreateTopicForm from "./components/discussions/CreateTopicForm";
+import TopicDetail from "./components/discussions/TopicDetail";
+import ReplyForm from "./components/discussions/ReplyForm";
+import BookClubMembers from "./components/admin/BookClubMembers";
+import BookClubSettings from "./components/admin/BookClubSettings";
 import Events from "./pages/Events";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
+import Unauthorized from "./pages/Unauthorized";
 
 function App() {
   return (
@@ -43,13 +50,13 @@ function App() {
               <Route path="/book-club" element={<BookClub />} />
               <Route path="/book-clubs" element={<BookClub />} />
               {/* Book Club Routes */}
-              <Route path="/book-club/new" element={<div>Create New Book Club Form</div>} /> {/* Placeholder */}
+              <Route path="/book-club/new" element={<CreateBookClubForm />} />
               <Route path="/book-club/:clubId" element={<BookClubDetails />} />
               <Route
                 path="/book-club/:clubId/discussions"
                 element={
                   <MemberRouteGuard>
-                    <div>Book Club Discussions</div>
+                    <TopicDetail />
                   </MemberRouteGuard>
                 }
               />
@@ -57,7 +64,7 @@ function App() {
                 path="/book-club/:clubId/members"
                 element={
                   <AdminRouteGuard>
-                    <div>Book Club Members</div>
+                    <BookClubMembers />
                   </AdminRouteGuard>
                 }
               />
@@ -65,14 +72,32 @@ function App() {
                 path="/book-club/:clubId/settings"
                 element={
                   <AdminRouteGuard>
-                    <div>Book Club Settings</div>
+                    <BookClubSettings />
                   </AdminRouteGuard>
                 }
               />
 
+              {/* Add new routes for discussions */}
+              <Route path="/book-club/:clubId/discussions/new" element={
+                <MemberRouteGuard>
+                  <CreateTopicForm />
+                </MemberRouteGuard>
+              } />
+              <Route path="/book-club/:clubId/discussions/:topicId" element={
+                <MemberRouteGuard>
+                  <TopicDetail />
+                </MemberRouteGuard>
+              } />
+              <Route path="/book-club/:clubId/discussions/:topicId/reply" element={
+                <MemberRouteGuard>
+                  <ReplyForm />
+                </MemberRouteGuard>
+              } />
+
               <Route path="/events" element={<Events />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
               <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

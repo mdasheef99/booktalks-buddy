@@ -64,18 +64,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return clubRoles.hasOwnProperty(clubId);
   };
 
+  // Main auth session effect - only depends on navigate
   useEffect(() => {
     const fetchSession = async () => {
       console.log("Fetching initial session...");
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Initial session:", session);
       setSession(session);
-      
+
       if (session?.user) {
         console.log("Session user found, skipping profile fetch. Using Supabase Auth user object directly.");
         setUser(session?.user);
       }
-      
+
       setLoading(false);
     };
 
@@ -85,12 +86,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         console.log("Auth state changed:", event, session);
         setSession(session);
-        
+
         if (session?.user) {
           console.log("Skipping profile fetch. Using Supabase Auth user object directly.");
           setUser(session?.user);
-          await fetchClubRoles();
-          
+
           if (event === 'SIGNED_IN') {
             console.log("User signed in, redirecting to book club");
             toast.success(`Welcome back!`);
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null);
           setClubRoles({});
         }
-        
+
         setLoading(false);
       }
     );
@@ -109,11 +109,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
-  }, [navigate, user?.id]);
+  }, [navigate]); // Removed user?.id dependency to prevent circular updates
+
+  // Separate effect for fetching club roles when user changes
+  useEffect(() => {
+    if (user?.id) {
+      console.log("User ID changed, fetching club roles");
+      fetchClubRoles();
+    }
+  }, [user?.id]);
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
-    
+
     try {
       console.log("Starting sign in process with email:", email);
       const { error, data } = await supabase.auth.signInWithPassword({
@@ -129,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log("Sign in successful, user:", data.user);
       toast.success("Successfully signed in!");
-      
+
       // Navigate will be handled by the auth state change listener
     } catch (error: any) {
       console.error("Unexpected error during sign in:", error);
@@ -141,7 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, username: string) => {
     setLoading(true);
-    
+
     try {
       console.log("Starting sign up process with email:", email);
       const { error, data } = await supabase.auth.signUp({

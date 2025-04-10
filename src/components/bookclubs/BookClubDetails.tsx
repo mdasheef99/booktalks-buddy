@@ -30,34 +30,75 @@ export const BookClubDetails: React.FC<BookClubDetailsProps> = () => {
   React.useEffect(() => {
     const fetchClubDetails = async () => {
       try {
-        if (!clubId) throw new Error('No club ID');
+        if (!clubId) {
+          console.error('No club ID provided');
+          toast.error('Missing club ID');
+          setLoading(false);
+          return;
+        }
+
+        if (!user?.id) {
+          console.error('User not authenticated');
+          toast.error('Please log in to view club details');
+          setLoading(false);
+          return;
+        }
+
+        console.log('Fetching details for club:', clubId);
+
         // Fetch club details
-        const clubData = await getClubDetails(clubId);
-        setClub(clubData);
+        try {
+          const clubData = await getClubDetails(clubId);
+          console.log('Club details:', clubData);
+          setClub(clubData);
+        } catch (error) {
+          console.error('Error fetching club details:', error);
+          toast.error('Failed to load club details');
+          setLoading(false);
+          return;
+        }
 
         // Fetch members
-        const memberData = await getClubMembers(clubId);
-        setMembers(memberData);
+        try {
+          const memberData = await getClubMembers(clubId);
+          console.log('Club members:', memberData);
+          setMembers(memberData);
 
-        // Check if user is admin
-        const userMember = memberData.find(m => m.user_id === user?.id);
-        setIsAdmin(userMember?.role === 'admin');
+          // Check if user is admin
+          const userMember = memberData.find(m => m.user_id === user?.id);
+          const userIsAdmin = userMember?.role === 'admin';
+          console.log(`User is ${userIsAdmin ? 'an admin' : 'not an admin'}`);
+          setIsAdmin(userIsAdmin);
+        } catch (error) {
+          console.error('Error fetching members:', error);
+          toast.error('Failed to load members');
+          setMembers([]);
+        }
 
         // Fetch current book
         try {
           const bookData = await getCurrentBook(clubId);
+          console.log('Current book:', bookData);
           setCurrentBook(bookData);
-        } catch {
+        } catch (error) {
+          console.error('Error fetching current book:', error);
           setCurrentBook(null);
         }
 
         // Fetch discussion topics
-        const topicData = await getClubTopics(user?.id || '', clubId);
-        setTopics(topicData);
+        try {
+          const topicData = await getClubTopics(user.id, clubId);
+          console.log('Discussion topics:', topicData);
+          setTopics(topicData);
+        } catch (error) {
+          console.error('Error fetching topics:', error);
+          toast.error('Failed to load discussion topics');
+          setTopics([]);
+        }
 
       } catch (error) {
-        console.error('Error fetching club details:', error);
-        toast.error('Failed to load club details');
+        console.error('Unexpected error in fetchClubDetails:', error);
+        toast.error('An unexpected error occurred');
       } finally {
         setLoading(false);
       }
@@ -65,38 +106,47 @@ export const BookClubDetails: React.FC<BookClubDetailsProps> = () => {
 
     fetchClubDetails();
 
-    // Subscribe to real-time changes
-    const subscription = supabase
-      .channel('club_details_channel')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'book_clubs',
-        filter: `id=eq.${clubId}`
-      }, () => {
-        fetchClubDetails();
-      })
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'current_books',
-        filter: `club_id=eq.${clubId}`
-      }, () => {
-        fetchClubDetails();
-      })
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'discussion_topics',
-        filter: `club_id=eq.${clubId}`
-      }, () => {
-        fetchClubDetails();
-      })
-      .subscribe();
+    // Only set up subscription if we have a clubId
+    if (clubId) {
+      console.log('Setting up real-time subscription for club:', clubId);
 
-    return () => {
-      subscription.unsubscribe();
-    };
+      // Subscribe to real-time changes
+      const subscription = supabase
+        .channel('club_details_channel')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'book_clubs',
+          filter: `id=eq.${clubId}`
+        }, (payload) => {
+          console.log('Book club changed:', payload);
+          fetchClubDetails();
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'current_books',
+          filter: `club_id=eq.${clubId}`
+        }, (payload) => {
+          console.log('Current book changed:', payload);
+          fetchClubDetails();
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'discussion_topics',
+          filter: `club_id=eq.${clubId}`
+        }, (payload) => {
+          console.log('Discussion topics changed:', payload);
+          fetchClubDetails();
+        })
+        .subscribe();
+
+      return () => {
+        console.log('Unsubscribing from club_details_channel');
+        subscription.unsubscribe();
+      };
+    }
   }, [clubId, user?.id]);
 
   if (loading) {
@@ -142,7 +192,7 @@ export const BookClubDetails: React.FC<BookClubDetailsProps> = () => {
           {isAdmin && (
             <Button
               variant="outline"
-              onClick={() => navigate(`/bookclub/${clubId}/settings`)}
+              onClick={() => navigate(`/book-club/${clubId}/settings`)}
             >
               <Settings className="h-4 w-4 mr-2" />
               Manage Club
@@ -193,16 +243,16 @@ export const BookClubDetails: React.FC<BookClubDetailsProps> = () => {
             <MessageSquare className="h-5 w-5" />
             Discussions
           </h2>
-          <Button onClick={() => navigate(`/bookclub/${clubId}/discussions/new`)}>
+          <Button onClick={() => navigate(`/book-club/${clubId}/discussions/new`)}>
             New Topic
           </Button>
         </div>
         <div className="space-y-4">
           {topics.map((topic) => (
-            <Card 
-              key={topic.id} 
+            <Card
+              key={topic.id}
               className="p-4 hover:bg-gray-50 cursor-pointer"
-              onClick={() => navigate(`/bookclub/${clubId}/discussions/${topic.id}`)}
+              onClick={() => navigate(`/book-club/${clubId}/discussions/${topic.id}`)}
             >
               <h3 className="font-medium">{topic.title}</h3>
               <p className="text-sm text-gray-600">

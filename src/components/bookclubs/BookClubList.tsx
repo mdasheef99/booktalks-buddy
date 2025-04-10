@@ -24,9 +24,15 @@ export const BookClubList: React.FC = () => {
   React.useEffect(() => {
     const fetchBookClubs = async () => {
       try {
-        if (!user?.id) throw new Error('User not authenticated');
+        if (!user?.id) {
+          console.log('User not authenticated, skipping fetch');
+          setLoading(false);
+          return;
+        }
 
+        console.log('Fetching book clubs for user:', user.id);
         const clubs = await getClubs(user.id);
+        console.log('Fetched clubs:', clubs);
         setBookClubs(clubs);
       } catch (error) {
         console.error('Error fetching book clubs:', error);
@@ -38,23 +44,27 @@ export const BookClubList: React.FC = () => {
 
     fetchBookClubs();
 
-    // Subscribe to real-time changes
-    const subscription = supabase
-      .channel('book_clubs_channel')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'book_clubs'
-      }, (payload) => {
-        console.log('Change received:', payload);
-        fetchBookClubs(); // Refresh the list when changes occur
-      })
-      .subscribe();
+    // Only set up subscription if user is authenticated
+    if (user?.id) {
+      // Subscribe to real-time changes
+      const subscription = supabase
+        .channel('book_clubs_channel')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'book_clubs'
+        }, (payload) => {
+          console.log('Change received:', payload);
+          fetchBookClubs(); // Refresh the list when changes occur
+        })
+        .subscribe();
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+      return () => {
+        console.log('Unsubscribing from book_clubs_channel');
+        subscription.unsubscribe();
+      };
+    }
+  }, [user?.id]); // Add user?.id as dependency to re-run when user changes
 
 
   console.log('Loading state:', loading);
