@@ -12,7 +12,6 @@ const AdminRouteGuard: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (clubId) {
-      console.log('AdminRouteGuard: Fetching club roles for clubId:', clubId);
       fetchClubRoles();
     }
   }, [clubId, fetchClubRoles]);
@@ -28,15 +27,13 @@ const AdminRouteGuard: React.FC<Props> = ({ children }) => {
     );
   }
 
-  // Add more detailed error handling
+  // Handle missing club ID
   if (!clubId) {
-    console.error('AdminRouteGuard: Club ID is missing');
-    return <div className="p-8 text-center">Error: Club ID is missing</div>;
+    return <Navigate to="/book-club" replace />;
   }
 
   // Check if the user is an admin
   const userIsAdmin = isAdmin(clubId);
-  console.log(`AdminRouteGuard: User is ${userIsAdmin ? '' : 'not '}an admin of club ${clubId}`);
 
   if (!userIsAdmin) {
     return <Navigate to="/unauthorized" replace />;

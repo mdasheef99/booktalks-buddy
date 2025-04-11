@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLoadProfiles } from '@/contexts/UserProfileContext';
 import { supabase } from '@/lib/supabase';
+import UserAvatar from '@/components/common/UserAvatar';
+import UserName from '@/components/common/UserName';
 
 interface Post {
   id: string;
@@ -30,6 +33,10 @@ const TopicDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Load profiles for topic creator and all post authors
+  useLoadProfiles([...(topic ? [topic] : []), ...posts],
+    (item) => 'user_id' in item ? item.user_id : '');
 
   useEffect(() => {
     const fetchTopicAndPosts = async () => {
@@ -153,27 +160,39 @@ const TopicDetail: React.FC = () => {
         Back to Book Club
       </Button>
 
-      <h1 className="text-2xl font-bold mb-6">{topic.title}</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{topic.title}</h1>
+        <div className="flex items-center gap-2 mt-2">
+          <UserAvatar userId={topic.user_id} size="sm" />
+          <p className="text-sm text-gray-600">
+            Started by <UserName userId={topic.user_id} linkToProfile /> • {new Date(topic.created_at).toLocaleString()}
+          </p>
+        </div>
+      </div>
 
       <div className="space-y-4 mb-8">
         {posts.length > 0 ? (
           posts.map((post) => (
             <Card key={post.id} className="p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-500">
-                    User: {post.user_id}
-                  </p>
+              <div className="flex gap-3">
+                <UserAvatar userId={post.user_id} size="md" />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <UserName userId={post.user_id} linkToProfile className="font-medium" />
+                    <p className="text-xs text-gray-400">
+                      {new Date(post.created_at).toLocaleString()}
+                    </p>
+                  </div>
                   <p className="mt-2">{post.content}</p>
                 </div>
-                <p className="text-xs text-gray-400">
-                  {new Date(post.created_at).toLocaleString()}
-                </p>
               </div>
             </Card>
           ))
         ) : (
-          <p className="text-center text-gray-500">No posts in this topic yet</p>
+          <div className="text-center p-8">
+            <MessageSquare className="h-12 w-12 mx-auto text-gray-300 mb-2" />
+            <p className="text-gray-500">No posts in this topic yet</p>
+          </div>
         )}
       </div>
 

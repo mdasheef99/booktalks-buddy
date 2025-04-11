@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -19,26 +20,26 @@ const CreateBookClubForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
       toast.error('Please enter a club name');
       return;
     }
-    
+
     if (!user?.id) {
       toast.error('You must be logged in to create a book club');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const club = await createBookClub(user.id, {
         name: name.trim(),
         description: description.trim(),
         privacy
       });
-      
+
       toast.success('Book club created successfully');
       navigate(`/book-club/${club.id}`);
     } catch (error) {
@@ -51,8 +52,16 @@ const CreateBookClubForm: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/book-club')}
+        className="mb-4"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Book Clubs
+      </Button>
       <h1 className="text-2xl font-bold mb-6">Create New Book Club</h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">
@@ -66,7 +75,7 @@ const CreateBookClubForm: React.FC = () => {
             required
           />
         </div>
-        
+
         <div>
           <label htmlFor="description" className="block text-sm font-medium mb-1">
             Description
@@ -79,7 +88,7 @@ const CreateBookClubForm: React.FC = () => {
             rows={4}
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-2">
             Privacy Setting
@@ -95,12 +104,12 @@ const CreateBookClubForm: React.FC = () => {
             </div>
           </RadioGroup>
           <p className="text-xs text-gray-500 mt-1">
-            {privacy === 'public' 
-              ? 'Anyone can see and join this club' 
+            {privacy === 'public'
+              ? 'Anyone can see and join this club'
               : 'Only invited members can join this club'}
           </p>
         </div>
-        
+
         <div className="flex justify-end space-x-3 pt-4">
           <Button
             type="button"

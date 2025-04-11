@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Error fetching club roles:', error);
+        toast.error('Failed to load club membership data');
         return;
       }
 
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       setClubRoles(rolesMap);
     } catch (err) {
-      console.error('Unexpected error fetching club roles:', err);
+      toast.error('Failed to load club membership data');
     }
   };
 
@@ -67,13 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Main auth session effect - only depends on navigate
   useEffect(() => {
     const fetchSession = async () => {
-      console.log("Fetching initial session...");
       const { data: { session } } = await supabase.auth.getSession();
-      console.log("Initial session:", session);
       setSession(session);
 
       if (session?.user) {
-        console.log("Session user found, skipping profile fetch. Using Supabase Auth user object directly.");
         setUser(session?.user);
       }
 
@@ -84,15 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth state changed:", event, session);
         setSession(session);
 
         if (session?.user) {
-          console.log("Skipping profile fetch. Using Supabase Auth user object directly.");
           setUser(session?.user);
 
           if (event === 'SIGNED_IN') {
-            console.log("User signed in, redirecting to book club");
             toast.success(`Welcome back!`);
             navigate('/book-club');
           }
@@ -106,7 +100,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
-      console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
   }, [navigate]); // Removed user?.id dependency to prevent circular updates
@@ -196,12 +189,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setLoading(true);
     try {
-      console.log("Signing out...");
       await supabase.auth.signOut();
       toast.success("You've been successfully signed out");
       navigate('/login');
     } catch (error) {
-      console.error("Error signing out:", error);
       toast.error("Failed to sign out");
     } finally {
       setLoading(false);

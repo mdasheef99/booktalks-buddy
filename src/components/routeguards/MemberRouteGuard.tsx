@@ -12,7 +12,6 @@ const MemberRouteGuard: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (clubId) {
-      console.log('MemberRouteGuard: Fetching club roles for clubId:', clubId);
       fetchClubRoles();
     }
   }, [clubId, fetchClubRoles]);
@@ -28,15 +27,13 @@ const MemberRouteGuard: React.FC<Props> = ({ children }) => {
     );
   }
 
-  // Add more detailed error handling
+  // Handle missing club ID
   if (!clubId) {
-    console.error('MemberRouteGuard: Club ID is missing');
-    return <div className="p-8 text-center">Error: Club ID is missing</div>;
+    return <Navigate to="/book-club" replace />;
   }
 
   // Check if the user is a member
   const userIsMember = isMember(clubId);
-  console.log(`MemberRouteGuard: User is ${userIsMember ? '' : 'not '}a member of club ${clubId}`);
 
   if (!userIsMember) {
     return <Navigate to="/unauthorized" replace />;

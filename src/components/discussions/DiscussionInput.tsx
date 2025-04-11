@@ -22,9 +22,9 @@ interface DiscussionInputProps {
   mode?: 'topic' | 'reply';
 }
 
-export const DiscussionInput: React.FC<DiscussionInputProps> = ({ 
-  clubId, 
-  topicId, 
+export const DiscussionInput: React.FC<DiscussionInputProps> = ({
+  clubId,
+  topicId,
   parentPostId,
   onSuccess,
   mode = 'reply'
@@ -64,7 +64,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
         await createPost(user.id, topicData.id, content.trim());
 
         toast.success('Discussion topic created');
-        navigate(`/bookclub/${clubId}/discussions/${topicData.id}`);
+        navigate(`/book-club/${clubId}/discussions/${topicData.id}`);
       } else {
         // Create reply post
         await createPost(user.id, topicId!, content.trim(), parentPostId);
@@ -115,7 +115,7 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
           </div>
 
           <div className="flex justify-end">
-            <Button 
+            <Button
               type="submit"
               disabled={submitting}
               className="flex items-center gap-2"

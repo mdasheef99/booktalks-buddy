@@ -53,7 +53,7 @@ export const DiscussionList: React.FC<DiscussionListProps> = ({ clubId, topicId 
         event: '*',
         schema: 'public',
         table: topicId ? 'discussion_posts' : 'discussion_topics',
-        filter: topicId 
+        filter: topicId
           ? `topic_id=eq.${topicId}`
           : `club_id=eq.${clubId}`
       }, () => {
@@ -95,10 +95,10 @@ export const DiscussionList: React.FC<DiscussionListProps> = ({ clubId, topicId 
                       {post.content}
                     </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
-                    onClick={() => navigate(`/bookclub/${clubId}/discussions/${topicId}/reply/${post.id}`)}
+                    onClick={() => navigate(`/book-club/${clubId}/discussions/${topicId}/reply/${post.id}`)}
                   >
                     <Reply className="h-4 w-4 mr-1" />
                     Reply
@@ -138,10 +138,10 @@ export const DiscussionList: React.FC<DiscussionListProps> = ({ clubId, topicId 
   return (
     <div className="space-y-4">
       {topics.map((topic) => (
-        <Card 
-          key={topic.id} 
+        <Card
+          key={topic.id}
           className="p-4 hover:bg-gray-50 cursor-pointer"
-          onClick={() => navigate(`/bookclub/${clubId}/discussions/${topic.id}`)}
+          onClick={() => navigate(`/book-club/${clubId}/discussions/${topic.id}`)}
         >
           <div className="flex items-center justify-between">
             <div>
