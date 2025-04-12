@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/browser";
 import { createClient } from "@supabase/supabase-js";
 import { Book } from "../../types/books";
 import { useToast } from "../use-toast";
+import { isUuid, getBookDiscussionId } from "../../services/base/supabaseService";
 
 // Initialize Supabase client (adjust with your environment variables)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
@@ -62,15 +63,34 @@ export function useDiscussedBooks(limit: number = 6) {
       if (bookError) throw bookError;
       if (!bookData) return [];
 
-      return bookData.map((book: any) => ({
-        id: book.id,
-        uuid: book.id,
-        title: book.title,
-        author: book.author,
-        description: book.genre || "",
-        imageUrl: book.cover_url,
-        categories: book.genre ? [book.genre] : [],
-      }));
+      // Map database results to Book objects
+      const mappedBooks = bookData.map((book: any) => {
+        // Get the original Google Books ID if this is a UUID
+        const originalId = isUuid(book.id) ? getBookDiscussionId(book.id) : book.id;
+
+        return {
+          id: originalId, // Use the original Google Books ID for consistency
+          uuid: book.id,  // Keep the UUID for reference
+          title: book.title,
+          author: book.author,
+          description: book.genre || "",
+          imageUrl: book.cover_url,
+          categories: book.genre ? [book.genre] : [],
+        };
+      });
+
+      // Deduplicate books based on the original Google Books ID
+      const uniqueBooks: Book[] = [];
+      const seenIds = new Set<string>();
+
+      for (const book of mappedBooks) {
+        if (!seenIds.has(book.id)) {
+          seenIds.add(book.id);
+          uniqueBooks.push(book);
+        }
+      }
+
+      return uniqueBooks;
     },
     staleTime: 15000,
     refetchOnWindowFocus: true,

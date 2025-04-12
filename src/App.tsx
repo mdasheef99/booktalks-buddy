@@ -63,10 +63,10 @@ function App() {
               <Route path="/book/:id" element={<BookDetail />} />
               <Route path="/events" element={<Events />} />
               <Route path="/search" element={<Search />} />
-              <Route path="/explore-books" element={<ExploreBooks />} />
             </Route>
 
-            {/* Routes outside main layout */}
+            {/* Routes outside main layout - Anonymous Chat Section */}
+            <Route path="/explore-books" element={<ExploreBooks />} />
             <Route path="/chat-selection" element={<ChatSelection />} />
             <Route path="/book-discussion/:id" element={<BookDiscussion />} />
 

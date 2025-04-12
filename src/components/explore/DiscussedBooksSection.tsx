@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MessageCircle, RefreshCw } from "lucide-react";
 import { Book } from "@/types/books";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import TrendingBookCard from "@/components/books/TrendingBookCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
+import { cn } from "@/lib/utils";
 
 interface DiscussedBooksSectionProps {
   books: Book[] | undefined;
@@ -23,6 +24,17 @@ const DiscussedBooksSection: React.FC<DiscussedBooksSectionProps> = ({
   onJoinDiscussion,
   onRefresh,
 }) => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    onRefresh();
+
+    // Reset the refreshing state after animation completes
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
   return (
     <div className="mb-12">
       <div className="flex items-center justify-between mb-4">
@@ -33,13 +45,17 @@ const DiscussedBooksSection: React.FC<DiscussedBooksSectionProps> = ({
           <MessageCircle className="ml-2 h-5 w-5 text-bookconnect-sage" />
         </div>
         <Button
-          onClick={onRefresh}
+          onClick={handleRefresh}
           variant="outline"
           size="sm"
           className="border-bookconnect-sage text-bookconnect-sage hover:bg-bookconnect-sage/10"
+          disabled={isRefreshing}
         >
-          <RefreshCw className="h-4 w-4 mr-1" />
-          Refresh
+          <RefreshCw className={cn(
+            "h-4 w-4 mr-1",
+            isRefreshing && "animate-spin"
+          )} />
+          {isRefreshing ? "Refreshing..." : "Refresh"}
         </Button>
       </div>
 
