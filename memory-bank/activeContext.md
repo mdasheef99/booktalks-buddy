@@ -1,68 +1,48 @@
-# Active Context - Book Club MVP Phase 3 (Updated 2025-04-10)
+# Active Context - Book Club Advanced Features (Updated 2025-04-12)
 
 ---
 
 ## Recent Changes
 
-- Fully migrated Explore page to new modular architecture.
-- Implemented Book Club MVP Phase 1 database schema and RLS policies in Supabase.
-- Created and applied migration script for Book Clubs, Members, Topics, Posts, and Current Books.
-- Implemented Book Club MVP Phase 2 backend API endpoints in `src/lib/api.ts`.
-- **Implemented Book Club MVP Phase 3 frontend UI components:**
-  - Created BookClubList and BookClubDetails components
-  - Created DiscussionList and DiscussionInput components
-  - Created AdminUserList, AdminClubManagement, and AdminJoinRequests components
-  - Implemented real-time updates using Supabase Realtime
-  - Added role-based access control and UI rendering
-  - Integrated with backend API endpoints
-  - Added error handling and loading states
-  - Styled using Tailwind CSS and Radix UI
-- **Integrated BookClubList into `BookClub.tsx` page.**
-- **Implemented navigation flow between components.**
-- **Implemented Admin and Member route guards.**
-- **Updated API layer (`src/lib/api.ts`) with comprehensive functions.**
-- **Debugged infinite loading issue:**
-  - Added logs to `listBookClubs` in `src/lib/api.ts`.
-  - Initial diagnosis: User was not a member of any club.
-  - User confirmed they added themselves as an admin member.
-  - Loading issue resolved - Book Club list is now loading.
+- Implemented advanced Book Club features:
+  - Club-specific user profiles with editing (username, bio, favorite genres/authors, avatar upload)
+  - Membership management: join, request to join (private clubs), cancel request, leave club, admin/member roles
+  - Real-time updates for club details, members, and current book using Supabase subscriptions
+  - Modern UI/UX: tabs for memberships/reading history, cards, icons, confirmation dialogs, robust error handling
+  - Admin/member navigation: settings, member management, leave club, logout
+  - Discussion topics: listed for members, with navigation to topic details
+  - API logic for profile and membership management (src/lib/api/profile.ts)
+  - Deep integration with Supabase for data, storage, and subscriptions
+- BookClubProfilePage, BookClubProfileSettings, and BookClubMemberships components added for profile and membership management
+- BookClubDetailsWithJoin component added for comprehensive club detail, join, and admin/member logic
+- Enhanced BookClubListPage and BookClubDetailsPage for improved navigation and discovery
+- Improved error handling, loading states, and user feedback throughout Book Club flows
 
 ---
 
 ## Current Status
 
-- Explore page is fully functional with new architecture.
-- Supabase integration restored and operational.
-- Authentication and profile management simplified and reliable.
-- Book Club database schema and access control implemented.
-- Book Club backend API endpoints are available.
-- **Book Club frontend UI components are implemented and integrated.**
-- **Book Club list is loading and displaying clubs.**
-- **Real-time discussion updates are implemented in components.**
-- No critical errors in console.
-- Development server running smoothly.
+- Book Club system supports advanced user profiles, membership management, and real-time updates
+- Club-specific profiles and memberships are fully integrated and editable
+- Admin/member roles and permissions are enforced throughout the UI and API
+- Real-time updates for club details, members, and current book are operational
+- Modern, responsive UI/UX with robust error handling and feedback
+- Supabase integration is deep and reliable for all Book Club features
 
 ---
 
 ## Next Steps
 
-- Push local commits to remote repository.
-- Conduct thorough UI/UX testing of Explore page and Book Club.
-- Add more tests for new hooks and components.
-- Continue with remaining refactor phases if any.
-- Monitor Supabase API usage and performance.
-- Begin Book Club MVP Phase 4: Testing and Deployment.
+- Expand reading history and book tracking features in profiles
+- Add more granular admin/moderator roles and permissions
+- Continue UI/UX polish and accessibility improvements
+- Increase test coverage for new Book Club features
+- Monitor Supabase performance and optimize queries/subscriptions
 
 ---
 
 ## Notes
 
-- `.env.local` **must be kept out of version control** for security.
-- Supabase credentials can be rotated if needed.
-- The migration significantly improves maintainability and scalability.
-- Authentication now relies solely on Supabase Auth metadata.
-- Anonymous chat and Book Club user systems are intentionally separate.
-- **Helper functions `is_club_member` and `is_club_admin` are assumed for RLS.**
-- **Real-time updates require careful management of Supabase subscriptions.**
-- **Role-based UI rendering depends on accurate role information from the API.**
-- Loading issue resolved by ensuring user is a member of at least one club.
+- Book Club features now go far beyond MVP, supporting deep personalization, robust membership management, and real-time collaboration
+- All profile and membership data is managed via Supabase, with fallback and error handling for reliability
+- The Book Club system is now a core pillar of the platform, with a mature, extensible architecture

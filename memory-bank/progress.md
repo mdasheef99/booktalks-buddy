@@ -1,61 +1,47 @@
 # Progress
 
 ## What works:
-- Basic project setup and tooling
-- Memory bank documentation structure
-- Initial documentation files created
-- Landing page structure and basic components
-- "Start anonymous chat" button opens username dialog
-- Basic routing setup
-- Book Club MVP Phase 1 database schema and RLS policies implemented
-- Book Club MVP Phase 2 backend API endpoints implemented
-- **Book Club MVP Phase 3 frontend UI components implemented:**
-  - BookClubList and BookClubDetails components
-  - DiscussionList and DiscussionInput with real-time updates
-  - Admin components (UserList, ClubManagement, JoinRequests)
-  - Role-based access control and UI rendering
-  - API integration complete
-  - Integrated into application routing (BookClub.tsx) and navigation flow
-  - Route guards implemented
-  - API layer updated and integrated
-- **Basic Book Club list is loading on the page**
+- Complete project setup and robust memory bank documentation
+- Landing page and navigation flows
+- Anonymous chat with username dialog and real-time discussions
+- Book search and discovery
+- **Advanced Book Club system:**
+  - Club-specific user profiles (edit username, bio, favorite genres/authors, avatar upload)
+  - Membership management (join, request to join, cancel request, leave club, admin/member roles)
+  - Real-time updates for club details, members, and current book (Supabase Realtime)
+  - Admin/member navigation (settings, member management, leave club, logout)
+  - Discussion topics and navigation to topic details
+  - Modern UI/UX: tabs, cards, icons, confirmation dialogs, robust error handling
+  - API logic for profile and membership management (src/lib/api/profile.ts)
+  - Deep Supabase integration for data, storage, and subscriptions
+- Explore page with modular architecture
+- Authentication and profile management
+- Role-based access control and UI rendering
+- Comprehensive error handling and feedback
 
 ## What's left to build:
-- Frontend application development (UI components, pages, routing, state management)
-  - Explore Books page functionality (requires React Query fix and UI fixes)
-- Backend API development (controllers, services, data access)
-- User authentication and authorization
-- Book search and discovery functionality
-- Book discussion forums and chat
-- Book Club MVP Phase 4: Testing and Deployment
-  - Write unit tests for UI components
-  - Write integration tests
-  - Test Supabase Realtime integration
-  - Test RLS policies
-  - Deploy to production
+- Expand reading history and book tracking features in profiles
+- Add more granular admin/moderator roles and permissions
+- Continue UI/UX polish and accessibility improvements
+- Increase test coverage for new Book Club features
 - Event scheduling and management
+- Monitor Supabase performance and optimize queries/subscriptions
 
 ## Current status:
-- Landing page errors resolved.
-- Investigating and resolving UI issues on the Explore page: duplicate headers with identical design and missing back button.
-- React Query issue investigation is paused until these Explore page UI issues are resolved.
-- Book Club database schema and RLS completed.
-- Book Club backend API endpoints implemented.
-- **Book Club frontend UI components implemented and integrated.**
-- **Basic Book Club list is loading, but needs further testing and UI improvements.**
-- **Real-time discussion updates implemented in components.**
+- Book Club system is mature, supporting advanced profiles, membership management, and real-time collaboration
+- All major Book Club features are implemented and integrated
+- Supabase integration is deep and reliable for all Book Club features
+- Modern, responsive UI/UX throughout Book Club flows
+- No critical errors in console; development server running smoothly
 
 ## Known issues:
-- **Explore Page UI Issues:** Duplicate headers with identical design and a missing back button on the Explore page.
-- **React Query Error:** "No QueryClient set, use QueryClientProvider to set one" when accessing features using React Query hooks (e.g., ExploreBooks page). Requires setting up `QueryClientProvider` at the application root (to be addressed after Explore page UI issues).
-- **Book Club list is loading, but needs full UI and functionality testing.**
+- Some UI/UX polish and accessibility improvements still needed
+- Explore Page: duplicate headers and missing back button (pending refactor)
+- React Query error: "No QueryClient set, use QueryClientProvider to set one" (to be addressed after UI fixes)
+- Further testing needed for edge cases in membership and profile management
 
 ## Evolution of project decisions:
-- Initially considered using a different backend framework, but decided to go with Node.js and Express.js (or Supabase Functions).
-- Decided to use Supabase for backend services.
-- Added Three.js for interactive 3D components (Decision Reversed: This feature has been removed).
-- Implementing asset verification system for development (No longer relevant after 3D removal).
-- Identified need for React Query for data fetching and state management.
-- Implemented Book Club features using modular component architecture.
-- Added real-time updates for discussions using Supabase Realtime.
-- Chose Tailwind CSS and Radix UI for consistent styling.
+- Evolved from MVP to a mature Book Club system with deep personalization and real-time collaboration
+- Centralized profile and membership management via Supabase
+- Modular, extensible architecture for future enhancements
+- Focus on robust error handling, user feedback, and modern UI/UX patterns

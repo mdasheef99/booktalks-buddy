@@ -10,19 +10,20 @@
   - Zustand (or Context API)
   - React Router
   - Vite
-  - **Real-time subscriptions via Supabase Realtime**
+  - **Real-time subscriptions via Supabase Realtime for discussions, club details, members, and current book**
+  - **Modern UI libraries: lucide-react (icons), sonner (toasts), shadcn-ui (UI primitives)**
 
 - **Backend:**
   - Node.js
   - Express.js (or Supabase Functions)
   - Supabase PostgreSQL
-  - **API logic implemented in `src/lib/api.ts`**
+  - **API logic implemented in `src/lib/api.ts` and `src/lib/api/profile.ts` for Book Club profiles/memberships**
   - **Contextual role checks for authorization**
 
 - **Database:**
   - Supabase PostgreSQL
   - **Row Level Security (RLS) enabled on Book Club tables**
-  - **Helper functions assumed:**
+  - **Helper functions:**
     - `is_club_member(club_id uuid)`
     - `is_club_admin(club_id uuid)`
 
@@ -30,12 +31,15 @@
   - Supabase Auth
 
 - **Realtime:**
-  - **Supabase Realtime for discussion updates**
-  - **Subscription management in components**
+  - **Supabase Realtime for discussion, club, and membership updates**
+  - **Subscription management in components and context**
+
+- **Storage:**
+  - **Supabase Storage for profile avatars**
 
 - **API Integration:**
   - Google Books API
-  - **Book Club API endpoints**
+  - **Book Club API endpoints for club, membership, and profile management**
 
 - **Development Tools:**
   - VS Code
@@ -57,11 +61,11 @@
 
 - Supabase free tier limitations and scaling considerations.
 - API rate limits for Google Books API; implement error handling and caching.
-- Real-time chat scalability.
+- Real-time chat and club update scalability.
 - **RLS policies depend on helper functions for role checks.**
 - **Supabase Realtime subscription limits.**
 - **Component re-renders with real-time updates.**
-- **Routing needs to be updated to integrate new components.**
+- **Routing must be kept up-to-date to integrate new Book Club components.**
 
 ## Dependencies:
 
@@ -70,6 +74,9 @@
 - Google Books API client or REST API.
 - Tailwind CSS for styling.
 - Radix UI for accessible components.
+- **lucide-react for icons**
+- **sonner for toast notifications**
+- **shadcn-ui for UI primitives**
 
 ## Tool Usage Patterns:
 
