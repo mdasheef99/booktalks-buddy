@@ -64,14 +64,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return clubRoles.hasOwnProperty(clubId);
   };
 
+  // Store the last known user ID to detect genuine sign-ins vs refreshes
+  const [lastKnownUserId, setLastKnownUserId] = useState<string | null>(null);
+
   // Main auth session effect - only depends on navigate
   useEffect(() => {
+    // Track if this is the initial session fetch
+    let isInitialMount = true;
+
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
 
       if (session?.user) {
         setUser(session?.user);
+        // Store the user ID when we first load the session
+        setLastKnownUserId(session.user.id);
       }
 
       setLoading(false);
@@ -81,28 +89,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state change event:", event, "User ID:", session?.user?.id, "Last known ID:", lastKnownUserId);
+
+        // Only update session if it's a meaningful change
         setSession(session);
 
         if (session?.user) {
           setUser(session?.user);
 
-          if (event === 'SIGNED_IN') {
+          // Only show welcome message and navigate on a genuine new sign-in
+          // This happens when the user ID changes from null to a value
+          const isGenuineSignIn = event === 'SIGNED_IN' &&
+                                !isInitialMount &&
+                                lastKnownUserId === null;
+
+          if (isGenuineSignIn) {
+            console.log("Genuine sign-in detected, navigating to book club");
             toast.success(`Welcome back!`);
             navigate('/book-club');
+            // Update the last known user ID
+            setLastKnownUserId(session.user.id);
+          } else if (lastKnownUserId !== session.user.id) {
+            // Update the last known user ID without navigation
+            // This handles user changes without tab switching
+            setLastKnownUserId(session.user.id);
           }
         } else {
+          // User signed out
           setUser(null);
           setClubRoles({});
+          setLastKnownUserId(null);
         }
 
         setLoading(false);
+        // After the first auth state change, we're no longer in the initial mount
+        isInitialMount = false;
       }
     );
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]); // Removed user?.id dependency to prevent circular updates
+  }, [navigate, lastKnownUserId]); // Added lastKnownUserId as a dependency
 
   // Separate effect for fetching club roles when user changes
   useEffect(() => {

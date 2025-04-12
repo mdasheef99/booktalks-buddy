@@ -30,3 +30,6 @@ export * from './admin/management';
 
 // Re-export the conflicting functions from bookclubs/members with different names
 export { removeMember as removeClubMember, inviteMember as inviteClubMember } from './bookclubs/members';
+
+// Re-export profile functions
+export * from './profile';

@@ -23,6 +23,8 @@ import BookClubDetailsPage from "./pages/BookClubDetailsPage";
 import BookClubDiscoveryPage from "./pages/BookClubDiscoveryPage";
 import BookClubDiscussionsPage from "./pages/BookClubDiscussionsPage";
 import BookClubTopicDetailPage from "./pages/BookClubTopicDetailPage";
+import BookClubProfilePage from "./pages/BookClubProfilePage";
+import EnhancedProfilePage from "./pages/EnhancedProfilePage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminClubManagementPage from "./pages/admin/AdminClubManagementPage";
 import AdminUserListPage from "./pages/admin/AdminUserListPage";
@@ -54,8 +56,8 @@ function App() {
 
             {/* Main layout routes */}
             <Route element={<Layout />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/user/:username" element={<UserProfile />} />
+              <Route path="/profile" element={<EnhancedProfilePage />} />
+              <Route path="/user/:username" element={<BookClubProfilePage />} />
               <Route path="/books" element={<Books />} />
               <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/book/:id" element={<BookDetail />} />

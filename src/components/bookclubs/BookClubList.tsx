@@ -81,9 +81,6 @@ export const BookClubList: React.FC = () => {
 
   return (
     <div>
-      <Button onClick={() => navigate('/book-club/new')} className="mb-4">
-        Create New Club
-      </Button>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {bookClubs.map((club) => (
           <Card
