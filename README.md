@@ -1,69 +1,93 @@
-# Welcome to your Lovable project
+# BookConnect - Connect Through Books
 
-## Project info
+BookConnect is a platform that connects book lovers and facilitates book discussions. It provides features for users to discover new books, join book clubs, participate in anonymous chats, and engage in interactive book discussions.
 
-**URL**: https://lovable.dev/projects/eb0e5176-f5ba-4c49-a726-bd40f5176b90
+## Features
 
-## How can I edit this code?
+### Anonymous Chat Section
 
-There are several ways of editing your application.
+- **Explore Books**: Discover trending books and recently discussed titles
+- **Book Discussions**: Join real-time chat discussions about specific books
+- **Anonymous Usernames**: Participate in discussions with a generated literary username
+- **Message Reactions**: React to messages with emojis
+- **Reply Threading**: Reply to specific messages in a discussion
 
-**Use Lovable**
+### Book Club Section
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/eb0e5176-f5ba-4c49-a726-bd40f5176b90) and start prompting.
+- **Create Book Clubs**: Start your own book club with custom name and description
+- **Join Book Clubs**: Browse and join existing book clubs
+- **Discussion Topics**: Create and participate in structured discussions within book clubs
+- **Current Book**: Set and track the book your club is currently reading
+- **Member Management**: Invite members and manage club membership
 
-Changes made via Lovable will be committed automatically to this repo.
+### User Profiles
 
-**Use your preferred IDE**
+- **Enhanced Profiles**: Customize your profile with reading preferences
+- **Book Club Profiles**: Separate profiles for the book club section
+- **Reading Preferences**: Share your favorite genres and authors
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Admin Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Club Management**: Admin dashboard for managing book clubs
+- **User Management**: Approve join requests and manage members
+- **Content Moderation**: Moderate discussions and enforce community guidelines
 
-Follow these steps:
+## Technology Stack
+
+- **Frontend**: React, TypeScript, Tailwind CSS, shadcn-ui
+- **Backend**: Supabase (PostgreSQL, Authentication, Storage, Realtime)
+- **Build Tool**: Vite
+- **State Management**: React Context API
+- **Routing**: React Router
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/yourusername/bookconnect.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to the project directory
+cd bookconnect
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Create a `.env` file in the root directory with the following variables:
 
-**Use GitHub Codespaces**
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+- `/src/components` - Reusable UI components
+- `/src/pages` - Page components for routing
+- `/src/hooks` - Custom React hooks
+- `/src/services` - API and service functions
+- `/src/contexts` - React context providers
+- `/src/lib` - Utility functions and libraries
 
-This project is built with .
+## Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/eb0e5176-f5ba-4c49-a726-bd40f5176b90) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+This project is licensed under the MIT License - see the LICENSE file for details.
