@@ -115,16 +115,8 @@ export async function getUserClubMemberships(userId: string): Promise<ClubMember
   console.log('API: Fetching club memberships for user ID:', userId);
 
   try {
-    // First check if the club_members table exists
-    const { data: tableInfo, error: tableError } = await supabase
-      .from('club_members')
-      .select('count(*)', { count: 'exact', head: true });
-
-    if (tableError) {
-      console.error('API: Error checking club_members table:', tableError);
-      console.log('API: Returning empty memberships due to table error');
-      return [];
-    }
+    // Skip the table existence check as it's causing 400 errors
+    // We'll just try to query the table directly
 
     // Get club memberships
     const { data: memberships, error: membershipError } = await supabase
@@ -168,13 +160,20 @@ export async function getUserClubMemberships(userId: string): Promise<ClubMember
     // Try to get current books, but don't fail if this doesn't work
     let currentBooks = [];
     try {
-      const { data: booksData, error: booksError } = await supabase
-        .from('current_books')
-        .select('club_id, book_id, book:books(id, title, author, cover_url)')
-        .in('club_id', clubIds);
+      // Only attempt to fetch books if we have club IDs
+      if (clubIds && clubIds.length > 0) {
+        const { data: booksData, error: booksError } = await supabase
+          .from('current_books')
+          .select('club_id, book_id, book:books(id, title, author, cover_url)')
+          .in('club_id', clubIds);
 
-      if (!booksError && booksData) {
-        currentBooks = booksData;
+        if (!booksError && booksData) {
+          currentBooks = booksData;
+        } else if (booksError) {
+          console.error('API: Error fetching current books:', booksError);
+        }
+      } else {
+        console.log('API: No club IDs to fetch current books for');
       }
     } catch (booksError) {
       console.error('API: Error fetching current books:', booksError);

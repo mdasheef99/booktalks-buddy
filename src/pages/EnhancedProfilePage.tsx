@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Book, Clock, Calendar, PlusCircle } from 'lucide-react';
+import { Edit, Book, Clock, Calendar, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUserClubMemberships } from '@/lib/api/profile';
 import ProfileForm from '@/components/profile/ProfileForm';
@@ -39,6 +39,7 @@ const EnhancedProfilePage: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [userMetadata, setUserMetadata] = useState<any>(null);
   const [memberships, setMemberships] = useState<any[]>([]);
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   // Fetch user data and memberships
   useEffect(() => {
