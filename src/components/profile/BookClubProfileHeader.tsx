@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookClubProfile, uploadProfileAvatar } from '@/lib/api/profile';
-import { Edit, Upload } from 'lucide-react';
+import { Edit, Upload, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface BookClubProfileHeaderProps {
@@ -72,11 +72,36 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
     }
   };
 
+  // State for bio expansion
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const maxBioLength = 300; // Maximum characters to show before "Read more"
+  const bioIsTruncated = profile.bio && profile.bio.length > maxBioLength;
+
+  const toggleBioExpansion = () => {
+    setBioExpanded(!bioExpanded);
+  };
+
   return (
     <Card className="mb-6 overflow-hidden">
-      <div className="h-32 bg-gradient-to-r from-bookconnect-brown to-bookconnect-terracotta" />
+      <div className="h-32 bg-gradient-to-r from-bookconnect-brown to-bookconnect-terracotta relative">
+        {/* Position Edit Profile button in top right */}
+        {isCurrentUser && (
+          <div className="absolute top-4 right-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white hover:bg-gray-100"
+              onClick={onEditProfile}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
+          </div>
+        )}
+      </div>
       <CardContent className="pt-0 relative">
-        <div className="flex flex-col md:flex-row gap-6 -mt-12 items-start md:items-end">
+        <div className="flex flex-col md:flex-row gap-6 -mt-16 items-start">
+          {/* Avatar positioned higher up */}
           <div className="relative">
             <Avatar className="h-24 w-24 border-4 border-white">
               <AvatarImage src={profile.avatar_url || ''} alt={profile.username} />
@@ -108,13 +133,36 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
             )}
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 mt-4 md:mt-0">
             <h1 className="text-2xl font-bold">{profile.username}</h1>
             <p className="text-sm text-gray-500">{profile.email}</p>
             <p className="text-sm text-gray-500">Member since {formatJoinDate()}</p>
 
+            {/* Bio with Read More/Less functionality */}
             {profile.bio && (
-              <p className="mt-2 text-gray-700">{profile.bio}</p>
+              <div className="mt-3">
+                <div className="text-gray-700 break-words whitespace-pre-wrap">
+                  {bioIsTruncated && !bioExpanded
+                    ? `${profile.bio.substring(0, maxBioLength)}...`
+                    : profile.bio}
+                </div>
+                {bioIsTruncated && (
+                  <button
+                    onClick={toggleBioExpansion}
+                    className="text-bookconnect-terracotta hover:text-bookconnect-terracotta/80 text-sm flex items-center mt-1"
+                  >
+                    {bioExpanded ? (
+                      <>
+                        Read less <ChevronUp className="h-3 w-3 ml-1" />
+                      </>
+                    ) : (
+                      <>
+                        Read more <ChevronDown className="h-3 w-3 ml-1" />
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             )}
 
             <div className="mt-3 flex flex-wrap gap-2">
@@ -128,18 +176,6 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
               ))}
             </div>
           </div>
-
-          {isCurrentUser && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-auto"
-              onClick={onEditProfile}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>

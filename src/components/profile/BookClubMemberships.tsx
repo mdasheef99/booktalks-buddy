@@ -1,8 +1,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { ClubMembership } from '@/lib/api/profile';
-import { Users, Book, Crown, User } from 'lucide-react';
+import { Users, Book, Crown, User, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface BookClubMembershipsProps {
   memberships: ClubMembership[];
@@ -14,6 +16,7 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
   loading
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Get role icon based on role
   const getRoleIcon = (role: string) => {
@@ -50,11 +53,22 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
   if (loading) {
     return (
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-bookconnect-terracotta" />
             Book Club Memberships
           </CardTitle>
+          {user && (
+            <Button
+              size="sm"
+              disabled
+              onClick={() => navigate('/book-club/new')}
+              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create New Club
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -72,21 +86,31 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-bookconnect-terracotta" />
           Book Club Memberships
         </CardTitle>
+        {user && (
+          <Button
+            size="sm"
+            onClick={() => navigate('/book-club/new')}
+            className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Club
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         {memberships.length > 0 ? (
           <div className="space-y-6">
             {memberships.map((membership) => (
-              <div 
+              <div
                 key={membership.club_id}
                 className="border-b border-gray-100 last:border-0 pb-4 last:pb-0"
               >
-                <div 
+                <div
                   className="flex items-center justify-between cursor-pointer"
                   onClick={() => navigate(`/book-club/${membership.club_id}`)}
                 >
@@ -108,8 +132,8 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
                 {membership.current_book && (
                   <div className="mt-3 flex items-start gap-3 bg-gray-50 p-3 rounded-md">
                     {membership.current_book.cover_url ? (
-                      <img 
-                        src={membership.current_book.cover_url} 
+                      <img
+                        src={membership.current_book.cover_url}
                         alt={membership.current_book.title}
                         className="h-16 w-12 object-cover rounded"
                       />

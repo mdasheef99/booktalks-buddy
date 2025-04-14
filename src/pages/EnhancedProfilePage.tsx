@@ -156,75 +156,105 @@ const EnhancedProfilePage: React.FC = () => {
               <div className="absolute inset-0 bg-[url('/images/book-pattern.png')] opacity-20"></div>
             </div>
             <CardContent className="pt-0 relative">
-              <div className="flex flex-col md:flex-row gap-6 -mt-12 items-start md:items-end">
-                <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-                  <AvatarImage src={userMetadata.avatar_url} alt="Profile" />
-                  <AvatarFallback className="bg-bookconnect-terracotta/20 text-bookconnect-terracotta text-xl font-serif">
-                    {getInitials()}
-                  </AvatarFallback>
-                </Avatar>
+              {/* Position buttons in top right corner, horizontally adjacent */}
+              <div className="absolute top-0 right-0 flex flex-row gap-2 z-10 p-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-bookconnect-brown/30 text-bookconnect-brown hover:bg-bookconnect-cream bg-white"
+                  onClick={() => setEditMode(true)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
 
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold font-serif text-bookconnect-brown">
-                    {userMetadata.display_name || userMetadata.username || user.email?.split('@')[0] || 'BookClub Member'}
-                  </h1>
-                  <p className="text-sm text-gray-600">{user.email}</p>
-                  <p className="text-sm text-gray-600">Member since {new Date(user.created_at || Date.now()).toLocaleDateString()}</p>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
+                  onClick={() => navigate('/book-club/new')}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Create Book Club
+                </Button>
+              </div>
 
-                  {userMetadata.bio && (
-                    <p className="mt-3 text-gray-700 font-serif">{userMetadata.bio}</p>
-                  )}
+              {/* Profile layout with avatar in top left */}
+              <div className="flex flex-col">
+                {/* Avatar and name section */}
+                <div className="flex items-start -mt-16 mb-6">
+                  <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                    <AvatarImage src={userMetadata.avatar_url} alt="Profile" />
+                    <AvatarFallback className="bg-bookconnect-terracotta/20 text-bookconnect-terracotta text-xl font-serif">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
 
-                  {userMetadata.reading_frequency && (
-                    <Badge variant="outline" className="mt-3 bg-bookconnect-cream text-bookconnect-brown border-bookconnect-brown/20">
-                      {READING_FREQUENCY_LABELS[userMetadata.reading_frequency as keyof typeof READING_FREQUENCY_LABELS] || userMetadata.reading_frequency}
-                    </Badge>
-                  )}
+                  <div className="ml-4 mt-4">
+                    <h1 className="text-2xl font-bold font-serif text-bookconnect-brown">
+                      {userMetadata.display_name || userMetadata.username || user.email?.split('@')[0] || 'BookClub Member'}
+                    </h1>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-sm text-gray-600">Member since {new Date(user.created_at || Date.now()).toLocaleDateString()}</p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-2 ml-auto">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-bookconnect-brown/30 text-bookconnect-brown hover:bg-bookconnect-cream"
-                    onClick={() => setEditMode(true)}
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Profile
-                  </Button>
+                {/* Bio section below profile info */}
+                {userMetadata.bio && (
+                  <div className="mt-2 max-w-full">
+                    <div className="text-gray-700 font-serif break-words whitespace-pre-wrap">
+                      {userMetadata.bio.length > 300 && !bioExpanded
+                        ? `${userMetadata.bio.substring(0, 300)}...`
+                        : userMetadata.bio}
+                    </div>
+                    {userMetadata.bio.length > 300 && (
+                      <button
+                        onClick={() => setBioExpanded(!bioExpanded)}
+                        className="text-bookconnect-terracotta hover:text-bookconnect-terracotta/80 text-sm flex items-center mt-1"
+                      >
+                        {bioExpanded ? (
+                          <>
+                            Read less <ChevronUp className="h-3 w-3 ml-1" />
+                          </>
+                        ) : (
+                          <>
+                            Read more <ChevronDown className="h-3 w-3 ml-1" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
 
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white"
-                    onClick={() => navigate('/book-club/new')}
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Create Book Club
-                  </Button>
-                </div>
+                {userMetadata.reading_frequency && (
+                  <Badge variant="outline" className="mt-3 bg-bookconnect-cream text-bookconnect-brown border-bookconnect-brown/20 self-start">
+                    {READING_FREQUENCY_LABELS[userMetadata.reading_frequency as keyof typeof READING_FREQUENCY_LABELS] || userMetadata.reading_frequency}
+                  </Badge>
+                )}
               </div>
             </CardContent>
           </Card>
 
           {/* Profile Content */}
           <Tabs defaultValue="preferences" className="mt-6">
-            <TabsList className="mb-4 bg-bookconnect-cream border border-bookconnect-brown/20">
-              <TabsTrigger
-                value="preferences"
-                className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
-              >
-                <Book className="h-4 w-4" />
-                Reading Preferences
-              </TabsTrigger>
-              <TabsTrigger
-                value="availability"
-                className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
-              >
-                <Clock className="h-4 w-4" />
-                Availability
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex justify-end mb-4">
+              <TabsList className="bg-bookconnect-cream border border-bookconnect-brown/20">
+                <TabsTrigger
+                  value="preferences"
+                  className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
+                >
+                  <Book className="h-4 w-4" />
+                  Reading Preferences
+                </TabsTrigger>
+                <TabsTrigger
+                  value="availability"
+                  className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
+                >
+                  <Clock className="h-4 w-4" />
+                  Availability
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Reading Preferences Tab */}
             <TabsContent value="preferences">
