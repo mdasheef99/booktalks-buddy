@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,7 +19,11 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
   setShowLeaveConfirm
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signOut } = useAuth();
+
+  // Check if we're coming from discussions
+  const fromDiscussions = location.state?.fromDiscussions;
 
   const handleLogout = async () => {
     try {
@@ -36,7 +40,17 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
     <>
       <Button
         variant="ghost"
-        onClick={() => navigate('/book-club')}
+        onClick={() => {
+          // If we came from discussions, use history.back() to preserve the stack
+          // Otherwise navigate directly to the book clubs list
+          if (fromDiscussions) {
+            navigate(-1);
+          } else {
+            navigate('/book-club', {
+              state: { fromClubDetails: true }
+            });
+          }
+        }}
         className="mb-4"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
@@ -46,9 +60,12 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
       {/* Navigation buttons - only show for members */}
       {isMember && (
         <div className="flex justify-center space-x-4 mb-4">
-          <Button onClick={() => navigate(`/book-club/${clubId}/members`)}>
-            Members Management
-          </Button>
+          {/* Only show Members Management to admins */}
+          {isAdmin && (
+            <Button onClick={() => navigate(`/book-club/${clubId}/members`)}>
+              Members Management
+            </Button>
+          )}
           {isAdmin && (
             <Button onClick={() => navigate(`/book-club/${clubId}/settings`)}>
               Club Settings

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,10 @@ export const BookClubList: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we're coming from club details
+  const fromClubDetails = location.state?.fromClubDetails;
 
   // Fetch book clubs
   React.useEffect(() => {
@@ -86,7 +90,9 @@ export const BookClubList: React.FC = () => {
           <Card
             key={club.id}
             className="overflow-hidden cursor-pointer"
-            onClick={() => navigate(`/book-club/${club.id}`)}
+            onClick={() => navigate(`/book-club/${club.id}`, {
+              state: { fromBookClubList: true }
+            })}
           >
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">

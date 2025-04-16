@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -22,6 +22,10 @@ const BookClubDiscussionsPage: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we're coming back from a topic page
+  const fromTopic = location.state?.fromTopic;
 
   React.useEffect(() => {
     const fetchTopics = async () => {
@@ -48,7 +52,7 @@ const BookClubDiscussionsPage: React.FC = () => {
       <div className="min-h-screen bg-bookconnect-cream flex items-center justify-center">
         <div className="text-center p-8 bg-white/80 rounded-lg shadow-lg border border-bookconnect-brown/20">
           <p className="font-serif text-bookconnect-brown mb-4">Please log in to view discussions</p>
-          <Button 
+          <Button
             onClick={() => navigate('/login')}
             className="bg-bookconnect-brown text-white hover:bg-bookconnect-brown/90"
           >
@@ -67,14 +71,24 @@ const BookClubDiscussionsPage: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate(`/book-club/${clubId}`)}
+              onClick={() => {
+                // If we came from a topic, use history.back() to preserve the stack
+                // Otherwise navigate directly to the book club
+                if (fromTopic) {
+                  navigate(-1);
+                } else {
+                  navigate(`/book-club/${clubId}`, {
+                    state: { fromDiscussions: true }
+                  });
+                }
+              }}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Book Club
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={() => navigate(`/book-club/${clubId}/discussions/new`)}
               className="flex items-center gap-2"
             >
@@ -82,13 +96,13 @@ const BookClubDiscussionsPage: React.FC = () => {
               New Topic
             </Button>
           </div>
-          
+
           <div className="bg-white shadow rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold flex items-center gap-2 mb-4">
               <MessageSquare className="h-6 w-6 text-bookconnect-terracotta" />
               Discussion Topics
             </h1>
-            
+
             {loading ? (
               <div className="animate-pulse space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -101,7 +115,7 @@ const BookClubDiscussionsPage: React.FC = () => {
               <div className="text-center py-8">
                 <MessageSquare className="h-12 w-12 mx-auto text-gray-300 mb-2" />
                 <p className="text-gray-600 mb-4">No discussion topics yet</p>
-                <Button 
+                <Button
                   onClick={() => navigate(`/book-club/${clubId}/discussions/new`)}
                 >
                   Start a New Topic

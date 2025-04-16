@@ -114,7 +114,7 @@ const BookClubTopicDetailPage: React.FC = () => {
       <div className="min-h-screen bg-bookconnect-cream flex items-center justify-center">
         <div className="text-center p-8 bg-white/80 rounded-lg shadow-lg border border-bookconnect-brown/20">
           <p className="font-serif text-bookconnect-brown mb-4">Please log in to view discussions</p>
-          <Button 
+          <Button
             onClick={() => navigate('/login')}
             className="bg-bookconnect-brown text-white hover:bg-bookconnect-brown/90"
           >
@@ -167,7 +167,12 @@ const BookClubTopicDetailPage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/book-club/${clubId}/discussions`)}
+            onClick={() => {
+              // Navigate back to discussions with state to preserve scroll position
+              navigate(`/book-club/${clubId}/discussions`, {
+                state: { fromTopic: true }
+              });
+            }}
             className="mb-4 flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -203,13 +208,13 @@ const BookClubTopicDetailPage: React.FC = () => {
                         )}
                       </div>
                       <p className="mt-2">{post.content}</p>
-                      
+
                       {/* Show reply form if replying to this post */}
                       {replyingTo === post.id && (
                         <div className="mt-4 ml-8">
-                          <DiscussionInput 
-                            clubId={clubId || ''} 
-                            topicId={topicId} 
+                          <DiscussionInput
+                            clubId={clubId || ''}
+                            topicId={topicId}
                             parentPostId={post.id}
                             onSuccess={() => {
                               setReplyingTo(null);
@@ -218,7 +223,7 @@ const BookClubTopicDetailPage: React.FC = () => {
                           />
                         </div>
                       )}
-                      
+
                       {/* Show replies to this post */}
                       {post.parent_post_id === null && (
                         <div className="ml-8 mt-4 space-y-4">
@@ -252,8 +257,8 @@ const BookClubTopicDetailPage: React.FC = () => {
               <MessageSquare className="h-5 w-5" />
               Add Your Reply
             </h2>
-            <DiscussionInput 
-              clubId={clubId || ''} 
+            <DiscussionInput
+              clubId={clubId || ''}
               topicId={topicId}
               onSuccess={fetchTopicAndPosts}
             />

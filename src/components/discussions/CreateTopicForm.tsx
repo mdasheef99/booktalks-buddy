@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
@@ -14,26 +15,29 @@ const CreateTopicForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!title.trim()) {
       toast.error('Please enter a topic title');
       return;
     }
-    
+
     if (!clubId || !user?.id) {
       toast.error('Missing required information');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       await addDiscussionTopic(user.id, clubId, title);
       toast.success('Topic created successfully');
-      navigate(`/book-club/${clubId}`);
+      navigate(`/book-club/${clubId}/discussions`, {
+        state: { fromNewTopic: true }
+      });
     } catch (error) {
       console.error('Error creating topic:', error);
       toast.error('Failed to create topic');
@@ -44,8 +48,19 @@ const CreateTopicForm: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      <Button
+        variant="ghost"
+        onClick={() => navigate(`/book-club/${clubId}/discussions`, {
+          state: { fromNewTopic: true }
+        })}
+        className="mb-4 flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Discussions
+      </Button>
+
       <h1 className="text-2xl font-bold mb-6">Create New Discussion Topic</h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
@@ -59,7 +74,7 @@ const CreateTopicForm: React.FC = () => {
             required
           />
         </div>
-        
+
         <div>
           <label htmlFor="content" className="block text-sm font-medium mb-1">
             Initial Post (Optional)
@@ -72,12 +87,14 @@ const CreateTopicForm: React.FC = () => {
             rows={5}
           />
         </div>
-        
+
         <div className="flex justify-end space-x-3 pt-4">
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate(`/book-club/${clubId}`)}
+            onClick={() => navigate(`/book-club/${clubId}/discussions`, {
+              state: { fromNewTopic: true }
+            })}
             disabled={loading}
           >
             Cancel
