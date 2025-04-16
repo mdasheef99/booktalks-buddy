@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import BookConnectHeader from '@/components/BookConnectHeader';
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Book, Clock, Calendar, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit, Book, Clock, Calendar, PlusCircle, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUserClubMemberships } from '@/lib/api/profile';
 import ProfileForm from '@/components/profile/ProfileForm';
@@ -116,9 +116,16 @@ const EnhancedProfilePage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
-        <BookConnectHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/book-club')}
+              className="mb-4 flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Book Clubs
+            </Button>
             <div className="animate-pulse space-y-6">
               <div className="h-64 bg-gray-200 rounded-lg"></div>
               <div className="h-48 bg-gray-200 rounded-lg"></div>
@@ -133,9 +140,16 @@ const EnhancedProfilePage: React.FC = () => {
   if (editMode) {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
-        <BookConnectHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/book-club')}
+              className="mb-4 flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Book Clubs
+            </Button>
             <ProfileForm
               onCancel={() => setEditMode(false)}
               onProfileUpdated={handleProfileUpdated}
@@ -148,9 +162,16 @@ const EnhancedProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/book-club')}
+            className="mb-4 flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Book Clubs
+          </Button>
           {/* Profile Header */}
           <Card className="mb-6 overflow-hidden border-bookconnect-brown/20 shadow-md">
             <div className="h-32 bg-bookconnect-cream relative overflow-hidden">
