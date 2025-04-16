@@ -29,7 +29,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   useEffect(() => {
     // Reset timeout when dialog opens/closes
     setLoginTimeout(false);
-    
+
     // Clear any timeout when the component unmounts or dialog state changes
     return () => clearTimeout(timeoutId);
   }, [open]);
@@ -40,7 +40,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     e.preventDefault();
     setIsLoading(true);
     setLoginTimeout(false);
-    
+
     // Set a timeout to display a message if login takes too long
     timeoutId = window.setTimeout(() => {
       setLoginTimeout(true);
@@ -116,14 +116,45 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               disabled={isLoading}
             />
           </div>
-          
+
           <div className="pt-2">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-[#5c4033] hover:bg-[#5c4033]/80"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
+            </Button>
+          </div>
+
+          <div className="flex justify-between text-sm pt-2">
+            <Button
+              type="button"
+              variant="link"
+              className="text-[#5c4033]/80 hover:text-[#5c4033] p-0 h-auto"
+              onClick={() => {
+                onOpenChange(false);
+                navigate('/register');
+              }}
+              disabled={isLoading}
+            >
+              Create Account
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              className="text-[#5c4033]/80 hover:text-[#5c4033] p-0 h-auto"
+              onClick={() => {
+                // Since we don't have a dedicated forgot password page,
+                // we'll just close the dialog and navigate to the login page
+                // where the user can use the main login form
+                onOpenChange(false);
+                navigate('/login');
+                toast.info('Please use the main login page to reset your password');
+              }}
+              disabled={isLoading}
+            >
+              Forgot Password?
             </Button>
           </div>
 
