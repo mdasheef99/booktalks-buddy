@@ -22,8 +22,8 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
   const location = useLocation();
   const { signOut } = useAuth();
 
-  // Check if we're coming from discussions
-  const fromDiscussions = location.state?.fromDiscussions;
+  // We don't need to check navigation state anymore
+  // The "Back to Book Clubs" button should always go to the book clubs list
 
   const handleLogout = async () => {
     try {
@@ -41,15 +41,11 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
       <Button
         variant="ghost"
         onClick={() => {
-          // If we came from discussions, use history.back() to preserve the stack
-          // Otherwise navigate directly to the book clubs list
-          if (fromDiscussions) {
-            navigate(-1);
-          } else {
-            navigate('/book-club', {
-              state: { fromClubDetails: true }
-            });
-          }
+          // Always navigate directly to the book clubs list
+          // This ensures consistent behavior regardless of navigation history
+          navigate('/book-club', {
+            state: { fromClubDetails: true }
+          });
         }}
         className="mb-4"
       >
