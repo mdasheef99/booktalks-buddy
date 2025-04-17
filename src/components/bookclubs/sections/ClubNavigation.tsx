@@ -62,11 +62,6 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
               Members Management
             </Button>
           )}
-          {isAdmin && (
-            <Button onClick={() => navigate(`/book-club/${clubId}/settings`)}>
-              Club Settings
-            </Button>
-          )}
           {!isAdmin && (
             <Button
               variant="outline"
