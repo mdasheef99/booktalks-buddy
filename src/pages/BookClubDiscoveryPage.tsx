@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import BookConnectHeader from '@/components/BookConnectHeader';
 import { getDiscoverableClubs, joinOrRequestClub, cancelJoinRequest } from '@/lib/api';
 
 interface BookClub {
@@ -40,7 +39,7 @@ const BookClubDiscoveryPage: React.FC = () => {
   // Fetch clubs with pagination and filters
   const fetchClubs = async (page: number = 1) => {
     if (!user?.id) return;
-    
+
     setLoading(true);
     try {
       const offset = (page - 1) * pageSize;
@@ -50,7 +49,7 @@ const BookClubDiscoveryPage: React.FC = () => {
         filter: privacyFilter,
         search: searchQuery
       });
-      
+
       setClubs(fetchedClubs);
       setTotalCount(count);
       setCurrentPage(page);
@@ -85,12 +84,12 @@ const BookClubDiscoveryPage: React.FC = () => {
     try {
       const result = await joinOrRequestClub(user.id, clubId);
       toast.success(result.message);
-      
+
       // Update the local state to reflect the change
-      setClubs(prevClubs => 
-        prevClubs.map(club => 
-          club.id === clubId 
-            ? { ...club, user_status: club.privacy === 'public' ? 'member' : 'pending' } 
+      setClubs(prevClubs =>
+        prevClubs.map(club =>
+          club.id === clubId
+            ? { ...club, user_status: club.privacy === 'public' ? 'member' : 'pending' }
             : club
         )
       );
@@ -110,10 +109,10 @@ const BookClubDiscoveryPage: React.FC = () => {
     try {
       const result = await cancelJoinRequest(user.id, clubId);
       toast.success(result.message);
-      
+
       // Update the local state to reflect the change
-      setClubs(prevClubs => 
-        prevClubs.map(club => 
+      setClubs(prevClubs =>
+        prevClubs.map(club =>
           club.id === clubId ? { ...club, user_status: 'not-member' } : club
         )
       );
@@ -133,10 +132,10 @@ const BookClubDiscoveryPage: React.FC = () => {
   // Render join button based on club status
   const renderActionButton = (club: BookClub) => {
     const isLoading = actionInProgress === club.id;
-    
+
     if (club.user_status === 'member' || club.user_status === 'admin') {
       return (
-        <Button 
+        <Button
           onClick={() => handleViewClub(club.id)}
           variant="outline"
         >
@@ -144,10 +143,10 @@ const BookClubDiscoveryPage: React.FC = () => {
         </Button>
       );
     }
-    
+
     if (club.user_status === 'pending') {
       return (
-        <Button 
+        <Button
           onClick={() => handleCancelRequest(club.id)}
           variant="outline"
           disabled={isLoading}
@@ -156,9 +155,9 @@ const BookClubDiscoveryPage: React.FC = () => {
         </Button>
       );
     }
-    
+
     return (
-      <Button 
+      <Button
         onClick={() => handleJoinClub(club.id)}
         disabled={isLoading}
       >
@@ -177,7 +176,7 @@ const BookClubDiscoveryPage: React.FC = () => {
       <div className="min-h-screen bg-bookconnect-cream flex items-center justify-center">
         <div className="text-center p-8 bg-white/80 rounded-lg shadow-lg border border-bookconnect-brown/20">
           <p className="font-serif text-bookconnect-brown mb-4">Please log in to discover book clubs</p>
-          <Button 
+          <Button
             onClick={() => navigate('/login')}
             className="bg-bookconnect-brown text-white hover:bg-bookconnect-brown/90"
           >
@@ -190,7 +189,6 @@ const BookClubDiscoveryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center mb-6">
@@ -220,7 +218,7 @@ const BookClubDiscoveryPage: React.FC = () => {
               </div>
               <Button onClick={handleSearch}>Search</Button>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-gray-500" />
               <Select
@@ -266,8 +264,8 @@ const BookClubDiscoveryPage: React.FC = () => {
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          club.privacy === 'private' 
-                            ? 'bg-yellow-100 text-yellow-800' 
+                          club.privacy === 'private'
+                            ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-green-100 text-green-800'
                         }`}>
                           {club.privacy || 'public'}
@@ -279,14 +277,14 @@ const BookClubDiscoveryPage: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    
+
                     <div>
                       {renderActionButton(club)}
                     </div>
                   </div>
                 </Card>
               ))}
-              
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex justify-between items-center mt-8">
@@ -320,7 +318,7 @@ const BookClubDiscoveryPage: React.FC = () => {
             <Card className="p-8 text-center">
               <h3 className="text-xl font-semibold mb-2">No clubs found</h3>
               <p className="text-gray-600 mb-6">
-                {searchQuery 
+                {searchQuery
                   ? `No clubs match your search for "${searchQuery}"`
                   : 'There are no book clubs available at the moment'}
               </p>

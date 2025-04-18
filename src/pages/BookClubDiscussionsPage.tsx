@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import BookConnectHeader from '@/components/BookConnectHeader';
 import { getClubTopics } from '@/lib/api';
 import { DiscussionList } from '@/components/discussions/DiscussionList';
 
@@ -66,7 +65,6 @@ const BookClubDiscussionsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">

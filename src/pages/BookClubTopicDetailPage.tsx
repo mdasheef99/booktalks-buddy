@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, MessageSquare, Reply } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import BookConnectHeader from '@/components/BookConnectHeader';
 import { supabase } from '@/lib/supabase';
 import { getDiscussionPosts } from '@/lib/api';
 import { DiscussionInput } from '@/components/discussions/DiscussionInput';
@@ -134,7 +133,6 @@ const BookClubTopicDetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
-        <BookConnectHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse space-y-4">
@@ -151,7 +149,6 @@ const BookClubTopicDetailPage: React.FC = () => {
   if (!topic) {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
-        <BookConnectHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-xl mb-4">Topic not found</p>
@@ -168,7 +165,6 @@ const BookClubTopicDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <Button

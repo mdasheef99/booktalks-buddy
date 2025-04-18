@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import BookConnectHeader from '@/components/BookConnectHeader';
 import BookClubProfileHeader from '@/components/profile/BookClubProfileHeader';
 import BookClubMemberships from '@/components/profile/BookClubMemberships';
 import BookClubProfileSettings from '@/components/profile/BookClubProfileSettings';
@@ -115,7 +114,6 @@ const BookClubProfilePage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
-        <BookConnectHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse space-y-6">
@@ -131,7 +129,6 @@ const BookClubProfilePage: React.FC = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
-        <BookConnectHeader />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
@@ -144,7 +141,6 @@ const BookClubProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}

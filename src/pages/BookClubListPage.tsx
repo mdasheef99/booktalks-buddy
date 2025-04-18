@@ -1,6 +1,5 @@
 import React from 'react';
 import { BookClubList } from '@/components/bookclubs/BookClubList';
-import BookConnectHeader from '@/components/BookConnectHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,6 @@ const BookClubListPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      <BookConnectHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
