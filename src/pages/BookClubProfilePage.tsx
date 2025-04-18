@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, BookOpen } from 'lucide-react';
 
 const BookClubProfilePage: React.FC = () => {
-  const { username } = useParams<{ username?: string }>();
+  const { username, userId } = useParams<{ username?: string; userId?: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const BookClubProfilePage: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
 
   // Determine if this is the current user's profile
-  const isCurrentUser = !username || (user && profile && user.id === profile.id);
+  const isCurrentUser = (!username && !userId) || (user && profile && user.id === profile.id);
 
   // Fetch profile data
   useEffect(() => {
@@ -34,9 +34,10 @@ const BookClubProfilePage: React.FC = () => {
       try {
         setLoading(true);
 
-        // If no username is provided, show the current user's profile
-        const userId = user.id;
-        console.log('Fetching profile for user ID:', userId);
+        // If no username or userId is provided, show the current user's profile
+        // If userId is provided in the URL, use that, otherwise use the current user's ID
+        const profileUserId = userId || username || user.id;
+        console.log('Fetching profile for user ID:', profileUserId);
 
         // First, let's check what tables are available
         console.log('Checking database structure...');
@@ -53,7 +54,7 @@ const BookClubProfilePage: React.FC = () => {
 
         // Create a simplified profile object from auth data
         const simplifiedProfile = {
-          id: userId,
+          id: profileUserId,
           email: authUser.user?.email || 'unknown@example.com',
           username: authUser.user?.email?.split('@')[0] || 'User',
           avatar_url: null,
@@ -68,7 +69,7 @@ const BookClubProfilePage: React.FC = () => {
 
         // For memberships, we can still try to fetch those
         try {
-          const membershipsData = await getUserClubMemberships(userId);
+          const membershipsData = await getUserClubMemberships(profileUserId);
           console.log('Memberships data:', membershipsData);
           setMemberships(membershipsData);
         } catch (membershipError) {

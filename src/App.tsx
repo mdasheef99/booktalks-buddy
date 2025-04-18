@@ -58,6 +58,8 @@ function App() {
             <Route element={<Layout />}>
               <Route path="/profile" element={<EnhancedProfilePage />} />
               <Route path="/user/:username" element={<BookClubProfilePage />} />
+              {/* Add a route that accepts user ID for profile links */}
+              <Route path="/profile/:userId" element={<BookClubProfilePage />} />
               <Route path="/books" element={<Books />} />
               <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/book/:id" element={<BookDetail />} />

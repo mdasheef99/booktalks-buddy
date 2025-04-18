@@ -49,6 +49,7 @@ const UserName: React.FC<UserNameProps> = ({
   );
 
   if (linkToProfile && profile?.id) {
+    // Use the user's ID to link to their profile
     return (
       <Link
         to={`/profile/${profile.id}`}
