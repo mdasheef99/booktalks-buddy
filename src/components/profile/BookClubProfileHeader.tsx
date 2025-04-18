@@ -81,16 +81,19 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
     setBioExpanded(!bioExpanded);
   };
 
+  // Log the isCurrentUser value to debug
+  console.log('BookClubProfileHeader - isCurrentUser:', isCurrentUser);
+
   return (
-    <Card className="mb-6 overflow-hidden">
-      <div className="h-32 bg-gradient-to-r from-bookconnect-brown to-bookconnect-terracotta relative">
-        {/* Position Edit Profile button in top right */}
+    <Card className="mb-6 overflow-hidden shadow-md">
+      <div className="h-32 bg-gradient-to-r from-bookconnect-cream to-amber-100 relative">
+        {/* Position Edit Profile button in top right - only for current user */}
         {isCurrentUser && (
           <div className="absolute top-4 right-4">
             <Button
               variant="outline"
               size="sm"
-              className="bg-white hover:bg-gray-100"
+              className="bg-white hover:bg-gray-100 shadow-sm"
               onClick={onEditProfile}
             >
               <Edit className="h-4 w-4 mr-2" />
@@ -101,19 +104,20 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
       </div>
       <CardContent className="pt-0 relative">
         <div className="flex flex-col md:flex-row gap-6 -mt-16 items-start">
-          {/* Avatar positioned higher up */}
-          <div className="relative">
-            <Avatar className="h-24 w-24 border-4 border-white">
+          {/* Avatar positioned in top left */}
+          <div className="relative ml-4 md:ml-0">
+            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
               <AvatarImage src={profile.avatar_url || ''} alt={profile.username} />
               <AvatarFallback className="text-xl bg-bookconnect-terracotta/20 text-bookconnect-terracotta">
                 {getInitials()}
               </AvatarFallback>
             </Avatar>
 
+            {/* Only show upload option for current user */}
             {isCurrentUser && (
               <div className="absolute bottom-0 right-0">
                 <label htmlFor="avatar-upload" className="cursor-pointer">
-                  <div className="h-8 w-8 rounded-full bg-bookconnect-brown text-white flex items-center justify-center hover:bg-bookconnect-brown/90 transition-colors">
+                  <div className="h-8 w-8 rounded-full bg-bookconnect-brown text-white flex items-center justify-center hover:bg-bookconnect-brown/90 transition-colors shadow-sm">
                     {uploading ? (
                       <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
@@ -134,14 +138,16 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
           </div>
 
           <div className="flex-1 mt-4 md:mt-0">
-            <h1 className="text-2xl font-bold">{profile.username}</h1>
-            <p className="text-sm text-gray-500">{profile.email}</p>
+            <h1 className="text-2xl font-bold text-bookconnect-brown">{profile.username}</h1>
+            {/* Only show email for current user */}
+            {isCurrentUser && <p className="text-sm text-gray-500">{profile.email}</p>}
             <p className="text-sm text-gray-500">Member since {formatJoinDate()}</p>
 
             {/* Bio with Read More/Less functionality */}
             {profile.bio && (
               <div className="mt-3">
-                <div className="text-gray-700 break-words whitespace-pre-wrap">
+                <h3 className="text-sm font-medium text-gray-600 mb-1">About</h3>
+                <div className="text-gray-700 break-words whitespace-pre-wrap bg-bookconnect-cream/30 p-3 rounded-md">
                   {bioIsTruncated && !bioExpanded
                     ? `${profile.bio.substring(0, maxBioLength)}...`
                     : profile.bio}
@@ -165,16 +171,22 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
               </div>
             )}
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {profile.favorite_genres?.map((genre, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full"
-                >
-                  {genre}
-                </span>
-              ))}
-            </div>
+            {/* Reading preferences */}
+            {profile.favorite_genres && profile.favorite_genres.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-medium text-gray-600 mb-1">Reading Preferences</h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.favorite_genres.map((genre, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm"
+                    >
+                      {genre}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

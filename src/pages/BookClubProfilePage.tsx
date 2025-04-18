@@ -21,7 +21,12 @@ const BookClubProfilePage: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
 
   // Determine if this is the current user's profile
-  const isCurrentUser = (!username && !userId) || (user && profile && user.id === profile.id);
+  // Only consider it the current user's profile if no username/userId is provided (viewing own profile)
+  const isCurrentUser = (!username && !userId);
+
+  // Log parameters to help debug
+  console.log('BookClubProfilePage - URL params:', { username, userId });
+  console.log('BookClubProfilePage - isCurrentUser:', isCurrentUser);
 
   // Fetch profile data
   useEffect(() => {
@@ -35,39 +40,110 @@ const BookClubProfilePage: React.FC = () => {
         setLoading(true);
 
         // If no username or userId is provided, show the current user's profile
-        // If userId is provided in the URL, use that, otherwise use the current user's ID
-        const profileUserId = userId || username || user.id;
+        // If userId is provided in the URL, use that, otherwise if username is provided, use that
+        // Otherwise, use the current user's ID
+        const profileUserId = isCurrentUser ? user.id : (userId || username || user.id);
         console.log('Fetching profile for user ID:', profileUserId);
 
-        // First, let's check what tables are available
-        console.log('Checking database structure...');
+        // If viewing current user's profile, use auth data
+        if (isCurrentUser) {
+          // Try to get the user profile from auth.users
+          const { data: authUser, error: authError } = await supabase.auth.getUser();
 
-        // Try to get the user profile from auth.users instead
-        const { data: authUser, error: authError } = await supabase.auth.getUser();
+          if (authError) {
+            console.error('Error getting auth user:', authError);
+            throw authError;
+          }
 
-        if (authError) {
-          console.error('Error getting auth user:', authError);
-          throw authError;
+          console.log('Current user auth data:', authUser);
+
+          // Create a profile object from current user's auth data
+          const currentUserProfile = {
+            id: user.id,
+            email: authUser.user?.email || 'unknown@example.com',
+            username: authUser.user?.email?.split('@')[0] || 'User',
+            avatar_url: null,
+            bio: null,
+            favorite_genres: [],
+            favorite_authors: [],
+            created_at: authUser.user?.created_at || new Date().toISOString()
+          };
+
+          setProfile(currentUserProfile);
+        }
+        // If viewing another user's profile, fetch from database
+        else {
+          console.log('Fetching other user profile for:', profileUserId);
+
+          // Try to fetch user from the database
+          let userData = null;
+
+          // First try by userId if provided
+          if (userId) {
+            const { data, error } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', userId)
+              .single();
+
+            if (error) {
+              console.error('Error fetching user by ID:', error);
+            } else if (data) {
+              userData = data;
+              console.log('Found user by ID:', userData);
+            }
+          }
+
+          // If not found by ID and username is provided, try by username
+          if (!userData && username) {
+            const { data, error } = await supabase
+              .from('users')
+              .select('*')
+              .eq('username', username)
+              .single();
+
+            if (error) {
+              console.error('Error fetching user by username:', error);
+            } else if (data) {
+              userData = data;
+              console.log('Found user by username:', userData);
+            }
+          }
+
+          // If user found in database, use that data
+          if (userData) {
+            const otherUserProfile = {
+              id: userData.id,
+              email: '', // Don't expose email for privacy
+              username: userData.username || `User-${userData.id.substring(0, 4)}`,
+              avatar_url: userData.avatar_url || null,
+              bio: userData.bio || null,
+              favorite_genres: userData.favorite_genres || [],
+              favorite_authors: userData.favorite_authors || [],
+              created_at: userData.created_at || new Date().toISOString()
+            };
+
+            setProfile(otherUserProfile);
+          }
+          // If user not found, create a placeholder profile
+          else {
+            console.warn('User not found in database, creating placeholder');
+            const placeholderProfile = {
+              id: profileUserId,
+              email: '',
+              username: username || `User-${profileUserId.substring(0, 4)}`,
+              avatar_url: null,
+              bio: null,
+              favorite_genres: [],
+              favorite_authors: [],
+              created_at: new Date().toISOString()
+            };
+
+            setProfile(placeholderProfile);
+          }
         }
 
-        console.log('Auth user data:', authUser);
-
-        // Create a simplified profile object from auth data
-        const simplifiedProfile = {
-          id: profileUserId,
-          email: authUser.user?.email || 'unknown@example.com',
-          username: authUser.user?.email?.split('@')[0] || 'User',
-          avatar_url: null,
-          bio: null,
-          favorite_genres: [],
-          favorite_authors: [],
-          created_at: authUser.user?.created_at || new Date().toISOString()
-        };
-
-        // Use this simplified profile instead of trying to fetch from the database
-        setProfile(simplifiedProfile);
-
-        // For memberships, we can still try to fetch those
+        // For memberships, fetch those for the profile user
         try {
           const membershipsData = await getUserClubMemberships(profileUserId);
           console.log('Memberships data:', membershipsData);
@@ -78,7 +154,6 @@ const BookClubProfilePage: React.FC = () => {
           setMemberships([]);
         }
 
-        // Skip the rest of the profile fetching logic
         return;
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -176,6 +251,7 @@ const BookClubProfilePage: React.FC = () => {
                 <BookClubMemberships
                   memberships={memberships}
                   loading={loading}
+                  isCurrentUser={isCurrentUser}
                 />
               </TabsContent>
 
