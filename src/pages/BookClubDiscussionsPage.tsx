@@ -24,8 +24,9 @@ const BookClubDiscussionsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if we're coming back from a topic page
+  // Check navigation state
   const fromTopic = location.state?.fromTopic;
+  const fromBookClubList = location.state?.fromBookClubList;
 
   React.useEffect(() => {
     const fetchTopics = async () => {
@@ -78,7 +79,11 @@ const BookClubDiscussionsPage: React.FC = () => {
                   navigate(-1);
                 } else {
                   navigate(`/book-club/${clubId}`, {
-                    state: { fromDiscussions: true }
+                    state: {
+                      fromDiscussions: true,
+                      // Preserve the fromBookClubList state if it exists
+                      fromBookClubList: fromBookClubList || false
+                    }
                   });
                 }
               }}

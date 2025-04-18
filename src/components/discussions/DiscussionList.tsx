@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/lib/supabase';
 import { getDiscussionPosts, getClubTopics } from '@/lib/api';
+import UserName from '@/components/common/UserName';
+import UserAvatar from '@/components/common/UserAvatar';
 
 type DiscussionTopic = Database['public']['Tables']['discussion_topics']['Row'];
 type DiscussionPost = Database['public']['Tables']['discussion_posts']['Row'];
@@ -88,9 +90,12 @@ export const DiscussionList: React.FC<DiscussionListProps> = ({ clubId, topicId 
               <div className="flex-grow">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm text-gray-600">
-                      {post.user_id} • {new Date(post.created_at || '').toLocaleString()}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <UserAvatar userId={post.user_id} size="sm" />
+                      <p className="text-sm text-gray-600">
+                        <UserName userId={post.user_id} linkToProfile /> • {new Date(post.created_at || '').toLocaleString()}
+                      </p>
+                    </div>
                     <div className="mt-2 text-gray-800">
                       {post.content}
                     </div>
@@ -114,9 +119,12 @@ export const DiscussionList: React.FC<DiscussionListProps> = ({ clubId, topicId 
                           <div className="flex items-start gap-4">
                             <div className="h-8 w-8 rounded-full bg-gray-200 flex-shrink-0" />
                             <div>
-                              <p className="text-sm text-gray-600">
-                                {reply.user_id} • {new Date(reply.created_at || '').toLocaleString()}
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <UserAvatar userId={reply.user_id} size="sm" />
+                                <p className="text-sm text-gray-600">
+                                  <UserName userId={reply.user_id} linkToProfile /> • {new Date(reply.created_at || '').toLocaleString()}
+                                </p>
+                              </div>
                               <div className="mt-2 text-gray-800">
                                 {reply.content}
                               </div>
@@ -147,7 +155,7 @@ export const DiscussionList: React.FC<DiscussionListProps> = ({ clubId, topicId 
             <div>
               <h3 className="font-medium">{topic.title}</h3>
               <p className="text-sm text-gray-600">
-                Started by {topic.user_id} • {new Date(topic.created_at || '').toLocaleString()}
+                Started by <UserName userId={topic.user_id} linkToProfile /> • {new Date(topic.created_at || '').toLocaleString()}
               </p>
             </div>
             <MessageSquare className="h-5 w-5 text-gray-400" />

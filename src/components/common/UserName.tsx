@@ -9,8 +9,8 @@ interface UserNameProps {
   withRole?: string;
 }
 
-const UserName: React.FC<UserNameProps> = ({ 
-  userId, 
+const UserName: React.FC<UserNameProps> = ({
+  userId,
   linkToProfile = false,
   className = '',
   withRole
@@ -33,9 +33,9 @@ const UserName: React.FC<UserNameProps> = ({
     fetchProfile();
   }, [userId]);
 
-  const displayName = loading 
-    ? 'Loading...' 
-    : (profile?.username || 'Unknown User');
+  const displayName = loading
+    ? 'Loading...'
+    : (profile?.displayname || profile?.username || `User ${userId.substring(0, 4)}`);
 
   const content = (
     <span className={className}>
@@ -48,10 +48,10 @@ const UserName: React.FC<UserNameProps> = ({
     </span>
   );
 
-  if (linkToProfile && profile?.username) {
+  if (linkToProfile && profile?.id) {
     return (
-      <Link 
-        to={`/user/${profile.username}`}
+      <Link
+        to={`/profile/${profile.id}`}
         className="hover:underline text-bookconnect-brown"
       >
         {content}

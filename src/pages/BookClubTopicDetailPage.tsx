@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, MessageSquare, Reply } from 'lucide-react';
@@ -9,6 +9,8 @@ import BookConnectHeader from '@/components/BookConnectHeader';
 import { supabase } from '@/lib/supabase';
 import { getDiscussionPosts } from '@/lib/api';
 import { DiscussionInput } from '@/components/discussions/DiscussionInput';
+import UserName from '@/components/common/UserName';
+import UserAvatar from '@/components/common/UserAvatar';
 
 interface Post {
   id: string;
@@ -34,6 +36,10 @@ const BookClubTopicDetailPage: React.FC = () => {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we have fromBookClubList in the state
+  const fromBookClubList = location.state?.fromBookClubList;
 
   const fetchTopicAndPosts = async () => {
     if (!topicId) {
@@ -169,8 +175,12 @@ const BookClubTopicDetailPage: React.FC = () => {
             variant="ghost"
             onClick={() => {
               // Navigate back to discussions with state to preserve scroll position
+              // and also preserve the fromBookClubList state if it exists
               navigate(`/book-club/${clubId}/discussions`, {
-                state: { fromTopic: true }
+                state: {
+                  fromTopic: true,
+                  fromBookClubList: fromBookClubList || false
+                }
               });
             }}
             className="mb-4 flex items-center gap-2"
@@ -181,9 +191,12 @@ const BookClubTopicDetailPage: React.FC = () => {
 
           <div className="bg-white shadow rounded-lg p-6 mb-6">
             <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
-            <p className="text-sm text-gray-500 mb-4">
-              Started by {topic.user_id} • {new Date(topic.created_at).toLocaleString()}
-            </p>
+            <div className="flex items-center gap-2 mb-4">
+              <UserAvatar userId={topic.user_id} size="sm" />
+              <p className="text-sm text-gray-500">
+                Started by <UserName userId={topic.user_id} linkToProfile /> • {new Date(topic.created_at).toLocaleString()}
+              </p>
+            </div>
           </div>
 
           <div className="space-y-4 mb-8">
@@ -193,9 +206,12 @@ const BookClubTopicDetailPage: React.FC = () => {
                   <div className="flex justify-between items-start">
                     <div className="w-full">
                       <div className="flex justify-between w-full">
-                        <p className="text-sm text-gray-500">
-                          {post.user_id} • {new Date(post.created_at).toLocaleString()}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <UserAvatar userId={post.user_id} size="sm" />
+                          <p className="text-sm text-gray-500">
+                            <UserName userId={post.user_id} linkToProfile /> • {new Date(post.created_at).toLocaleString()}
+                          </p>
+                        </div>
                         {!post.parent_post_id && (
                           <Button
                             variant="ghost"
@@ -233,9 +249,12 @@ const BookClubTopicDetailPage: React.FC = () => {
                               <Card key={reply.id} className="p-4">
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <p className="text-sm text-gray-500">
-                                      {reply.user_id} • {new Date(reply.created_at).toLocaleString()}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                      <UserAvatar userId={reply.user_id} size="sm" />
+                                      <p className="text-sm text-gray-500">
+                                        <UserName userId={reply.user_id} linkToProfile /> • {new Date(reply.created_at).toLocaleString()}
+                                      </p>
+                                    </div>
                                     <p className="mt-2">{reply.content}</p>
                                   </div>
                                 </div>
