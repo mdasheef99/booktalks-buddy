@@ -71,19 +71,14 @@ const BookClubDiscussionsPage: React.FC = () => {
             <Button
               variant="ghost"
               onClick={() => {
-                // If we came from a topic, use history.back() to preserve the stack
-                // Otherwise navigate directly to the book club
-                if (fromTopic) {
-                  navigate(-1);
-                } else {
-                  navigate(`/book-club/${clubId}`, {
-                    state: {
-                      fromDiscussions: true,
-                      // Preserve the fromBookClubList state if it exists
-                      fromBookClubList: fromBookClubList || false
-                    }
-                  });
-                }
+                // Always navigate directly to the book club page
+                navigate(`/book-club/${clubId}`, {
+                  state: {
+                    fromDiscussions: true,
+                    // Preserve the fromBookClubList state if it exists
+                    fromBookClubList: fromBookClubList || false
+                  }
+                });
               }}
               className="flex items-center gap-2"
             >
