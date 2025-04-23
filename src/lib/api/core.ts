@@ -19,6 +19,9 @@ export function buildQueryString(params?: Record<string, string | number | boole
   return query ? `?${query}` : '';
 }
 
+// API key from environment variables
+const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY || '';
+
 /**
  * Generic API fetch wrapper
  */
@@ -26,8 +29,15 @@ export async function apiFetch<T>(
   url: string,
   options: ApiRequestOptions = {}
 ): Promise<T> {
-  const { queryParams, headers, ...rest } = options;
-  const fullUrl = url + buildQueryString(queryParams);
+  const { queryParams = {}, headers, ...rest } = options;
+
+  // Add API key for Google Books API requests
+  let updatedQueryParams = { ...queryParams };
+  if (url.includes('googleapis.com/books') && API_KEY) {
+    updatedQueryParams.key = API_KEY;
+  }
+
+  const fullUrl = url + buildQueryString(updatedQueryParams);
 
   const response = await fetch(fullUrl, {
     headers: {
