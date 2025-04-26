@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage } from "@/services/chatService";
+import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage, trackPresence } from "@/services/chatService";
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
 
@@ -25,20 +25,8 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         console.log("Got chat history:", chatHistory);
         setMessages(chatHistory);
 
-        // Extract unique usernames from chat history
-        const uniqueUsernames = new Set<string>();
-        chatHistory.forEach(msg => {
-          if (msg.username) uniqueUsernames.add(msg.username);
-        });
-
-        // Add current user to online users
-        setOnlineUsers(prev => {
-          const newUsers = Array.from(uniqueUsernames);
-          if (!newUsers.includes(username)) {
-            newUsers.push(username);
-          }
-          return newUsers;
-        });
+        // Initialize with current user
+        setOnlineUsers([username]);
 
       } catch (error) {
         console.error("Error loading chat history:", error);
@@ -54,7 +42,7 @@ export function useBookDiscussion(id: string, title: string, author: string, use
     };
 
     loadChatHistory();
-  }, [id, username]);
+  }, [id, username]); // Re-run when username changes
 
   // Subscribe to real-time chat updates
   useEffect(() => {
@@ -76,16 +64,6 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         return [...prevMessages, newMessage];
       });
 
-      // Add user to online users list if not already there
-      if (newMessage.username) {
-        setOnlineUsers(prev => {
-          if (!prev.includes(newMessage.username)) {
-            return [...prev, newMessage.username];
-          }
-          return prev;
-        });
-      }
-
       setConnectionError(false);
     });
 
@@ -94,6 +72,22 @@ export function useBookDiscussion(id: string, title: string, author: string, use
       subscription.unsubscribe();
     };
   }, [id]);
+
+  // Track presence of users in the chat
+  useEffect(() => {
+    if (!id || !username) return;
+
+    console.log("Setting up presence tracking for book:", id);
+    const presenceTracker = trackPresence(id, username, (onlineUsers) => {
+      console.log("Online users updated:", onlineUsers);
+      setOnlineUsers(onlineUsers);
+    });
+
+    return () => {
+      console.log("Unsubscribing from presence tracking");
+      presenceTracker.unsubscribe();
+    };
+  }, [id, username]);
 
   const handleSendMessage = async (message: string, replyToId?: string) => {
     if (!id || !message.trim()) {

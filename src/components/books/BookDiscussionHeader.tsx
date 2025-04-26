@@ -16,49 +16,43 @@ interface BookDiscussionHeaderProps {
   onlineUsers?: string[];
 }
 
-const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({ 
-  title, 
-  author, 
+const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
+  title,
+  author,
   onBack,
-  onlineUsers = [] 
+  onlineUsers = []
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const navigate = useNavigate();
-  
+
   const uniqueUsers = [...new Set(onlineUsers)];
   const onlineCount = uniqueUsers.length;
-  
-  const handleUserClick = (username: string) => {
-    // Navigate to the user's profile page with the correct URL
-    navigate(`/profile/${encodeURIComponent(username)}`);
-    setIsPopoverOpen(false);
-  };
-  
+
   return (
     <header className="sticky top-0 z-10 bg-bookconnect-brown shadow-md py-1.5 px-3">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onBack} 
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
             className="mr-1 text-white hover:bg-bookconnect-brown/20 h-7 w-7 p-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          
+
           <h1 className="font-serif text-base md:text-lg text-bookconnect-cream line-clamp-1">
             <span className="font-bold">{title}</span>
             {author && <span className="italic font-normal text-xs"> by {author}</span>}
           </h1>
         </div>
-        
+
         <div className="flex items-center">
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-bookconnect-cream hover:bg-bookconnect-brown/20 flex items-center h-7"
               >
                 <span className="relative mr-1">
@@ -76,14 +70,13 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
                 {uniqueUsers.length > 0 ? (
                   <div className="max-h-48 overflow-y-auto">
                     {uniqueUsers.map((username, idx) => (
-                      <button
+                      <div
                         key={`user-${idx}`}
-                        className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-bookconnect-cream w-full text-left"
-                        onClick={() => handleUserClick(username)}
+                        className="flex items-center gap-2 py-1.5 px-2"
                       >
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                         <span className="text-sm font-serif text-bookconnect-brown">{username}</span>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 ) : (

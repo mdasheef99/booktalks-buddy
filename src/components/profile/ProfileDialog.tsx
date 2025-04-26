@@ -32,7 +32,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     chatRequests,
     activeChatsCount,
     isLoading,
-    
+
     // Methods
     initialize,
     setupRealtimeSubscription,
@@ -48,7 +48,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
 
   useEffect(() => {
     if (!open) return;
-    
+
     return setupRealtimeSubscription();
   }, [open]);
 
@@ -56,18 +56,29 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     await handleSaveProfile();
     // Force a refresh of both localStorage values
     if (username) {
+      // Store the username in both localStorage keys for consistency
       localStorage.setItem("anon_username", username);
       localStorage.setItem("username", username);
+
+      // Create a custom event to notify other components about the username change
+      const usernameChangeEvent = new CustomEvent('usernameChanged', {
+        detail: { username }
+      });
+      window.dispatchEvent(usernameChangeEvent);
+
       toast("Username updated", {
         description: "Your username has been updated throughout the app."
       });
     }
+
+    // Close the dialog after saving
+    onClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent 
-        className="max-w-xl w-[95%] h-[85vh] mx-auto bg-bookconnect-cream overflow-hidden flex flex-col" 
+      <DialogContent
+        className="max-w-xl w-[95%] h-[85vh] mx-auto bg-bookconnect-cream overflow-hidden flex flex-col"
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1528459105426-b9548367069b?q=80&w=1412&auto=format&fit=crop')`,
           backgroundSize: 'cover',

@@ -2,7 +2,7 @@
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import UsernameEditor from "./UsernameEditor";
-import ProfileForm from "./ProfileForm";
+import SimpleProfileForm from "./SimpleProfileForm";
 import ChatSettings from "./ChatSettings";
 import ChatRequestsList, { ChatRequest } from "./ChatRequestsList";
 import ReadingActivity from "./ReadingActivity";
@@ -44,7 +44,7 @@ const ProfileDialogContent: React.FC<ProfileDialogContentProps> = ({
         <div className="space-y-6 font-serif px-2">
           <UsernameEditor username={username} setUsername={setUsername} />
 
-          <ProfileForm 
+          <SimpleProfileForm
             favoriteAuthor={favoriteAuthor}
             setFavoriteAuthor={setFavoriteAuthor}
             favoriteGenre={favoriteGenre}
@@ -53,14 +53,14 @@ const ProfileDialogContent: React.FC<ProfileDialogContentProps> = ({
             setBio={setBio}
           />
 
-          <ChatSettings 
+          <ChatSettings
             allowChats={allowChats}
             setAllowChats={setAllowChats}
             activeChatsCount={activeChatsCount}
           />
 
           {chatRequests.length > 0 && (
-            <ChatRequestsList 
+            <ChatRequestsList
               chatRequests={chatRequests}
               onChatAction={onChatAction}
             />
