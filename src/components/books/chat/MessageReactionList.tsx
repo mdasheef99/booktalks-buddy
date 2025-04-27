@@ -16,6 +16,7 @@ interface MessageReactionListProps {
   currentUsername: string;
   isCurrentUser: boolean;
   onReactionsUpdated: (messageId: string) => void;
+  isDeleted?: boolean; // Flag to indicate if the message is deleted
 }
 
 const MessageReactionList: React.FC<MessageReactionListProps> = ({
@@ -23,7 +24,8 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
   messageId,
   currentUsername,
   isCurrentUser,
-  onReactionsUpdated
+  onReactionsUpdated,
+  isDeleted = false
 }) => {
   // Debug log to see what reactions data we're receiving
   console.log("MessageReactionList - reactions:", reactions);
@@ -153,6 +155,28 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
 
   console.log("Grouped reactions:", groupedReactions);
 
+  // If the message is deleted, only show existing reactions in read-only mode
+  if (isDeleted) {
+    return (
+      <>
+        <div className="flex flex-wrap gap-1">
+          {/* Render only the emojis that users have reacted with in read-only mode */}
+          {Object.values(groupedReactions).map((group) => (
+            <div
+              key={group.emoji}
+              className="rounded-full px-2 py-1 flex items-center space-x-1 bg-gray-100 border border-gray-200 opacity-70"
+              title={`${group.users ? group.users.length : group.count} ${(group.users ? group.users.length : group.count) === 1 ? 'person' : 'people'} reacted with ${group.emoji}`}
+            >
+              <span className="text-base">{group.emoji}</span>
+              <span className="text-xs font-bold">{group.users ? group.users.length : group.count}</span>
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  // Normal mode for non-deleted messages
   return (
     <>
       <div className="flex flex-wrap gap-1">

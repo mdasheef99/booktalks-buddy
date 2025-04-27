@@ -31,17 +31,20 @@ const MessageActions: React.FC<MessageActionsProps> = ({
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  
+
+  // Check if message is deleted
+  const isDeleted = !!message.deleted_at;
+
   const handleReply = () => {
     onReplyToMessage(message);
     setDropdownOpen(false);
   };
-  
+
   const handleDelete = async () => {
     try {
       console.log("Deleting message:", message.id);
       const success = await deleteMessage(message.id);
-      
+
       if (success) {
         console.log("Message deleted successfully");
         toast.success("Message deleted");
@@ -53,18 +56,24 @@ const MessageActions: React.FC<MessageActionsProps> = ({
       setDropdownOpen(false);
     }
   };
-  
+
+  // If message is deleted, don't show any actions
+  if (isDeleted) {
+    return null;
+  }
+
   return (
     <>
       {/* Action buttons in top-right corner of message bubble */}
       <div className={`absolute top-2 ${isCurrentUser ? 'right-2' : 'right-2'} flex items-center space-x-2`}>
         {/* Reaction emoji button */}
-        <MessageReaction 
-          messageId={message.id} 
+        <MessageReaction
+          messageId={message.id}
           currentUsername={currentUsername}
           onReactionsUpdated={onReactionsUpdated}
+          isDeleted={isDeleted}
         />
-        
+
         {/* Three-dot menu */}
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
@@ -76,14 +85,14 @@ const MessageActions: React.FC<MessageActionsProps> = ({
             {/* Display actions in dropdown */}
             <div className="flex flex-col gap-1">
               {/* Reply button */}
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={handleReply}
                 className="flex items-center text-sm text-bookconnect-brown/80 hover:bg-bookconnect-terracotta/10 px-3 py-1.5 rounded cursor-pointer"
               >
                 <Reply size={15} className="mr-2" />
                 <span>Reply</span>
               </DropdownMenuItem>
-              
+
               {/* Delete button (only for user's own messages) */}
               {isCurrentUser && (
                 <HoverCard openDelay={300}>

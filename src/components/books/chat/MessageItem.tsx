@@ -129,6 +129,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             currentUsername={currentUsername}
             isCurrentUser={isCurrentUser}
             onReactionsUpdated={handleReactionsUpdated}
+            isDeleted={isDeleted}
           />
         </div>
       </div>
