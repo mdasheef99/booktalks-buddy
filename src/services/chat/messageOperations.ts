@@ -56,6 +56,8 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
   }
 }
 
+import { handleChatError, isNetworkError } from '@/lib/errorHandling';
+
 export async function sendChatMessage(
   message: string,
   bookId: string,
@@ -68,6 +70,11 @@ export async function sendChatMessage(
 ): Promise<ChatMessage | null> {
   if (!message.trim() || !bookId || !username) {
     console.error("Missing required fields for sending message");
+    handleChatError(
+      new Error("Missing required fields"),
+      "Send Message",
+      { bookId, username, messageLength: message?.length || 0 }
+    );
     return null;
   }
 
@@ -89,7 +96,9 @@ export async function sendChatMessage(
       username,
       timestamp,
       user_id: userId || null,
-      reply_to_id: replyToId || null
+      reply_to_id: replyToId || null,
+      // Add a status field to track message state
+      status: 'sending'
     };
 
     console.log("Inserting message:", newMessage);
@@ -102,13 +111,31 @@ export async function sendChatMessage(
 
     if (error) {
       console.error("Supabase error sending message:", error);
+
+      // Check if it's a network error
+      if (isNetworkError(error)) {
+        handleChatError(
+          error,
+          "Send Message",
+          { bookId, username },
+          "Network error. Your message will be retried when connection is restored."
+        );
+      } else {
+        handleChatError(
+          error,
+          "Send Message",
+          { bookId, username, message: message.substring(0, 50) + (message.length > 50 ? '...' : '') }
+        );
+      }
+
       throw error;
     }
 
     console.log("Message sent successfully, response:", data);
     return data;
   } catch (error) {
-    console.error("Failed to send message:", error);
+    // Don't handle the error here, just rethrow it
+    // This allows the component to handle it appropriately
     throw error;
   }
 }

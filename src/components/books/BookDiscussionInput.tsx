@@ -4,7 +4,7 @@ import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ChatMessage } from "@/services/chatService";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -18,59 +18,64 @@ interface BookDiscussionInputProps {
   onCancelReply: () => void;
 }
 
-const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({ 
-  onSendMessage, 
+const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
+  onSendMessage,
   replyTo,
-  onCancelReply 
+  onCancelReply
 }) => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
-  
+
+  const [sendError, setSendError] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!message.trim() || isSubmitting) return;
-    
+
     try {
       setIsSubmitting(true);
+      setSendError(null);
+
       await onSendMessage(message, replyTo?.id);
       setMessage("");
       toast.dismiss("message-error");
-      
+
       if (replyTo) {
         onCancelReply();
       }
-      
+
       setTimeout(() => {
         inputRef.current?.focus();
       }, 0);
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Failed to send message. Please try again.", {
-        id: "message-error",
-        duration: 5000,
-      });
+
+      // Set local error state for inline display
+      setSendError("Failed to send message. Please try again.");
+
+      // We don't show a toast here because our error handling utility already does that
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   const addEmoji = (emoji: string) => {
     setMessage(prev => prev + emoji);
     // Don't auto-close the emoji picker
-    
+
     // Focus the input after adding emoji
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
   };
-  
+
   return (
     <TooltipProvider>
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-1 border border-bookconnect-brown/20">
@@ -84,7 +89,7 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
                 {replyTo.deleted_at ? "Message deleted" : replyTo.message}
               </p>
             </div>
-            <Button 
+            <Button
               type="button"
               variant="ghost"
               size="sm"
@@ -96,29 +101,53 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
             </Button>
           </div>
         )}
-        
+
+        {sendError && (
+          <div className="mx-2 mb-1 p-1 bg-red-50 text-red-600 text-xs rounded border border-red-200 flex items-center">
+            <div className="mr-1 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            {sendError}
+            <button
+              type="button"
+              className="ml-auto text-red-500 hover:text-red-700"
+              onClick={() => setSendError(null)}
+              aria-label="Dismiss error"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center">
           <EmojiPicker
             onEmojiSelect={addEmoji}
             isOpen={isEmojiPickerOpen}
             onOpenChange={setIsEmojiPickerOpen}
           />
-          
+
           <input
             type="text"
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              if (sendError) setSendError(null);
+            }}
             placeholder={replyTo ? "Type your reply..." : "Share your thoughts..."}
             disabled={isSubmitting}
-            className="flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7"
+            className={`flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7 ${sendError ? 'border-red-300' : ''}`}
             ref={inputRef}
           />
-          
+
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button 
-                type="submit" 
-                disabled={!message.trim() || isSubmitting} 
+              <Button
+                type="submit"
+                disabled={!message.trim() || isSubmitting}
                 className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0"
               >
                 {isSubmitting ? (

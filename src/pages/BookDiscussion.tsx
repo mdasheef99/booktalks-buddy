@@ -65,7 +65,8 @@ const BookDiscussion: React.FC = () => {
     onlineUsers,
     handleSendMessage,
     handleReplyToMessage,
-    handleCancelReply
+    handleCancelReply,
+    pendingMessages
   } = useBookDiscussion(id || "", title, author, username, coverUrl);
 
   const handleBack = () => {
@@ -92,6 +93,7 @@ const BookDiscussion: React.FC = () => {
             onReplyToMessage={handleReplyToMessage}
             onCancelReply={handleCancelReply}
             onSendMessage={handleSendMessage}
+            pendingMessages={pendingMessages}
           />
         </div>
       </div>
