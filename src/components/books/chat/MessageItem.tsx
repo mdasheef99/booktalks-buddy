@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChatMessage, getMessageReactions } from "@/services/chat/messageService";
+import { ChatMessage, getMessageReactions, subscribeToReactions } from "@/services/chat/messageService";
 import { Check } from "lucide-react";
 import ReplyPreview from "./ReplyPreview";
 import MessageActions from "./MessageActions";
@@ -28,11 +28,26 @@ const MessageItem: React.FC<MessageItemProps> = ({
 }) => {
   const isDeleted = !!message.deleted_at;
   const [reactions, setReactions] = useState(message.reactions || []);
-  
+
   useEffect(() => {
     setReactions(message.reactions || []);
-  }, [message.reactions]);
-  
+
+    // Set up a subscription to reaction changes for this message
+    const subscription = subscribeToReactions(message.id, () => {
+      // When reactions change, fetch the latest reactions
+      console.log("Reaction change detected via subscription, updating...");
+      handleReactionsUpdated(message.id);
+    });
+
+    // Fetch reactions immediately to ensure we have the latest data
+    handleReactionsUpdated(message.id);
+
+    // Clean up subscription when component unmounts or message changes
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [message.id]);
+
   const formatTime = (timestamp: string) => {
     try {
       const date = new Date(timestamp);
@@ -54,15 +69,15 @@ const MessageItem: React.FC<MessageItemProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}
       ref={setRef}
     >
       <div className={`flex flex-col max-w-[75%] min-w-[150px] w-[300px]`}>
-        <div 
+        <div
           className={`relative px-3.5 py-2 rounded-2xl font-serif text-sm shadow-md
-            ${isCurrentUser 
-              ? 'bg-gradient-to-br from-bookconnect-sage/95 to-bookconnect-sage/85 text-white rounded-br-none border border-bookconnect-sage/20' 
+            ${isCurrentUser
+              ? 'bg-gradient-to-br from-bookconnect-sage/95 to-bookconnect-sage/85 text-white rounded-br-none border border-bookconnect-sage/20'
               : 'bg-gradient-to-br from-bookconnect-terracotta/60 to-bookconnect-terracotta/50 text-white rounded-bl-none border border-bookconnect-terracotta/20'
             } ${isDeleted ? 'opacity-70' : ''} transition-all duration-300 ease-in-out backdrop-blur-sm`}
         >
@@ -70,7 +85,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             <span className={`text-xs font-medium ${isCurrentUser ? 'text-white/90' : 'text-white/90'}`}>
               {message.username}
             </span>
-            <MessageActions 
+            <MessageActions
               message={message}
               currentUsername={currentUsername}
               isCurrentUser={isCurrentUser}
@@ -79,13 +94,13 @@ const MessageItem: React.FC<MessageItemProps> = ({
               onReactionsUpdated={handleReactionsUpdated}
             />
           </div>
-          
-          <ReplyPreview 
-            originalMessage={originalMessage} 
+
+          <ReplyPreview
+            originalMessage={originalMessage}
             isCurrentUser={isCurrentUser}
             onScrollToMessage={onScrollToMessage}
           />
-          
+
           <div className="whitespace-pre-wrap break-words">
             {isDeleted ? (
               <span className="italic opacity-75">Message deleted</span>
@@ -93,7 +108,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
               message.message
             )}
           </div>
-          
+
           <div className="flex justify-between items-center w-full mt-1.5">
             <span className="text-[10px] opacity-80 ml-auto flex items-center">
               {formatTime(message.timestamp)}
@@ -106,7 +121,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             </span>
           </div>
         </div>
-        
+
         <div className={`w-full ${isCurrentUser ? 'self-end' : 'self-start'} mt-1`}>
           <MessageReactionList
             reactions={reactions}
