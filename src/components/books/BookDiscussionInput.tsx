@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback, memo } from "react";
 import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
 
   const [sendError, setSendError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!message.trim() || isSubmitting) return;
@@ -64,9 +64,9 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [message, isSubmitting, onSendMessage, replyTo, onCancelReply]);
 
-  const addEmoji = (emoji: string) => {
+  const addEmoji = useCallback((emoji: string) => {
     setMessage(prev => prev + emoji);
     // Don't auto-close the emoji picker
 
@@ -74,7 +74,7 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
-  };
+  }, []);
 
   return (
     <TooltipProvider>
@@ -165,4 +165,4 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
   );
 };
 
-export default BookDiscussionInput;
+export default memo(BookDiscussionInput);

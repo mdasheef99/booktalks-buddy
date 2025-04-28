@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { ChatMessage, getMessageReactions, subscribeToReactions } from "@/services/chat/messageService";
 import { Check } from "lucide-react";
 import ReplyPreview from "./ReplyPreview";
@@ -57,7 +57,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
     }
   };
 
-  const handleReactionsUpdated = async (messageId: string) => {
+  const handleReactionsUpdated = useCallback(async (messageId: string) => {
     try {
       console.log("Refreshing reactions for message:", messageId);
       const updatedReactions = await getMessageReactions(messageId);
@@ -66,7 +66,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
     } catch (error) {
       console.error("Error refreshing reactions:", error);
     }
-  };
+  }, []);
 
   return (
     <div
@@ -137,4 +137,4 @@ const MessageItem: React.FC<MessageItemProps> = ({
   );
 };
 
-export default MessageItem;
+export default memo(MessageItem);

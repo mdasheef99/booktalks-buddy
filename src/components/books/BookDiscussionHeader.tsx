@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, memo, useCallback } from "react";
 import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -91,4 +91,4 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
   );
 };
 
-export default BookDiscussionHeader;
+export default memo(BookDiscussionHeader);
