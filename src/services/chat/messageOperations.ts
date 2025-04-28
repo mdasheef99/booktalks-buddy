@@ -5,35 +5,66 @@ import { ensureBookExists } from './bookService';
 import { getMessageReactions } from './reactions';
 
 // ========== Chat Message Functions ==========
-export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
+interface GetBookChatResult {
+  messages: ChatMessage[];
+  hasMore: boolean;
+}
+
+export async function getBookChat(
+  bookId: string,
+  options?: {
+    limit?: number;
+    beforeTimestamp?: string;
+  }
+): Promise<GetBookChatResult> {
+  // Set default options
+  const limit = options?.limit || 30;
+  const beforeTimestamp = options?.beforeTimestamp;
+
   // Ensure we're using the original Google Books ID
   const originalId = isUuid(bookId) ? getBookDiscussionId(bookId) : bookId;
 
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(originalId);
 
-  console.log("Fetching chat for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId);
+  console.log("Fetching chat for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId,
+    "with options:", { limit, beforeTimestamp });
 
   try {
-    const { data, error } = await supabase
+    // Start building the query
+    let query = supabase
       .from('chat_messages')
-      .select('*')
-      .eq('book_id', dbBookId)
-      .order('timestamp', { ascending: true })
-      .limit(50); // Limiting to 50 messages initially as per requirement
+      .select('*', { count: 'exact' })
+      .eq('book_id', dbBookId);
+
+    // Add timestamp filter for pagination if provided
+    if (beforeTimestamp) {
+      query = query.lt('timestamp', beforeTimestamp);
+    }
+
+    // Add ordering and limit
+    query = query
+      .order('timestamp', { ascending: false }) // Descending for pagination (newest first)
+      .limit(limit + 1); // Fetch one extra to determine if there are more messages
+
+    // Execute the query
+    const { data, error, count } = await query;
 
     if (error) {
       console.error("Error fetching chat messages:", error);
       throw error;
     }
 
-    console.log("Retrieved messages:", data);
+    // Check if there are more messages
+    const hasMore = data && data.length > limit;
 
-    // Process messages to include reactions
-    const messages = data || [];
-    const currentUsername = localStorage.getItem('anon_username') ||
-                          localStorage.getItem('username') ||
-                          'Anonymous Reader';
+    // Remove the extra message if we fetched one
+    const messages = hasMore ? data.slice(0, limit) : (data || []);
+
+    // Reverse the messages to maintain ascending order (oldest first)
+    messages.reverse();
+
+    console.log("Retrieved messages:", messages.length, "hasMore:", hasMore);
 
     // Load reactions for each message
     const messagesWithReactions = await Promise.all(messages.map(async (message) => {
@@ -49,10 +80,16 @@ export async function getBookChat(bookId: string): Promise<ChatMessage[]> {
       }
     }));
 
-    return messagesWithReactions;
+    return {
+      messages: messagesWithReactions,
+      hasMore
+    };
   } catch (error) {
     console.error("Failed to load chat messages:", error);
-    return [];
+    return {
+      messages: [],
+      hasMore: false
+    };
   }
 }
 
@@ -96,9 +133,8 @@ export async function sendChatMessage(
       username,
       timestamp,
       user_id: userId || null,
-      reply_to_id: replyToId || null,
-      // Add a status field to track message state
-      status: 'sending'
+      reply_to_id: replyToId || null
+      // Status is tracked client-side only, not in the database
     };
 
     console.log("Inserting message:", newMessage);

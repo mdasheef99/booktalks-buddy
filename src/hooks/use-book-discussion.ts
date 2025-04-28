@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage, trackPresence } from "@/services/chatService";
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
@@ -16,6 +16,12 @@ export function useBookDiscussion(id: string, title: string, author: string, use
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([username]); // Current user is always online
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
+
+  // Pagination state
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
+  const [oldestMessageTimestamp, setOldestMessageTimestamp] = useState<string | null>(null);
+
   const { isOnline, isOffline, checkConnection } = useConnectionStatus();
 
   // Load chat history when component mounts
@@ -27,9 +33,20 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         setLoading(true);
         setConnectionError(false);
         console.log("Loading chat history for book:", id, "with username:", username);
-        const chatHistory = await getBookChat(id);
-        console.log("Got chat history:", chatHistory);
-        setMessages(chatHistory);
+
+        // Use the updated getBookChat function with pagination support
+        const result = await getBookChat(id, { limit: 30 });
+        console.log("Got chat history:", result);
+
+        setMessages(result.messages);
+        setHasMoreMessages(result.hasMore);
+
+        // Set the oldest message timestamp for pagination
+        if (result.messages.length > 0) {
+          setOldestMessageTimestamp(result.messages[0].timestamp);
+        } else {
+          setOldestMessageTimestamp(null);
+        }
 
         // Initialize with current user
         setOnlineUsers([username]);
@@ -87,8 +104,17 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         if (isConnected) {
           // If we're online, try to reload chat history
           console.log("Connection restored, reloading chat history");
-          const chatHistory = await getBookChat(id);
-          setMessages(chatHistory);
+          const result = await getBookChat(id, { limit: 30 });
+          setMessages(result.messages);
+          setHasMoreMessages(result.hasMore);
+
+          // Update oldest message timestamp
+          if (result.messages.length > 0) {
+            setOldestMessageTimestamp(result.messages[0].timestamp);
+          } else {
+            setOldestMessageTimestamp(null);
+          }
+
           setConnectionError(false);
           setReconnectAttempts(0);
 
@@ -265,7 +291,7 @@ export function useBookDiscussion(id: string, title: string, author: string, use
     return () => clearInterval(interval);
   }, []);
 
-  const handleSendMessage = async (message: string, replyToId?: string) => {
+  const handleSendMessage = useCallback(async (message: string, replyToId?: string) => {
     if (!id || !message.trim()) {
       console.error("Missing required data for sending message");
       return;
@@ -368,15 +394,60 @@ export function useBookDiscussion(id: string, title: string, author: string, use
 
       throw error; // Re-throw so the input component can handle it
     }
-  };
+  }, [id, username, title, author, coverUrl, isOnline, queueMessage, sendChatMessage]);
 
-  const handleReplyToMessage = (message: ChatMessage) => {
+  const handleReplyToMessage = useCallback((message: ChatMessage) => {
     setReplyTo(message);
-  };
+  }, []);
 
-  const handleCancelReply = () => {
+  const handleCancelReply = useCallback(() => {
     setReplyTo(null);
-  };
+  }, []);
+
+  // Function to load older messages (for pagination)
+  const loadOlderMessages = useCallback(async () => {
+    if (!id || !oldestMessageTimestamp || isLoadingOlderMessages || !hasMoreMessages) {
+      return;
+    }
+
+    try {
+      setIsLoadingOlderMessages(true);
+      console.log("Loading older messages before timestamp:", oldestMessageTimestamp);
+
+      const result = await getBookChat(id, {
+        limit: 20,
+        beforeTimestamp: oldestMessageTimestamp
+      });
+
+      if (result.messages.length > 0) {
+        // Prepend older messages to the existing messages
+        setMessages(prevMessages => [...result.messages, ...prevMessages]);
+
+        // Update the oldest message timestamp
+        setOldestMessageTimestamp(result.messages[0].timestamp);
+      }
+
+      // Update whether there are more messages to load
+      setHasMoreMessages(result.hasMore);
+
+    } catch (error) {
+      console.error("Error loading older messages:", error);
+
+      // Report to Sentry
+      Sentry.captureException(error, {
+        tags: { component: "BookDiscussion", action: "loadOlderMessages" },
+        extra: { bookId: id }
+      });
+
+      // Show error toast
+      toast.error("Couldn't load older messages", {
+        description: "Please try again later",
+        duration: 3000,
+      });
+    } finally {
+      setIsLoadingOlderMessages(false);
+    }
+  }, [id, oldestMessageTimestamp, isLoadingOlderMessages, hasMoreMessages]);
 
   return {
     messages,
@@ -385,8 +456,11 @@ export function useBookDiscussion(id: string, title: string, author: string, use
     replyTo,
     onlineUsers,
     pendingMessages,
+    hasMoreMessages,
+    isLoadingOlderMessages,
     handleSendMessage,
     handleReplyToMessage,
-    handleCancelReply
+    handleCancelReply,
+    loadOlderMessages
   };
 }

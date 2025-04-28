@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import { ChatMessage } from "@/services/chatService";
 import BookDiscussionChat from "@/components/books/BookDiscussionChat";
 import BookDiscussionInput from "@/components/books/BookDiscussionInput";
@@ -14,6 +14,9 @@ interface BookDiscussionContainerProps {
   onCancelReply: () => void;
   onSendMessage: (message: string, replyToId?: string) => Promise<void>;
   pendingMessages?: number;
+  hasMoreMessages?: boolean;
+  isLoadingOlderMessages?: boolean;
+  onLoadOlderMessages?: () => Promise<void>;
 }
 
 const BookDiscussionContainer: React.FC<BookDiscussionContainerProps> = ({
@@ -25,7 +28,10 @@ const BookDiscussionContainer: React.FC<BookDiscussionContainerProps> = ({
   onReplyToMessage,
   onCancelReply,
   onSendMessage,
-  pendingMessages = 0
+  pendingMessages = 0,
+  hasMoreMessages = false,
+  isLoadingOlderMessages = false,
+  onLoadOlderMessages
 }) => {
   return (
     <div
@@ -60,6 +66,9 @@ const BookDiscussionContainer: React.FC<BookDiscussionContainerProps> = ({
           loading={loading}
           currentUsername={username}
           onReplyToMessage={onReplyToMessage}
+          hasMoreMessages={hasMoreMessages}
+          isLoadingOlderMessages={isLoadingOlderMessages}
+          onLoadOlderMessages={onLoadOlderMessages}
         />
       </div>
 
@@ -75,4 +84,4 @@ const BookDiscussionContainer: React.FC<BookDiscussionContainerProps> = ({
   );
 };
 
-export default BookDiscussionContainer;
+export default memo(BookDiscussionContainer);

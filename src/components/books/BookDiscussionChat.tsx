@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import React, { useRef, useState, useEffect, useCallback, memo } from "react";
 import { ChatMessage } from "@/services/chatService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,13 +12,19 @@ interface BookDiscussionChatProps {
   loading: boolean;
   currentUsername: string;
   onReplyToMessage: (message: ChatMessage) => void;
+  hasMoreMessages?: boolean;
+  isLoadingOlderMessages?: boolean;
+  onLoadOlderMessages?: () => Promise<void>;
 }
 
 const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   messages,
   loading,
   currentUsername,
-  onReplyToMessage
+  onReplyToMessage,
+  hasMoreMessages = false,
+  isLoadingOlderMessages = false,
+  onLoadOlderMessages
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<Record<string, HTMLDivElement>>({});
@@ -52,19 +58,73 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
     }
   }, [highlightedMessageId]);
 
+  // Add scroll event listener to detect when to load older messages
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || !hasMoreMessages || !onLoadOlderMessages) return;
+
+    // Track the last scroll position to determine direction
+    let lastScrollTop = scrollContainer.scrollTop;
+
+    // Debounce function to prevent multiple rapid calls
+    let isLoading = false;
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const handleScroll = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+
+      timeoutId = setTimeout(() => {
+        // Only trigger when scrolling up (towards older messages)
+        const scrollTop = scrollContainer.scrollTop;
+        const scrollingUp = scrollTop < lastScrollTop;
+        lastScrollTop = scrollTop;
+
+        // Check if we're near the top of the scroll container
+        const isNearTop = scrollTop < 200;
+
+        if (scrollingUp && isNearTop && hasMoreMessages && !isLoadingOlderMessages && !isLoading) {
+          console.log("Near top of scroll container, loading older messages");
+          isLoading = true;
+
+          // Save current scroll height and position
+          const scrollHeight = scrollContainer.scrollHeight;
+          const scrollPosition = scrollContainer.scrollTop;
+
+          // Load older messages
+          onLoadOlderMessages().finally(() => {
+            // After loading, restore relative scroll position
+            setTimeout(() => {
+              if (scrollContainer) {
+                const newScrollHeight = scrollContainer.scrollHeight;
+                const heightDifference = newScrollHeight - scrollHeight;
+                scrollContainer.scrollTop = scrollPosition + heightDifference;
+              }
+              isLoading = false;
+            }, 100);
+          });
+        }
+      }, 200); // 200ms debounce
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      scrollContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMoreMessages, isLoadingOlderMessages, onLoadOlderMessages]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0 && scrollContainerRef.current) {
       scrollToBottom();
     }
-  }, [messages.length, scrollToBottom]);
+  }, [messages.length]);
 
-  // Memoize the scrollToMessage function to prevent unnecessary re-renders
   const scrollToMessage = useCallback((messageId: string) => {
     setHighlightedMessageId(messageId);
   }, []);
 
-  // Memoize the findOriginalMessage function
   const findOriginalMessage = useCallback((replyToId?: string): ChatMessage | undefined => {
     if (!replyToId) return undefined;
     return messages.find(message => message.id === replyToId);
@@ -103,32 +163,36 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
           style={{ scrollBehavior: 'smooth' }}
         >
           <div className="space-y-1">
-            {useMemo(() =>
-              messages.map((message) => {
-                const isCurrentUser = message.username === currentUsername;
-                const originalMessage = findOriginalMessage(message.reply_to_id);
-
-                return (
-                  <MessageItem
-                    key={`${message.id}-${message.timestamp}`}
-                    message={message}
-                    isCurrentUser={isCurrentUser}
-                    currentUsername={currentUsername}
-                    originalMessage={originalMessage}
-                    onReplyToMessage={onReplyToMessage}
-                    onScrollToMessage={scrollToMessage}
-                    isMobile={isMobile}
-                    setRef={el => {
-                      if (el) {
-                        messageRefs.current[message.id] = el;
-                      }
-                    }}
-                  />
-                );
-              }),
-              // Only re-render the message list when these dependencies change
-              [messages, currentUsername, findOriginalMessage, onReplyToMessage, scrollToMessage, isMobile]
+            {/* Loading indicator for older messages */}
+            {isLoadingOlderMessages && (
+              <div className="flex justify-center py-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-bookconnect-terracotta"></div>
+              </div>
             )}
+
+            {/* Message list */}
+            {messages.map((message) => {
+              const isCurrentUser = message.username === currentUsername;
+              const originalMessage = findOriginalMessage(message.reply_to_id);
+
+              return (
+                <MessageItem
+                  key={`${message.id}-${message.timestamp}`}
+                  message={message}
+                  isCurrentUser={isCurrentUser}
+                  currentUsername={currentUsername}
+                  originalMessage={originalMessage}
+                  onReplyToMessage={onReplyToMessage}
+                  onScrollToMessage={scrollToMessage}
+                  isMobile={isMobile}
+                  setRef={el => {
+                    if (el) {
+                      messageRefs.current[message.id] = el;
+                    }
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
 
@@ -143,4 +207,4 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
   );
 };
 
-export default BookDiscussionChat;
+export default memo(BookDiscussionChat);
