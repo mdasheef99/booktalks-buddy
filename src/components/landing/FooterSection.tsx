@@ -5,10 +5,9 @@ import { useNavigate } from "react-router-dom";
 interface FooterSectionProps {
   handleEventsClick: () => void;
   handleBookClubsClick: () => void;
-  handleAdminClick: () => void;
 }
 
-const FooterSection = ({ handleEventsClick, handleBookClubsClick, handleAdminClick }: FooterSectionProps) => {
+const FooterSection = ({ handleEventsClick, handleBookClubsClick }: FooterSectionProps) => {
   return (
     <footer className="bg-bookconnect-brown text-white pt-16 pb-8">
       <div className="container mx-auto px-6">
@@ -65,9 +64,9 @@ const FooterSection = ({ handleEventsClick, handleBookClubsClick, handleAdminCli
               Stay updated with the latest literary events and book recommendations.
             </p>
             <div className="flex">
-              <input 
-                type="email" 
-                placeholder="Your email address" 
+              <input
+                type="email"
+                placeholder="Your email address"
                 className="bg-white/10 border border-white/20 text-white placeholder:text-white/50 py-2 px-4 rounded-l-md w-full focus:outline-none focus:ring-1 focus:ring-bookconnect-terracotta"
               />
               <button className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta text-white py-2 px-4 rounded-r-md transition-colors">
@@ -76,7 +75,7 @@ const FooterSection = ({ handleEventsClick, handleBookClubsClick, handleAdminCli
             </div>
           </div>
         </div>
-        
+
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <p className="text-sm text-white/70">
@@ -93,12 +92,6 @@ const FooterSection = ({ handleEventsClick, handleBookClubsClick, handleAdminCli
             <a href="#" className="text-sm text-white/70 hover:text-white transition-colors">
               Contact
             </a>
-            <button 
-              onClick={handleAdminClick}
-              className="text-xs text-white/50 hover:text-white/70 transition-colors"
-            >
-              Admin
-            </button>
           </div>
         </div>
       </div>

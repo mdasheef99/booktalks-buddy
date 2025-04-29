@@ -36,7 +36,6 @@ import ReplyForm from "./components/discussions/ReplyForm";
 import BookClubMembers from "./components/admin/BookClubMembers";
 import BookClubSettings from "./components/admin/BookClubSettings";
 import Events from "./pages/Events";
-import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";

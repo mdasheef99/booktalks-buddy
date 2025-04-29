@@ -23,9 +23,9 @@ export const useClubMembership = (clubId: string | undefined, clubPrivacy?: stri
       if (onStatusChange) {
         onStatusChange();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error joining club:', error);
-      toast.error('Failed to join club. Please try again.');
+      toast.error(error.message || 'Failed to join club. Please try again.');
     } finally {
       setActionInProgress(false);
     }
@@ -43,9 +43,9 @@ export const useClubMembership = (clubId: string | undefined, clubPrivacy?: stri
       if (onStatusChange) {
         onStatusChange();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error cancelling request:', error);
-      toast.error('Failed to cancel request. Please try again.');
+      toast.error(error.message || 'Failed to cancel request. Please try again.');
     } finally {
       setActionInProgress(false);
     }
@@ -67,9 +67,9 @@ export const useClubMembership = (clubId: string | undefined, clubPrivacy?: stri
 
       toast.success('You have left the book club');
       navigate('/book-club');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error leaving club:', error);
-      toast.error('Failed to leave the club. Please try again.');
+      toast.error(error.message || 'Failed to leave the club. Please try again.');
       setShowLeaveConfirm(false);
     } finally {
       setActionInProgress(false);

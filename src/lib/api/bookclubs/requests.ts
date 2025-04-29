@@ -14,7 +14,7 @@ export async function getPendingJoinRequests() {
       .order('joined_at', { ascending: false });
 
     if (requestError) throw requestError;
-    
+
     if (!pendingRequests || pendingRequests.length === 0) {
       return [];
     }
@@ -41,7 +41,7 @@ export async function getPendingJoinRequests() {
     const enrichedRequests = pendingRequests.map(request => {
       const club = clubs?.find(c => c.id === request.club_id);
       const user = users?.find(u => u.id === request.user_id);
-      
+
       return {
         ...request,
         club_name: club?.name,
@@ -50,9 +50,16 @@ export async function getPendingJoinRequests() {
     });
 
     return enrichedRequests;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[getPendingJoinRequests] Error:', error);
-    throw error;
+
+    if (error.code === '42501') {
+      throw new Error('You don\'t have permission to view join requests');
+    } else if (error.message) {
+      throw new Error(`Failed to load join requests: ${error.message}`);
+    } else {
+      throw new Error('Failed to load join requests. Please try again later.');
+    }
   }
 }
 
@@ -65,7 +72,7 @@ export async function getPendingJoinRequests() {
 export async function approveJoinRequest(userId: string, clubId: string) {
   try {
     // Check if the request exists and is pending
-    const { data: existingRequest, error: checkError } = await supabase
+    const { error: checkError } = await supabase
       .from('club_members')
       .select('role')
       .eq('user_id', userId)
@@ -91,9 +98,16 @@ export async function approveJoinRequest(userId: string, clubId: string) {
     if (updateError) throw updateError;
 
     return { success: true, message: 'Request approved successfully' };
-  } catch (error) {
+  } catch (error: any) {
     console.error('[approveJoinRequest] Error:', error);
-    throw error;
+
+    if (error.code === '42501') {
+      throw new Error('You don\'t have permission to approve join requests');
+    } else if (error.message) {
+      throw new Error(`Failed to approve request: ${error.message}`);
+    } else {
+      throw new Error('Failed to approve request. Please try again later.');
+    }
   }
 }
 
@@ -106,7 +120,7 @@ export async function approveJoinRequest(userId: string, clubId: string) {
 export async function denyJoinRequest(userId: string, clubId: string) {
   try {
     // Check if the request exists and is pending
-    const { data: existingRequest, error: checkError } = await supabase
+    const { error: checkError } = await supabase
       .from('club_members')
       .select('role')
       .eq('user_id', userId)
@@ -132,8 +146,15 @@ export async function denyJoinRequest(userId: string, clubId: string) {
     if (deleteError) throw deleteError;
 
     return { success: true, message: 'Request denied successfully' };
-  } catch (error) {
+  } catch (error: any) {
     console.error('[denyJoinRequest] Error:', error);
-    throw error;
+
+    if (error.code === '42501') {
+      throw new Error('You don\'t have permission to deny join requests');
+    } else if (error.message) {
+      throw new Error(`Failed to deny request: ${error.message}`);
+    } else {
+      throw new Error('Failed to deny request. Please try again later.');
+    }
   }
 }

@@ -38,27 +38,32 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
 
   return (
     <>
-      <Button
-        variant="ghost"
-        onClick={() => {
-          // Always navigate directly to the book clubs list
-          // This ensures consistent behavior regardless of navigation history
-          navigate('/book-club', {
-            state: { fromClubDetails: true }
-          });
-        }}
-        className="mb-4"
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Book Clubs
-      </Button>
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          onClick={() => {
+            // Always navigate directly to the book clubs list
+            // This ensures consistent behavior regardless of navigation history
+            navigate('/book-club', {
+              state: { fromClubDetails: true }
+            });
+          }}
+          className="rounded-lg border border-bookconnect-brown/10 shadow-sm hover:shadow transition-all duration-200 bg-white/80 hover:bg-white"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2 text-bookconnect-brown" />
+          <span className="text-bookconnect-brown font-medium">Back to Book Clubs</span>
+        </Button>
+      </div>
 
       {/* Navigation buttons - only show for members */}
       {isMember && (
-        <div className="flex justify-center space-x-4 mb-4">
+        <div className="flex flex-wrap justify-center gap-3 mb-6 bg-white/80 p-4 rounded-xl shadow-sm border border-bookconnect-brown/10">
           {/* Only show Members Management to admins */}
           {isAdmin && (
-            <Button onClick={() => navigate(`/book-club/${clubId}/members`)}>
+            <Button
+              onClick={() => navigate(`/book-club/${clubId}/members`)}
+              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 transition-all duration-200 shadow-sm hover:shadow"
+            >
               Members Management
             </Button>
           )}
@@ -66,15 +71,15 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
             <Button
               variant="outline"
               onClick={() => setShowLeaveConfirm(true)}
-              className="border-red-200 text-red-600 hover:bg-red-50"
+              className="border-red-200 text-red-600 hover:bg-red-50 transition-all duration-200 shadow-sm hover:shadow"
             >
               Leave Club
             </Button>
           )}
           <Button
             onClick={handleLogout}
-            variant="destructive"
-            className="bg-bookconnect-brown hover:bg-bookconnect-brown/80 text-white"
+            variant="outline"
+            className="border-bookconnect-brown/20 text-bookconnect-brown hover:bg-bookconnect-brown/5 transition-all duration-200 shadow-sm hover:shadow"
           >
             <LogOut className="h-4 w-4 mr-2" /> Logout
           </Button>

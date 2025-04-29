@@ -46,9 +46,7 @@ export function useTrendingBooks(genre: string, maxResults: number = 5) {
       }));
     },
     enabled: !!genre.trim(),
-    staleTime: 1000 * 60 * 30, // 30 minutes
-    cacheTime: 1000 * 60 * 60, // 60 minutes
-    retry: 2, // Retry failed requests twice
+    staleTime: 1000 * 60 * 10, // 10 minutes
     meta: {
       onError: (error: Error) => {
         Sentry.captureException(error, {

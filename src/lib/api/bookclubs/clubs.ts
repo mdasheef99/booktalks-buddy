@@ -144,11 +144,12 @@ export async function deleteBookClub(userId: string, clubId: string) {
 export async function listBookClubs(userId: string) {
   console.log('[listBookClubs] called with userId:', userId);
 
-  // First, get club IDs where user is a member
+  // First, get club IDs where user is a member (excluding pending requests)
   const { data: memberData, error: memberError } = await supabase
     .from('club_members')
     .select('club_id')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .not('role', 'eq', 'pending');
 
   console.log('[listBookClubs] memberData:', memberData, 'memberError:', memberError);
 

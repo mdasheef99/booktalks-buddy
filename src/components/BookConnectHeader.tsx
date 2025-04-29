@@ -1,8 +1,8 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { UserRound } from "lucide-react";
 import { ProfileDialog } from "./profile";
+import { Button } from "./ui/button";
 
 interface BookConnectHeaderProps {
   externalProfileDialog?: {
@@ -25,7 +25,21 @@ const BookConnectHeader: React.FC<BookConnectHeaderProps> = ({ externalProfileDi
           <span className="font-serif text-2xl font-bold text-bookconnect-brown">BookConnect</span>
         </Link>
 
-        {/* Profile icon and dialog removed for authenticated Book Club */}
+        {/* Profile icon button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setProfileOpen(true)}
+          className="rounded-full hover:bg-bookconnect-terracotta/10 text-bookconnect-brown"
+          aria-label="Open profile"
+        >
+          <UserRound className="h-5 w-5" />
+        </Button>
+
+        {/* Profile dialog - controlled by external state if provided */}
+        {!externalProfileDialog && (
+          <ProfileDialog open={profileOpen} onClose={() => setProfileOpen(false)} />
+        )}
       </div>
     </div>
   );

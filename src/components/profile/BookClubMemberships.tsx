@@ -9,11 +9,13 @@ import { useAuth } from '@/contexts/AuthContext';
 interface BookClubMembershipsProps {
   memberships: ClubMembership[];
   loading: boolean;
+  isCurrentUser?: boolean;
 }
 
 const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
   memberships,
-  loading
+  loading,
+  isCurrentUser = false
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -58,7 +60,7 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
             <Users className="h-5 w-5 text-bookconnect-terracotta" />
             Book Club Memberships
           </CardTitle>
-          {user && (
+          {user && isCurrentUser && (
             <Button
               size="sm"
               disabled
@@ -91,11 +93,11 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
           <Users className="h-5 w-5 text-bookconnect-terracotta" />
           Book Club Memberships
         </CardTitle>
-        {user && (
+        {user && isCurrentUser && (
           <Button
             size="sm"
             onClick={() => navigate('/book-club/new')}
-            className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+            className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 shadow-sm"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create New Club
@@ -130,7 +132,7 @@ const BookClubMemberships: React.FC<BookClubMembershipsProps> = ({
                 </div>
 
                 {membership.current_book && (
-                  <div className="mt-3 flex items-start gap-3 bg-gray-50 p-3 rounded-md">
+                  <div className="mt-3 flex items-start gap-3 bg-bookconnect-cream/30 p-3 rounded-md shadow-sm">
                     {membership.current_book.cover_url ? (
                       <img
                         src={membership.current_book.cover_url}

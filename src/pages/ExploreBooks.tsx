@@ -128,6 +128,11 @@ const ExploreBooks: React.FC = () => {
           setOpen: setShowProfileDialog,
         }}
       />
+      {/* Render the ProfileDialog component */}
+      <ProfileDialog
+        open={showProfileDialog}
+        onClose={() => setShowProfileDialog(false)}
+      />
         <NewExploreContainer>
           <NewExploreHeader genres={genres} primaryGenre={primaryGenre} />
 

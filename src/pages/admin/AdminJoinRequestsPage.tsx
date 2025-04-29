@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { useLoadProfiles } from '@/contexts/UserProfileContext';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -26,6 +29,7 @@ const AdminJoinRequestsPage: React.FC = () => {
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingRequests, setProcessingRequests] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
 
   // Use our custom hook for filtering and sorting
   const {
@@ -51,9 +55,9 @@ const AdminJoinRequestsPage: React.FC = () => {
         setLoading(true);
         const enrichedRequests = await getPendingJoinRequests();
         setRequests(enrichedRequests);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching join requests:', error);
-        toast.error('Failed to load join requests');
+        toast.error(error.message || 'Failed to load join requests');
       } finally {
         setLoading(false);
       }
@@ -99,9 +103,9 @@ const AdminJoinRequestsPage: React.FC = () => {
 
       // Update local state
       setRequests(prev => prev.filter(req => !(req.user_id === userId && req.club_id === clubId)));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error handling join request:', error);
-      toast.error(`Failed to ${approve ? 'approve' : 'reject'} request. Please try again.`);
+      toast.error(error.message || `Failed to ${approve ? 'approve' : 'reject'} request. Please try again.`);
     } finally {
       // Clear processing state
       setProcessingRequests(prev => ({ ...prev, [requestKey]: false }));
@@ -125,6 +129,15 @@ const AdminJoinRequestsPage: React.FC = () => {
 
   return (
     <div>
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/admin/dashboard')}
+        className="mb-4 flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+
       <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">Join Requests</h1>
 
       {/* Sorting and Filtering Controls */}

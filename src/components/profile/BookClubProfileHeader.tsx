@@ -174,7 +174,7 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
             {/* Reading preferences */}
             {profile.favorite_genres && profile.favorite_genres.length > 0 && (
               <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Reading Preferences</h3>
+                <h3 className="text-sm font-medium text-gray-600 mb-1">Favorite Genres</h3>
                 <div className="flex flex-wrap gap-2">
                   {profile.favorite_genres.map((genre, index) => (
                     <span
@@ -182,6 +182,23 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
                       className="px-2 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm"
                     >
                       {genre}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Favorite Authors */}
+            {profile.favorite_authors && profile.favorite_authors.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-medium text-gray-600 mb-1">Favorite Authors</h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.favorite_authors.map((author, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm"
+                    >
+                      {author}
                     </span>
                   ))}
                 </div>

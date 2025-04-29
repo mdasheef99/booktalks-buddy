@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, Users, MessageSquare } from 'lucide-react';
+import { Plus, Settings, Users, MessageSquare, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,16 +73,25 @@ const AdminClubManagementPage: React.FC = () => {
 
   return (
     <div>
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/admin/dashboard')}
+        className="mb-4 flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+
       <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">Book Club Management</h1>
-      
-      <Button 
-        onClick={handleCreateClub} 
+
+      <Button
+        onClick={handleCreateClub}
         className="mb-6 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
       >
         <Plus className="h-4 w-4 mr-2" />
         Create New Club
       </Button>
-      
+
       <div className="space-y-4">
         {clubs.length > 0 ? (
           clubs.map((club) => (
@@ -103,26 +112,26 @@ const AdminClubManagementPage: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => handleViewMembers(club.id)}
                     >
                       <Users className="h-4 w-4 mr-1" />
                       Members
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => handleViewDiscussions(club.id)}
                     >
                       <MessageSquare className="h-4 w-4 mr-1" />
                       Discussions
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => handleEditClub(club.id)}
                     >
@@ -138,8 +147,8 @@ const AdminClubManagementPage: React.FC = () => {
           <Card>
             <CardContent className="p-6 text-center">
               <p className="text-muted-foreground">No book clubs found</p>
-              <Button 
-                onClick={handleCreateClub} 
+              <Button
+                onClick={handleCreateClub}
                 className="mt-4 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
               >
                 <Plus className="h-4 w-4 mr-2" />

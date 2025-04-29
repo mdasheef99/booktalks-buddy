@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Users, BookOpen, MessageSquare } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BarChart, Users, BookOpen, MessageSquare, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const AdminDashboardPage: React.FC = () => {
@@ -10,6 +12,7 @@ const AdminDashboardPage: React.FC = () => {
     totalDiscussions: 0
   });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -67,8 +70,17 @@ const AdminDashboardPage: React.FC = () => {
 
   return (
     <div>
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/book-club')}
+        className="mb-4 flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Book Clubs
+      </Button>
+
       <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">Dashboard</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader className="pb-2">
@@ -81,7 +93,7 @@ const AdminDashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">Total Members</CardTitle>
@@ -93,7 +105,7 @@ const AdminDashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">Total Discussions</CardTitle>
@@ -106,7 +118,7 @@ const AdminDashboardPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Recent Activity</CardTitle>

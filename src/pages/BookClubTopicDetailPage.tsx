@@ -197,7 +197,8 @@ const BookClubTopicDetailPage: React.FC = () => {
 
           <div className="space-y-4 mb-8">
             {posts.length > 0 ? (
-              posts.map((post) => (
+              // Only map through top-level posts (those with parent_post_id === null)
+              posts.filter(post => post.parent_post_id === null).map((post) => (
                 <Card key={post.id} className="p-4">
                   <div className="flex justify-between items-start">
                     <div className="w-full">
@@ -208,16 +209,14 @@ const BookClubTopicDetailPage: React.FC = () => {
                             <UserName userId={post.user_id} linkToProfile /> • {new Date(post.created_at).toLocaleString()}
                           </p>
                         </div>
-                        {!post.parent_post_id && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
-                          >
-                            <Reply className="h-4 w-4 mr-1" />
-                            Reply
-                          </Button>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
+                        >
+                          <Reply className="h-4 w-4 mr-1" />
+                          Reply
+                        </Button>
                       </div>
                       <p className="mt-2">{post.content}</p>
 

@@ -142,9 +142,27 @@ export async function joinOrRequestClub(userId: string, clubId: string) {
       : 'Request to join sent successfully';
 
     return { success: true, message };
-  } catch (error) {
+  } catch (error: any) {
     console.error('[joinOrRequestClub] Error:', error);
-    throw error;
+
+    // Provide more specific error messages based on error type
+    if (error.code === '23505') {
+      // Unique constraint violation - user might already have a membership record
+      throw new Error('You already have a relationship with this club');
+    } else if (error.code === '23503') {
+      // Foreign key constraint violation
+      throw new Error('Invalid club or user ID');
+    } else if (error.code === '42501') {
+      // Permission denied (RLS policy violation)
+      throw new Error('You don\'t have permission to join this club');
+    } else if (error.code === '23514') {
+      // Check constraint violation
+      throw new Error('Invalid role type for club membership');
+    } else if (error.message) {
+      throw new Error(`Failed to join club: ${error.message}`);
+    } else {
+      throw new Error('Failed to join club. Please try again later.');
+    }
   }
 }
 
@@ -183,8 +201,17 @@ export async function cancelJoinRequest(userId: string, clubId: string) {
     if (deleteError) throw deleteError;
 
     return { success: true, message: 'Join request cancelled successfully' };
-  } catch (error) {
+  } catch (error: any) {
     console.error('[cancelJoinRequest] Error:', error);
-    throw error;
+
+    // Provide more specific error messages based on error type
+    if (error.code === '42501') {
+      // Permission denied (RLS policy violation)
+      throw new Error('You don\'t have permission to cancel this request');
+    } else if (error.message) {
+      throw new Error(`Failed to cancel request: ${error.message}`);
+    } else {
+      throw new Error('Failed to cancel request. Please try again later.');
+    }
   }
 }

@@ -5,8 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { BookClubProfile, updateBookClubProfile } from '@/lib/api/profile';
+import { syncUserProfileToDatabase } from '@/lib/syncUserProfile';
 import { Settings, X, Plus, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
+import SyncProfilesButton from '@/components/admin/SyncProfilesButton';
 
 interface BookClubProfileSettingsProps {
   profile: BookClubProfile;
@@ -65,31 +68,37 @@ const BookClubProfileSettings: React.FC<BookClubProfileSettingsProps> = ({
     setSaving(true);
 
     try {
-      // Since we're using a simplified profile approach, we'll just update the local state
-      // and notify the parent component
-      const updatedProfile = {
-        ...profile,
+      // First, update the auth metadata
+      const { error: authError } = await supabase.auth.updateUser({
+        data: {
+          bio,
+          favorite_genres: favoriteGenres,
+          favorite_authors: favoriteAuthors
+        }
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      // Then, update the users table
+      const updatedProfile = await updateBookClubProfile(profile.id, {
         username,
         bio,
         favorite_genres: favoriteGenres,
         favorite_authors: favoriteAuthors
-      };
+      });
 
-      // In a real implementation, we would call the API here
-      // await updateBookClubProfile(profile.id, { ... });
+      // Also sync the data to the users table for other users to see
+      await syncUserProfileToDatabase(profile.id);
 
-      // For now, just simulate a successful update
-      setTimeout(() => {
-        toast.success('Profile updated successfully');
-        // Pass the updated profile back to the parent
-        onProfileUpdated();
-        setSaving(false);
-      }, 500);
-
-      return;
+      toast.success('Profile updated successfully');
+      // Pass the updated profile back to the parent
+      onProfileUpdated();
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
+    } finally {
       setSaving(false);
     }
   };
@@ -204,13 +213,16 @@ const BookClubProfileSettings: React.FC<BookClubProfileSettingsProps> = ({
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+            <SyncProfilesButton />
+          </div>
           <Button
             type="submit"
             disabled={saving}

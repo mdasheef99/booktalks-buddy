@@ -51,10 +51,6 @@ const Landing = () => {
     navigate("/events");
   };
 
-  const handleAdminClick = () => {
-    navigate("/admin-dashboard");
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
@@ -82,34 +78,33 @@ const Landing = () => {
       <EventsSection handleEventsClick={handleEventsClick} />
 
       {/* Book Clubs Section */}
-      <BookClubsSection 
-        handleBookClubClick={handleBookClubClick} 
-        handleBookClubsClick={handleBookClubsClick} 
+      <BookClubsSection
+        handleBookClubClick={handleBookClubClick}
+        handleBookClubsClick={handleBookClubsClick}
       />
 
       {/* Quote Section */}
       <QuoteSection />
 
       {/* Footer Section */}
-      <FooterSection 
+      <FooterSection
         handleEventsClick={handleEventsClick}
         handleBookClubsClick={handleBookClubsClick}
-        handleAdminClick={handleAdminClick}
       />
 
       {/* Dialogs */}
-      <UsernameDialog 
-        open={usernameDialogOpen} 
+      <UsernameDialog
+        open={usernameDialogOpen}
         onOpenChange={setUsernameDialogOpen}
         onComplete={handleUsernameComplete}
       />
-      
-      <GenreDialog 
-        open={genreDialogOpen} 
+
+      <GenreDialog
+        open={genreDialogOpen}
         onOpenChange={setGenreDialogOpen}
         username={currentUsername}
       />
-      
+
       <LoginDialog
         open={loginDialogOpen}
         onOpenChange={setLoginDialogOpen}

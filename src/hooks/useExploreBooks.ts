@@ -65,8 +65,6 @@ export function useExploreBooks() {
     queryKey: ["bookSearch", searchQuery],
     queryFn: () => fetchBooksByQuery(searchQuery, 8),
     enabled: searchQuery.length > 0,
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    cacheTime: 1000 * 60 * 30, // 30 minutes
     meta: {
       onError: (error: Error) => {
         Sentry.captureException(error, {
@@ -93,8 +91,6 @@ export function useExploreBooks() {
   } = useQuery({
     queryKey: ["trendingBooks", primaryGenre],
     queryFn: () => fetchTrendingBooks(primaryGenre, 5),
-    staleTime: 1000 * 60 * 30, // 30 minutes
-    cacheTime: 1000 * 60 * 60, // 60 minutes
     meta: {
       onError: (error: Error) => {
         Sentry.captureException(error, {
@@ -122,8 +118,7 @@ export function useExploreBooks() {
   } = useQuery({
     queryKey: ["discussedBooks", lastDiscussionTime],
     queryFn: () => fetchRecentlyDiscussedBooks(6),
-    staleTime: 30000, // 30 seconds
-    cacheTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 15000,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     meta: {

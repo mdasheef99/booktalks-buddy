@@ -13,8 +13,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-const MainNavigation: React.FC = () => {
+interface MainNavigationProps {
+  collapsed?: boolean;
+}
+
+const MainNavigation: React.FC<MainNavigationProps> = ({ collapsed = false }) => {
   const { user, signOut, clubRoles } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = React.useState(false);
@@ -32,108 +37,97 @@ const MainNavigation: React.FC = () => {
     await signOut();
   };
 
+  // Helper function to render nav links with tooltips when collapsed
+  const renderNavLink = (to: string, icon: React.ReactNode, label: string) => {
+    const linkContent = (isActive: boolean) => (
+      <div className={`
+        flex items-center p-2 rounded-lg
+        ${isActive
+          ? 'bg-bookconnect-brown/15 text-bookconnect-brown shadow-sm border border-bookconnect-brown/10'
+          : 'text-gray-700 hover:bg-bookconnect-brown/5 hover:border hover:border-bookconnect-brown/5'}
+        ${collapsed ? 'justify-center' : ''}
+        transition-all duration-200
+      `}>
+        <div className={`${isActive ? 'text-bookconnect-brown' : 'text-bookconnect-brown/70'}`}>
+          {icon}
+        </div>
+        {!collapsed && <span className={`ml-3 font-medium ${isActive ? 'text-bookconnect-brown' : 'text-gray-700'}`}>{label}</span>}
+      </div>
+    );
+
+    return collapsed ? (
+      <TooltipProvider key={to}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <NavLink to={to} className={({ isActive }) => linkContent(isActive)}>
+              {({ isActive }) => linkContent(isActive)}
+            </NavLink>
+          </TooltipTrigger>
+          <TooltipContent side="right">{label}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ) : (
+      <NavLink key={to} to={to} className={({ isActive }) => linkContent(isActive)}>
+        {({ isActive }) => linkContent(isActive)}
+      </NavLink>
+    );
+  };
+
   return (
     <nav className="flex flex-col h-full">
       <div className="space-y-1 flex-1">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg ${isActive
-              ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-              : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-          }
-        >
-          <Home className="h-5 w-5 mr-3" />
-          Home
-        </NavLink>
-
-        <NavLink
-          to="/books"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg ${isActive
-              ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-              : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-          }
-        >
-          <BookOpen className="h-5 w-5 mr-3" />
-          Books
-        </NavLink>
-
-        <NavLink
-          to="/book-club"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg ${isActive
-              ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-              : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-          }
-        >
-          <Users className="h-5 w-5 mr-3" />
-          Book Clubs
-        </NavLink>
-
-        <NavLink
-          to="/events"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg ${isActive
-              ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-              : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-          }
-        >
-          <Calendar className="h-5 w-5 mr-3" />
-          Events
-        </NavLink>
-
-        <NavLink
-          to="/search"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg ${isActive
-              ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-              : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-          }
-        >
-          <SearchIcon className="h-5 w-5 mr-3" />
-          Search
-        </NavLink>
+        {renderNavLink("/", <Home className="h-5 w-5" />, "Home")}
+        {renderNavLink("/books", <BookOpen className="h-5 w-5" />, "Books")}
+        {renderNavLink("/book-club", <Users className="h-5 w-5" />, "Book Clubs")}
+        {renderNavLink("/events", <Calendar className="h-5 w-5" />, "Events")}
+        {renderNavLink("/search", <SearchIcon className="h-5 w-5" />, "Search")}
       </div>
 
       {user && (
         <div className="pt-4 border-t border-gray-200 space-y-1">
-          <NavLink
-            to="/profile"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${isActive
-                ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-                : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-            }
-          >
-            <User className="h-5 w-5 mr-3" />
-            Profile
-          </NavLink>
+          {renderNavLink("/profile", <User className="h-5 w-5" />, "Profile")}
 
-          {isAdmin && (
-            <NavLink
-              to="/admin/dashboard"
-              className={({ isActive }) =>
-                `flex items-center p-2 rounded-lg ${isActive
-                  ? 'bg-bookconnect-brown/10 text-bookconnect-brown'
-                  : 'text-gray-700 hover:bg-bookconnect-brown/5'}`
-              }
+          {isAdmin && renderNavLink("/admin/dashboard", <Settings className="h-5 w-5" />, "Admin Panel")}
+
+          {collapsed ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleLogout}
+                    variant="ghost"
+                    className={`
+                      w-full p-2 rounded-lg
+                      text-bookconnect-brown/70 hover:text-bookconnect-brown
+                      hover:bg-bookconnect-brown/5 hover:border hover:border-bookconnect-brown/5
+                      transition-all duration-200
+                      ${collapsed ? 'justify-center' : 'justify-start'}
+                    `}
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Logout</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className="
+                w-full justify-start p-2 rounded-lg
+                font-medium text-gray-700
+                hover:bg-bookconnect-brown/5 hover:text-bookconnect-brown
+                hover:border hover:border-bookconnect-brown/5
+                transition-all duration-200
+              "
             >
-              <Settings className="h-5 w-5 mr-3" />
-              Admin Panel
-            </NavLink>
+              <div className="text-bookconnect-brown/70">
+                <LogOut className="h-5 w-5 mr-3" />
+              </div>
+              Logout
+            </Button>
           )}
-
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="flex items-center p-2 rounded-lg w-full justify-start text-gray-700 hover:bg-bookconnect-brown/5"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
-          </Button>
-
-
         </div>
       )}
     </nav>

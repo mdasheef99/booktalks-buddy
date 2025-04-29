@@ -93,9 +93,10 @@ const BookClubDiscoveryPage: React.FC = () => {
             : club
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error joining club:', error);
-      toast.error('Failed to join club. Please try again.');
+      // Display the specific error message from the API
+      toast.error(error.message || 'Failed to join club. Please try again.');
     } finally {
       setActionInProgress(null);
     }
@@ -116,9 +117,10 @@ const BookClubDiscoveryPage: React.FC = () => {
           club.id === clubId ? { ...club, user_status: 'not-member' } : club
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error cancelling request:', error);
-      toast.error('Failed to cancel request. Please try again.');
+      // Display the specific error message from the API
+      toast.error(error.message || 'Failed to cancel request. Please try again.');
     } finally {
       setActionInProgress(null);
     }

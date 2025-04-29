@@ -77,43 +77,55 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
 
       <div className="space-y-8">
         {/* Club Header */}
-        <ClubHeader
-          club={club}
-          isAdmin={isAdmin}
-          isMember={isMember}
-          isPending={isPending}
-          clubId={clubId || ''}
-          actionInProgress={actionInProgress}
-          handleJoinClub={handleJoinClub}
-          handleCancelRequest={handleCancelRequest}
-        />
+        <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+          <ClubHeader
+            club={club}
+            isAdmin={isAdmin}
+            isMember={isMember}
+            isPending={isPending}
+            clubId={clubId || ''}
+            actionInProgress={actionInProgress}
+            handleJoinClub={handleJoinClub}
+            handleCancelRequest={handleCancelRequest}
+          />
+        </div>
 
         {/* Current Book */}
-        <CurrentBookSection currentBook={currentBook} />
+        <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+          <CurrentBookSection currentBook={currentBook} />
+        </div>
 
         {/* Members */}
-        <MembersSection members={members} />
+        <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+          <MembersSection members={members} />
+        </div>
 
         {/* Discussion Topics - Only show for members */}
         {isMember && (
-          <DiscussionsSection topics={topics} clubId={clubId || ''} />
+          <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+            <DiscussionsSection topics={topics} clubId={clubId || ''} />
+          </div>
         )}
 
         {/* Join message for non-members */}
         {!isMember && !isPending && (
-          <JoinClubSection
-            clubPrivacy={club.privacy || 'public'}
-            actionInProgress={actionInProgress}
-            handleJoinClub={handleJoinClub}
-          />
+          <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+            <JoinClubSection
+              clubPrivacy={club.privacy || 'public'}
+              actionInProgress={actionInProgress}
+              handleJoinClub={handleJoinClub}
+            />
+          </div>
         )}
 
         {/* Pending message */}
         {isPending && (
-          <PendingMembershipSection
-            actionInProgress={actionInProgress}
-            handleCancelRequest={handleCancelRequest}
-          />
+          <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+            <PendingMembershipSection
+              actionInProgress={actionInProgress}
+              handleCancelRequest={handleCancelRequest}
+            />
+          </div>
         )}
       </div>
 

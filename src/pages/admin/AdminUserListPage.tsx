@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Mail, UserPlus } from 'lucide-react';
+import { Search, Mail, UserPlus, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 
@@ -21,6 +22,7 @@ const AdminUserListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
   const [showInviteForm, setShowInviteForm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -46,7 +48,7 @@ const AdminUserListPage: React.FC = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      const filtered = users.filter(user => 
+      const filtered = users.filter(user =>
         (user.username && user.username.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (user.email && user.email.toLowerCase().includes(searchQuery.toLowerCase()))
       );
@@ -62,7 +64,7 @@ const AdminUserListPage: React.FC = () => {
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!inviteEmail) {
       toast.error('Please enter an email address');
       return;
@@ -96,8 +98,17 @@ const AdminUserListPage: React.FC = () => {
 
   return (
     <div>
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/admin/dashboard')}
+        className="mb-4 flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+
       <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">User Management</h1>
-      
+
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -108,8 +119,8 @@ const AdminUserListPage: React.FC = () => {
             onChange={handleSearch}
           />
         </div>
-        
-        <Button 
+
+        <Button
           onClick={() => setShowInviteForm(!showInviteForm)}
           className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
         >
@@ -117,7 +128,7 @@ const AdminUserListPage: React.FC = () => {
           Invite User
         </Button>
       </div>
-      
+
       {showInviteForm && (
         <Card className="mb-6">
           <CardContent className="p-6">
@@ -134,9 +145,9 @@ const AdminUserListPage: React.FC = () => {
                 />
               </div>
               <Button type="submit">Send Invite</Button>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setShowInviteForm(false)}
               >
                 Cancel
@@ -145,7 +156,7 @@ const AdminUserListPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
-      
+
       <div className="space-y-4">
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
@@ -168,7 +179,7 @@ const AdminUserListPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm">
                       View Profile

@@ -39,7 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase
         .from('club_members')
         .select('club_id, role')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .not('role', 'eq', 'pending');
 
       if (error) {
         toast.error('Failed to load club membership data');
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isMember = (clubId: string) => {
-    return clubRoles.hasOwnProperty(clubId);
+    return clubRoles.hasOwnProperty(clubId) && clubRoles[clubId] !== 'pending';
   };
 
   // Store the last known user ID to detect genuine sign-ins vs refreshes

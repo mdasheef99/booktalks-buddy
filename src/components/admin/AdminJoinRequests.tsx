@@ -30,9 +30,9 @@ export const AdminJoinRequests: React.FC<AdminJoinRequestsProps> = ({ clubId }) 
 
         if (error) throw error;
         setRequests(data || []);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching join requests:', error);
-        toast.error('Failed to load join requests');
+        toast.error(error.message || 'Failed to load join requests');
       } finally {
         setLoading(false);
       }
@@ -81,12 +81,12 @@ export const AdminJoinRequests: React.FC<AdminJoinRequestsProps> = ({ clubId }) 
         if (deleteError) throw deleteError;
         toast.success('Request rejected');
       }
-      
+
       // Update local state
       setRequests(prev => prev.filter(req => req.user_id !== memberId));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error handling join request:', error);
-      toast.error('Failed to process request');
+      toast.error(error.message || 'Failed to process request');
     }
   };
 
@@ -110,7 +110,7 @@ export const AdminJoinRequests: React.FC<AdminJoinRequestsProps> = ({ clubId }) 
 
       <div className="space-y-4">
         {requests.map((request) => (
-          <div 
+          <div
             key={request.user_id}
             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
           >

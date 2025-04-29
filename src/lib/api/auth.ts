@@ -28,6 +28,7 @@ export async function isClubMember(userId: string, clubId: string): Promise<bool
     .select('role')
     .eq('user_id', userId)
     .eq('club_id', clubId)
+    .not('role', 'eq', 'pending')
     .single();
 
   return !!data && !error;
