@@ -7,6 +7,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
+import { hasEntitlement, hasContextualEntitlement } from '@/lib/entitlements';
 
 type AuthContextType = {
   user: User | null;
@@ -16,11 +18,18 @@ type AuthContextType = {
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
 
-  // New: club membership info
+  // Club membership info
   clubRoles: Record<string, string>; // clubId -> role
   fetchClubRoles: () => Promise<void>;
   isAdmin: (clubId: string) => boolean;
   isMember: (clubId: string) => boolean;
+
+  // Entitlements
+  entitlements: string[];
+  entitlementsLoading: boolean;
+  refreshEntitlements: () => Promise<void>;
+  hasEntitlement: (entitlement: string) => boolean;
+  hasContextualEntitlement: (prefix: string, contextId: string) => boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [clubRoles, setClubRoles] = useState<Record<string, string>>({});
+  const [entitlements, setEntitlements] = useState<string[]>([]);
+  const [entitlementsLoading, setEntitlementsLoading] = useState(true);
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
 
@@ -63,6 +74,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isMember = (clubId: string) => {
     return clubRoles.hasOwnProperty(clubId) && clubRoles[clubId] !== 'pending';
+  };
+
+  // Entitlements functions
+  const refreshEntitlements = async () => {
+    if (!user) {
+      setEntitlements([]);
+      setEntitlementsLoading(false);
+      return;
+    }
+
+    try {
+      setEntitlementsLoading(true);
+      const userEntitlements = await getUserEntitlements(user.id, true);
+      setEntitlements(userEntitlements);
+    } catch (error) {
+      console.error('Error refreshing entitlements:', error);
+      toast.error('Failed to load user permissions');
+    } finally {
+      setEntitlementsLoading(false);
+    }
+  };
+
+  const checkEntitlement = (entitlement: string) => {
+    return hasEntitlement(entitlements, entitlement);
+  };
+
+  const checkContextualEntitlement = (prefix: string, contextId: string) => {
+    return hasContextualEntitlement(entitlements, prefix, contextId);
   };
 
   // Store the last known user ID to detect genuine sign-ins vs refreshes
@@ -138,6 +177,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user?.id) {
       console.log("User ID changed, fetching club roles");
       fetchClubRoles();
+    }
+  }, [user?.id]);
+
+  // Effect for loading entitlements when user changes
+  useEffect(() => {
+    if (user?.id) {
+      console.log("User ID changed, loading entitlements");
+      refreshEntitlements();
+    } else {
+      setEntitlements([]);
+      setEntitlementsLoading(false);
     }
   }, [user?.id]);
 
@@ -218,7 +268,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setLoading(true);
     try {
+      // Invalidate entitlements cache if user exists
+      if (user?.id) {
+        invalidateUserEntitlements(user.id);
+      }
+
       await supabase.auth.signOut();
+      setEntitlements([]);
       toast.success("You've been successfully signed out");
       navigate('/login');
     } catch (error) {
@@ -239,7 +295,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clubRoles,
       fetchClubRoles,
       isAdmin,
-      isMember
+      isMember,
+      entitlements,
+      entitlementsLoading,
+      refreshEntitlements,
+      hasEntitlement: checkEntitlement,
+      hasContextualEntitlement: checkContextualEntitlement
     }}>
       {children}
     </AuthContext.Provider>
