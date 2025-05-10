@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -14,9 +14,67 @@ type BookClubInsert = Database['public']['Tables']['book_clubs']['Insert'];
 type ClubMember = Database['public']['Tables']['club_members']['Row'];
 type ClubMemberInsert = Database['public']['Tables']['club_members']['Insert'];
 
+// BookClubCard component to handle individual club cards
+interface BookClubCardProps {
+  club: BookClub;
+  onClick: () => void;
+}
+
+const BookClubCard: React.FC<BookClubCardProps> = ({ club, onClick }) => {
+  const navigate = useNavigate();
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    // Check if the description is overflowing
+    if (descriptionRef.current) {
+      const element = descriptionRef.current;
+      setIsOverflowing(element.scrollHeight > element.clientHeight);
+    }
+  }, [club.description]);
+
+  return (
+    <Card
+      className="overflow-hidden cursor-pointer h-64 flex flex-col"
+      onClick={onClick}
+    >
+      <div className="p-6 flex flex-col flex-grow">
+        <div className="flex items-center gap-3 mb-4">
+          <Users className="h-6 w-6 text-primary" />
+          <h3 className="text-xl font-semibold">{club.name}</h3>
+        </div>
+        <div className="h-20 overflow-hidden relative mb-2">
+          <p
+            ref={descriptionRef}
+            className="text-muted-foreground max-h-20"
+          >
+            {club.description || 'No description available'}
+          </p>
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
+        </div>
+        <div className="mt-auto">
+          {isOverflowing && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary hover:text-primary/80 p-0 h-auto font-medium"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
+            >
+              Read more
+            </Button>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 export const BookClubList: React.FC = () => {
-  const [bookClubs, setBookClubs] = React.useState<BookClub[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [bookClubs, setBookClubs] = useState<BookClub[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +83,7 @@ export const BookClubList: React.FC = () => {
   const fromClubDetails = location.state?.fromClubDetails;
 
   // Fetch book clubs
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchBookClubs = async () => {
       try {
         if (!user?.id) {
@@ -87,23 +145,13 @@ export const BookClubList: React.FC = () => {
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {bookClubs.map((club) => (
-          <Card
+          <BookClubCard
             key={club.id}
-            className="overflow-hidden cursor-pointer"
+            club={club}
             onClick={() => navigate(`/book-club/${club.id}`, {
               state: { fromBookClubList: true }
             })}
-          >
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Users className="h-6 w-6 text-primary" />
-                <h3 className="text-xl font-semibold">{club.name}</h3>
-              </div>
-              <p className="text-muted-foreground mb-4">
-                {club.description || 'No description available'}
-              </p>
-            </div>
-          </Card>
+          />
         ))}
       </div>
     </div>
