@@ -230,7 +230,11 @@ const AdminUserListPage: React.FC = () => {
                       </div>
                     )}
 
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/profile/${user.id}`)}
+                    >
                       View Profile
                     </Button>
                   </div>

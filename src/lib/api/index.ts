@@ -15,6 +15,7 @@ export * from './bookclubs/books';
 export * from './bookclubs/discussions';
 export * from './bookclubs/discovery';
 export * from './bookclubs/requests';
+export * from './bookclubs/reactions';
 
 // Re-export members functions but handle the conflicting ones explicitly
 export {

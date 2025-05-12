@@ -30,7 +30,9 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
     loading,
     isMember,
     isPending,
-    isAdmin,
+    isAdmin, // Legacy admin check
+    canManageClub, // New entitlements-based check
+    canModerateClub, // New entitlements-based check
     fetchClubDetails
   } = useClubDetails(clubId);
 
@@ -71,7 +73,6 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
       <ClubNavigation
         clubId={clubId || ''}
         isMember={isMember}
-        isAdmin={isAdmin}
         setShowLeaveConfirm={setShowLeaveConfirm}
       />
 
@@ -80,7 +81,6 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
           <ClubHeader
             club={club}
-            isAdmin={isAdmin}
             isMember={isMember}
             isPending={isPending}
             clubId={clubId || ''}

@@ -1,5 +1,5 @@
 import { supabase } from '../../supabase';
-import { isClubMember } from '../auth';
+import { isClubMember, isClubAdmin } from '../auth';
 
 /**
  * Book Club Discussion Topics and Posts
@@ -78,8 +78,50 @@ export async function getDiscussionPosts(topicId: string) {
   return data;
 }
 
+/**
+ * Delete a discussion post
+ * Only the post author or a club admin can delete a post
+ */
+export async function deleteDiscussionPost(userId: string, postId: string) {
+  // First get the post to check ownership and get the topic_id
+  const { data: post, error: postError } = await supabase
+    .from('discussion_posts')
+    .select('user_id, topic_id')
+    .eq('id', postId)
+    .single();
+
+  if (postError || !post) throw new Error('Post not found');
+
+  // Get the club_id from the topic
+  const { data: topic, error: topicError } = await supabase
+    .from('discussion_topics')
+    .select('club_id')
+    .eq('id', post.topic_id)
+    .single();
+
+  if (topicError || !topic) throw new Error('Topic not found');
+
+  // Check if user is the post author or a club admin
+  const isAuthor = post.user_id === userId;
+  const isAdmin = await isClubAdmin(userId, topic.club_id);
+
+  if (!isAuthor && !isAdmin) throw new Error('Unauthorized');
+
+  // Delete the post
+  const { error } = await supabase
+    .from('discussion_posts')
+    .delete()
+    .eq('id', postId);
+
+  if (error) throw error;
+  return { success: true };
+}
+
 // Alias for addDiscussionTopic
 export const createTopic = addDiscussionTopic;
 
 // Alias for replyToTopic
 export const createPost = replyToTopic;
+
+// Alias for deleteDiscussionPost
+export const deletePost = deleteDiscussionPost;

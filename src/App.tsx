@@ -29,6 +29,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminClubManagementPage from "./pages/admin/AdminClubManagementPage";
 import AdminUserListPage from "./pages/admin/AdminUserListPage";
 import AdminJoinRequestsPage from "./pages/admin/AdminJoinRequestsPage";
+import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
 import TopicDetail from "./components/discussions/TopicDetail";
@@ -129,6 +130,7 @@ function App() {
             }>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="analytics" element={<AdminAnalyticsPage />} />
               <Route path="clubs" element={<AdminClubManagementPage />} />
               <Route path="users" element={<AdminUserListPage />} />
               <Route path="requests" element={<AdminJoinRequestsPage />} />

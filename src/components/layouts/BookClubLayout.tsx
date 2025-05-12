@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import BookConnectHeader from '@/components/BookConnectHeader';
+import BookClubHeader from '@/components/bookclubs/BookClubHeader';
 
 interface BookClubLayoutProps {
   title?: string;
@@ -21,8 +21,8 @@ const BookClubLayout: React.FC<BookClubLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
-      {showHeader && <BookConnectHeader />}
-      
+      {showHeader && <BookClubHeader />}
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {backLink && (
@@ -35,11 +35,11 @@ const BookClubLayout: React.FC<BookClubLayoutProps> = ({
               {backText}
             </Button>
           )}
-          
+
           {title && (
             <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">{title}</h1>
           )}
-          
+
           <Outlet />
         </div>
       </div>

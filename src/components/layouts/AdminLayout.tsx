@@ -1,12 +1,13 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Users, 
-  UserPlus, 
-  LogOut, 
-  ArrowLeft 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  UserPlus,
+  LogOut,
+  ArrowLeft,
+  BarChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,11 +30,11 @@ const AdminLayout: React.FC = () => {
         </div>
 
         <nav className="flex-1 space-y-2">
-          <NavLink 
-            to="/admin/dashboard" 
-            className={({ isActive }) => 
-              `flex items-center p-3 rounded-lg ${isActive 
-                ? 'bg-white/20 text-white' 
+          <NavLink
+            to="/admin/dashboard"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
                 : 'text-white/70 hover:bg-white/10'}`
             }
           >
@@ -41,11 +42,23 @@ const AdminLayout: React.FC = () => {
             Dashboard
           </NavLink>
 
-          <NavLink 
-            to="/admin/clubs" 
-            className={({ isActive }) => 
-              `flex items-center p-3 rounded-lg ${isActive 
-                ? 'bg-white/20 text-white' 
+          <NavLink
+            to="/admin/analytics"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
+                : 'text-white/70 hover:bg-white/10'}`
+            }
+          >
+            <BarChart className="h-5 w-5 mr-3" />
+            Analytics
+          </NavLink>
+
+          <NavLink
+            to="/admin/clubs"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
                 : 'text-white/70 hover:bg-white/10'}`
             }
           >
@@ -53,11 +66,11 @@ const AdminLayout: React.FC = () => {
             Clubs
           </NavLink>
 
-          <NavLink 
-            to="/admin/users" 
-            className={({ isActive }) => 
-              `flex items-center p-3 rounded-lg ${isActive 
-                ? 'bg-white/20 text-white' 
+          <NavLink
+            to="/admin/users"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
                 : 'text-white/70 hover:bg-white/10'}`
             }
           >
@@ -65,11 +78,11 @@ const AdminLayout: React.FC = () => {
             Users
           </NavLink>
 
-          <NavLink 
-            to="/admin/requests" 
-            className={({ isActive }) => 
-              `flex items-center p-3 rounded-lg ${isActive 
-                ? 'bg-white/20 text-white' 
+          <NavLink
+            to="/admin/requests"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
                 : 'text-white/70 hover:bg-white/10'}`
             }
           >
@@ -87,7 +100,7 @@ const AdminLayout: React.FC = () => {
             <ArrowLeft className="h-5 w-5 mr-3" />
             Back to Site
           </Button>
-          
+
           <Button
             variant="ghost"
             className="w-full justify-start text-white/70 hover:bg-white/10 hover:text-white p-3"

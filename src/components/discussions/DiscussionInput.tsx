@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Send } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -32,8 +32,35 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
   const [submitting, setSubmitting] = React.useState(false);
+  const [isFocused, setIsFocused] = React.useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea based on content
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto';
+
+    // Set the height to scrollHeight
+    const newHeight = Math.max(
+      mode === 'topic' ? 100 : 40, // Min height
+      Math.min(
+        textarea.scrollHeight,
+        mode === 'topic' ? 200 : 80 // Max height
+      )
+    );
+
+    textarea.style.height = `${newHeight}px`;
+  };
+
+  // Adjust height when content changes
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [content, mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,11 +110,11 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card className="p-4">
-        <div className="space-y-4">
-          {mode === 'topic' && (
+      {mode === 'topic' ? (
+        <Card className="p-4 shadow-md border border-gray-100 rounded-lg">
+          <div className="space-y-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Topic Title
               </label>
               <Input
@@ -95,52 +122,88 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter topic title"
-                className="w-full"
+                className="w-full border-gray-200 focus:border-bookconnect-sage focus:ring-1 focus:ring-bookconnect-sage/30 transition-all"
               />
             </div>
-          )}
 
-          <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-              {mode === 'topic' ? 'Initial Post' : 'Your Reply'}
-            </label>
+            <div>
+              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1.5">
+                Initial Post
+              </label>
+              <Textarea
+                ref={textareaRef}
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Start the discussion..."
+                rows={4}
+                className="w-full resize-none text-sm py-2 px-3 border-gray-200 focus:border-bookconnect-sage focus:ring-1 focus:ring-bookconnect-sage/30 transition-all"
+                style={{ overflow: content.length > 100 ? 'auto' : 'hidden' }}
+              />
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="flex items-center gap-2 bg-bookconnect-sage hover:bg-bookconnect-sage/90 text-white transition-all"
+              >
+                {submitting ? (
+                  'Posting...'
+                ) : (
+                  <>
+                    <MessageSquare className="h-4 w-4" />
+                    Create Topic
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <Card className={`p-0 overflow-hidden ${isFocused ? 'shadow-md ring-1 ring-bookconnect-sage/30' : 'shadow-sm'} border border-gray-200 rounded-lg transition-all duration-200`}>
+          <div className="space-y-0">
             <Textarea
+              ref={textareaRef}
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={mode === 'topic' ? 'Start the discussion...' : 'Write your reply...'}
-              rows={4}
-              className="w-full resize-none"
+              placeholder="Write your reply..."
+              rows={1}
+              className="w-full resize-none text-sm py-2.5 px-3 border-0 focus:ring-1 focus:ring-bookconnect-sage/40 transition-all placeholder:text-gray-400"
+              style={{ overflow: content.length > 50 ? 'auto' : 'hidden' }}
+              onFocus={() => {
+                setIsFocused(true);
+                adjustTextareaHeight();
+              }}
+              onBlur={() => setIsFocused(false)}
             />
-          </div>
 
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="flex items-center gap-2"
-            >
-              {submitting ? (
-                'Posting...'
-              ) : (
-                <>
-                  {mode === 'topic' ? (
-                    <>
-                      <MessageSquare className="h-4 w-4" />
-                      Create Topic
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4" />
-                      Post Reply
-                    </>
-                  )}
-                </>
-              )}
-            </Button>
+            <div className={`flex justify-end items-center ${isFocused ? 'bg-gray-50' : 'bg-gray-50/80'} py-2 px-3 border-t border-gray-200 transition-colors`}>
+              <Button
+                type="submit"
+                disabled={submitting || !content.trim()}
+                variant="ghost"
+                size="sm"
+                className={`flex items-center gap-1.5 rounded-full h-7 px-3 ${
+                  content.trim()
+                    ? 'text-bookconnect-sage font-medium hover:text-white hover:bg-bookconnect-sage border border-bookconnect-sage/30'
+                    : 'text-gray-500 border border-gray-300'
+                } transition-all duration-200`}
+              >
+                {submitting ? (
+                  <span className="text-xs">Posting...</span>
+                ) : (
+                  <>
+                    <Send className="h-3 w-3" />
+                    <span className="text-xs font-medium">Reply</span>
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      )}
     </form>
   );
 };

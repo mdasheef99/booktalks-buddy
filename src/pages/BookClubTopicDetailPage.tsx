@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ArrowLeft, MessageSquare, Reply } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { getDiscussionPosts } from '@/lib/api';
-import { DiscussionInput } from '@/components/discussions/DiscussionInput';
 import UserName from '@/components/common/UserName';
 import UserAvatar from '@/components/common/UserAvatar';
+import ThreadedComment from '@/components/discussions/ThreadedComment';
+import { buildThreadedPosts, ThreadedPost } from '@/utils/discussion-utils';
 
-interface Post {
-  id: string;
-  content: string;
-  user_id: string;
-  created_at: string;
-  parent_post_id: string | null;
-}
+// Using ThreadedPost from utils/discussion-utils.ts
 
 interface Topic {
   id: string;
@@ -30,9 +24,8 @@ interface Topic {
 const BookClubTopicDetailPage: React.FC = () => {
   const { clubId, topicId } = useParams<{ clubId: string; topicId: string }>();
   const [topic, setTopic] = useState<Topic | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [threadedPosts, setThreadedPosts] = useState<ThreadedPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,7 +71,11 @@ const BookClubTopicDetailPage: React.FC = () => {
       // Fetch posts for this topic
       const postsData = await getDiscussionPosts(topicId);
       console.log('Posts:', postsData);
-      setPosts(postsData);
+
+      // Build threaded posts structure
+      const threaded = buildThreadedPosts(postsData);
+      console.log('Threaded posts:', threaded);
+      setThreadedPosts(threaded);
     } catch (error) {
       console.error('Error fetching topic details:', error);
       toast.error('Failed to load discussion');
@@ -195,88 +192,23 @@ const BookClubTopicDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-4 mb-8">
-            {posts.length > 0 ? (
-              // Only map through top-level posts (those with parent_post_id === null)
-              posts.filter(post => post.parent_post_id === null).map((post) => (
-                <Card key={post.id} className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="w-full">
-                      <div className="flex justify-between w-full">
-                        <div className="flex items-center gap-2">
-                          <UserAvatar userId={post.user_id} size="sm" />
-                          <p className="text-sm text-gray-500">
-                            <UserName userId={post.user_id} linkToProfile /> • {new Date(post.created_at).toLocaleString()}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
-                        >
-                          <Reply className="h-4 w-4 mr-1" />
-                          Reply
-                        </Button>
-                      </div>
-                      <p className="mt-2">{post.content}</p>
-
-                      {/* Show reply form if replying to this post */}
-                      {replyingTo === post.id && (
-                        <div className="mt-4 ml-8">
-                          <DiscussionInput
-                            clubId={clubId || ''}
-                            topicId={topicId}
-                            parentPostId={post.id}
-                            onSuccess={() => {
-                              setReplyingTo(null);
-                              fetchTopicAndPosts();
-                            }}
-                          />
-                        </div>
-                      )}
-
-                      {/* Show replies to this post */}
-                      {post.parent_post_id === null && (
-                        <div className="ml-8 mt-4 space-y-4">
-                          {posts
-                            .filter(reply => reply.parent_post_id === post.id)
-                            .map(reply => (
-                              <Card key={reply.id} className="p-4">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <UserAvatar userId={reply.user_id} size="sm" />
-                                      <p className="text-sm text-gray-500">
-                                        <UserName userId={reply.user_id} linkToProfile /> • {new Date(reply.created_at).toLocaleString()}
-                                      </p>
-                                    </div>
-                                    <p className="mt-2">{reply.content}</p>
-                                  </div>
-                                </div>
-                              </Card>
-                            ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))
+          <div className="space-y-4">
+            {threadedPosts.length > 0 ? (
+              <div>
+                {threadedPosts.map(post => (
+                  <ThreadedComment
+                    key={post.id}
+                    post={post}
+                    clubId={clubId || ''}
+                    topicId={topicId || ''}
+                    onSuccess={fetchTopicAndPosts}
+                  />
+                ))}
+              </div>
             ) : (
               <p className="text-center text-gray-500 py-8">No posts in this topic yet</p>
             )}
           </div>
-
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Add Your Reply
-            </h2>
-            <DiscussionInput
-              clubId={clubId || ''}
-              topicId={topicId}
-              onSuccess={fetchTopicAndPosts}
-            />
-          </Card>
         </div>
       </div>
     </div>

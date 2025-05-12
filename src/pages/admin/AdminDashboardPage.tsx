@@ -1,71 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart, Users, BookOpen, MessageSquare, ArrowLeft } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, BarChart, Bell } from 'lucide-react';
+import {
+  useAdminStats,
+  useTimeRangeFilter,
+  TimeRangeFilter,
+  LoadingDashboard,
+  MainStatsRow,
+  QuickStatsRow,
+  TierDistributionCard,
+  RecentActivityCard,
+  TimeRange
+} from './dashboard';
 
 const AdminDashboardPage: React.FC = () => {
-  const [stats, setStats] = useState({
-    totalClubs: 0,
-    totalMembers: 0,
-    totalDiscussions: 0
-  });
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { timeRange, setTimeRange } = useTimeRangeFilter('month');
+  const { loading, stats, error } = useAdminStats(timeRange);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        // Fetch total clubs
-        const { count: clubCount, error: clubError } = await supabase
-          .from('book_clubs')
-          .select('*', { count: 'exact', head: true });
+  // Debug output
+  console.log('AdminDashboardPage - timeRange:', timeRange);
+  console.log('AdminDashboardPage - loading:', loading);
+  console.log('AdminDashboardPage - stats:', stats);
+  console.log('AdminDashboardPage - error:', error);
 
-        // Fetch total members (unique users in club_members)
-        const { data: memberData, error: memberError } = await supabase
-          .from('club_members')
-          .select('user_id');
-
-        // Fetch total discussions
-        const { count: discussionCount, error: discussionError } = await supabase
-          .from('discussion_topics')
-          .select('*', { count: 'exact', head: true });
-
-        if (clubError) throw clubError;
-        if (memberError) throw memberError;
-        if (discussionError) throw discussionError;
-
-        // Get unique member count
-        const uniqueMembers = new Set();
-        memberData?.forEach(member => uniqueMembers.add(member.user_id));
-
-        setStats({
-          totalClubs: clubCount || 0,
-          totalMembers: uniqueMembers.size,
-          totalDiscussions: discussionCount || 0
-        });
-      } catch (error) {
-        console.error('Error fetching admin stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  // Add click handler to manually log when time range changes
+  const handleTimeRangeChange = (newRange: TimeRange) => {
+    console.log('Time range changed to:', newRange);
+    setTimeRange(newRange);
+  };
 
   if (loading) {
-    return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 w-64 bg-gray-300 rounded"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="h-32 bg-gray-300 rounded"></div>
-          <div className="h-32 bg-gray-300 rounded"></div>
-          <div className="h-32 bg-gray-300 rounded"></div>
-        </div>
-      </div>
-    );
+    return <LoadingDashboard />;
   }
 
   return (
@@ -79,56 +47,57 @@ const AdminDashboardPage: React.FC = () => {
         Back to Book Clubs
       </Button>
 
-      <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">Dashboard</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <h1 className="text-3xl font-serif text-bookconnect-brown">Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Total Book Clubs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold">{stats.totalClubs}</div>
-              <BookOpen className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          {/* Time Range Filter */}
+          <TimeRangeFilter
+            timeRange={timeRange}
+            onTimeRangeChange={handleTimeRangeChange}
+          />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Total Members</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold">{stats.totalMembers}</div>
-              <Users className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
-            </div>
-          </CardContent>
-        </Card>
+          <div className="flex gap-2 ml-auto">
+            <Button
+              onClick={() => navigate('/admin/analytics')}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <BarChart className="h-4 w-4 text-bookconnect-brown" />
+              View Analytics
+            </Button>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Total Discussions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold">{stats.totalDiscussions}</div>
-              <MessageSquare className="h-8 w-8 text-bookconnect-terracotta opacity-80" />
-            </div>
-          </CardContent>
-        </Card>
+            {stats.pendingJoinRequests > 0 && (
+              <Button
+                onClick={() => navigate('/admin/requests')}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Bell className="h-4 w-4 text-bookconnect-terracotta" />
+                Pending Requests
+                <Badge className="ml-1 bg-bookconnect-terracotta">{stats.pendingJoinRequests}</Badge>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            This section will display recent activity across all book clubs.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Main Stats Row */}
+      <MainStatsRow stats={stats} timeRange={timeRange} />
+
+      {/* Quick Stats Row */}
+      <QuickStatsRow stats={stats} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <TierDistributionCard
+          tierDistribution={stats.tierDistribution}
+          totalUsers={stats.totalUsers}
+        />
+
+        <RecentActivityCard
+          recentActivity={stats.recentActivity}
+        />
+      </div>
     </div>
   );
 };

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHasContextualEntitlement } from '@/lib/entitlements/hooks';
+import { isClubMember } from '@/lib/api/auth';
 
 interface Props {
   children: React.ReactNode;
@@ -14,18 +15,49 @@ interface Props {
 const MemberRouteGuard: React.FC<Props> = ({ children }) => {
   const { clubId } = useParams<{ clubId: string }>();
   const { user, loading } = useAuth();
+  const [isRegularMember, setIsRegularMember] = useState<boolean>(false);
+  const [checkingMembership, setCheckingMembership] = useState<boolean>(true);
 
   // Check if the user is a club lead or moderator (which implies membership)
   const { result: isClubLead, loading: loadingLead } = useHasContextualEntitlement('CLUB_LEAD', clubId || '');
   const { result: isClubModerator, loading: loadingModerator } = useHasContextualEntitlement('CLUB_MODERATOR', clubId || '');
 
-  // TODO: Add a proper check for regular club membership using entitlements
-  // For now, we'll consider a user a member if they're a lead or moderator
-  // In a complete implementation, you would check a CLUB_MEMBER_[clubId] entitlement
-  const isMember = isClubLead || isClubModerator;
+  // Check for regular membership
+  useEffect(() => {
+    async function checkMembership() {
+      if (!user || !clubId) {
+        setIsRegularMember(false);
+        setCheckingMembership(false);
+        return;
+      }
+
+      try {
+        const membershipResult = await isClubMember(user.id, clubId);
+        setIsRegularMember(membershipResult);
+      } catch (error) {
+        console.error('Error checking club membership:', error);
+        setIsRegularMember(false);
+      } finally {
+        setCheckingMembership(false);
+      }
+    }
+
+    checkMembership();
+  }, [user, clubId]);
+
+  // Combine all membership checks
+  const isMember = isClubLead || isClubModerator || isRegularMember;
+
+  // Debug logging
+  console.log(`MemberRouteGuard for club ${clubId}:`, {
+    isClubLead,
+    isClubModerator,
+    isRegularMember,
+    isMember
+  });
 
   // Show loading state while checking permissions
-  if (loading || loadingLead || loadingModerator) {
+  if (loading || loadingLead || loadingModerator || checkingMembership) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-pulse">
