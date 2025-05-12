@@ -4,6 +4,28 @@
 
 This document outlines the implementation of the subscription management system for BookTalks Buddy. The system allows store owners to upgrade users to privileged tiers with monthly or annual subscription plans and track payment information.
 
+## Admin User Section Structure
+
+The admin user section has been restructured to provide a more organized and user-friendly interface for managing users and their subscription tiers:
+
+1. **User List Page**:
+   - Displays a list of all users with their basic information
+   - Includes search functionality to filter users
+   - Shows user tier status with visual indicators
+   - Provides tier management controls for each user
+
+2. **User Tier Management**:
+   - Implemented as a component that can be embedded in user cards
+   - Provides a dropdown to select the user's tier
+   - Shows a confirmation dialog before making changes
+   - Includes fields for subscription details and payment information
+
+3. **Subscription Information Display**:
+   - Collapsible section in user cards for privileged users
+   - Shows subscription details (tier, type, start/end dates)
+   - Displays payment history with amounts and references
+   - Provides a clean, organized view of subscription status
+
 ## Database Schema
 
 ### Tables
@@ -144,6 +166,24 @@ export async function updateUserTier(
   - Store owners and managers can view and manage subscriptions for their store
   - Users can view their own subscriptions
   - Payment records are properly secured
+
+## Admin Panel Access Fix
+
+A legacy condition was fixed that was incorrectly giving admin panel access to all users who had created a club. The following changes were made:
+
+1. **Route Guards Update**:
+   - `GlobalAdminRouteGuard.tsx` now uses entitlements instead of club roles
+   - `AdminRouteGuard.tsx` properly checks for store-level admin entitlements
+   - `MemberRouteGuard.tsx` updated to use the entitlements system
+
+2. **Navigation Updates**:
+   - `MainNavigation.tsx` now shows admin links only to users with proper entitlements
+   - Admin section visibility is controlled by entitlements, not club roles
+
+3. **Entitlements System**:
+   - Enhanced to properly check for store-level admin permissions
+   - Added helper functions to check specific entitlements
+   - Implemented proper hierarchy of roles and permissions
 
 ## Future Enhancements
 
