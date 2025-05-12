@@ -3,9 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Mail, UserPlus, ArrowLeft } from 'lucide-react';
+import { Search, Mail, UserPlus, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { UserTierManager } from '@/components/admin/UserTierManager';
+import { UserTierBadge } from '@/components/admin/UserTierBadge';
+import { UserSubscriptionInfo } from '@/components/admin/UserSubscriptionInfo';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface User {
   id: string;
@@ -13,6 +17,7 @@ interface User {
   email: string | null;
   favorite_genre: string | null;
   favorite_author: string | null;
+  account_tier: string;
 }
 
 const AdminUserListPage: React.FC = () => {
@@ -24,12 +29,34 @@ const AdminUserListPage: React.FC = () => {
   const [showInviteForm, setShowInviteForm] = useState(false);
   const navigate = useNavigate();
 
+  // Store ID for the current store
+  const [storeId, setStoreId] = useState<string | null>(null);
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchStoreAndUsers = async () => {
       try {
+        // First, try to fetch the store ID
+        const { data: storeData, error: storeError } = await supabase
+          .from('stores')
+          .select('id')
+          .limit(1)
+          .single();
+
+        if (storeError) {
+          console.error('Error fetching store:', storeError);
+          toast.error('Failed to load store information. Some features may be limited.');
+        } else if (storeData) {
+          console.log('Store found:', storeData.id);
+          setStoreId(storeData.id);
+        } else {
+          console.warn('No store found in the database');
+          toast.warning('No store found. Please create a store first to enable all admin features.');
+        }
+
+        // Then fetch users with their account tiers
         const { data, error } = await supabase
           .from('users')
-          .select('id, username, email, favorite_genre, favorite_author')
+          .select('id, username, email, favorite_genre, favorite_author, account_tier')
           .order('username');
 
         if (error) throw error;
@@ -43,7 +70,7 @@ const AdminUserListPage: React.FC = () => {
       }
     };
 
-    fetchUsers();
+    fetchStoreAndUsers();
   }, []);
 
   useEffect(() => {
@@ -162,7 +189,7 @@ const AdminUserListPage: React.FC = () => {
           filteredUsers.map((user) => (
             <Card key={user.id}>
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-semibold">{user.username || 'No username'}</h3>
                     <p className="text-muted-foreground">{user.email || 'No email'}</p>
@@ -180,12 +207,52 @@ const AdminUserListPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-4">
+                    {storeId ? (
+                      <UserTierManager
+                        userId={user.id}
+                        currentTier={user.account_tier || 'free'}
+                        storeId={storeId}
+                        onTierUpdated={(newTier) => {
+                          // Update the local state when tier changes
+                          setUsers(users.map(u =>
+                            u.id === user.id ? { ...u, account_tier: newTier } : u
+                          ));
+                          setFilteredUsers(filteredUsers.map(u =>
+                            u.id === user.id ? { ...u, account_tier: newTier } : u
+                          ));
+                        }}
+                      />
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <UserTierBadge tier={user.account_tier || 'free'} />
+                        <span className="text-sm text-muted-foreground">(Store required for tier management)</span>
+                      </div>
+                    )}
+
                     <Button variant="outline" size="sm">
                       View Profile
                     </Button>
                   </div>
                 </div>
+
+                {/* Subscription information - only show for privileged users */}
+                {user.account_tier && user.account_tier !== 'free' && (
+                  <Collapsible className="mt-4 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium">Subscription Information</h4>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm" className="p-0 h-8 w-8">
+                          <ChevronDown className="h-4 w-4" />
+                          <span className="sr-only">Toggle subscription info</span>
+                        </Button>
+                      </CollapsibleTrigger>
+                    </div>
+                    <CollapsibleContent className="mt-2">
+                      <UserSubscriptionInfo userId={user.id} />
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
               </CardContent>
             </Card>
           ))

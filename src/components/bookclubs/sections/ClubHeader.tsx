@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { UserPlus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Database } from '@/integrations/supabase/types';
+import { useCanManageClub } from '@/lib/entitlements/hooks';
 
 type BookClub = Database['public']['Tables']['book_clubs']['Row'];
 
 interface ClubHeaderProps {
   club: BookClub;
-  isAdmin: boolean;
   isMember: boolean;
   isPending: boolean;
   clubId: string;
@@ -19,7 +19,6 @@ interface ClubHeaderProps {
 
 const ClubHeader: React.FC<ClubHeaderProps> = ({
   club,
-  isAdmin,
   isMember,
   isPending,
   clubId,
@@ -28,6 +27,13 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
   handleCancelRequest
 }) => {
   const navigate = useNavigate();
+
+  // Get the store ID for the club
+  // Note: In a real implementation, you would fetch this from the database
+  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+
+  // Check if the user can manage this club using entitlements
+  const { result: canManage } = useCanManageClub(clubId, storeId);
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
@@ -70,8 +76,8 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
           </div>
         )}
 
-        {/* Admin settings button */}
-        {isAdmin && (
+        {/* Admin settings button - only visible to users who can manage the club */}
+        {canManage && (
           <Button
             variant="outline"
             onClick={() => navigate(`/book-club/${clubId}/settings`)}

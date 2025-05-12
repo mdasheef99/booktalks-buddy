@@ -1,55 +1,42 @@
-import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
+import { supabase } from '@/lib/supabase';
 import { getUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
 
 /**
- * Admin Management Functions
+ * API functions for managing user tiers
  */
 
 /**
- * List all members for admin view
+ * Get a user's current tier
+ * @param userId - ID of the user to get the tier for
+ * @returns The user's current tier
  */
-export async function listAdminMembers(userId: string) {
-  // Check if user is a global admin (assumed via Auth metadata or separate check)
-  // For now, assume all authenticated users can list members (adjust as needed)
-  const { data, error } = await supabase.from('users').select('*');
-  if (error) throw error;
-  return data;
+export async function getUserTier(userId: string) {
+  // Get the authenticated user
+  const { data: { session } } = await supabase.auth.getSession();
+  const currentUser = session?.user;
+
+  if (!currentUser) {
+    throw new Error('Unauthorized');
+  }
+
+  // Get the user's tier
+  const { data, error } = await supabase
+    .from('users')
+    .select('account_tier')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    throw new Error('User not found');
+  }
+
+  return { tier: data.account_tier };
 }
 
 /**
- * Remove a member from a club (admin only)
- * Note: This is duplicated in bookclubs/members.ts for organizational purposes
- */
-export async function removeMember(adminId: string, userIdToRemove: string, clubId: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
-
-  const { error } = await supabase
-    .from('club_members')
-    .delete()
-    .eq('user_id', userIdToRemove)
-    .eq('club_id', clubId);
-
-  if (error) throw error;
-  return { success: true };
-}
-
-/**
- * Invite a member to a club (admin only)
- * Note: This is duplicated in bookclubs/members.ts for organizational purposes
- */
-export async function inviteMember(adminId: string, clubId: string, inviteeEmail: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
-
-  // Implement invite logic (e.g., insert into invites table or send email)
-  // Placeholder implementation:
-  return { success: true, message: 'Invite sent (placeholder)' };
-}
-
-/**
- * Update a user's account tier
- * @param adminId - ID of the admin making the change
+ * Update a user's tier
+ * @param currentUserId - ID of the user making the change
  * @param userId - ID of the user to update
  * @param tier - New tier ('free', 'privileged', or 'privileged_plus')
  * @param storeId - ID of the store context
@@ -57,9 +44,10 @@ export async function inviteMember(adminId: string, clubId: string, inviteeEmail
  * @param paymentReference - Optional reference for the payment
  * @param amount - Optional payment amount
  * @param notes - Optional notes about the payment
+ * @returns The updated user
  */
 export async function updateUserTier(
-  adminId: string,
+  currentUserId: string,
   userId: string,
   tier: string,
   storeId: string,
@@ -68,15 +56,15 @@ export async function updateUserTier(
   amount?: number,
   notes?: string
 ) {
-  // Check if the admin has permission to manage user tiers
-  const entitlements = await getUserEntitlements(adminId);
-  if (!canManageUserTiers(entitlements, storeId)) {
-    throw new Error('You do not have permission to manage user tiers');
-  }
-
   // Validate the tier
   if (!['free', 'privileged', 'privileged_plus'].includes(tier)) {
     throw new Error('Invalid tier. Must be one of: free, privileged, privileged_plus');
+  }
+
+  // Check if the current user has permission to manage user tiers
+  const entitlements = await getUserEntitlements(currentUserId);
+  if (!canManageUserTiers(entitlements, storeId)) {
+    throw new Error('You do not have permission to manage user tiers');
   }
 
   try {
@@ -101,7 +89,7 @@ export async function updateUserTier(
           p_store_id: storeId,
           p_tier: tier,
           p_subscription_type: subscriptionType,
-          p_recorded_by: adminId,
+          p_recorded_by: currentUserId,
           p_amount: amount,
           p_payment_reference: paymentReference,
           p_notes: notes

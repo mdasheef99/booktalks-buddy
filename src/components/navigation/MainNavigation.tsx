@@ -14,24 +14,32 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useHasEntitlement, useIsPlatformOwner } from '@/lib/entitlements/hooks';
 
 interface MainNavigationProps {
   collapsed?: boolean;
 }
 
 const MainNavigation: React.FC<MainNavigationProps> = ({ collapsed = false }) => {
-  const { user, signOut, clubRoles } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = React.useState(false);
 
+  // Check for admin entitlements
+  const { result: canManageUserTiers } = useHasEntitlement('CAN_MANAGE_USER_TIERS');
+  const { result: canManageAllClubs } = useHasEntitlement('CAN_MANAGE_ALL_CLUBS');
+  const { result: canManageStoreSettings } = useHasEntitlement('CAN_MANAGE_STORE_SETTINGS');
+  const { result: isPlatformOwner } = useIsPlatformOwner();
+
   React.useEffect(() => {
-    // Check if user is an admin in any club based on clubRoles
-    if (user && Object.values(clubRoles).includes('admin')) {
+    // Check if user has admin entitlements
+    // User is admin if they are a platform owner, store owner, or store manager
+    if (user && (isPlatformOwner || canManageStoreSettings || canManageUserTiers || canManageAllClubs)) {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
     }
-  }, [user, clubRoles]);
+  }, [user, isPlatformOwner, canManageStoreSettings, canManageUserTiers, canManageAllClubs]);
 
   const handleLogout = async () => {
     await signOut();

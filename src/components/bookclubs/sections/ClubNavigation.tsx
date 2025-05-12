@@ -4,23 +4,29 @@ import { ArrowLeft, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useCanManageClub } from '@/lib/entitlements/hooks';
 
 interface ClubNavigationProps {
   clubId: string;
   isMember: boolean;
-  isAdmin: boolean;
   setShowLeaveConfirm: (show: boolean) => void;
 }
 
 const ClubNavigation: React.FC<ClubNavigationProps> = ({
   clubId,
   isMember,
-  isAdmin,
   setShowLeaveConfirm
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useAuth();
+
+  // Get the store ID for the club
+  // Note: In a real implementation, you would fetch this from the database
+  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+
+  // Check if the user can manage this club using entitlements
+  const { result: canManage } = useCanManageClub(clubId, storeId);
 
   // We don't need to check navigation state anymore
   // The "Back to Book Clubs" button should always go to the book clubs list
@@ -58,8 +64,8 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
       {/* Navigation buttons - only show for members */}
       {isMember && (
         <div className="flex flex-wrap justify-center gap-3 mb-6 bg-white/80 p-4 rounded-xl shadow-sm border border-bookconnect-brown/10">
-          {/* Only show Members Management to admins */}
-          {isAdmin && (
+          {/* Only show Members Management to users who can manage the club */}
+          {canManage && (
             <Button
               onClick={() => navigate(`/book-club/${clubId}/members`)}
               className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 transition-all duration-200 shadow-sm hover:shadow"
@@ -67,7 +73,7 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
               Members Management
             </Button>
           )}
-          {!isAdmin && (
+          {!canManage && (
             <Button
               variant="outline"
               onClick={() => setShowLeaveConfirm(true)}

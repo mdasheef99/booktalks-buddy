@@ -9,6 +9,7 @@ import {
   getCurrentBook,
   getClubTopics
 } from '@/lib/api';
+import { useCanManageClub, useCanModerateClub } from '@/lib/entitlements/hooks';
 
 type BookClub = Database['public']['Tables']['book_clubs']['Row'];
 type ClubMember = Database['public']['Tables']['club_members']['Row'];
@@ -140,10 +141,24 @@ export const useClubDetails = (clubId: string | undefined) => {
     }
   }, [clubId, user?.id]);
 
+  // Get the store ID for the club
+  // Note: In a real implementation, you would fetch this from the database or from the club object
+  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+
+  // Check if the user can manage or moderate this club using entitlements
+  const { result: canManage } = useCanManageClub(clubId || '', storeId);
+  const { result: canModerate } = useCanModerateClub(clubId || '', storeId);
+
   // Helper functions for status checks
   const isMember = userStatus === 'member' || userStatus === 'admin';
   const isPending = userStatus === 'pending';
+
+  // Legacy admin check - will be replaced by entitlements
   const isAdmin = userStatus === 'admin';
+
+  // New entitlements-based checks
+  const canManageClub = canManage;
+  const canModerateClub = canModerate;
 
   // Create a function to expose for external use
   const refreshClubDetails = async () => {
@@ -194,6 +209,9 @@ export const useClubDetails = (clubId: string | undefined) => {
     isMember,
     isPending,
     isAdmin,
+    // New entitlements-based properties
+    canManageClub,
+    canModerateClub,
     fetchClubDetails: refreshClubDetails
   };
 };

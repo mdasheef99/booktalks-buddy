@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHasEntitlement, useIsPlatformOwner } from '@/lib/entitlements/hooks';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const GlobalAdminRouteGuard: React.FC<Props> = ({ children }) => {
-  const { user, loading, clubRoles } = useAuth();
+  const { user, loading } = useAuth();
+  const { result: canManageUserTiers, loading: loadingUserTiers } = useHasEntitlement('CAN_MANAGE_USER_TIERS');
+  const { result: canManageAllClubs, loading: loadingClubs } = useHasEntitlement('CAN_MANAGE_ALL_CLUBS');
+  const { result: canManageStoreSettings, loading: loadingStoreSettings } = useHasEntitlement('CAN_MANAGE_STORE_SETTINGS');
+  const { result: isPlatformOwner, loading: loadingPlatformOwner } = useIsPlatformOwner();
+
   const [isGlobalAdmin, setIsGlobalAdmin] = useState<boolean | null>(null);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
 
@@ -20,20 +26,31 @@ const GlobalAdminRouteGuard: React.FC<Props> = ({ children }) => {
       }
 
       try {
-        // Check if the user has any admin roles in their clubRoles
-        const hasAdminRole = Object.values(clubRoles).includes('admin');
-        setIsGlobalAdmin(hasAdminRole);
+        // Check if the user has any admin entitlements
+        // User is admin if they are a platform owner, store owner, or store manager
+        const hasAdminEntitlements = isPlatformOwner ||
+                                    canManageStoreSettings ||
+                                    canManageUserTiers ||
+                                    canManageAllClubs;
+
+        setIsGlobalAdmin(hasAdminEntitlements);
       } catch (error) {
+        console.error('Error checking admin status:', error);
         setIsGlobalAdmin(false);
       } finally {
         setCheckingAdmin(false);
       }
     };
 
-    checkGlobalAdminStatus();
-  }, [user, clubRoles]);
+    // Only check admin status when all entitlement checks are complete
+    if (!loadingUserTiers && !loadingClubs && !loadingStoreSettings && !loadingPlatformOwner) {
+      checkGlobalAdminStatus();
+    }
+  }, [user, canManageUserTiers, canManageAllClubs, canManageStoreSettings, isPlatformOwner,
+      loadingUserTiers, loadingClubs, loadingStoreSettings, loadingPlatformOwner]);
 
-  if (loading || checkingAdmin) {
+  // Show loading state if any of the required data is still loading
+  if (loading || checkingAdmin || loadingUserTiers || loadingClubs || loadingStoreSettings || loadingPlatformOwner) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-pulse">

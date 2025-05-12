@@ -33,3 +33,6 @@ export { removeMember as removeClubMember, inviteMember as inviteClubMember } fr
 
 // Re-export profile functions
 export * from './profile';
+
+// Re-export user tier functions
+export * from './users/tier';
