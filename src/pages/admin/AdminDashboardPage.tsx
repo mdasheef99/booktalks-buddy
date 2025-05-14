@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, BarChart, Bell } from 'lucide-react';
+import { ArrowLeft, BarChart, Bell, RefreshCw } from 'lucide-react';
 import {
   useAdminStats,
   useTimeRangeFilter,
@@ -18,22 +18,39 @@ import {
 const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { timeRange, setTimeRange } = useTimeRangeFilter('month');
-  const { loading, stats, error } = useAdminStats(timeRange);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+  const { loading, stats, error } = useAdminStats(timeRange, refreshKey);
 
-  // Debug output
-  console.log('AdminDashboardPage - timeRange:', timeRange);
-  console.log('AdminDashboardPage - loading:', loading);
-  console.log('AdminDashboardPage - stats:', stats);
-  console.log('AdminDashboardPage - error:', error);
-
-  // Add click handler to manually log when time range changes
-  const handleTimeRangeChange = (newRange: TimeRange) => {
-    console.log('Time range changed to:', newRange);
+  // Handle time range changes
+  const handleTimeRangeChange = useCallback((newRange: TimeRange) => {
     setTimeRange(newRange);
-  };
+  }, [setTimeRange]);
+
+  // Handle manual refresh
+  const handleRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   if (loading) {
     return <LoadingDashboard />;
+  }
+
+  // Display error message if there's an error
+  if (error) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-serif text-bookconnect-brown mb-4">Dashboard Error</h2>
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md mb-6">
+          {error.message}
+        </div>
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-bookconnect-brown hover:bg-bookconnect-brown/90"
+        >
+          Refresh Dashboard
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -48,7 +65,14 @@ const AdminDashboardPage: React.FC = () => {
       </Button>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <h1 className="text-3xl font-serif text-bookconnect-brown">Dashboard</h1>
+        <div>
+          <h1 className="text-3xl font-serif text-bookconnect-brown">Dashboard</h1>
+          {stats.lastUpdated && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Last updated: {new Date(stats.lastUpdated).toLocaleString()}
+            </p>
+          )}
+        </div>
 
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           {/* Time Range Filter */}
@@ -58,6 +82,16 @@ const AdminDashboardPage: React.FC = () => {
           />
 
           <div className="flex gap-2 ml-auto">
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              className="flex items-center gap-2"
+              title="Refresh dashboard data"
+            >
+              <RefreshCw className="h-4 w-4 text-bookconnect-sage" />
+              Refresh
+            </Button>
+
             <Button
               onClick={() => navigate('/admin/analytics')}
               variant="outline"

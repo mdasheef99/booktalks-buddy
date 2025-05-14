@@ -32,6 +32,27 @@ export interface DashboardStats {
   newClubsInRange: number;
   activeDiscussions: number;
 
+  // Previous period stats for comparison
+  previousPeriod?: {
+    newUsers: number;
+    newClubs: number;
+    activeDiscussions: number;
+  };
+
+  // Growth rates (percentage change from previous period)
+  growthRates?: {
+    users: number;
+    clubs: number;
+    discussions: number;
+  };
+
+  // User acquisition metrics
+  userAcquisition?: {
+    averagePerWeek: number;
+    averagePerMonth: number;
+    trend: number[]; // Last 6 data points for sparkline
+  };
+
   // Club stats
   clubsWithCurrentBook: number;
   pendingJoinRequests: number;
@@ -44,7 +65,13 @@ export interface DashboardStats {
   // Grouped stats
   recentActivity: RecentActivity;
   tierDistribution: TierDistribution;
+
+  // Metadata
+  lastUpdated?: string; // ISO string timestamp for when the stats were last updated
 }
+
+// Trend direction for stats
+export type TrendDirection = 'up' | 'down' | 'neutral';
 
 // Props for the StatsCard component
 export interface StatsCardProps {
@@ -53,6 +80,18 @@ export interface StatsCardProps {
   icon?: React.ReactNode;
   secondaryText?: string;
   className?: string;
+  // Enhanced props
+  trend?: {
+    direction: TrendDirection;
+    value: number | string;
+    label?: string;
+  };
+  progressBar?: {
+    value: number;
+    max: number;
+    label?: string;
+  };
+  sparkline?: number[];
 }
 
 // Props for the TimeRangeFilter component

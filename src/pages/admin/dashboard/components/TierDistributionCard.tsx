@@ -10,30 +10,34 @@ const TierDistributionCard: React.FC<TierDistributionCardProps> = ({
   tierDistribution,
   totalUsers
 }) => {
-  // Calculate percentages
-  const freePercentage = totalUsers > 0 
-    ? ((tierDistribution.free / totalUsers) * 100).toFixed(1) 
-    : '0.0';
-  
-  const privilegedPercentage = totalUsers > 0 
-    ? ((tierDistribution.privileged / totalUsers) * 100).toFixed(1) 
-    : '0.0';
-  
-  const privilegedPlusPercentage = totalUsers > 0 
-    ? ((tierDistribution.privileged_plus / totalUsers) * 100).toFixed(1) 
+  // Ensure tierDistribution is defined
+  const tiers = tierDistribution || { free: 0, privileged: 0, privileged_plus: 0 };
+  const total = totalUsers || 0;
+
+  // Calculate percentages safely
+  const freePercentage = total > 0 && tiers.free !== undefined
+    ? ((tiers.free / total) * 100).toFixed(1)
     : '0.0';
 
-  // Calculate bar widths
-  const freeWidth = totalUsers > 0 
-    ? `${(tierDistribution.free / totalUsers) * 100}%` 
+  const privilegedPercentage = total > 0 && tiers.privileged !== undefined
+    ? ((tiers.privileged / total) * 100).toFixed(1)
+    : '0.0';
+
+  const privilegedPlusPercentage = total > 0 && tiers.privileged_plus !== undefined
+    ? ((tiers.privileged_plus / total) * 100).toFixed(1)
+    : '0.0';
+
+  // Calculate bar widths safely
+  const freeWidth = total > 0 && tiers.free !== undefined
+    ? `${(tiers.free / total) * 100}%`
     : '0%';
-  
-  const privilegedWidth = totalUsers > 0 
-    ? `${(tierDistribution.privileged / totalUsers) * 100}%` 
+
+  const privilegedWidth = total > 0 && tiers.privileged !== undefined
+    ? `${(tiers.privileged / total) * 100}%`
     : '0%';
-  
-  const privilegedPlusWidth = totalUsers > 0 
-    ? `${(tierDistribution.privileged_plus / totalUsers) * 100}%` 
+
+  const privilegedPlusWidth = total > 0 && tiers.privileged_plus !== undefined
+    ? `${(tiers.privileged_plus / total) * 100}%`
     : '0%';
 
   return (
@@ -50,7 +54,7 @@ const TierDistributionCard: React.FC<TierDistributionCardProps> = ({
               <span>Free</span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">{tierDistribution.free}</span>
+              <span className="mr-2">{tiers.free}</span>
               <span className="text-xs text-muted-foreground">
                 ({freePercentage}%)
               </span>
@@ -66,7 +70,7 @@ const TierDistributionCard: React.FC<TierDistributionCardProps> = ({
               </span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">{tierDistribution.privileged}</span>
+              <span className="mr-2">{tiers.privileged}</span>
               <span className="text-xs text-muted-foreground">
                 ({privilegedPercentage}%)
               </span>
@@ -82,7 +86,7 @@ const TierDistributionCard: React.FC<TierDistributionCardProps> = ({
               </span>
             </div>
             <div className="flex items-center">
-              <span className="mr-2">{tierDistribution.privileged_plus}</span>
+              <span className="mr-2">{tiers.privileged_plus}</span>
               <span className="text-xs text-muted-foreground">
                 ({privilegedPlusPercentage}%)
               </span>

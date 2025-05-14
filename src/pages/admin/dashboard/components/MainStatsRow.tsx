@@ -1,59 +1,80 @@
 import React from 'react';
 import { Users, BookOpen, MessageSquare } from 'lucide-react';
-import StatsCard from './StatsCard';
-import { MainStatsRowProps } from '../types';
+import EnhancedStatsCard from './EnhancedStatsCard';
+import UserStatsCard from './UserStatsCard';
+import { MainStatsRowProps, TrendDirection } from '../types';
 
 /**
  * Component for the main statistics row
  */
 const MainStatsRow: React.FC<MainStatsRowProps> = ({ stats, timeRange }) => {
-  console.log('MainStatsRow rendering with stats:', stats);
-  console.log('Time-sensitive stats values:', {
-    newUsersInRange: stats.newUsersInRange,
-    newClubsInRange: stats.newClubsInRange,
-    activeDiscussions: stats.activeDiscussions
-  });
+  // Calculate percentage of users in clubs safely
+  const calculatePercentage = () => {
+    if (!stats.totalUsers || stats.totalUsers === 0 || !stats.totalMembers) {
+      return '0.0';
+    }
+    return ((stats.totalMembers / stats.totalUsers) * 100).toFixed(1);
+  };
+
+  // Determine trend direction based on growth rate
+  const getTrendDirection = (growthRate?: number): TrendDirection => {
+    if (!growthRate) return 'neutral';
+    return growthRate > 0 ? 'up' : growthRate < 0 ? 'down' : 'neutral';
+  };
+
+  // Format growth rate for display
+  const formatGrowthRate = (growthRate?: number): string => {
+    if (!growthRate) return '0%';
+    return `${growthRate > 0 ? '+' : ''}${growthRate.toFixed(1)}%`;
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      {/* Total Users Card */}
-      <StatsCard
-        title="Total Users"
-        value={stats.totalUsers !== undefined ? stats.totalUsers : 'Loading...'}
-        icon={<Users className="h-8 w-8" />}
-        secondaryText={`${stats.newUsersInRange} new in selected period`}
-      />
-
-      {/* Debug Card */}
-      <StatsCard
-        title="Debug Card"
-        value={42}
-        icon={<Users className="h-8 w-8" />}
-        secondaryText={`Current time range: ${timeRange || 'unknown'}`}
-      />
+      {/* Enhanced User Stats Card */}
+      <UserStatsCard stats={stats} />
 
       {/* Book Clubs Card */}
-      <StatsCard
+      <EnhancedStatsCard
         title="Book Clubs"
-        value={stats.totalClubs}
+        value={stats.totalClubs !== undefined ? stats.totalClubs : 'Loading...'}
         icon={<BookOpen className="h-8 w-8" />}
-        secondaryText={`${stats.newClubsInRange} new in selected period`}
+        secondaryText={`${stats.newClubsInRange || 0} new in selected period`}
+        trend={stats.growthRates?.clubs !== undefined ? {
+          direction: getTrendDirection(stats.growthRates.clubs),
+          value: formatGrowthRate(stats.growthRates.clubs),
+          label: 'from previous period'
+        } : undefined}
+        progressBar={stats.totalClubs > 0 ? {
+          value: stats.newClubsInRange || 0,
+          max: stats.totalClubs,
+          label: 'New clubs as % of total'
+        } : undefined}
       />
 
       {/* Discussions Card */}
-      <StatsCard
+      <EnhancedStatsCard
         title="Discussions"
-        value={stats.totalDiscussions}
+        value={stats.totalDiscussions !== undefined ? stats.totalDiscussions : 'Loading...'}
         icon={<MessageSquare className="h-8 w-8" />}
-        secondaryText={`${stats.activeDiscussions} active in selected period`}
+        secondaryText={`${stats.activeDiscussions || 0} active in selected period`}
+        trend={stats.growthRates?.discussions !== undefined ? {
+          direction: getTrendDirection(stats.growthRates.discussions),
+          value: formatGrowthRate(stats.growthRates.discussions),
+          label: 'from previous period'
+        } : undefined}
       />
 
       {/* Club Members Card */}
-      <StatsCard
+      <EnhancedStatsCard
         title="Club Members"
-        value={stats.totalMembers}
+        value={stats.totalMembers !== undefined ? stats.totalMembers : 'Loading...'}
         icon={<Users className="h-8 w-8" />}
-        secondaryText={`${((stats.totalMembers / stats.totalUsers) * 100).toFixed(1)}% of users are in clubs`}
+        secondaryText={`${calculatePercentage()}% of users are in clubs`}
+        progressBar={stats.totalUsers > 0 ? {
+          value: stats.totalMembers || 0,
+          max: stats.totalUsers,
+          label: 'Members as % of total users'
+        } : undefined}
       />
     </div>
   );
