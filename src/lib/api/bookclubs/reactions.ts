@@ -13,6 +13,18 @@ export const REACTION_TYPES = {
   WOW: '😮',
   SAD: '😢',
   ANGRY: '😡',
+  CLAP: '👏',
+  THINKING: '🤔',
+  PARTY: '🎉',
+  FIRE: '🔥',
+  EYES: '👀',
+  BOOK: '📚',
+  STAR: '⭐',
+  SPARKLE: '✨',
+  HUNDRED: '💯',
+  MIND_BLOWN: '🤯',
+  HEART_EYES: '😍',
+  THUMBS_DOWN: '👎',
 };
 
 export type ReactionType = keyof typeof REACTION_TYPES;
@@ -27,6 +39,7 @@ export interface Reaction {
 
 /**
  * Add a reaction to a post
+ * Each user can only have one reaction per post (regardless of type)
  */
 export async function addReaction(userId: string, postId: string, reactionType: string) {
   if (!Object.values(REACTION_TYPES).includes(reactionType)) {
@@ -34,40 +47,77 @@ export async function addReaction(userId: string, postId: string, reactionType: 
   }
 
   try {
-    // Check if user has already reacted with this type
-    const { data: existingReactions, error: checkError } = await supabase
+    // Check if user has any existing reactions on this post (regardless of type)
+    const { data: allUserReactions, error: checkAllError } = await supabase
       .from('post_reactions')
-      .select('id')
+      .select('id, reaction_type')
       .eq('user_id', userId)
-      .eq('post_id', postId)
-      .eq('reaction_type', reactionType);
+      .eq('post_id', postId);
 
-    if (checkError) {
-      throw checkError;
+    if (checkAllError) {
+      throw checkAllError;
     }
 
-    // Get the first reaction if any exist
-    const existingReaction = existingReactions && existingReactions.length > 0 ? existingReactions[0] : null;
+    // Find if the user has already reacted with this specific type
+    const existingReactionOfSameType = allUserReactions?.find(r => r.reaction_type === reactionType);
 
-    // If user already reacted with this type, remove it (toggle behavior)
-    if (existingReaction) {
-      const { error: deleteError } = await supabase
-        .from('post_reactions')
-        .delete()
-        .eq('id', existingReaction.id);
+    // If user has any reactions on this post
+    if (allUserReactions && allUserReactions.length > 0) {
+      // If user already reacted with this specific type, remove it (toggle behavior)
+      if (existingReactionOfSameType) {
+        const { error: deleteError } = await supabase
+          .from('post_reactions')
+          .delete()
+          .eq('id', existingReactionOfSameType.id);
 
-      if (deleteError) throw deleteError;
-      return { success: true, added: false };
+        if (deleteError) throw deleteError;
+        return {
+          success: true,
+          added: false,
+          removed: true,
+          previousType: reactionType
+        };
+      }
+      // If user reacted with a different type, remove the old reaction and add the new one
+      else {
+        // First, delete all existing reactions from this user on this post
+        const { error: deleteError } = await supabase
+          .from('post_reactions')
+          .delete()
+          .eq('user_id', userId)
+          .eq('post_id', postId);
+
+        if (deleteError) throw deleteError;
+
+        // Then add the new reaction
+        const { data, error } = await supabase
+          .from('post_reactions')
+          .insert([{ post_id: postId, user_id: userId, reaction_type: reactionType }])
+          .select();
+
+        if (error) throw error;
+        return {
+          success: true,
+          added: true,
+          replaced: true,
+          previousType: allUserReactions[0].reaction_type,
+          data: data && data.length > 0 ? data[0] : null
+        };
+      }
     }
 
-    // Add the reaction
+    // If user has no reactions on this post yet, add the new reaction
     const { data, error } = await supabase
       .from('post_reactions')
       .insert([{ post_id: postId, user_id: userId, reaction_type: reactionType }])
       .select();
 
     if (error) throw error;
-    return { success: true, added: true, data: data && data.length > 0 ? data[0] : null };
+    return {
+      success: true,
+      added: true,
+      data: data && data.length > 0 ? data[0] : null
+    };
   } catch (error: any) {
     // If the table doesn't exist yet, throw a specific error
     if (error.message?.includes('relation "post_reactions" does not exist')) {
@@ -81,7 +131,7 @@ export async function addReaction(userId: string, postId: string, reactionType: 
 /**
  * Get all reactions for a post
  */
-export async function getPostReactions(postId: string) {
+export async function getPostReactions(postId: string): Promise<Reaction[]> {
   try {
     const { data, error } = await supabase
       .from('post_reactions')
@@ -89,7 +139,7 @@ export async function getPostReactions(postId: string) {
       .eq('post_id', postId);
 
     if (error) throw error;
-    return data || [];
+    return data as Reaction[] || [];
   } catch (error: any) {
     // If the table doesn't exist yet, return an empty array
     if (error.message?.includes('relation "post_reactions" does not exist')) {

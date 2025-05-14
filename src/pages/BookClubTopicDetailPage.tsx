@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -10,6 +10,7 @@ import UserName from '@/components/common/UserName';
 import UserAvatar from '@/components/common/UserAvatar';
 import ThreadedComment from '@/components/discussions/ThreadedComment';
 import { buildThreadedPosts, ThreadedPost } from '@/utils/discussion-utils';
+import { DiscussionInput } from '@/components/discussions/DiscussionInput';
 
 // Using ThreadedPost from utils/discussion-utils.ts
 
@@ -204,9 +205,34 @@ const BookClubTopicDetailPage: React.FC = () => {
                     onSuccess={fetchTopicAndPosts}
                   />
                 ))}
+
+                {/* Add reply input at the bottom for convenience */}
+                <div className="mt-8 mb-4">
+                  <h3 className="text-lg font-medium mb-3">Add your reply</h3>
+                  <DiscussionInput
+                    clubId={clubId || ''}
+                    topicId={topicId || ''}
+                    onSuccess={fetchTopicAndPosts}
+                  />
+                </div>
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">No posts in this topic yet</p>
+              <div className="bg-white shadow rounded-lg p-6">
+                <div className="text-center mb-6">
+                  <MessageSquare className="h-12 w-12 mx-auto text-gray-300 mb-2" />
+                  <p className="text-gray-600 mb-2">No posts in this topic yet</p>
+                  <p className="text-sm text-gray-500">Be the first to start the discussion!</p>
+                </div>
+
+                <div className="mt-4">
+                  <h3 className="text-lg font-medium mb-3">Add the first post</h3>
+                  <DiscussionInput
+                    clubId={clubId || ''}
+                    topicId={topicId || ''}
+                    onSuccess={fetchTopicAndPosts}
+                  />
+                </div>
+              </div>
             )}
           </div>
         </div>

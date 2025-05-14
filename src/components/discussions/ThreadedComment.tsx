@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, ChevronDown, ChevronRight, ArrowUpRight, Trash2, AlertCircle } from 'lucide-react';
+import { MessageSquare, ChevronDown, ChevronRight, ChevronUp, ArrowUpRight, Trash2, AlertCircle } from 'lucide-react';
 import UserName from '@/components/common/UserName';
 import UserAvatar from '@/components/common/UserAvatar';
 import { ThreadedPost } from '@/utils/discussion-utils';
@@ -11,6 +10,8 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { deletePost } from '@/lib/api';
 import { toast } from 'sonner';
+
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,7 @@ interface ThreadedCommentProps {
   topicId: string;
   onSuccess: () => void;
   maxDepth?: number;
+  isCollapsed?: boolean; // Allow parent to control collapsed state
 }
 
 const ThreadedComment: React.FC<ThreadedCommentProps> = ({
@@ -35,15 +37,23 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
   clubId,
   topicId,
   onSuccess,
-  maxDepth = 8 // Maximum depth to render before flattening
+  maxDepth = 8, // Maximum depth to render before flattening
+  isCollapsed: isCollapsedProp // Prop to control collapsed state from parent
 }) => {
   const { user } = useAuth();
   const [isReplying, setIsReplying] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsedState, setIsCollapsedState] = useState(false);
+  // New state to track if deep replies (grandchildren and beyond) should be collapsed
+  const [areDeepRepliesCollapsed, setAreDeepRepliesCollapsed] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const hasReplies = post.replies.length > 0;
+  // Check if this post has any deep replies (grandchildren)
+  const hasDeepReplies = post.replies.some(reply => reply.replies.length > 0);
   const effectiveDepth = Math.min(post.depth, maxDepth);
+
+  // Use the prop value if provided, otherwise use the state
+  const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : isCollapsedState;
 
   // Check if current user is the author of the post
   const isAuthor = user?.id === post.user_id;
@@ -61,6 +71,26 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
   ];
 
   const threadColor = threadColors[effectiveDepth % threadColors.length];
+
+  // Handle toggling of all replies
+  const handleToggleAllReplies = () => {
+    // Only update our internal state if we're not controlled by a prop
+    if (isCollapsedProp === undefined) {
+      setIsCollapsedState(!isCollapsed);
+    }
+
+    // If we're expanding this thread and it has deep replies,
+    // also collapse the deep replies to focus on immediate children
+    if (isCollapsed && hasDeepReplies) {
+      setAreDeepRepliesCollapsed(true);
+    } else if (!isCollapsed) {
+      // If we're collapsing, no need to change deep replies state
+      // as they won't be visible anyway
+    } else if (hasDeepReplies) {
+      // Toggle deep replies state when clicking on a parent with deep replies
+      setAreDeepRepliesCollapsed(!areDeepRepliesCollapsed);
+    }
+  };
 
   // Handle post deletion
   const handleDelete = async () => {
@@ -117,12 +147,12 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
                   "cursor-pointer flex flex-col items-center mr-0.5",
                   hasReplies ? "text-gray-300 hover:text-bookconnect-sage" : "text-gray-200"
                 )}
-                onClick={() => hasReplies && setIsCollapsed(!isCollapsed)}
+                onClick={() => hasReplies && handleToggleAllReplies()}
               >
-                <div className="h-3.5 w-3.5 flex items-center justify-center">
+                <div className="h-4.5 w-4.5 flex items-center justify-center">
                   {hasReplies && (isCollapsed ?
-                    <ChevronRight className="h-3.5 w-3.5" /> :
-                    <ChevronDown className="h-3.5 w-3.5" />
+                    <ChevronRight className="h-4.5 w-4.5" /> :
+                    <ChevronDown className="h-4.5 w-4.5" />
                   )}
                 </div>
                 <div className="h-full w-0.5 bg-gray-100 my-0.5"></div>
@@ -162,46 +192,46 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
               <div className="flex items-center gap-2 text-gray-400">
                 <button
                   className={cn(
-                    "flex items-center transition-colors p-1 rounded hover:bg-gray-100",
+                    "flex items-center justify-center transition-colors p-1.5 rounded min-w-[28px] min-h-[28px]",
                     isReplying
-                      ? "text-bookconnect-sage"
-                      : "text-gray-400"
+                      ? "text-white bg-bookconnect-sage hover:bg-bookconnect-sage/90"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-bookconnect-sage border border-gray-200"
                   )}
                   onClick={() => setIsReplying(!isReplying)}
                   title={isReplying ? "Cancel reply" : "Reply"}
                 >
-                  <MessageSquare className="h-3.5 w-3.5" />
+                  <MessageSquare className="h-4.5 w-4.5" />
                 </button>
 
                 {post.depth > 0 && (
                   <button
-                    className="flex items-center p-1 rounded hover:bg-gray-100"
+                    className="flex items-center justify-center p-1.5 rounded hover:bg-gray-100 min-w-[28px] min-h-[28px]"
                     onClick={() => {
                       // This would be used to navigate to parent comment
                       // For now just a visual element
                     }}
                     title="Go to parent"
                   >
-                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    <ArrowUpRight className="h-4.5 w-4.5" />
                   </button>
                 )}
 
                 {/* Delete button - only shown to the author */}
                 {isAuthor && (
                   <button
-                    className="flex items-center p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50"
+                    className="flex items-center justify-center p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 min-w-[28px] min-h-[28px]"
                     onClick={() => setShowDeleteDialog(true)}
                     disabled={isDeleting}
                     title="Delete comment"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4.5 w-4.5" />
                   </button>
                 )}
 
                 {hasReplies && (
                   <button
-                    className="flex items-center p-1 rounded hover:bg-gray-100"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="flex items-center p-1.5 rounded hover:bg-gray-100"
+                    onClick={() => handleToggleAllReplies()}
                     title={isCollapsed ? "Show replies" : "Hide replies"}
                   >
                     <span className="text-xs">
@@ -232,20 +262,61 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
         {/* Render replies recursively if not collapsed */}
         {!isCollapsed && hasReplies && (
           <div className="replies mt-1">
-            {post.replies.length > 5 && !isCollapsed && (
-              <div className="text-xs text-gray-400 mb-1 ml-2 hover:text-bookconnect-sage cursor-pointer" onClick={() => setIsCollapsed(true)}>
-                ↑ Collapse {post.replies.length} replies
-              </div>
-            )}
+            {/* Controls for managing replies */}
+            <div className="flex items-center justify-between mb-1 ml-2">
+              {post.replies.length > 5 && (
+                <div className="text-sm text-gray-400 hover:text-bookconnect-sage cursor-pointer flex items-center" onClick={() => handleToggleAllReplies()}>
+                  <ChevronUp className="h-4 w-4 mr-1" /> Collapse {post.replies.length} replies
+                </div>
+              )}
+
+              {/* Toggle for deep replies */}
+              {hasDeepReplies && (
+                <div
+                  className={`text-xs ${areDeepRepliesCollapsed ? 'text-bookconnect-sage' : 'text-gray-400'} hover:text-bookconnect-sage cursor-pointer flex items-center ml-auto`}
+                  onClick={() => setAreDeepRepliesCollapsed(!areDeepRepliesCollapsed)}
+                >
+                  {areDeepRepliesCollapsed ? (
+                    <>
+                      <ChevronDown className="h-3.5 w-3.5 mr-1" />
+                      Expand nested replies
+                    </>
+                  ) : (
+                    <>
+                      <ChevronUp className="h-3.5 w-3.5 mr-1" />
+                      Collapse nested replies
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             {post.replies.map(reply => (
-              <ThreadedComment
-                key={reply.id}
-                post={reply}
-                clubId={clubId}
-                topicId={topicId}
-                onSuccess={onSuccess}
-                maxDepth={maxDepth}
-              />
+              <React.Fragment key={reply.id}>
+                <ThreadedComment
+                  post={reply}
+                  clubId={clubId}
+                  topicId={topicId}
+                  onSuccess={onSuccess}
+                  maxDepth={maxDepth}
+                  // Pass down the deep replies collapsed state to children
+                  // Only if this is a direct child (depth = 1) and has its own replies
+                  {...(areDeepRepliesCollapsed && reply.replies.length > 0
+                    ? { isCollapsed: true }
+                    : {}
+                  )}
+                />
+
+                {/* Show indicator for collapsed deep replies */}
+                {areDeepRepliesCollapsed && reply.replies.length > 0 && (
+                  <div
+                    className="text-xs text-gray-400 ml-8 mb-2 hover:text-bookconnect-sage cursor-pointer flex items-center"
+                    onClick={() => setAreDeepRepliesCollapsed(false)}
+                  >
+                    <ChevronRight className="h-3.5 w-3.5 mr-1" />
+                    <span className="italic">{reply.replies.length} nested {reply.replies.length === 1 ? 'reply' : 'replies'} hidden</span>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
         )}
@@ -254,9 +325,9 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
         {isCollapsed && hasReplies && (
           <div
             className="text-xs text-gray-400 ml-5 mb-2 hover:text-bookconnect-sage cursor-pointer flex items-center"
-            onClick={() => setIsCollapsed(false)}
+            onClick={() => handleToggleAllReplies()}
           >
-            <ChevronRight className="h-3 w-3 mr-1" />
+            <ChevronRight className="h-4 w-4 mr-1" />
             View {post.replies.length} {post.replies.length === 1 ? 'reply' : 'replies'}
           </div>
         )}

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { addDiscussionTopic } from '@/lib/api';
+import { addDiscussionTopic, createPost } from '@/lib/api';
 
 const CreateTopicForm: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
@@ -33,9 +33,18 @@ const CreateTopicForm: React.FC = () => {
     setLoading(true);
 
     try {
-      await addDiscussionTopic(user.id, clubId, title);
-      toast.success('Topic created successfully');
-      navigate(`/book-club/${clubId}/discussions`, {
+      // Step 1: Create the topic
+      const topicData = await addDiscussionTopic(user.id, clubId, title.trim());
+
+      // Step 2: Create the initial post if content is provided
+      if (content.trim()) {
+        await createPost(user.id, topicData.id, content.trim());
+      }
+
+      toast.success('Discussion topic created successfully');
+
+      // Step 3: Redirect to the new topic page
+      navigate(`/book-club/${clubId}/discussions/${topicData.id}`, {
         state: { fromNewTopic: true }
       });
     } catch (error) {
@@ -77,15 +86,18 @@ const CreateTopicForm: React.FC = () => {
 
         <div>
           <label htmlFor="content" className="block text-sm font-medium mb-1">
-            Initial Post (Optional)
+            Initial Post Content
           </label>
           <Textarea
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Start the discussion with an initial post"
+            placeholder="Start the discussion with your first post"
             rows={5}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Adding content will create your first post in this topic. If left empty, you'll be redirected to the topic to add your first post.
+          </p>
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">

@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send, Smile } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +10,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/lib/supabase';
 import { createTopic, createPost } from '@/lib/api';
+import { REACTION_TYPES } from '@/lib/api/bookclubs/reactions';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from '@/lib/utils';
 
 type DiscussionTopic = Database['public']['Tables']['discussion_topics']['Row'];
 type DiscussionPost = Database['public']['Tables']['discussion_posts']['Row'];
@@ -29,10 +36,11 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   onSuccess,
   mode = 'reply'
 }) => {
-  const [title, setTitle] = React.useState('');
-  const [content, setContent] = React.useState('');
-  const [submitting, setSubmitting] = React.useState(false);
-  const [isFocused, setIsFocused] = React.useState(false);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -61,6 +69,33 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
   useEffect(() => {
     adjustTextareaHeight();
   }, [content, mode]);
+
+  // Function to insert emoji at cursor position
+  const insertEmoji = (emoji: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    // Get text before and after cursor
+    const textBefore = content.substring(0, start);
+    const textAfter = content.substring(end);
+
+    // Insert emoji at cursor position
+    const newContent = textBefore + emoji + textAfter;
+    setContent(newContent);
+
+    // Close emoji picker
+    setEmojiPickerOpen(false);
+
+    // Focus back on textarea and set cursor position after the inserted emoji
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + emoji.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,16 +165,53 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Initial Post
               </label>
-              <Textarea
-                ref={textareaRef}
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Start the discussion..."
-                rows={4}
-                className="w-full resize-none text-sm py-2 px-3 border-gray-200 focus:border-bookconnect-sage focus:ring-1 focus:ring-bookconnect-sage/30 transition-all"
-                style={{ overflow: content.length > 100 ? 'auto' : 'hidden' }}
-              />
+              <div className="relative">
+                <Textarea
+                  ref={textareaRef}
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Start the discussion..."
+                  rows={4}
+                  className="w-full resize-none text-sm py-2 px-3 border-gray-200 focus:border-bookconnect-sage focus:ring-1 focus:ring-bookconnect-sage/30 transition-all"
+                  style={{ overflow: content.length > 100 ? 'auto' : 'hidden' }}
+                />
+                <div className="absolute bottom-2 left-2">
+                  <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-bookconnect-sage hover:bg-gray-100 rounded-full h-7 w-7 p-0 flex items-center justify-center"
+                        title="Insert emoji"
+                      >
+                        <Smile className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2" align="start" side="top">
+                      <div className="flex flex-col gap-2">
+                        <div className="text-xs text-gray-500 px-1">
+                          Click to insert emoji
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 max-w-[280px]">
+                          {Object.values(REACTION_TYPES).map(emoji => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => insertEmoji(emoji)}
+                              className="text-xl hover:bg-gray-100 p-1.5 rounded transition-colors"
+                              title={`Insert ${emoji}`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-end pt-1">
@@ -179,7 +251,43 @@ export const DiscussionInput: React.FC<DiscussionInputProps> = ({
               onBlur={() => setIsFocused(false)}
             />
 
-            <div className={`flex justify-end items-center ${isFocused ? 'bg-gray-50' : 'bg-gray-50/80'} py-2 px-3 border-t border-gray-200 transition-colors`}>
+            <div className={`flex justify-between items-center ${isFocused ? 'bg-gray-50' : 'bg-gray-50/80'} py-2 px-3 border-t border-gray-200 transition-colors`}>
+              {/* Emoji Picker */}
+              <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-500 hover:text-bookconnect-sage hover:bg-gray-100 rounded-full h-7 w-7 p-0 flex items-center justify-center"
+                    title="Insert emoji"
+                  >
+                    <Smile className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2" align="start" side="top">
+                  <div className="flex flex-col gap-2">
+                    <div className="text-xs text-gray-500 px-1">
+                      Click to insert emoji
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 max-w-[280px]">
+                      {Object.values(REACTION_TYPES).map(emoji => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => insertEmoji(emoji)}
+                          className="text-xl hover:bg-gray-100 p-1.5 rounded transition-colors"
+                          title={`Insert ${emoji}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              {/* Submit Button */}
               <Button
                 type="submit"
                 disabled={submitting || !content.trim()}
