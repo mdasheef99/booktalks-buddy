@@ -34,7 +34,7 @@ export function buildThreadedPosts(
     .map(post => {
       // Find all replies to this post
       const replies = buildThreadedPosts(posts, post.id, depth + 1);
-      
+
       // Return the post with its replies and depth
       return {
         ...post,
@@ -42,4 +42,29 @@ export function buildThreadedPosts(
         depth
       };
     });
+}
+
+/**
+ * Clears all session storage related to a specific topic's collapsed states
+ * @param topicId The ID of the discussion topic
+ * @param sessionKeyPrefix Optional prefix for the session storage key (default: 'discussion')
+ */
+export function resetTopicCollapseState(topicId: string, sessionKeyPrefix: string = 'discussion'): void {
+  if (typeof window === 'undefined') return;
+
+  const sessionKey = `${sessionKeyPrefix}-${topicId}`;
+  const keysToRemove: string[] = [];
+
+  // Find all keys in session storage that match our pattern
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (key && key.startsWith(sessionKey)) {
+      keysToRemove.push(key);
+    }
+  }
+
+  // Remove all matching keys
+  keysToRemove.forEach(key => {
+    sessionStorage.removeItem(key);
+  });
 }

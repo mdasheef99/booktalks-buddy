@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { ArrowLeft, MessageSquare, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -9,7 +9,7 @@ import { getDiscussionPosts } from '@/lib/api';
 import UserName from '@/components/common/UserName';
 import UserAvatar from '@/components/common/UserAvatar';
 import ThreadedComment from '@/components/discussions/ThreadedComment';
-import { buildThreadedPosts, ThreadedPost } from '@/utils/discussion-utils';
+import { buildThreadedPosts, ThreadedPost, resetTopicCollapseState } from '@/utils/discussion-utils';
 import { DiscussionInput } from '@/components/discussions/DiscussionInput';
 
 // Using ThreadedPost from utils/discussion-utils.ts
@@ -184,12 +184,32 @@ const BookClubTopicDetailPage: React.FC = () => {
           </Button>
 
           <div className="bg-white shadow rounded-lg p-6 mb-6">
-            <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
-            <div className="flex items-center gap-2 mb-4">
-              <UserAvatar userId={topic.user_id} size="sm" />
-              <p className="text-sm text-gray-500">
-                Started by <UserName userId={topic.user_id} linkToProfile /> • {new Date(topic.created_at).toLocaleString()}
-              </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
+                <div className="flex items-center gap-2">
+                  <UserAvatar userId={topic.user_id} size="sm" />
+                  <p className="text-sm text-gray-500">
+                    Started by <UserName userId={topic.user_id} linkToProfile /> • {new Date(topic.created_at).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 text-gray-600 hover:text-bookconnect-sage"
+                onClick={() => {
+                  // Reset all collapse states for this topic
+                  resetTopicCollapseState(topicId || '');
+                  // Refresh the page to apply default states
+                  fetchTopicAndPosts();
+                  toast.success('View reset to default');
+                }}
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>Reset View</span>
+              </Button>
             </div>
           </div>
 
@@ -203,6 +223,9 @@ const BookClubTopicDetailPage: React.FC = () => {
                     clubId={clubId || ''}
                     topicId={topicId || ''}
                     onSuccess={fetchTopicAndPosts}
+                    sessionKey={`discussion-${topicId}`}
+                    // Top-level comments are expanded by default, but we still respect session storage
+                    // This is handled internally in the component, so we don't need to pass isCollapsed here
                   />
                 ))}
 

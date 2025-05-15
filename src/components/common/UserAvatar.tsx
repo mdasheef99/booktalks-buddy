@@ -5,7 +5,7 @@ import { getUserProfile, UserProfile } from '@/services/profileService';
 
 interface UserAvatarProps {
   userId: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
   showTooltip?: boolean;
   className?: string;
 }
@@ -36,6 +36,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
 
   // Size classes
   const sizeClasses = {
+    xxs: 'h-4 w-4 text-[10px]',
     xs: 'h-6 w-6',
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
