@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Edit, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { UserMetadata, READING_FREQUENCY_LABELS } from './types';
+import UserTierBadge from '@/components/common/UserTierBadge';
 
 interface ProfileHeaderProps {
   user: any;
@@ -73,9 +74,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </Avatar>
 
             <div className="ml-4 mt-4">
-              <h1 className="text-2xl font-bold font-serif text-bookconnect-brown">
-                {userMetadata.display_name || userMetadata.username || user.email?.split('@')[0] || 'BookClub Member'}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold font-serif text-bookconnect-brown">
+                  {userMetadata.display_name || userMetadata.username || user.email?.split('@')[0] || 'BookClub Member'}
+                </h1>
+                {user.account_tier && (
+                  <UserTierBadge tier={user.account_tier} size="md" />
+                )}
+              </div>
               <p className="text-sm text-gray-600">{user.email}</p>
               <p className="text-sm text-gray-600">Member since {new Date(user.created_at || Date.now()).toLocaleDateString()}</p>
             </div>

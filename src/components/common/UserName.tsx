@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getUserProfile, UserProfile } from '@/services/profileService';
+import UserTierBadge from '@/components/common/UserTierBadge';
 
 interface UserNameProps {
   userId: string;
   linkToProfile?: boolean;
   className?: string;
   withRole?: string;
+  showTierBadge?: boolean;
 }
 
 const UserName: React.FC<UserNameProps> = ({
   userId,
   linkToProfile = false,
   className = '',
-  withRole
+  withRole,
+  showTierBadge = true
 }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,12 +41,17 @@ const UserName: React.FC<UserNameProps> = ({
     : (profile?.displayname || profile?.username || `User ${userId.substring(0, 4)}`);
 
   const content = (
-    <span className={className}>
-      {displayName}
-      {withRole && (
-        <span className="text-gray-500 text-sm ml-1">
-          ({withRole})
-        </span>
+    <span className={`flex items-center gap-1 ${className}`}>
+      <span>
+        {displayName}
+        {withRole && (
+          <span className="text-gray-500 text-sm ml-1">
+            ({withRole})
+          </span>
+        )}
+      </span>
+      {showTierBadge && profile?.account_tier && (
+        <UserTierBadge tier={profile.account_tier} size="sm" />
       )}
     </span>
   );

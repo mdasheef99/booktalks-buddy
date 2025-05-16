@@ -206,3 +206,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* User tier badge gradients */
+.bg-silver-gradient {
+  background: linear-gradient(135deg, #e6e6e6 0%, #c0c0c0 50%, #d9d9d9 100%);
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #f7e084 0%, #ffd700 50%, #f9e076 100%);
+}

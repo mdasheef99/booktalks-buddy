@@ -242,7 +242,7 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
                   <UserAvatar userId={post.user_id} size="xs" />
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-[0.85rem] font-medium text-gray-600">
-                      <UserName userId={post.user_id} linkToProfile />
+                      <UserName userId={post.user_id} linkToProfile showTierBadge={true} />
                     </span>
                     <span className="text-[0.75rem] text-gray-400 opacity-60 group-hover:opacity-100 transition-opacity">
                       {new Date(post.created_at).toLocaleString(undefined, {
@@ -509,7 +509,7 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
                 <div className="flex items-center gap-1.5 mb-1">
                   <UserAvatar userId={post.replies[0].user_id} size="xxs" />
                   <span className="text-[0.75rem] font-medium text-gray-600">
-                    <UserName userId={post.replies[0].user_id} />
+                    <UserName userId={post.replies[0].user_id} showTierBadge={true} />
                   </span>
                 </div>
                 <p className="text-[0.8rem] text-gray-600 line-clamp-2">

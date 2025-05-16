@@ -9,6 +9,7 @@ export interface UserProfile {
   favorite_author: string | null;
   favorite_genre: string | null;
   bio: string | null;
+  account_tier?: string | null;
 }
 
 // In-memory cache for profiles
@@ -81,7 +82,7 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
     // Fetch user data
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, favorite_author, favorite_genre, bio')
+      .select('id, username, email, favorite_author, favorite_genre, bio, account_tier')
       .in('id', idsToFetch);
 
     if (error) throw error;
@@ -98,7 +99,8 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           avatar_url: null,
           favorite_author: profile.favorite_author,
           favorite_genre: profile.favorite_genre,
-          bio: profile.bio
+          bio: profile.bio,
+          account_tier: profile.account_tier
         };
         profileCache[profile.id] = profileWithDefaults;
         result.set(profile.id, profileWithDefaults);
@@ -116,7 +118,8 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           avatar_url: null,
           favorite_author: null,
           favorite_genre: null,
-          bio: null
+          bio: null,
+          account_tier: null
         };
         profileCache[id] = placeholder;
         result.set(id, placeholder);
@@ -138,7 +141,8 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           avatar_url: null,
           favorite_author: null,
           favorite_genre: null,
-          bio: null
+          bio: null,
+          account_tier: null
         };
         result.set(id, placeholder);
       }
@@ -164,7 +168,7 @@ async function fetchSingleProfile(userId: string): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, favorite_author, favorite_genre, bio')
+      .select('id, username, email, favorite_author, favorite_genre, bio, account_tier')
       .eq('id', userId)
       .single();
 
@@ -184,7 +188,8 @@ async function fetchSingleProfile(userId: string): Promise<UserProfile | null> {
       avatar_url: null, // Set default value for avatar_url
       favorite_author: data.favorite_author,
       favorite_genre: data.favorite_genre,
-      bio: data.bio
+      bio: data.bio,
+      account_tier: data.account_tier
     };
 
     return profileWithDefaults;

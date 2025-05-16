@@ -6,53 +6,75 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 type UserTierBadgeProps = {
   tier: string;
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
   showTooltip?: boolean;
 };
 
 /**
- * Component for displaying a user's account tier as a badge
+ * Component for displaying a user's account tier as a badge with appropriate styling and icons
  */
-export function UserTierBadge({ tier, className = '', showTooltip = true }: UserTierBadgeProps) {
+const UserTierBadge: React.FC<UserTierBadgeProps> = ({
+  tier,
+  className = '',
+  size = 'md',
+  showTooltip = true,
+}) => {
+  // Default to 'free' if tier is not provided
+  const userTier = tier || 'free';
+
   // Define badge properties based on tier
   let badgeProps: {
     icon: React.ReactNode;
+    label: string;
     tooltip: string;
     className: string;
-  } | null = null;
+  };
 
-  switch (tier) {
+  // Size classes for the badge (icon-only version)
+  const sizeClasses = {
+    sm: 'p-0.5 h-4 w-4',
+    md: 'p-0.5 h-5 w-5',
+    lg: 'p-1 h-6 w-6',
+  };
+
+  // Icon size classes (without margin since we're not showing text)
+  const iconSizeClasses = {
+    sm: 'h-2.5 w-2.5',
+    md: 'h-3.5 w-3.5',
+    lg: 'h-4 w-4',
+  };
+
+  switch (userTier) {
     case 'privileged':
       badgeProps = {
-        icon: <Star className="h-3.5 w-3.5" />,
+        icon: <Star className={iconSizeClasses[size]} />,
+        label: 'Privileged',
         tooltip: 'Privileged member with premium benefits including book club creation',
         className: 'bg-silver-gradient text-gray-700 border border-gray-300 shadow-sm',
       };
       break;
     case 'privileged_plus':
       badgeProps = {
-        icon: <Crown className="h-3.5 w-3.5" />,
+        icon: <Crown className={iconSizeClasses[size]} />,
+        label: 'Privileged+',
         tooltip: 'Privileged+ member with exclusive benefits and priority access',
         className: 'bg-gold-gradient text-amber-800 border border-amber-300 shadow-sm',
       };
       break;
     default:
-      // Free tier - show a simple text badge
-      return (
-        <Badge variant="outline" className={`text-xs py-0.5 px-2 ${className}`}>
-          Free
-        </Badge>
-      );
+      // Free tier - no badge displayed
+      return null;
   }
 
   const badge = (
     <Badge
       variant="outline"
-      className={`p-0.5 h-5 w-5 flex items-center justify-center rounded-full ${badgeProps.className} ${className}`}
+      className={`${badgeProps.className} ${sizeClasses[size]} flex items-center justify-center rounded-full ${className}`}
     >
       {badgeProps.icon}
     </Badge>
@@ -75,4 +97,6 @@ export function UserTierBadge({ tier, className = '', showTooltip = true }: User
   }
 
   return badge;
-}
+};
+
+export default UserTierBadge;
