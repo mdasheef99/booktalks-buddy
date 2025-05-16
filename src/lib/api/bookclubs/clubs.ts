@@ -11,15 +11,23 @@ import { isClubAdmin } from '../auth';
 export async function createBookClub(userId: string, club: { name: string; description?: string; privacy?: string }) {
   if (!club.name) throw new Error('Club name is required');
 
-  console.log('Creating book club with data:', { name: club.name, description: club.description, privacy: club.privacy });
+  console.log('Creating book club with data:', {
+    name: club.name,
+    description: club.description,
+    privacy: club.privacy,
+    lead_user_id: userId,
+    access_tier_required: 'free'
+  });
 
-  // Remove created_by if it doesn't exist in the schema
+  // Include lead_user_id which is required (NOT NULL constraint)
   const { data, error } = await supabase
     .from('book_clubs')
     .insert([{
       name: club.name,
       description: club.description,
-      privacy: club.privacy
+      privacy: club.privacy,
+      lead_user_id: userId,
+      access_tier_required: 'free' // Default to free access tier
     }])
     .select()
     .single();
