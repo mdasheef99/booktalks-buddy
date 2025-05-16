@@ -1,5 +1,6 @@
 import { supabase } from '../../supabase';
 import { isClubAdmin, isClubMember } from '../auth';
+import { invalidateUserEntitlements } from '@/lib/entitlements/cache';
 
 /**
  * Book Club Membership Management
@@ -50,6 +51,12 @@ export async function addClubMember(adminId: string, clubId: string, userId: str
     .insert([{ user_id: userId, club_id: clubId, role }]);
 
   if (error) throw error;
+
+  // If the role is 'admin', invalidate the user's entitlements cache
+  if (role === 'admin') {
+    invalidateUserEntitlements(userId);
+  }
+
   return { success: true };
 }
 
@@ -66,6 +73,15 @@ export async function updateMemberRole(adminId: string, clubId: string, userId: 
     .eq('club_id', clubId);
 
   if (error) throw error;
+
+  // Invalidate the user's entitlements cache since their role has changed
+  invalidateUserEntitlements(userId);
+
+  // Also invalidate the admin's cache if they're different
+  if (adminId !== userId) {
+    invalidateUserEntitlements(adminId);
+  }
+
   return { success: true };
 }
 
@@ -75,6 +91,19 @@ export async function updateMemberRole(adminId: string, clubId: string, userId: 
 export async function removeMember(adminId: string, userIdToRemove: string, clubId: string) {
   if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
 
+  // First, check if the user is an admin of the club
+  const { data: memberData, error: memberError } = await supabase
+    .from('club_members')
+    .select('role')
+    .eq('user_id', userIdToRemove)
+    .eq('club_id', clubId)
+    .single();
+
+  if (memberError && memberError.code !== 'PGRST116') throw memberError;
+
+  const isAdmin = memberData?.role === 'admin';
+
+  // Remove the member
   const { error } = await supabase
     .from('club_members')
     .delete()
@@ -82,6 +111,12 @@ export async function removeMember(adminId: string, userIdToRemove: string, club
     .eq('club_id', clubId);
 
   if (error) throw error;
+
+  // If the user was an admin, invalidate their entitlements cache
+  if (isAdmin) {
+    invalidateUserEntitlements(userIdToRemove);
+  }
+
   return { success: true };
 }
 

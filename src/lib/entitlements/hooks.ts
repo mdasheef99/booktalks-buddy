@@ -20,14 +20,17 @@ import {
 /**
  * Hook to get all entitlements for the current user
  *
- * @returns An object containing the entitlements array and loading state
+ * @returns An object containing the entitlements array, loading state, and refresh function
  */
 export function useEntitlements() {
   const { user } = useAuth();
   const [entitlements, setEntitlements] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cacheStatus, setCacheStatus] = useState<'hit' | 'miss' | 'error' | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadEntitlements() {
       if (!user) {
         setEntitlements([]);
@@ -37,17 +40,49 @@ export function useEntitlements() {
 
       try {
         setLoading(true);
+
+        // Track the start time for performance monitoring
+        const startTime = performance.now();
+
+        // Get entitlements from cache or calculate them
         const userEntitlements = await getUserEntitlements(user.id);
-        setEntitlements(userEntitlements);
+
+        // Calculate the time it took to get entitlements
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+
+        // Only update state if the component is still mounted
+        if (isMounted) {
+          setEntitlements(userEntitlements);
+
+          // Determine if this was a cache hit or miss
+          // This is a simplified approach - in a real implementation,
+          // you might want to pass this information from the cache function
+          if (duration < 50) { // Arbitrary threshold to guess if it was a cache hit
+            setCacheStatus('hit');
+          } else {
+            setCacheStatus('miss');
+          }
+        }
       } catch (error) {
         console.error('Error loading entitlements:', error);
-        setEntitlements([]);
+        if (isMounted) {
+          setEntitlements([]);
+          setCacheStatus('error');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     loadEntitlements();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   const refreshEntitlements = useCallback(async () => {
@@ -55,16 +90,27 @@ export function useEntitlements() {
 
     try {
       setLoading(true);
+      setCacheStatus(null);
+
+      // Force refresh by passing true as the second argument
       const userEntitlements = await getUserEntitlements(user.id, true);
+
       setEntitlements(userEntitlements);
+      setCacheStatus('miss'); // It's always a miss when forcing refresh
     } catch (error) {
       console.error('Error refreshing entitlements:', error);
+      setCacheStatus('error');
     } finally {
       setLoading(false);
     }
   }, [user]);
 
-  return { entitlements, loading, refreshEntitlements };
+  return {
+    entitlements,
+    loading,
+    refreshEntitlements,
+    cacheStatus
+  };
 }
 
 /**

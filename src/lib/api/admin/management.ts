@@ -1,6 +1,6 @@
 import { supabase } from '../../supabase';
 import { isClubAdmin } from '../auth';
-import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
 
 /**
@@ -90,6 +90,14 @@ export async function updateUserTier(
 
     if (userError) {
       throw new Error('Failed to update user tier: ' + userError.message);
+    }
+
+    // Invalidate the user's entitlements cache since their tier has changed
+    invalidateUserEntitlements(userId);
+
+    // Also invalidate the admin's cache if they're different
+    if (adminId !== userId) {
+      invalidateUserEntitlements(adminId);
     }
 
     // If upgrading to a paid tier, create a subscription and payment record

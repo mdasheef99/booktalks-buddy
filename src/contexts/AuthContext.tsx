@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return clubRoles.hasOwnProperty(clubId) && clubRoles[clubId] !== 'pending';
   };
 
-  // Entitlements functions
+  // Entitlements functions with improved caching
   const refreshEntitlements = async () => {
     if (!user) {
       setEntitlements([]);
@@ -86,8 +86,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       setEntitlementsLoading(true);
+
+      // Force refresh by passing true as the second argument
       const userEntitlements = await getUserEntitlements(user.id, true);
       setEntitlements(userEntitlements);
+
+      // Log cache statistics for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[AuthContext] Entitlements refreshed with force=true');
+      }
     } catch (error) {
       console.error('Error refreshing entitlements:', error);
       toast.error('Failed to load user permissions');
@@ -184,7 +191,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user?.id) {
       console.log("User ID changed, loading entitlements");
-      refreshEntitlements();
+
+      // Set loading state
+      setEntitlementsLoading(true);
+
+      // Use the cached entitlements if available
+      getUserEntitlements(user.id)
+        .then(userEntitlements => {
+          setEntitlements(userEntitlements);
+
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[AuthContext] Entitlements loaded from cache or calculated');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading entitlements:', error);
+          setEntitlements([]);
+        })
+        .finally(() => {
+          setEntitlementsLoading(false);
+        });
     } else {
       setEntitlements([]);
       setEntitlementsLoading(false);
@@ -271,6 +297,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Invalidate entitlements cache if user exists
       if (user?.id) {
         invalidateUserEntitlements(user.id);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[AuthContext] Invalidated entitlements cache for user:', user.id);
+        }
       }
 
       await supabase.auth.signOut();

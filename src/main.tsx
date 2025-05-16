@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.tsx';
 import './index.css';
+import { initEntitlementsCache } from './lib/entitlements/init';
 
 // Get the root element and create a React root
 const rootElement = document.getElementById("root")
@@ -14,6 +15,9 @@ if (!rootElement) {
 
 // Create a client
 const queryClient = new QueryClient();
+
+// Initialize the entitlements caching system
+initEntitlementsCache();
 
 // Create root and render the app
 createRoot(rootElement).render(
