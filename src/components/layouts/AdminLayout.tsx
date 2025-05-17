@@ -7,14 +7,17 @@ import {
   UserPlus,
   LogOut,
   ArrowLeft,
-  BarChart
+  BarChart,
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHasEntitlement } from '@/lib/entitlements/hooks';
 
 const AdminLayout: React.FC = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const { result: canManageEvents } = useHasEntitlement('CAN_MANAGE_STORE_EVENTS');
 
   const handleLogout = async () => {
     await signOut();
@@ -89,6 +92,20 @@ const AdminLayout: React.FC = () => {
             <UserPlus className="h-5 w-5 mr-3" />
             Join Requests
           </NavLink>
+
+          {canManageEvents && (
+            <NavLink
+              to="/admin/events"
+              className={({ isActive }) =>
+                `flex items-center p-3 rounded-lg ${isActive
+                  ? 'bg-white/20 text-white'
+                  : 'text-white/70 hover:bg-white/10'}`
+              }
+            >
+              <Calendar className="h-5 w-5 mr-3" />
+              Events
+            </NavLink>
+          )}
         </nav>
 
         <div className="pt-6 border-t border-white/20 space-y-2">

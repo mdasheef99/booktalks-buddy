@@ -4,7 +4,6 @@ import {
   Home,
   BookOpen,
   Users,
-  Calendar,
   Search as SearchIcon,
   User,
   Settings,
@@ -15,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useHasEntitlement, useIsPlatformOwner } from '@/lib/entitlements/hooks';
+import EventsNavItem from '@/components/events/EventsNavItem';
 
 interface MainNavigationProps {
   collapsed?: boolean;
@@ -87,7 +87,7 @@ const MainNavigation: React.FC<MainNavigationProps> = ({ collapsed = false }) =>
         {renderNavLink("/", <Home className="h-5 w-5" />, "Home")}
         {renderNavLink("/books", <BookOpen className="h-5 w-5" />, "Books")}
         {renderNavLink("/book-club", <Users className="h-5 w-5" />, "Book Clubs")}
-        {renderNavLink("/events", <Calendar className="h-5 w-5" />, "Events")}
+        <EventsNavItem collapsed={collapsed} />
         {renderNavLink("/search", <SearchIcon className="h-5 w-5" />, "Search")}
       </div>
 

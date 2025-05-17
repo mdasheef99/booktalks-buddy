@@ -305,6 +305,18 @@ export type Database = {
           description: string
           id: string
           title: string
+          club_id: string | null
+          store_id: string | null
+          event_type: string | null
+          start_time: string | null
+          end_time: string | null
+          location: string | null
+          is_virtual: boolean | null
+          virtual_meeting_link: string | null
+          max_participants: number | null
+          featured_on_landing: boolean | null
+          created_by: string | null
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
@@ -312,6 +324,18 @@ export type Database = {
           description: string
           id?: string
           title: string
+          club_id?: string | null
+          store_id?: string | null
+          event_type?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          location?: string | null
+          is_virtual?: boolean | null
+          virtual_meeting_link?: string | null
+          max_participants?: number | null
+          featured_on_landing?: boolean | null
+          created_by?: string | null
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
@@ -319,8 +343,117 @@ export type Database = {
           description?: string
           id?: string
           title?: string
+          club_id?: string | null
+          store_id?: string | null
+          event_type?: string | null
+          start_time?: string | null
+          end_time?: string | null
+          location?: string | null
+          is_virtual?: boolean | null
+          virtual_meeting_link?: string | null
+          max_participants?: number | null
+          featured_on_landing?: boolean | null
+          created_by?: string | null
+          updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      event_participants: {
+        Row: {
+          event_id: string
+          user_id: string
+          rsvp_status: string
+          rsvp_at: string | null
+        }
+        Insert: {
+          event_id: string
+          user_id: string
+          rsvp_status: string
+          rsvp_at?: string | null
+        }
+        Update: {
+          event_id?: string
+          user_id?: string
+          rsvp_status?: string
+          rsvp_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      event_notifications: {
+        Row: {
+          id: string
+          event_id: string
+          user_id: string
+          is_read: boolean
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          user_id: string
+          is_read?: boolean
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          user_id?: string
+          is_read?: boolean
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       message_reactions: {
         Row: {

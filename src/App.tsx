@@ -30,6 +30,9 @@ import AdminClubManagementPage from "./pages/admin/AdminClubManagementPage";
 import AdminUserListPage from "./pages/admin/AdminUserListPage";
 import AdminJoinRequestsPage from "./pages/admin/AdminJoinRequestsPage";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
+import AdminEventsPage from "./pages/admin/AdminEventsPage";
+import CreateEventPage from "./pages/admin/CreateEventPage";
+import EditEventPage from "./pages/admin/EditEventPage";
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
 import TopicDetail from "./components/discussions/TopicDetail";
@@ -37,6 +40,7 @@ import ReplyForm from "./components/discussions/ReplyForm";
 import BookClubMembers from "./components/admin/BookClubMembers";
 import BookClubSettings from "./components/admin/BookClubSettings";
 import Events from "./pages/Events";
+import EventDetailsPage from "./pages/EventDetailsPage";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";
@@ -64,6 +68,7 @@ function App() {
               <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/book/:id" element={<BookDetail />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/events/:eventId" element={<EventDetailsPage />} />
               <Route path="/search" element={<Search />} />
             </Route>
 
@@ -134,6 +139,9 @@ function App() {
               <Route path="clubs" element={<AdminClubManagementPage />} />
               <Route path="users" element={<AdminUserListPage />} />
               <Route path="requests" element={<AdminJoinRequestsPage />} />
+              <Route path="events" element={<AdminEventsPage />} />
+              <Route path="events/create" element={<CreateEventPage />} />
+              <Route path="events/edit/:eventId" element={<EditEventPage />} />
             </Route>
 
             {/* Catch-all route */}

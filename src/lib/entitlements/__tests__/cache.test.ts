@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import {
   getUserEntitlements,
   invalidateUserEntitlements,
@@ -6,7 +6,10 @@ import {
   getEntitlementsCacheTimestamp,
   isEntitlementsCacheExpired,
   getCachedUserIds,
-  getEntitlementsCacheSize
+  getEntitlementsCacheSize,
+  configureEntitlementsCache,
+  getEntitlementsCacheStats,
+  resetEntitlementsCacheStats
 } from '../cache';
 import { calculateUserEntitlements } from '../index';
 
@@ -15,12 +18,52 @@ vi.mock('../index', () => ({
   calculateUserEntitlements: vi.fn()
 }));
 
+// Mock sessionStorage
+const mockSessionStorage = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    key: vi.fn((index: number) => {
+      return Object.keys(store)[index] || null;
+    }),
+    get length() {
+      return Object.keys(store).length;
+    }
+  };
+})();
+
+// Replace the global sessionStorage with our mock
+Object.defineProperty(window, 'sessionStorage', {
+  value: mockSessionStorage
+});
+
 describe('Entitlements Cache', () => {
   beforeEach(() => {
+    // Configure cache for testing
+    configureEntitlementsCache({
+      EXPIRATION: 5 * 60 * 1000, // 5 minutes
+      KEY_PREFIX: 'test_entitlements_',
+      VERSION: 1,
+      DEBUG: false
+    });
+
     // Clear the cache before each test
     clearEntitlementsCache();
+    resetEntitlementsCacheStats();
 
-    // Reset the mock
+    // Clear the sessionStorage mock
+    mockSessionStorage.clear();
+
+    // Reset all mocks
     vi.clearAllMocks();
 
     // Mock implementation of calculateUserEntitlements
@@ -29,6 +72,10 @@ describe('Entitlements Cache', () => {
         return [`ENTITLEMENT_FOR_${userId}`];
       }
     );
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   describe('getUserEntitlements', () => {
@@ -182,6 +229,87 @@ describe('Entitlements Cache', () => {
 
       // Should be 2
       expect(size).toBe(2);
+    });
+  });
+
+  describe('configureEntitlementsCache', () => {
+    it('should update the cache configuration', async () => {
+      // Configure with custom expiration
+      const customExpiration = 10 * 60 * 1000; // 10 minutes
+      configureEntitlementsCache({
+        EXPIRATION: customExpiration,
+        KEY_PREFIX: 'custom_prefix_',
+        DEBUG: true
+      });
+
+      const userId = 'user1';
+
+      // Cache entitlements
+      await getUserEntitlements(userId);
+
+      // Verify the cache key uses the new prefix
+      expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+        expect.stringContaining('custom_prefix_'),
+        expect.any(String)
+      );
+    });
+  });
+
+  describe('getEntitlementsCacheStats', () => {
+    it('should track cache hits and misses', async () => {
+      const userId = 'user1';
+
+      // First call should be a miss
+      await getUserEntitlements(userId);
+
+      // Second call should be a hit
+      await getUserEntitlements(userId);
+
+      // Force refresh should be a miss
+      await getUserEntitlements(userId, true);
+
+      const stats = getEntitlementsCacheStats();
+      expect(stats.hits).toBe(1);
+      expect(stats.misses).toBe(2);
+    });
+  });
+
+  describe('resetEntitlementsCacheStats', () => {
+    it('should reset cache statistics', async () => {
+      const userId = 'user1';
+
+      // Generate some stats
+      await getUserEntitlements(userId);
+      await getUserEntitlements(userId);
+
+      // Reset stats
+      resetEntitlementsCacheStats();
+
+      const stats = getEntitlementsCacheStats();
+      expect(stats.hits).toBe(0);
+      expect(stats.misses).toBe(0);
+      expect(stats.errors).toBe(0);
+    });
+  });
+
+  describe('error handling', () => {
+    it('should handle sessionStorage errors gracefully', async () => {
+      // Make sessionStorage.setItem throw an error
+      mockSessionStorage.setItem.mockImplementationOnce(() => {
+        throw new Error('Storage quota exceeded');
+      });
+
+      const userId = 'user1';
+
+      // Should not throw despite storage error
+      const entitlements = await getUserEntitlements(userId);
+
+      // Should still return entitlements
+      expect(entitlements).toEqual([`ENTITLEMENT_FOR_${userId}`]);
+
+      // Should track the error
+      const stats = getEntitlementsCacheStats();
+      expect(stats.errors).toBeGreaterThan(0);
     });
   });
 });

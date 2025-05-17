@@ -9,7 +9,7 @@ import { LoginDialog } from "@/components/dialogs/LoginDialog";
 
 // Import the new component sections
 import HeroSection from "@/components/landing/HeroSection";
-import EventsSection from "@/components/landing/EventsSection";
+import EventsSection from "@/components/landing/events";
 import BookClubsSection from "@/components/landing/BookClubsSection";
 import QuoteSection from "@/components/landing/QuoteSection";
 import FooterSection from "@/components/landing/FooterSection";
