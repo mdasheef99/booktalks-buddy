@@ -317,6 +317,11 @@ export type Database = {
           featured_on_landing: boolean | null
           created_by: string | null
           updated_at: string | null
+          image_url: string | null
+          thumbnail_url: string | null
+          medium_url: string | null
+          image_alt_text: string | null
+          image_metadata: Record<string, any> | null
         }
         Insert: {
           created_at?: string | null
@@ -336,6 +341,11 @@ export type Database = {
           featured_on_landing?: boolean | null
           created_by?: string | null
           updated_at?: string | null
+          image_url?: string | null
+          thumbnail_url?: string | null
+          medium_url?: string | null
+          image_alt_text?: string | null
+          image_metadata?: Record<string, any> | null
         }
         Update: {
           created_at?: string | null
@@ -355,6 +365,11 @@ export type Database = {
           featured_on_landing?: boolean | null
           created_by?: string | null
           updated_at?: string | null
+          image_url?: string | null
+          thumbnail_url?: string | null
+          medium_url?: string | null
+          image_alt_text?: string | null
+          image_metadata?: Record<string, any> | null
         }
         Relationships: [
           {

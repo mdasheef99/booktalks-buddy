@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Event } from '@/lib/api/bookclubs/events';
-import { subscriptionManager, ConnectionState } from '@/lib/realtime/subscriptionManager';
+import { subscriptionManager, ConnectionState } from '@/lib/realtime';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
@@ -31,10 +31,10 @@ export function useEventRealtime({
   // Handle real-time event updates
   const handleEventChange = useCallback((payload: RealtimePostgresChangesPayload<Event>) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
-    
+
     setEvents(currentEvents => {
       let updatedEvents = [...currentEvents];
-      
+
       switch (eventType) {
         case 'INSERT':
           // Add new event to the list
@@ -43,17 +43,17 @@ export function useEventRealtime({
             if (showToasts) toast.info('New event added');
           }
           break;
-          
+
         case 'UPDATE':
           // Update existing event
           if (newRecord) {
-            updatedEvents = updatedEvents.map(event => 
+            updatedEvents = updatedEvents.map(event =>
               event.id === newRecord.id ? { ...event, ...newRecord } : event
             );
             if (showToasts) toast.info('Event updated');
           }
           break;
-          
+
         case 'DELETE':
           // Remove deleted event
           if (oldRecord) {
@@ -62,7 +62,7 @@ export function useEventRealtime({
           }
           break;
       }
-      
+
       return updatedEvents;
     });
   }, [showToasts]);
@@ -72,12 +72,12 @@ export function useEventRealtime({
     // Clean up previous subscriptions
     subscriptionIds.forEach(id => subscriptionManager.unsubscribe(id));
     setSubscriptionIds([]);
-    
+
     const newSubscriptionIds: string[] = [];
-    
+
     // Subscribe to connection state changes
     subscriptionManager.addConnectionStateListener(setConnectionState);
-    
+
     // Subscribe to specific event if eventId is provided
     if (eventId) {
       const eventSubscriptionId = subscriptionManager.subscribe({
@@ -93,10 +93,10 @@ export function useEventRealtime({
           if (showToasts) toast.success('Reconnected to event updates');
         }
       });
-      
+
       newSubscriptionIds.push(eventSubscriptionId);
     }
-    
+
     // Subscribe to store events if storeId is provided
     if (storeId) {
       const storeEventsSubscriptionId = subscriptionManager.subscribe({
@@ -112,10 +112,10 @@ export function useEventRealtime({
           if (showToasts) toast.success('Reconnected to store event updates');
         }
       });
-      
+
       newSubscriptionIds.push(storeEventsSubscriptionId);
     }
-    
+
     // Subscribe to club events if clubId is provided
     if (clubId) {
       const clubEventsSubscriptionId = subscriptionManager.subscribe({
@@ -131,12 +131,12 @@ export function useEventRealtime({
           if (showToasts) toast.success('Reconnected to club event updates');
         }
       });
-      
+
       newSubscriptionIds.push(clubEventsSubscriptionId);
     }
-    
+
     setSubscriptionIds(newSubscriptionIds);
-    
+
     // Clean up subscriptions when component unmounts
     return () => {
       newSubscriptionIds.forEach(id => subscriptionManager.unsubscribe(id));
@@ -153,8 +153,8 @@ export function useEventRealtime({
 
   // Optimistic update functions
   const optimisticUpdate = useCallback((updatedEvent: Partial<Event> & { id: string }) => {
-    setEvents(currentEvents => 
-      currentEvents.map(event => 
+    setEvents(currentEvents =>
+      currentEvents.map(event =>
         event.id === updatedEvent.id ? { ...event, ...updatedEvent } : event
       )
     );
@@ -170,7 +170,7 @@ export function useEventRealtime({
   }, []);
 
   const optimisticRemove = useCallback((eventId: string) => {
-    setEvents(currentEvents => 
+    setEvents(currentEvents =>
       currentEvents.filter(event => event.id !== eventId)
     );
   }, []);

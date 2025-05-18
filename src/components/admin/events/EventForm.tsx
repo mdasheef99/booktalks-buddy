@@ -19,6 +19,8 @@ import BasicInfoSection from './form-sections/BasicInfoSection';
 import DateTimeSection from './form-sections/DateTimeSection';
 import LocationSection from './form-sections/LocationSection';
 import AdditionalSettingsSection from './form-sections/AdditionalSettingsSection';
+import ImageSection from './form-sections/ImageSection';
+import TempImageSection from './form-sections/TempImageSection';
 
 interface EventFormProps {
   event?: Event;
@@ -71,6 +73,15 @@ const EventForm: React.FC<EventFormProps> = ({ event, isEditing = false }) => {
   const [virtualMeetingLink, setVirtualMeetingLink] = useState(event?.virtual_meeting_link || '');
   const [maxParticipants, setMaxParticipants] = useState(event?.max_participants?.toString() || '');
   const [featuredOnLanding, setFeaturedOnLanding] = useState(event?.featured_on_landing || false);
+
+  // Image state
+  const [imageUrl, setImageUrl] = useState(event?.image_url || null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(event?.thumbnail_url || null);
+  const [mediumUrl, setMediumUrl] = useState(event?.medium_url || null);
+  const [imageAltText, setImageAltText] = useState(event?.image_alt_text || null);
+
+  // Temporary image file for new events
+  const [tempImageFile, setTempImageFile] = useState<File | null>(null);
 
   // Fetch book clubs
   useEffect(() => {
@@ -135,18 +146,49 @@ const EventForm: React.FC<EventFormProps> = ({ event, isEditing = false }) => {
         virtual_meeting_link: isVirtual ? virtualMeetingLink.trim() : null,
         max_participants: maxParticipants ? parseInt(maxParticipants) : null,
         featured_on_landing: featuredOnLanding,
+        // Include image data
+        image_url: imageUrl,
+        thumbnail_url: thumbnailUrl,
+        medium_url: mediumUrl,
+        image_alt_text: imageAltText,
       };
 
       if (isEditing && event) {
         await updateEvent(user.id, event.id, eventData);
         toast.success('Event updated successfully');
-      } else {
-        await createEvent(user.id, storeId, eventData);
-        toast.success('Event created successfully');
-      }
 
-      // Navigate back to events list
-      navigate('/admin/events');
+        // Navigate back to events list
+        navigate('/admin/events');
+      } else {
+        // Create the event first
+        const newEvent = await createEvent(user.id, storeId, eventData);
+
+        // If we have a temporary image file, upload it
+        if (tempImageFile && newEvent?.id) {
+          try {
+            toast.info('Uploading event image...');
+
+            // Upload the image
+            const { uploadEventImage } = await import('@/lib/api/bookclubs/events');
+            await uploadEventImage(
+              user.id,
+              newEvent.id,
+              tempImageFile,
+              tempImageFile.name
+            );
+
+            toast.success('Event and image created successfully');
+          } catch (error: any) {
+            console.error('Error uploading image:', error);
+            toast.error('Event created but image upload failed: ' + (error.message || 'Unknown error'));
+          }
+        } else {
+          toast.success('Event created successfully');
+        }
+
+        // Navigate back to events list
+        navigate('/admin/events');
+      }
     } catch (error: any) {
       console.error('Error saving event:', error);
       toast.error(error.message || 'Failed to save event');
@@ -180,6 +222,33 @@ const EventForm: React.FC<EventFormProps> = ({ event, isEditing = false }) => {
             bookClubs={bookClubs}
             eventTypes={EVENT_TYPES}
           />
+
+          {/* Event Image */}
+          {isEditing && event ? (
+            <ImageSection
+              eventId={event.id}
+              imageUrl={imageUrl}
+              thumbnailUrl={thumbnailUrl}
+              imageAltText={imageAltText}
+              onImageUploaded={(imageUrl, thumbnailUrl, mediumUrl) => {
+                setImageUrl(imageUrl);
+                setThumbnailUrl(thumbnailUrl);
+                setMediumUrl(mediumUrl);
+              }}
+              onImageRemoved={() => {
+                setImageUrl(null);
+                setThumbnailUrl(null);
+                setMediumUrl(null);
+                setImageAltText(null);
+              }}
+            />
+          ) : (
+            <TempImageSection
+              selectedFile={tempImageFile}
+              onImageSelected={(file) => setTempImageFile(file)}
+              onImageRemoved={() => setTempImageFile(null)}
+            />
+          )}
 
           {/* Date and Time */}
           <DateTimeSection

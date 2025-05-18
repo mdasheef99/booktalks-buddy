@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 const EventDetailsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  
+
   // Fetch event details
   const { data: event, isLoading, isError } = useQuery({
     queryKey: ['event', eventId],
@@ -51,45 +51,45 @@ const EventDetailsPage: React.FC = () => {
   // Format date and time
   const formatDateTime = () => {
     if (!event) return { date: '', time: '', isPastEvent: false };
-    
+
     try {
       // Try to parse the start_time first (new field)
       if (event.start_time) {
         const startDate = new Date(event.start_time);
         const formattedDate = format(startDate, 'EEEE, MMMM d, yyyy');
         const formattedTime = format(startDate, 'h:mm a');
-        
-        return { 
-          date: formattedDate, 
+
+        return {
+          date: formattedDate,
           time: formattedTime,
           isPastEvent: isPast(startDate)
         };
       }
-      
+
       // Fall back to the date field (legacy field)
       const date = new Date(event.date);
       if (isNaN(date.getTime())) {
-        return { 
-          date: event.date, 
-          time: '', 
-          isPastEvent: false 
+        return {
+          date: event.date,
+          time: '',
+          isPastEvent: false
         };
       }
-      
+
       const formattedDate = format(date, 'EEEE, MMMM d, yyyy');
       const formattedTime = format(date, 'h:mm a');
-      
-      return { 
-        date: formattedDate, 
+
+      return {
+        date: formattedDate,
         time: formattedTime,
         isPastEvent: isPast(date)
       };
     } catch (error) {
       console.error("Error parsing date:", error);
-      return { 
-        date: event.date, 
-        time: '', 
-        isPastEvent: false 
+      return {
+        date: event.date,
+        time: '',
+        isPastEvent: false
       };
     }
   };
@@ -109,7 +109,7 @@ const EventDetailsPage: React.FC = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          
+
           <Skeleton className="h-10 w-3/4 mb-4" />
           <Skeleton className="h-6 w-1/2 mb-6" />
           <Skeleton className="h-40 w-full mb-6" />
@@ -133,7 +133,7 @@ const EventDetailsPage: React.FC = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          
+
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold mb-4">Event Not Found</h1>
             <p className="text-muted-foreground mb-6">The event you're looking for doesn't exist or has been removed.</p>
@@ -155,59 +155,71 @@ const EventDetailsPage: React.FC = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        
+
         <div className="flex flex-wrap items-start gap-2 mb-4">
           {event.event_type && (
             <Badge className="bg-bookconnect-terracotta text-white">
               {event.event_type.replace('_', ' ')}
             </Badge>
           )}
-          
+
           {event.featured_on_landing && (
             <Badge className="bg-amber-500 text-white">
               Featured
             </Badge>
           )}
-          
+
           {isPastEvent && (
             <Badge variant="outline" className="text-muted-foreground">
               Past Event
             </Badge>
           )}
         </div>
-        
+
         <h1 className="text-3xl md:text-4xl font-serif font-bold mb-4">{event.title}</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-2 space-y-6">
+            {/* Event Image */}
+            {event.image_url && (
+              <div className="mb-6 rounded-lg overflow-hidden shadow-md">
+                <img
+                  src={event.image_url}
+                  alt={event.image_alt_text || event.title}
+                  className="w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
             <div className="space-y-4">
               <div className="flex items-center text-sm">
                 <Calendar className="h-5 w-5 mr-2 text-bookconnect-terracotta" />
                 <span className="font-medium">{date}</span>
               </div>
-              
+
               {time && (
                 <div className="flex items-center text-sm">
                   <Clock className="h-5 w-5 mr-2 text-bookconnect-terracotta" />
                   <span>{time}</span>
                 </div>
               )}
-              
+
               {event.location && (
                 <div className="flex items-center text-sm">
                   <MapPin className="h-5 w-5 mr-2 text-bookconnect-terracotta" />
                   <span>{event.location}</span>
                 </div>
               )}
-              
+
               {event.is_virtual && (
                 <div className="flex items-center text-sm">
                   <Video className="h-5 w-5 mr-2 text-bookconnect-terracotta" />
                   <span>Virtual Event</span>
                   {event.virtual_meeting_link && (
-                    <a 
-                      href={event.virtual_meeting_link} 
-                      target="_blank" 
+                    <a
+                      href={event.virtual_meeting_link}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-bookconnect-terracotta hover:underline"
                     >
@@ -216,14 +228,14 @@ const EventDetailsPage: React.FC = () => {
                   )}
                 </div>
               )}
-              
+
               {event.store_id && (
                 <div className="flex items-center text-sm">
                   <Building className="h-5 w-5 mr-2 text-bookconnect-terracotta" />
                   <span>Store Event</span>
                 </div>
               )}
-              
+
               {event.max_participants && (
                 <div className="flex items-center text-sm">
                   <Users className="h-5 w-5 mr-2 text-bookconnect-terracotta" />
@@ -231,18 +243,18 @@ const EventDetailsPage: React.FC = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="prose max-w-none">
-              <p>{event.description}</p>
+              <p className="break-words whitespace-normal overflow-hidden w-full" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{event.description}</p>
             </div>
-            
+
             <div className="flex flex-wrap gap-3">
               {!isPastEvent && (
                 <RsvpButton eventId={event.id} className="flex-1" />
               )}
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 onClick={handleShare}
                 className="flex items-center"
               >
@@ -251,7 +263,7 @@ const EventDetailsPage: React.FC = () => {
               </Button>
             </div>
           </div>
-          
+
           <div>
             <ParticipantsList eventId={event.id} />
           </div>

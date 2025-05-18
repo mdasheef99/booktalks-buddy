@@ -67,9 +67,11 @@ const ParticipantListHeader: React.FC<ParticipantListHeaderProps> = ({
           onClick={handleRefresh}
           title="Refresh participant list"
           disabled={isFullyLoading}
+          aria-label="Refresh participant list"
+          className="flex items-center"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${loading.participants ? 'animate-spin' : ''}`} />
-          Refresh
+          <span>Refresh</span>
         </Button>
 
         <div className="relative">
@@ -79,9 +81,12 @@ const ParticipantListHeader: React.FC<ParticipantListHeaderProps> = ({
             onClick={exportParticipants}
             title={`Export ${exportFormat === 'filtered' ? 'filtered' : 'all'} participants as CSV`}
             disabled={exportLoading || isFullyLoading || participants.length === 0}
+            aria-label={`Export ${exportFormat === 'filtered' ? 'filtered' : 'all'} participants as CSV`}
+            className="flex items-center"
           >
             <Download className={`h-4 w-4 mr-2 ${exportLoading ? 'animate-bounce' : ''}`} />
-            Export {exportFormat === 'filtered' ? 'Filtered' : 'All'}
+            <span>Export {exportFormat === 'filtered' ? 'Filtered' : 'All'}</span>
+            {exportLoading && <span className="sr-only">(Loading...)</span>}
           </Button>
           <Button
             variant="ghost"
@@ -90,10 +95,25 @@ const ParticipantListHeader: React.FC<ParticipantListHeaderProps> = ({
             onClick={() => setExportFormat(prev => prev === 'filtered' ? 'all' : 'filtered')}
             title={`Switch to export ${exportFormat === 'filtered' ? 'all' : 'filtered'} participants`}
             disabled={exportLoading || isFullyLoading}
+            aria-label={`Switch to export ${exportFormat === 'filtered' ? 'all' : 'filtered'} participants`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z" />
             </svg>
+            <span className="sr-only">
+              Switch to export {exportFormat === 'filtered' ? 'all' : 'filtered'} participants
+            </span>
           </Button>
         </div>
 
@@ -103,9 +123,16 @@ const ParticipantListHeader: React.FC<ParticipantListHeaderProps> = ({
           onClick={sendEmailToParticipants}
           title="Send email to participants"
           disabled={isFullyLoading || participants.length === 0}
+          aria-label="Send email to all participants"
+          className="flex items-center"
         >
           <Mail className="h-4 w-4 mr-2" />
-          Email All
+          <span>Email All</span>
+          {participants.length > 0 && (
+            <span className="ml-1 text-xs bg-gray-200 text-gray-800 rounded-full px-1.5 py-0.5">
+              {participants.length}
+            </span>
+          )}
         </Button>
       </div>
     </div>
