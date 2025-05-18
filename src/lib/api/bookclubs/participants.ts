@@ -1,7 +1,7 @@
 import { supabase } from '../../supabase';
 import { isClubMember } from '../auth';
 import { Database } from '@/integrations/supabase/types';
-import { getEvent } from './events';
+import { getEvent } from './events/queries';
 
 /**
  * Event Participants Management

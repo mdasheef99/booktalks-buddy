@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
-import { getClubEvents, getFeaturedEvents } from '@/lib/api/bookclubs/events';
+import { getClubEvents, getFeaturedEvents } from '@/lib/api/bookclubs/events/queries';
 
 // Filter options for events
 export type EventFilter = 'all' | 'upcoming' | 'past' | 'featured' | 'my-clubs';
@@ -51,9 +51,9 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      
+
       let fetchedEvents: Event[] = [];
-      
+
       // Fetch different events based on filter
       if (filter === 'featured') {
         fetchedEvents = await getFeaturedEvents();
@@ -67,11 +67,11 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
         const { data, error } = await supabase
           .from('events')
           .select('*');
-          
+
         if (error) throw error;
         fetchedEvents = data;
       }
-      
+
       setEvents(fetchedEvents);
       setError(null);
     } catch (err) {
@@ -86,7 +86,7 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
   useEffect(() => {
     // Apply filters
     let filtered = [...events];
-    
+
     if (filter === 'upcoming') {
       const now = new Date();
       filtered = filtered.filter(event => {
@@ -102,7 +102,7 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
     } else if (filter === 'my-clubs') {
       filtered = filtered.filter(event => event.club_id && userClubs.includes(event.club_id));
     }
-    
+
     // Apply sorting
     if (sort === 'newest') {
       filtered.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
@@ -121,14 +121,14 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
         return 0;
       });
     }
-    
+
     setFilteredEvents(filtered);
   }, [events, filter, sort, userClubs]);
 
   // Initial fetch
   useEffect(() => {
     fetchEvents();
-    
+
     // Set up real-time subscription
     const subscription = supabase
       .channel('events_changes')
@@ -141,7 +141,7 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
         fetchEvents();
       })
       .subscribe();
-    
+
     return () => {
       subscription.unsubscribe();
     };

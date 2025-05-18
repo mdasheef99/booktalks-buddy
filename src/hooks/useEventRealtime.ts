@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Event } from '@/lib/api/bookclubs/events';
+import { Event } from '@/lib/api/bookclubs/events/types';
 import { subscriptionManager, ConnectionState } from '@/lib/realtime';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { toast } from 'sonner';

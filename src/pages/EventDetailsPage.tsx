@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getEvent } from '@/lib/api/bookclubs/events';
+import { getEvent } from '@/lib/api/bookclubs/events/queries';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Calendar, Clock, MapPin, Users, Video, Building, Share2 } from 'lucide-react';

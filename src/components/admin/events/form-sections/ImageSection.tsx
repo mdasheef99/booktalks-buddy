@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import FormSection from './FormSection';
 import EventImageUpload from '@/components/events/EventImageUpload';
-import { uploadEventImage, removeEventImage } from '@/lib/api/bookclubs/events';
+import { uploadEventImage, removeEventImage } from '@/lib/api/bookclubs/events/images';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {

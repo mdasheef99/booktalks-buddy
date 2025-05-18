@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Event } from '@/lib/api/bookclubs/events';
+import { Event } from '@/lib/api/bookclubs/events/types';
 import { Participant, ExportFormat } from '../types';
 import { exportParticipantsAsCSV } from '../utils';
 import { handleError, ErrorType, createStandardError } from '@/lib/utils/error-handling';

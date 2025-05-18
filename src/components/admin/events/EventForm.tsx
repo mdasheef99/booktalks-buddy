@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { createEvent, updateEvent, Event } from '@/lib/api/bookclubs/events';
+import { Event } from '@/lib/api/bookclubs/events/types';
+import { createEvent, updateEvent } from '@/lib/api/bookclubs/events/core';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -169,7 +170,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, isEditing = false }) => {
             toast.info('Uploading event image...');
 
             // Upload the image
-            const { uploadEventImage } = await import('@/lib/api/bookclubs/events');
+            const { uploadEventImage } = await import('@/lib/api/bookclubs/events/images');
             await uploadEventImage(
               user.id,
               newEvent.id,

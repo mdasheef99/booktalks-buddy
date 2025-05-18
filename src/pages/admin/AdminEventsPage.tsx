@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { getStoreEvents } from '@/lib/api/bookclubs/events';
-import { Event } from '@/lib/api/bookclubs/events';
+import { Event } from '@/lib/api/bookclubs/events/types';
+import { getStoreEvents } from '@/lib/api/bookclubs/events/queries';
 import {
   Select,
   SelectContent,

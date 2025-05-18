@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getEvent, Event } from '@/lib/api/bookclubs/events';
+import { Event } from '@/lib/api/bookclubs/events/types';
+import { getEvent } from '@/lib/api/bookclubs/events/queries';
 import { toast } from 'sonner';
 import { useEventRealtime } from '@/hooks/useEventRealtime';
 import { useParticipantsRealtime } from '@/hooks/participants';

@@ -1,4 +1,4 @@
-import { Event } from '@/lib/api/bookclubs/events';
+import { Event } from '@/lib/api/bookclubs/events/types';
 import { Dispatch, SetStateAction } from 'react';
 
 // Define RSVP status type
