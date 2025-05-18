@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DestructiveActionDialog from '@/components/common/DestructiveActionDialog';
 import { DeleteEventDialogProps } from './types';
 
 /**
@@ -20,27 +11,44 @@ const DeleteEventDialog: React.FC<DeleteEventDialogProps> = ({
   eventTitle,
   onClose,
   onConfirm,
+  isLoading = false,
+  event = null,
 }) => {
+  const handleConfirm = () => {
+    onConfirm(eventId);
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This will permanently delete the event "{eventTitle}". This action cannot be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => onConfirm(eventId)}
-            className="bg-red-600 hover:bg-red-700"
-          >
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <DestructiveActionDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={handleConfirm}
+      title="Delete Event"
+      description={`Are you sure you want to delete the event "${eventTitle}"? This action cannot be undone.`}
+      confirmText="Delete Event"
+      cancelText="Cancel"
+      severity="high"
+      isLoading={isLoading}
+      additionalContent={
+        event && (
+          <div className="bg-gray-50 p-3 rounded-md">
+            <p className="text-sm font-medium">Event details:</p>
+            <p className="text-sm mt-1">Title: {event.title}</p>
+            <p className="text-sm mt-1">
+              Date: {new Date(event.start_time || event.date).toLocaleDateString()}
+            </p>
+            {event.location && (
+              <p className="text-sm mt-1">Location: {event.location}</p>
+            )}
+            {event.participant_count > 0 && (
+              <p className="text-sm mt-1 text-amber-600 font-medium">
+                Warning: This event has {event.participant_count} registered participants who will be affected.
+              </p>
+            )}
+          </div>
+        )
+      }
+    />
   );
 };
 

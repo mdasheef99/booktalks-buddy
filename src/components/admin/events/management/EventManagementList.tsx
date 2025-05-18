@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { deleteEvent, toggleEventFeatured } from '@/lib/api/bookclubs/events';
+import { deleteEvent, toggleEventFeatured, Event } from '@/lib/api/bookclubs/events';
 import { EventManagementListProps } from './types';
 import EventCard from './EventCard';
 import EmptyState from './EmptyState';
+import DeleteEventDialog from './DeleteEventDialog';
 
 /**
  * Component for displaying a grid of event cards with management functionality
@@ -13,6 +14,11 @@ import EmptyState from './EmptyState';
 const EventManagementList: React.FC<EventManagementListProps> = ({ events, onRefresh }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // State for delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Handle view event
   const handleViewEvent = (eventId: string) => {
@@ -29,9 +35,32 @@ const EventManagementList: React.FC<EventManagementListProps> = ({ events, onRef
     navigate('/admin/events/create');
   };
 
-  // Handle delete event
+  // Open delete confirmation dialog
+  const openDeleteDialog = (event: Event) => {
+    setEventToDelete(event);
+    setDeleteDialogOpen(true);
+  };
+
+  // Close delete confirmation dialog
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setEventToDelete(null);
+  };
+
+  // Handle delete event (called from card)
   const handleDeleteEvent = async (eventId: string) => {
-    if (!user?.id) return;
+    // Find the event to delete
+    const event = events.find(e => e.id === eventId);
+    if (event) {
+      openDeleteDialog(event);
+    }
+  };
+
+  // Confirm delete event (called from dialog)
+  const confirmDeleteEvent = async (eventId: string) => {
+    if (!user?.id || !eventId) return;
+
+    setIsDeleting(true);
 
     try {
       try {
@@ -54,9 +83,14 @@ const EventManagementList: React.FC<EventManagementListProps> = ({ events, onRef
 
       // Refresh the events list
       onRefresh();
+
+      // Close the dialog
+      closeDeleteDialog();
     } catch (error) {
       console.error('Error deleting event:', error);
       toast.error('Failed to delete event');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -97,18 +131,33 @@ const EventManagementList: React.FC<EventManagementListProps> = ({ events, onRef
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {events.map((event) => (
-        <EventCard
-          key={event.id}
-          event={event}
-          onViewEvent={handleViewEvent}
-          onEditEvent={handleEditEvent}
-          onDeleteEvent={handleDeleteEvent}
-          onToggleFeatured={handleToggleFeatured}
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {events.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            onViewEvent={handleViewEvent}
+            onEditEvent={handleEditEvent}
+            onDeleteEvent={handleDeleteEvent}
+            onToggleFeatured={handleToggleFeatured}
+          />
+        ))}
+      </div>
+
+      {/* Delete Event Confirmation Dialog */}
+      {eventToDelete && (
+        <DeleteEventDialog
+          isOpen={deleteDialogOpen}
+          eventId={eventToDelete.id}
+          eventTitle={eventToDelete.title}
+          event={eventToDelete}
+          onClose={closeDeleteDialog}
+          onConfirm={confirmDeleteEvent}
+          isLoading={isDeleting}
         />
-      ))}
-    </div>
+      )}
+    </>
   );
 };
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { getEventParticipants, getEventParticipantCounts } from '@/lib/api/bookclubs/participants';
-import { getEvent } from '@/lib/api/bookclubs/events';
+import { getEvent, Event } from '@/lib/api/bookclubs/events';
 import { toast } from 'sonner';
 import {
   Card,
@@ -10,6 +9,9 @@ import {
 } from '@/components/ui/card';
 import { useDebounce } from '@/hooks/useDebounce';
 import { exportParticipantsAsCSV } from './utils';
+import { handleError, ErrorType, createStandardError } from '@/lib/utils/error-handling';
+import { useEventRealtime } from '@/hooks/useEventRealtime';
+import { useParticipantsRealtime } from '@/hooks/useParticipantsRealtime';
 import {
   ParticipantListHeader,
   ParticipantListFilters,
@@ -21,45 +23,16 @@ import {
 } from './components';
 import {
   EventParticipantsListProps,
-  Participant,
-  ParticipantCounts,
   LoadingStates,
   ErrorStates,
-  RsvpStatus
+  RsvpStatus,
+  ExportFormat
 } from './types';
 
 /**
  * Component for displaying and managing event participants
  */
 const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }) => {
-  // State for participants data
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  
-  // State for participant counts
-  const [counts, setCounts] = useState<ParticipantCounts>({
-    going: 0,
-    maybe: 0,
-    not_going: 0,
-    total: 0,
-  });
-  
-  // State for event details with proper typing
-  const [event, setEvent] = useState<any>(null);
-  
-  // State for loading indicators
-  const [loading, setLoading] = useState<LoadingStates>({
-    event: true,
-    participants: true,
-    counts: true
-  });
-  
-  // State for error handling
-  const [errors, setErrors] = useState<ErrorStates>({
-    event: null,
-    participants: null,
-    counts: null
-  });
-  
   // State for UI controls
   const [activeTab, setActiveTab] = useState<RsvpStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,108 +40,114 @@ const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [exportLoading, setExportLoading] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'filtered' | 'all'>('filtered');
-  
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('filtered');
+
+  // State for loading indicators
+  const [loading, setLoading] = useState<LoadingStates>({
+    event: true,
+    participants: true,
+    counts: true
+  });
+
+  // State for error handling
+  const [errors, setErrors] = useState<ErrorStates>({
+    event: null,
+    participants: null,
+    counts: null
+  });
+
+  // State for event details with proper typing
+  const [event, setEvent] = useState<Event | null>(null);
+
+  // Use event real-time hook
+  useEventRealtime({
+    eventId,
+    initialEvents: event ? [event] : [],
+    onDataChange: (events) => {
+      if (events.length > 0) {
+        setEvent(events[0]);
+      }
+    },
+    showToasts: false
+  });
+
+  // Use participants real-time hook
+  const { participants, counts } = useParticipantsRealtime({
+    eventId,
+    showToasts: false
+  });
+
   // Debounce search query to avoid excessive filtering
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Fetch event details
+  // Load initial data
   useEffect(() => {
-    const fetchEventDetails = async () => {
+    const loadInitialData = async () => {
       if (!eventId) return;
-      
-      setLoading(prev => ({ ...prev, event: true }));
-      setErrors(prev => ({ ...prev, event: null }));
-      
+
+      setLoading({
+        event: true,
+        participants: true,
+        counts: true
+      });
+
+      setErrors({
+        event: null,
+        participants: null,
+        counts: null
+      });
+
       try {
+        // Fetch event details
         const eventDetails = await getEvent(eventId);
         setEvent(eventDetails);
+
+        // Initial data loaded successfully
       } catch (error) {
-        console.error('Error fetching event details:', error);
-        setErrors(prev => ({ 
-          ...prev, 
-          event: error instanceof Error ? error : new Error('Failed to load event details') 
+        // Create a standard error with recovery action
+        const standardError = createStandardError(
+          ErrorType.FETCH,
+          'Failed to load event details',
+          'Unable to retrieve the event information. This may affect some functionality.',
+          error instanceof Error ? error : undefined,
+          () => loadInitialData()
+        );
+
+        // Handle the error (logs and shows toast)
+        handleError(standardError, 'EventParticipantsList.loadInitialData');
+
+        // Update component error state
+        setErrors(prev => ({
+          ...prev,
+          event: error instanceof Error ? error : new Error(standardError.message)
         }));
-        toast.error('Failed to load event details');
       } finally {
         setLoading(prev => ({ ...prev, event: false }));
       }
     };
-    
-    fetchEventDetails();
+
+    loadInitialData();
   }, [eventId, refreshKey]);
 
-  // Fetch participants
+  // Update loading state based on real-time connection status
   useEffect(() => {
-    const fetchParticipants = async () => {
-      if (!eventId) return;
-      
-      setLoading(prev => ({ ...prev, participants: true }));
-      setErrors(prev => ({ ...prev, participants: null }));
-      
-      try {
-        const fetchedParticipants = await getEventParticipants(eventId);
-        
-        // Ensure the data matches our expected type
-        const typedParticipants: Participant[] = fetchedParticipants.map(p => ({
-          event_id: p.event_id,
-          user_id: p.user_id,
-          rsvp_status: p.rsvp_status as RsvpStatus,
-          rsvp_at: p.rsvp_at,
-          user: {
-            username: p.user?.username || null,
-            email: p.user?.email || ''
-          }
-        }));
-        
-        setParticipants(typedParticipants);
-      } catch (error) {
-        console.error('Error fetching participants:', error);
-        setErrors(prev => ({ 
-          ...prev, 
-          participants: error instanceof Error ? error : new Error('Failed to load participants') 
-        }));
-        toast.error('Failed to load participants');
-      } finally {
+    // Update loading state when real-time data is available
+    if (participants.length > 0) {
+      setLoading(prev => ({ ...prev, participants: false }));
+    } else {
+      // Set a timeout to stop showing loading state after a reasonable time
+      // This prevents infinite loading if there are no participants
+      const timer = setTimeout(() => {
         setLoading(prev => ({ ...prev, participants: false }));
-      }
-    };
-    
-    fetchParticipants();
-  }, [eventId, refreshKey]);
+      }, 3000); // 3 seconds timeout
 
-  // Fetch participant counts
-  useEffect(() => {
-    const fetchCounts = async () => {
-      if (!eventId) return;
-      
-      setLoading(prev => ({ ...prev, counts: true }));
-      setErrors(prev => ({ ...prev, counts: null }));
-      
-      try {
-        const fetchedCounts = await getEventParticipantCounts(eventId);
-        const total = (fetchedCounts.going || 0) + (fetchedCounts.maybe || 0) + (fetchedCounts.not_going || 0);
-        
-        setCounts({
-          going: fetchedCounts.going || 0,
-          maybe: fetchedCounts.maybe || 0,
-          not_going: fetchedCounts.not_going || 0,
-          total
-        });
-      } catch (error) {
-        console.error('Error fetching participant counts:', error);
-        setErrors(prev => ({ 
-          ...prev, 
-          counts: error instanceof Error ? error : new Error('Failed to load participant counts') 
-        }));
-        toast.error('Failed to load participant counts');
-      } finally {
-        setLoading(prev => ({ ...prev, counts: false }));
-      }
-    };
-    
-    fetchCounts();
-  }, [eventId, refreshKey]);
+      return () => clearTimeout(timer);
+    }
+
+    if (counts.total >= 0) {
+      setLoading(prev => ({ ...prev, counts: false }));
+    }
+  }, [participants.length, counts.total]);
 
   // Reset pagination when filters change
   useEffect(() => {
@@ -183,7 +162,7 @@ const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }
         (activeTab === 'all' || participant.rsvp_status === activeTab) &&
         // Filter by search query (case insensitive)
         (debouncedSearchQuery === '' ||
-          (participant.user.username && 
+          (participant.user.username &&
            participant.user.username.toLowerCase().includes(debouncedSearchQuery.toLowerCase())) ||
           participant.user.email.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
     );
@@ -191,29 +170,86 @@ const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }
 
   // Handle refresh button click
   const handleRefresh = useCallback(() => {
+    // Increment refresh key to trigger initial data load
     setRefreshKey(prev => prev + 1);
-    toast.success('Participant list refreshed');
+
+    // Reset loading states
+    setLoading({
+      event: true,
+      participants: true,
+      counts: true
+    });
+
+    // Show toast
+    toast.success('Refreshing participant data...', {
+      description: 'Fetching the latest participant information',
+      duration: 2000
+    });
+
+    // Set a timeout to ensure loading state is cleared even if no data is returned
+    setTimeout(() => {
+      setLoading(prev => ({
+        ...prev,
+        participants: false,
+        counts: false
+      }));
+    }, 5000); // 5 seconds timeout as a fallback
   }, []);
 
   // Export participants as CSV
-  const handleExportParticipants = useCallback(() => {
-    exportParticipantsAsCSV(
-      participants,
-      event,
-      exportFormat,
-      filteredParticipants,
-      setExportLoading
-    );
+  const handleExportParticipants = useCallback(async () => {
+    if (participants.length === 0) {
+      const error = createStandardError(
+        ErrorType.VALIDATION,
+        'No participants to export',
+        'There are no participants available to export.'
+      );
+      handleError(error, 'EventParticipantsList.handleExportParticipants');
+      return;
+    }
+
+    try {
+      setExportLoading(true);
+      toast.info('Preparing export...', { duration: 2000 });
+
+      await exportParticipantsAsCSV(
+        participants,
+        event,
+        exportFormat,
+        filteredParticipants,
+        setExportLoading
+      );
+
+      const participantCount = exportFormat === 'filtered' ? filteredParticipants.length : participants.length;
+      toast.success('Export successful', {
+        description: `${participantCount} participants exported to CSV.`
+      });
+    } catch (error) {
+      const standardError = createStandardError(
+        ErrorType.UNKNOWN,
+        'Export failed',
+        'There was a problem exporting the participants.',
+        error instanceof Error ? error : undefined,
+        () => handleExportParticipants()
+      );
+
+      handleError(standardError, 'EventParticipantsList.handleExportParticipants');
+    } finally {
+      setExportLoading(false);
+    }
   }, [event, participants, filteredParticipants, exportFormat]);
 
   // Send email to participants (placeholder function)
   const sendEmailToParticipants = useCallback(() => {
-    toast.info('This feature is not yet implemented');
+    toast.info('Email feature coming soon', {
+      description: 'The ability to send emails to participants will be available in a future update.',
+      duration: 4000
+    });
   }, []);
 
   // Check if all data is loading
   const isFullyLoading = loading.event && loading.participants && loading.counts;
-  
+
   // Check if there are any errors
   const hasErrors = errors.event || errors.participants || errors.counts;
 
@@ -247,7 +283,7 @@ const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }
           sendEmailToParticipants={sendEmailToParticipants}
           participants={participants}
         />
-        
+
         <ParticipantListFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -259,7 +295,7 @@ const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }
           debouncedSearchQuery={debouncedSearchQuery}
         />
       </CardHeader>
-      
+
       <CardContent>
         <ParticipantListTabs
           activeTab={activeTab}
@@ -272,7 +308,7 @@ const EventParticipantsList: React.FC<EventParticipantsListProps> = ({ eventId }
           loading={loading}
         />
       </CardContent>
-      
+
       <CardFooter className="border-t pt-6">
         <ParticipantListSummary counts={counts} event={event} />
       </CardFooter>

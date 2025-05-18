@@ -53,4 +53,6 @@ export interface DeleteEventDialogProps {
   eventTitle: string;
   onClose: () => void;
   onConfirm: (eventId: string) => Promise<void>;
+  isLoading?: boolean;
+  event?: Event | null;
 }

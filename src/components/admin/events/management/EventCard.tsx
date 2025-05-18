@@ -16,7 +16,7 @@ const EventCard: React.FC<EventCardProps> = ({
   onToggleFeatured,
 }) => {
   return (
-    <Card className="flex flex-col h-full border shadow-sm">
+    <Card className="flex flex-col h-full border shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
       <EventCardHeader
         event={event}
         onViewEvent={onViewEvent}
