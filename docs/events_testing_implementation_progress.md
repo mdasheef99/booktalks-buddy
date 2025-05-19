@@ -38,8 +38,14 @@ This document tracks the implementation progress of the testing strategy outline
 
 ### In Progress
 
+- ✅ `useParticipantsData` hook tests (src/hooks/participants/__tests__/useParticipantsData.test.ts)
+  - Tests for initial state with empty options
+  - Tests for initialization with provided initial participants and counts
+  - Tests for successful data fetching
+  - Tests for error handling
+  - Tests for callback handling (onDataChange and onCountsChange)
+
 ### Not Started
-- ❌ `useParticipantsData` hook tests
 - ❌ `useParticipantsExport` hook tests
 
 ## Integration Tests
@@ -77,7 +83,8 @@ Based on the testing strategy document, the next steps are:
 
 1. **Complete Hook Tests**:
    - ✅ Fixed issues with `useEventNotifications` tests
-   - Implement tests for `useParticipantsData` and `useParticipantsExport` hooks using the same approach
+   - ✅ Implemented tests for `useParticipantsData` hook
+   - Implement tests for `useParticipantsExport` hook using the same approach
 
 2. **Implement Integration Tests**:
    - Test component combinations (Events Page + API)
@@ -90,8 +97,8 @@ Based on the testing strategy document, the next steps are:
 
 ## Conclusion
 
-The implementation of the testing strategy is progressing well, with the foundational test utilities and three key hook tests completed. We've successfully addressed the subscription cleanup issues in the useEventNotifications tests and established a reliable pattern for testing hooks with complex dependencies.
+The implementation of the testing strategy is progressing well, with the foundational test utilities and four key hook tests completed. We've successfully addressed the subscription cleanup issues in the useEventNotifications tests and established a reliable pattern for testing hooks with complex dependencies.
 
-The focus now is on implementing tests for the remaining hooks (useParticipantsData and useParticipantsExport) using the same approach before moving on to integration and end-to-end tests.
+We've now implemented tests for the useParticipantsData hook, which handles participant data fetching and state management. The focus now is on implementing tests for the remaining hook (useParticipantsExport) using the same approach before moving on to integration and end-to-end tests.
 
 This incremental approach ensures that each layer of the application is thoroughly tested before moving on to more complex scenarios, following the testing pyramid concept outlined in the strategy document.

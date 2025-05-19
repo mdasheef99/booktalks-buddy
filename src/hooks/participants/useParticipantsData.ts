@@ -84,17 +84,20 @@ export function useParticipantsData({
     }
   }, [participants, onDataChange]);
 
+  // Call onCountsChange when counts change
+  useEffect(() => {
+    if (onCountsChange) {
+      onCountsChange(counts);
+    }
+  }, [counts, onCountsChange]);
+
   // Initialize counts from initial participants
   useEffect(() => {
     if (initialParticipants.length > 0) {
       const initialCalculatedCounts = calculateCounts(initialParticipants);
       setCounts(initialCalculatedCounts);
-
-      if (onCountsChange) {
-        onCountsChange(initialCalculatedCounts);
-      }
     }
-  }, [initialParticipants, calculateCounts, onCountsChange]);
+  }, [initialParticipants, calculateCounts]);
 
   return {
     participants,
