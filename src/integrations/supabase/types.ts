@@ -58,25 +58,31 @@ export type Database = {
           author: string
           cover_url: string | null
           created_at: string | null
-          genre: string
+          genre: string | null
           id: string
           title: string
+          google_books_id: string | null
+          description: string | null
         }
         Insert: {
           author: string
           cover_url?: string | null
           created_at?: string | null
-          genre: string
+          genre?: string | null
           id?: string
           title: string
+          google_books_id?: string | null
+          description?: string | null
         }
         Update: {
           author?: string
           cover_url?: string | null
           created_at?: string | null
-          genre?: string
+          genre?: string | null
           id?: string
           title?: string
+          google_books_id?: string | null
+          description?: string | null
         }
         Relationships: []
       }
@@ -189,24 +195,112 @@ export type Database = {
           },
         ]
       }
+      book_nominations: {
+        Row: {
+          id: string
+          club_id: string
+          book_id: string
+          nominated_by: string
+          status: string
+          nominated_at: string
+        }
+        Insert: {
+          id?: string
+          club_id: string
+          book_id: string
+          nominated_by: string
+          status?: string
+          nominated_at?: string
+        }
+        Update: {
+          id?: string
+          club_id?: string
+          book_id?: string
+          nominated_by?: string
+          status?: string
+          nominated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_nominations_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_nominations_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_nominations_nominated_by_fkey"
+            columns: ["nominated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_likes: {
+        Row: {
+          nomination_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          nomination_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: {
+          nomination_id?: string
+          user_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_likes_nomination_id_fkey"
+            columns: ["nomination_id"]
+            isOneToOne: false
+            referencedRelation: "book_nominations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       current_books: {
         Row: {
           author: string
           club_id: string
           set_at: string | null
           title: string
+          book_id: string | null
+          nomination_id: string | null
         }
         Insert: {
           author: string
           club_id: string
           set_at?: string | null
           title: string
+          book_id?: string | null
+          nomination_id?: string | null
         }
         Update: {
           author?: string
           club_id?: string
           set_at?: string | null
           title?: string
+          book_id?: string | null
+          nomination_id?: string | null
         }
         Relationships: [
           {
@@ -214,6 +308,20 @@ export type Database = {
             columns: ["club_id"]
             isOneToOne: true
             referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "current_books_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "current_books_nomination_id_fkey"
+            columns: ["nomination_id"]
+            isOneToOne: false
+            referencedRelation: "book_nominations"
             referencedColumns: ["id"]
           },
         ]

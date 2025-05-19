@@ -41,6 +41,8 @@ import BookClubMembers from "./components/admin/BookClubMembers";
 import BookClubSettings from "./components/admin/BookClubSettings";
 import Events from "./pages/Events";
 import EventDetailsPage from "./pages/EventDetailsPage";
+import BookNominationsPage from "./pages/BookNominationsPage";
+import BookNominationFormPage from "./pages/BookNominationFormPage";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";
@@ -84,6 +86,8 @@ function App() {
               <Route path="/discover-clubs" element={<BookClubDiscoveryPage />} />
               <Route path="/book-club/new" element={<CreateBookClubForm />} />
               <Route path="/book-club/:clubId" element={<BookClubDetailsPage />} />
+              <Route path="/book-club/:clubId/nominations" element={<BookNominationsPage />} />
+              <Route path="/book-club/:clubId/nominations/new" element={<BookNominationFormPage />} />
             </Route>
 
             {/* Member-protected routes */}

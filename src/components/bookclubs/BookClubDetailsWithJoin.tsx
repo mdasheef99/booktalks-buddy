@@ -13,6 +13,7 @@ import ClubNavigation from './sections/ClubNavigation';
 import CurrentBookSection from './sections/CurrentBookSection';
 import MembersSection from './sections/MembersSection';
 import DiscussionsSection from './sections/DiscussionsSection';
+import NominationsSection from './sections/NominationsSection';
 import JoinClubSection from './sections/JoinClubSection';
 import PendingMembershipSection from './sections/PendingMembershipSection';
 
@@ -94,6 +95,17 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
           <CurrentBookSection currentBook={currentBook} />
         </div>
+
+        {/* Book Nominations - Only show for members */}
+        {isMember && (
+          <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
+            <NominationsSection
+              clubId={clubId || ''}
+              isMember={isMember}
+              isAdmin={isAdmin}
+            />
+          </div>
+        )}
 
         {/* Members */}
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
