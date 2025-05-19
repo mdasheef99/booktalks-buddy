@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  getUnreadEventNotificationsCount, 
+import {
+  getUnreadEventNotificationsCount,
   subscribeToEventNotifications,
   EventNotification
 } from '@/lib/api/bookclubs/notifications';
@@ -58,7 +58,10 @@ export function useEventNotifications() {
 
     // Clean up subscription on unmount
     return () => {
-      subscription.unsubscribe();
+      // Check if subscription exists before calling unsubscribe
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, [user?.id]);
 

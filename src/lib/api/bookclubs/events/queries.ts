@@ -26,14 +26,23 @@ export async function getEvent(eventId: string): Promise<Event> {
 /**
  * Get all events for a specific club
  * @param clubId - The ID of the club
+ * @param upcomingOnly - Whether to only return upcoming events
  * @returns Array of events
  */
-export async function getClubEvents(clubId: string): Promise<Event[]> {
-  const { data, error } = await supabase
+export async function getClubEvents(clubId: string, upcomingOnly: boolean = false): Promise<Event[]> {
+  let query = supabase
     .from('events')
     .select('*')
-    .eq('club_id', clubId)
-    .order('start_time', { ascending: true });
+    .eq('club_id', clubId);
+
+  // Filter for upcoming events if requested
+  if (upcomingOnly) {
+    const now = new Date().toISOString();
+    query = query.gte('start_time', now);
+  }
+
+  // Order by start time
+  const { data, error } = await query.order('start_time', { ascending: true });
 
   if (error) {
     console.error('Error fetching club events:', error);
