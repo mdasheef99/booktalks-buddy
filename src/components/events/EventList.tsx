@@ -62,7 +62,7 @@ const EventList: React.FC<EventListProps> = ({
 
 // Skeleton loader for events
 export const EventSkeleton = () => (
-  <div className="rounded-lg border border-border p-6 shadow-sm">
+  <div className="rounded-lg border border-border p-6 shadow-sm" data-testid="skeleton-loader">
     <Skeleton className="h-6 w-3/4 mb-4" />
     <Skeleton className="h-4 w-1/2 mb-2" />
     <Skeleton className="h-4 w-1/3 mb-2" />
