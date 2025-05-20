@@ -157,21 +157,29 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 
 #### 4.1.2 Searching and Nominating Books
 - "Nominate a Book" button at top of nominations list
-- Search interface with results from Google Books API
-- Book cards showing cover, title, author
-- "Nominate" button on each result
-- Confirmation step before finalizing nomination
+- Dedicated nomination page with tabbed interface
+- Search tab with results from Google Books API
+- Preview tab for reviewing book details before nomination
+- Book cards showing cover, title, author, and description
+- Responsive design for all screen sizes
+- Comprehensive error handling and loading states
 
 #### 4.1.3 Viewing Nominations
-- List of all active nominations for the club
-- Each nomination shows book details, nominator, and like count
-- Sorting options (most liked, newest, alphabetical)
-- Pagination for clubs with many nominations
+- List and grid view options for nominations
+- Each nomination shows book cover, title, author, description, nominator, and like count
+- Status indicators for active, selected, and archived nominations
+- Sorting options (most liked, newest)
+- Filtering options by status (active, selected, archived, all)
+- Responsive layout that adapts to different screen sizes
+- Staggered animation for smooth loading experience
 
 #### 4.1.4 Liking/Unliking Nominations
-- Like button on each nomination card
-- Visual indication of nominations the user has already liked
+- Like button on each nomination card with count indicator
+- Visual indication of nominations the user has already liked (color change)
+- Loading state during like/unlike operation
 - Real-time update of like count when clicked
+- Optimistic UI updates for better user experience
+- Touch-friendly hit areas for mobile users
 
 ### 4.2 Club Administrators
 
@@ -233,13 +241,18 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 
 **Status**: Completed on July 1, 2025
 **Implementation Files**:
-- `src/lib/api/bookclubs/nominations.ts` - Book nomination functionality
+- `src/lib/api/bookclubs/nominations/index.ts` - Book nomination functionality
+- `src/lib/api/bookclubs/nominations/create.ts` - Nomination creation
+- `src/lib/api/bookclubs/nominations/retrieve.ts` - Nomination retrieval
+- `src/lib/api/bookclubs/nominations/manage.ts` - Nomination management
 - `src/lib/api/bookclubs/likes.ts` - Like/unlike functionality
-- `src/lib/api/bookclubs/books.ts` - Updated current book management
+- `src/lib/api/bookclubs/books/search.ts` - Book search functionality
+- `src/lib/api/bookclubs/books/storage.ts` - Book storage functionality
+- `src/lib/api/bookclubs/types.ts` - Type definitions
 - `src/integrations/supabase/types.ts` - Updated database types
 
 **Implementation Notes**:
-- Leveraged existing Google Books API integration from `src/services/googleBooksService.ts`
+- Modularized API functions into smaller, focused files for better maintainability
 - Created comprehensive API functions for nominations with proper error handling
 - Implemented like/unlike functionality with user-specific tracking
 - Updated current book management to work with both the new schema and maintain backward compatibility
@@ -247,6 +260,7 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 - Fixed type issues and improved error handling throughout the API functions
 - Implemented efficient like counting mechanism for better performance
 - Ensured proper permission checks for all operations
+- Added dedicated book search functionality with Google Books API integration
 
 ### 6.3 Phase 3: Basic UI Components ✅
 - ✅ Create nominations tab and list
@@ -258,7 +272,7 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 - `src/components/bookclubs/sections/NominationsSection.tsx` - Main nominations section component
 - `src/components/bookclubs/nominations/NominationsList.tsx` - List of nominations
 - `src/components/bookclubs/nominations/NominationCard.tsx` - Individual nomination card
-- `src/components/bookclubs/nominations/BookSearchModal.tsx` - Book search and nomination modal
+- `src/components/bookclubs/nominations/NominationGrid.tsx` - Grid view for nominations
 - `src/components/bookclubs/BookClubDetailsWithJoin.tsx` - Integration with book club page
 
 **Implementation Notes**:
@@ -268,7 +282,8 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 - Integrated with the existing book club page layout
 - Added sorting and filtering options for nominations
 - Implemented admin controls for setting current books
-- Ensured responsive design for all screen sizes
+- Created both list and grid views for nominations
+- Added navigation to the dedicated nomination page
 
 ### 6.4 Phase 4: Admin Features ✅
 - ✅ Implement current book selection
@@ -290,10 +305,32 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 - Improved the UI for setting a nomination as the current book
 - Ensured proper permission checks for all admin operations
 
-### 6.5 Phase 5: Refinement and Optimization
-- Improve performance for clubs with many nominations
-- Add additional sorting and filtering options
-- Implement any deferred features
+### 6.5 Phase 5: Refinement and Optimization ✅
+- ✅ Improve performance for clubs with many nominations
+- ✅ Enhance UI/UX with improved loading states and error handling
+- ✅ Create dedicated nomination page with improved user experience
+- ✅ Implement responsive design optimizations
+- ✅ Fix image loading issues and improve visual transitions
+
+**Status**: Completed on July 15, 2025
+**Implementation Files**:
+- `src/pages/BookNominationFormPage.tsx` - Dedicated page for book nomination
+- `src/pages/BookNominationsPage.tsx` - Refactored nominations page
+- `src/components/bookclubs/nominations/SkeletonBookCover.tsx` - Progressive image loading
+- `src/components/bookclubs/nominations/ErrorDisplay.tsx` - Enhanced error handling
+- `src/components/bookclubs/nominations/LoadingButton.tsx` - Improved loading states
+- `src/components/bookclubs/nominations/useNominations.tsx` - Custom hook for data management
+
+**Implementation Notes**:
+- Refactored large files into smaller, more modular components for better maintainability
+- Created a dedicated page for book nominations with tabbed interface for search and preview
+- Fixed image loading flickering issue in SkeletonBookCover with improved state management
+- Implemented comprehensive error handling with contextual error messages and retry functionality
+- Added loading states with staggered animations for a more natural loading experience
+- Enhanced responsive design with specific breakpoints (480px, 768px, 1024px, 1280px)
+- Improved touch targets for mobile users (minimum 44x44px)
+- Implemented progressive image loading with smooth transitions
+- Created comprehensive documentation for UI components and patterns
 
 ## 7. Technical Considerations and Challenges
 
@@ -304,8 +341,13 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 
 ### 7.2 Performance Considerations
 - Efficient queries for nominations with like counts
-- Pagination for clubs with many nominations
+- Optimized image loading with progressive enhancement
+- Staggered animations to reduce perceived loading time
+- Lazy loading of images with the loading="lazy" attribute
+- Responsive image handling for different screen sizes
 - Optimistic UI updates for likes
+- Modular code structure for better maintainability and performance
+- Proper state management to prevent unnecessary re-renders
 
 ### 7.3 Data Migration
 - Strategy for existing current books
@@ -315,6 +357,10 @@ ADD COLUMN nomination_id UUID REFERENCES book_nominations(id);
 - Proper permission checks for all operations
 - Validation of all user inputs
 - Prevention of nomination/like spam
+- Contextual error handling with appropriate user feedback
+- Secure navigation between pages
+- Proper error boundaries to prevent application crashes
+- Comprehensive error logging for debugging
 
 ### 7.5 Future Extensibility
 - Design to accommodate potential future features:
