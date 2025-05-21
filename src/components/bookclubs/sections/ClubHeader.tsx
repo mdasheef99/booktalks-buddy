@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Database } from '@/integrations/supabase/types';
 import { useCanManageClub } from '@/lib/entitlements/hooks';
+import { ClubManagementPanel } from '../management';
 
 type BookClub = Database['public']['Tables']['book_clubs']['Row'];
 
@@ -27,6 +28,7 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
   handleCancelRequest
 }) => {
   const navigate = useNavigate();
+  const [managementPanelOpen, setManagementPanelOpen] = useState(false);
 
   // Get the store ID for the club
   // Note: In a real implementation, you would fetch this from the database
@@ -80,13 +82,22 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
         {canManage && (
           <Button
             variant="outline"
-            onClick={() => navigate(`/book-club/${clubId}/settings`)}
+            onClick={() => setManagementPanelOpen(true)}
           >
             <Settings className="h-4 w-4 mr-2" />
             Manage Club
           </Button>
         )}
       </div>
+
+      {/* Club Management Panel */}
+      {canManage && (
+        <ClubManagementPanel
+          clubId={clubId}
+          open={managementPanelOpen}
+          onClose={() => setManagementPanelOpen(false)}
+        />
+      )}
     </div>
   );
 };
