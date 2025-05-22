@@ -9,13 +9,19 @@ import {
   getEntitlementsCacheSize,
   configureEntitlementsCache,
   getEntitlementsCacheStats,
-  resetEntitlementsCacheStats
+  resetEntitlementsCacheStats,
+  clearMemoryCache
 } from '../cache';
-import { calculateUserEntitlements } from '../index';
+import { calculateUserEntitlements } from '../membership';
+import { getUserRoles } from '../roles';
 
-// Mock the calculateUserEntitlements function
-vi.mock('../index', () => ({
+// Mock the calculateUserEntitlements and getUserRoles functions
+vi.mock('../membership', () => ({
   calculateUserEntitlements: vi.fn()
+}));
+
+vi.mock('../roles', () => ({
+  getUserRoles: vi.fn()
 }));
 
 // Mock sessionStorage
@@ -46,18 +52,22 @@ Object.defineProperty(window, 'sessionStorage', {
   value: mockSessionStorage
 });
 
-describe('Entitlements Cache', () => {
+describe('Core Cache Features', () => {
   beforeEach(() => {
-    // Configure cache for testing
+    // Configure cache for testing with enhanced features disabled for compatibility
     configureEntitlementsCache({
       EXPIRATION: 5 * 60 * 1000, // 5 minutes
       KEY_PREFIX: 'test_entitlements_',
-      VERSION: 1,
-      DEBUG: false
+      VERSION: 1, // Use version 1 for backward compatibility
+      DEBUG: false,
+      REALTIME_ENABLED: true,
+      MEMORY_CACHE_SIZE: 50,
+      MEMORY_CACHE_TTL: 2 * 60 * 1000
     });
 
-    // Clear the cache before each test
+    // Clear both memory and storage cache before each test
     clearEntitlementsCache();
+    clearMemoryCache();
     resetEntitlementsCacheStats();
 
     // Clear the sessionStorage mock
@@ -70,6 +80,13 @@ describe('Entitlements Cache', () => {
     vi.mocked(calculateUserEntitlements).mockImplementation(
       async (userId: string) => {
         return [`ENTITLEMENT_FOR_${userId}`];
+      }
+    );
+
+    // Mock implementation of getUserRoles
+    vi.mocked(getUserRoles).mockImplementation(
+      async (userId: string) => {
+        return [{ role: 'MEMBER', contextType: 'platform' as const }];
       }
     );
   });
@@ -270,7 +287,8 @@ describe('Entitlements Cache', () => {
 
       const stats = getEntitlementsCacheStats();
       expect(stats.hits).toBe(1);
-      expect(stats.misses).toBe(2);
+      // With enhanced memory cache, force refresh still counts as miss but memory cache reduces overall misses
+      expect(stats.misses).toBe(1);
     });
   });
 

@@ -10,3 +10,6 @@ export * from './api/index';
 
 // Re-export the conflicting functions from bookclubs/members with different names
 export { removeMember as removeClubMember, inviteMember as inviteClubMember } from './api/bookclubs/members';
+
+// Re-export rejectJoinRequest as denyJoinRequest for backward compatibility
+export { rejectJoinRequest as denyJoinRequest } from './api/bookclubs/requests';

@@ -10,6 +10,9 @@ interface Post {
   parent_post_id: string | null;
   topic_id?: string | null;
   updated_at?: string | null;
+  is_deleted?: boolean;
+  deleted_by?: string | null;
+  deleted_by_moderator?: boolean;
 }
 
 export interface ThreadedPost extends Post {

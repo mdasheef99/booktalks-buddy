@@ -22,9 +22,16 @@ export async function createEvent(
 
   // Check if the user has permission to create events for this store
   const hasPermission = hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId) ||
-                         hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId);
+                         hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId) ||
+                         entitlements.includes('CAN_MANAGE_EVENTS') ||
+                         entitlements.includes('CAN_MANAGE_ALL_STORES');
 
   if (!hasPermission) {
+    console.log('🚨 Event creation permission check failed for user:', userId);
+    console.log('📍 Store ID:', storeId);
+    console.log('🔑 User entitlements:', entitlements);
+    console.log('🔍 Looking for: STORE_OWNER_' + storeId + ' or STORE_MANAGER_' + storeId);
+    console.log('🔍 Or general permissions: CAN_MANAGE_EVENTS, CAN_MANAGE_ALL_STORES');
     throw new Error('Unauthorized: Only store owners and managers can create events');
   }
 
@@ -84,10 +91,21 @@ export async function updateEvent(
 
   // Check if the user has permission to update this event
   const isCreator = event.created_by === userId;
-  const hasStorePermission = event.store_id ?
-    hasContextualEntitlement(entitlements, 'STORE_OWNER', event.store_id) ||
-    hasContextualEntitlement(entitlements, 'STORE_MANAGER', event.store_id) :
-    false;
+
+  let hasStorePermission = false;
+  if (event.store_id) {
+    const hasStoreOwnerPermission = hasContextualEntitlement(entitlements, 'STORE_OWNER', event.store_id) ||
+                                    entitlements.includes(`STORE_OWNER_${event.store_id}`);
+
+    const hasStoreManagerPermission = hasContextualEntitlement(entitlements, 'STORE_MANAGER', event.store_id) ||
+                                      entitlements.includes(`STORE_MANAGER_${event.store_id}`);
+
+    const hasGeneralEventPermission = entitlements.includes('CAN_MANAGE_EVENTS') ||
+                                      entitlements.includes('CAN_MANAGE_STORE_SETTINGS') ||
+                                      entitlements.includes('CAN_MANAGE_ALL_STORES');
+
+    hasStorePermission = hasStoreOwnerPermission || hasStoreManagerPermission || hasGeneralEventPermission;
+  }
 
   if (!isCreator && !hasStorePermission) {
     throw new Error('Unauthorized: Only the event creator or store owners/managers can update events');
@@ -133,10 +151,21 @@ export async function deleteEvent(userId: string, eventId: string): Promise<{ su
 
   // Check if the user has permission to delete this event
   const isCreator = event.created_by === userId;
-  const hasStorePermission = event.store_id ?
-    hasContextualEntitlement(entitlements, 'STORE_OWNER', event.store_id) ||
-    hasContextualEntitlement(entitlements, 'STORE_MANAGER', event.store_id) :
-    false;
+
+  let hasStorePermission = false;
+  if (event.store_id) {
+    const hasStoreOwnerPermission = hasContextualEntitlement(entitlements, 'STORE_OWNER', event.store_id) ||
+                                    entitlements.includes(`STORE_OWNER_${event.store_id}`);
+
+    const hasStoreManagerPermission = hasContextualEntitlement(entitlements, 'STORE_MANAGER', event.store_id) ||
+                                      entitlements.includes(`STORE_MANAGER_${event.store_id}`);
+
+    const hasGeneralEventPermission = entitlements.includes('CAN_MANAGE_EVENTS') ||
+                                      entitlements.includes('CAN_MANAGE_STORE_SETTINGS') ||
+                                      entitlements.includes('CAN_MANAGE_ALL_STORES');
+
+    hasStorePermission = hasStoreOwnerPermission || hasStoreManagerPermission || hasGeneralEventPermission;
+  }
 
   if (!isCreator && !hasStorePermission) {
     throw new Error('Unauthorized: Only the event creator or store owners/managers can delete events');

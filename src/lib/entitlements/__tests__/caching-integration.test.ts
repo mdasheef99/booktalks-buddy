@@ -12,7 +12,7 @@ import {
   clearEntitlementsCache,
   configureEntitlementsCache
 } from '../cache';
-import { calculateUserEntitlements } from '../index';
+import { calculateUserEntitlements } from '../membership';
 import { initEntitlementsCache } from '../init';
 
 // Mock the AuthContext
@@ -23,8 +23,12 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 
 // Mock the calculateUserEntitlements function
-vi.mock('../index', () => ({
-  calculateUserEntitlements: vi.fn(),
+vi.mock('../membership', () => ({
+  calculateUserEntitlements: vi.fn()
+}));
+
+// Mock permissions functions
+vi.mock('../permissions', () => ({
   hasEntitlement: (entitlements: string[], entitlement: string) =>
     entitlements.includes(entitlement),
   hasContextualEntitlement: (entitlements: string[], prefix: string, contextId: string) =>

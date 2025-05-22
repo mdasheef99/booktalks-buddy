@@ -1,5 +1,6 @@
 import { supabase } from '../../supabase';
 import { isClubMember, isClubAdmin } from '../auth';
+import { isClubLead } from './permissions';
 
 /**
  * Book Club Discussion Topics and Posts
@@ -70,7 +71,18 @@ export async function getClubTopics(userId: string, clubId: string) {
 export async function getDiscussionPosts(topicId: string) {
   const { data, error } = await supabase
     .from('discussion_posts')
-    .select('*')
+    .select(`
+      id,
+      content,
+      user_id,
+      parent_post_id,
+      topic_id,
+      created_at,
+      updated_at,
+      is_deleted,
+      deleted_by,
+      deleted_by_moderator
+    `)
     .eq('topic_id', topicId)
     .order('created_at', { ascending: true });
 
@@ -79,8 +91,33 @@ export async function getDiscussionPosts(topicId: string) {
 }
 
 /**
- * Delete a discussion post
- * Only the post author or a club admin can delete a post
+ * Check if user has permission to moderate content in a club
+ */
+async function hasModeratorPermission(userId: string, clubId: string): Promise<boolean> {
+  // Check if user is the club lead
+  const isLead = await isClubLead(userId, clubId);
+  if (isLead) return true;
+
+  // Check if user is a moderator
+  const { data: moderator, error: moderatorError } = await supabase
+    .from('club_moderators')
+    .select('user_id')
+    .eq('club_id', clubId)
+    .eq('user_id', userId)
+    .single();
+
+  if (!moderatorError && moderator) return true;
+
+  // Check if user is a club admin (from club_members table)
+  const isAdmin = await isClubAdmin(userId, clubId);
+  if (isAdmin) return true;
+
+  return false;
+}
+
+/**
+ * Soft delete a discussion post
+ * The post author or a club admin/moderator can delete a post
  */
 export async function deleteDiscussionPost(userId: string, postId: string) {
   // First get the post to check ownership and get the topic_id
@@ -101,20 +138,30 @@ export async function deleteDiscussionPost(userId: string, postId: string) {
 
   if (topicError || !topic) throw new Error('Topic not found');
 
-  // Check if user is the post author or a club admin
+  // Check if user is the post author or has moderator permissions
   const isAuthor = post.user_id === userId;
-  const isAdmin = await isClubAdmin(userId, topic.club_id);
+  const hasModPermission = await hasModeratorPermission(userId, topic.club_id);
 
-  if (!isAuthor && !isAdmin) throw new Error('Unauthorized');
+  if (!isAuthor && !hasModPermission) throw new Error('Unauthorized');
 
-  // Delete the post
+  // Soft delete the post
   const { error } = await supabase
     .from('discussion_posts')
-    .delete()
+    .update({
+      is_deleted: true,
+      deleted_by: userId,
+      deleted_by_moderator: hasModPermission && !isAuthor, // Only mark as deleted by moderator if it's not the author
+      deleted_at: new Date().toISOString()
+    })
     .eq('id', postId);
 
   if (error) throw error;
-  return { success: true };
+  return {
+    success: true,
+    id: postId,
+    is_deleted: true,
+    deleted_by_moderator: hasModPermission && !isAuthor
+  };
 }
 
 // Alias for addDiscussionTopic
