@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Database } from '@/integrations/supabase/types';
 import { useCanManageClub } from '@/lib/entitlements/hooks';
 import { ClubManagementPanel } from '../management';
+import { supabase } from '@/lib/supabase';
 
 type BookClub = Database['public']['Tables']['book_clubs']['Row'];
 
@@ -30,9 +31,32 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
   const navigate = useNavigate();
   const [managementPanelOpen, setManagementPanelOpen] = useState(false);
 
-  // Get the store ID for the club
-  // Note: In a real implementation, you would fetch this from the database
-  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+  // Get the store ID for the club dynamically
+  const [storeId, setStoreId] = useState<string>('');
+
+  useEffect(() => {
+    const fetchStoreId = async () => {
+      try {
+        // Use the club prop if it has store_id, otherwise fetch from database
+        if (club.store_id) {
+          setStoreId(club.store_id);
+        } else {
+          const { data: clubData } = await supabase
+            .from('book_clubs')
+            .select('store_id')
+            .eq('id', clubId)
+            .single();
+
+          setStoreId(clubData?.store_id || '');
+        }
+      } catch (error) {
+        console.error('Error fetching club store ID:', error);
+        setStoreId('');
+      }
+    };
+
+    fetchStoreId();
+  }, [clubId, club.store_id]);
 
   // Check if the user can manage this club using entitlements
   const { result: canManage } = useCanManageClub(clubId, storeId);

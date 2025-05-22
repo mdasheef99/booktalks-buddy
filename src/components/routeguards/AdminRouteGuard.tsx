@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCanManageClub } from '@/lib/entitlements/hooks';
+import { supabase } from '@/lib/supabase';
 
 interface Props {
   children: React.ReactNode;
@@ -15,19 +16,46 @@ const AdminRouteGuard: React.FC<Props> = ({ children }) => {
   const { clubId } = useParams<{ clubId: string }>();
   const { user, loading } = useAuth();
 
-  // Get the store ID for the club
-  // Note: In a real implementation, you would fetch this from the database
-  // For now, we'll use a default store ID since we're transitioning to the new system
-  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+  // Get the store ID for the club dynamically
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [fetchingStoreId, setFetchingStoreId] = useState(true);
+
+  useEffect(() => {
+    const fetchStoreId = async () => {
+      if (!clubId) {
+        setFetchingStoreId(false);
+        return;
+      }
+
+      try {
+        const { data: club } = await supabase
+          .from('book_clubs')
+          .select('store_id')
+          .eq('id', clubId)
+          .single();
+
+        setStoreId(club?.store_id || null);
+      } catch (error) {
+        console.error('Error fetching club store ID:', error);
+        setStoreId(null);
+      } finally {
+        setFetchingStoreId(false);
+      }
+    };
+
+    fetchStoreId();
+  }, [clubId]);
 
   // Check if the user can manage this club using entitlements
   const { result: canManage, loading: loadingPermissions } = useCanManageClub(
     clubId || '',
-    storeId
+    storeId || ''
   );
 
+  const isLoading = loading || loadingPermissions || fetchingStoreId;
+
   // Show loading state while checking permissions
-  if (loading || loadingPermissions) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-pulse">

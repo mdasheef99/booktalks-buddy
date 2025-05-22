@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useCanManageClub } from '@/lib/entitlements/hooks';
+import { supabase } from '@/lib/supabase';
 
 interface ClubNavigationProps {
   clubId: string;
@@ -21,9 +22,27 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
   const location = useLocation();
   const { signOut } = useAuth();
 
-  // Get the store ID for the club
-  // Note: In a real implementation, you would fetch this from the database
-  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+  // Get the store ID for the club dynamically
+  const [storeId, setStoreId] = useState<string>('');
+
+  useEffect(() => {
+    const fetchStoreId = async () => {
+      try {
+        const { data: club } = await supabase
+          .from('book_clubs')
+          .select('store_id')
+          .eq('id', clubId)
+          .single();
+
+        setStoreId(club?.store_id || '');
+      } catch (error) {
+        console.error('Error fetching club store ID:', error);
+        setStoreId('');
+      }
+    };
+
+    fetchStoreId();
+  }, [clubId]);
 
   // Check if the user can manage this club using entitlements
   const { result: canManage } = useCanManageClub(clubId, storeId);

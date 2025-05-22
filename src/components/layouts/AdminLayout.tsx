@@ -17,7 +17,7 @@ import { useHasEntitlement } from '@/lib/entitlements/hooks';
 const AdminLayout: React.FC = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const { result: canManageEvents } = useHasEntitlement('CAN_MANAGE_STORE_EVENTS');
+  const { result: canManageEvents } = useHasEntitlement('CAN_MANAGE_EVENTS');
 
   const handleLogout = async () => {
     await signOut();
