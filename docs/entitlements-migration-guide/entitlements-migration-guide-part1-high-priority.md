@@ -282,17 +282,17 @@ After implementing all HIGH PRIORITY changes, test these scenarios:
 ## ✅ Part 1 Completion Checklist
 
 ### Pre-Implementation
-- [ ] Debug script run successfully - user entitlements verified
-- [ ] Backup branch created: `feature/entitlements-migration-phase2-task4`
+- [x] Debug script run successfully - user entitlements verified
+- [x] Backup branch created: `feature/entitlements-migration-phase2-task4`
 - [ ] All required imports verified in target files
 - [ ] Development environment ready
 
 ### Implementation
-- [ ] **Change 2.1**: Store management logic fixed (`canManageStore` function)
-- [ ] **Change 3.1**: Club management permissions added (`canManageClub` function)
-- [ ] **Change 4.1**: Store admin fallback permissions added
-- [ ] **Change 1.1**: Store admin add permission check updated
-- [ ] **Change 1.2**: Store admin remove permission check updated
+- [x] **Change 2.1**: Store management logic fixed (`canManageStore` function)
+- [x] **Change 3.1**: Club management permissions added (`canManageClub` function)
+- [x] **Change 4.1**: Store admin fallback permissions added
+- [x] **Change 1.1**: Store admin add permission check updated
+- [x] **Change 1.2**: Store admin remove permission check updated
 
 ### Testing
 - [ ] Manual testing completed for all scenarios

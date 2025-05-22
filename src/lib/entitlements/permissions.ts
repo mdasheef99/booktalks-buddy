@@ -52,7 +52,9 @@ export function canManageClub(
     hasEntitlement(entitlements, 'CAN_MANAGE_ALL_CLUBS') ||
     hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId) ||
     hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId) ||
-    hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId)
+    hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId) ||
+    entitlements.includes('CAN_MANAGE_STORE_SETTINGS') ||
+    entitlements.includes('CAN_MANAGE_ALL_STORES')
   );
 }
 
@@ -87,8 +89,9 @@ export function canManageStore(
   storeId: string
 ): boolean {
   return (
-    hasEntitlement(entitlements, 'CAN_MANAGE_STORE_SETTINGS') &&
-    hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId)
+    hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId) ||
+    entitlements.includes('CAN_MANAGE_ALL_STORES') ||
+    entitlements.includes('CAN_MANAGE_STORE_SETTINGS')
   );
 }
 
