@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase';
-import { isClubAdmin } from '@/lib/api/auth';
 import { getNominationById } from './retrieve';
 
 /**

@@ -1,5 +1,6 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
+import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Get all pending join requests with user and club details
@@ -73,8 +74,22 @@ export async function getPendingJoinRequests() {
  */
 export async function approveJoinRequest(adminId: string, clubId: string, userId: string) {
   try {
-    // Check if the admin has permission
-    if (!(await isClubAdmin(adminId, clubId))) {
+    // Get user entitlements and check club management permission
+    const entitlements = await getUserEntitlements(adminId);
+
+    // Get club's store ID for contextual permission checking
+    const { data: club } = await supabase
+      .from('book_clubs')
+      .select('store_id')
+      .eq('id', clubId)
+      .single();
+
+    const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+    if (!canManage) {
+      console.log('🚨 Approve join request permission check failed for user:', adminId);
+      console.log('📍 Club ID:', clubId);
+      console.log('🔑 User entitlements:', entitlements);
       throw new Error('You don\'t have permission to approve join requests');
     }
 
@@ -127,8 +142,22 @@ export async function approveJoinRequest(adminId: string, clubId: string, userId
  */
 export async function rejectJoinRequest(adminId: string, clubId: string, userId: string) {
   try {
-    // Check if the admin has permission
-    if (!(await isClubAdmin(adminId, clubId))) {
+    // Get user entitlements and check club management permission
+    const entitlements = await getUserEntitlements(adminId);
+
+    // Get club's store ID for contextual permission checking
+    const { data: club } = await supabase
+      .from('book_clubs')
+      .select('store_id')
+      .eq('id', clubId)
+      .single();
+
+    const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+    if (!canManage) {
+      console.log('🚨 Reject join request permission check failed for user:', adminId);
+      console.log('📍 Club ID:', clubId);
+      console.log('🔑 User entitlements:', entitlements);
       throw new Error('You don\'t have permission to deny join requests');
     }
 

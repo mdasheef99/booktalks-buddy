@@ -1,5 +1,5 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin, isClubMember } from '../auth';
+import { isClubMember } from '../auth';
 import { invalidateUserEntitlements, getUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageClub } from '@/lib/entitlements/permissions';
 
@@ -209,8 +209,22 @@ export async function updateMemberRole(adminId: string, clubId: string, userId: 
  */
 export async function removeMember(adminId: string, userIdToRemove: string, clubId: string) {
   try {
-    // Check if the admin has permission
-    if (!(await isClubAdmin(adminId, clubId))) {
+    // Get user entitlements and check club management permission
+    const entitlements = await getUserEntitlements(adminId);
+
+    // Get club's store ID for contextual permission checking
+    const { data: club } = await supabase
+      .from('book_clubs')
+      .select('store_id')
+      .eq('id', clubId)
+      .single();
+
+    const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+    if (!canManage) {
+      console.log('🚨 Remove member permission check failed for user:', adminId);
+      console.log('📍 Club ID:', clubId);
+      console.log('🔑 User entitlements:', entitlements);
       throw new Error('You don\'t have permission to remove club members');
     }
 
@@ -267,7 +281,24 @@ export async function removeMember(adminId: string, userIdToRemove: string, club
  * @returns Success status
  */
 export async function inviteMember(adminId: string, clubId: string, inviteeEmail: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Invite member permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can invite members');
+  }
 
   // Implement invite logic (e.g., insert into invites table or send email)
   console.log(`Sending invite to ${inviteeEmail} for club ${clubId}`);

@@ -1,5 +1,4 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
 import { getUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageClub } from '@/lib/entitlements/permissions';
 

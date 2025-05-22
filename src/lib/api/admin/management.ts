@@ -1,5 +1,4 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
 import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
 import { canManageClub } from '@/lib/entitlements/permissions';
@@ -36,7 +35,24 @@ export async function listAdminMembers(userId: string) {
  * Note: This is duplicated in bookclubs/members.ts for organizational purposes
  */
 export async function removeMember(adminId: string, userIdToRemove: string, clubId: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Remove member permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can remove members');
+  }
 
   const { error } = await supabase
     .from('club_members')

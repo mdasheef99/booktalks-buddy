@@ -1,6 +1,8 @@
 import { supabase } from '../../supabase';
-import { isClubMember, isClubAdmin } from '../auth';
+import { isClubMember } from '../auth';
 import { isClubLead } from './permissions';
+import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Book Club Discussion Topics and Posts
@@ -108,9 +110,18 @@ async function hasModeratorPermission(userId: string, clubId: string): Promise<b
 
   if (!moderatorError && moderator) return true;
 
-  // Check if user is a club admin (from club_members table)
-  const isAdmin = await isClubAdmin(userId, clubId);
-  if (isAdmin) return true;
+  // Check if user has club management permissions using enhanced entitlements
+  const entitlements = await getUserEntitlements(userId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+  if (canManage) return true;
 
   return false;
 }

@@ -1,5 +1,4 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
 
 /**
  * Book Club Current Book Management
