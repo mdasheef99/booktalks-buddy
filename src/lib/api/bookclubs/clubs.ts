@@ -1,5 +1,7 @@
 import { supabase } from '../../supabase';
 import { isClubAdmin } from '../auth';
+import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Book Club CRUD operations
@@ -56,7 +58,24 @@ export async function createBookClub(userId: string, club: { name: string; descr
  * Update an existing book club
  */
 export async function updateBookClub(userId: string, clubId: string, updates: { name?: string; description?: string; privacy?: string }) {
-  if (!(await isClubAdmin(userId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(userId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Club update permission check failed for user:', userId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can update club settings');
+  }
 
   const { data, error } = await supabase
     .from('book_clubs')
@@ -73,7 +92,24 @@ export async function updateBookClub(userId: string, clubId: string, updates: { 
  * Delete a book club and all associated data
  */
 export async function deleteBookClub(userId: string, clubId: string) {
-  if (!(await isClubAdmin(userId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(userId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Club deletion permission check failed for user:', userId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can delete clubs');
+  }
 
   console.log('Deleting book club:', clubId);
 

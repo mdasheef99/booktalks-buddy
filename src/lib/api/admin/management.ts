@@ -2,6 +2,7 @@ import { supabase } from '../../supabase';
 import { isClubAdmin } from '../auth';
 import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Admin Management Functions
@@ -11,8 +12,20 @@ import { canManageUserTiers } from '@/lib/entitlements';
  * List all members for admin view
  */
 export async function listAdminMembers(userId: string) {
-  // Check if user is a global admin (assumed via Auth metadata or separate check)
-  // For now, assume all authenticated users can list members (adjust as needed)
+  // Check if user has admin permissions
+  const entitlements = await getUserEntitlements(userId);
+
+  const hasAdminPermission = entitlements.includes('CAN_MANAGE_USER_TIERS') ||
+                            entitlements.includes('CAN_MANAGE_ALL_CLUBS') ||
+                            entitlements.includes('CAN_MANAGE_ALL_STORES') ||
+                            entitlements.includes('CAN_MANAGE_STORE_SETTINGS');
+
+  if (!hasAdminPermission) {
+    console.log('🚨 List members permission check failed for user:', userId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only administrators can list all members');
+  }
+
   const { data, error } = await supabase.from('users').select('*');
   if (error) throw error;
   return data;
@@ -40,7 +53,24 @@ export async function removeMember(adminId: string, userIdToRemove: string, club
  * Note: This is duplicated in bookclubs/members.ts for organizational purposes
  */
 export async function inviteMember(adminId: string, clubId: string, inviteeEmail: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Club invite permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can invite members');
+  }
 
   // Implement invite logic (e.g., insert into invites table or send email)
   // Placeholder implementation:

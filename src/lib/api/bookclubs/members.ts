@@ -1,6 +1,7 @@
 import { supabase } from '../../supabase';
 import { isClubAdmin, isClubMember } from '../auth';
-import { invalidateUserEntitlements } from '@/lib/entitlements/cache';
+import { invalidateUserEntitlements, getUserEntitlements } from '@/lib/entitlements/cache';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Book Club Membership Management
@@ -124,7 +125,24 @@ export async function getClubMembers(clubId: string) {
  * Add a member to a club (admin only)
  */
 export async function addClubMember(adminId: string, clubId: string, userId: string, role: string = 'member') {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Add member permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can add members');
+  }
 
   const { error } = await supabase
     .from('club_members')
@@ -144,7 +162,24 @@ export async function addClubMember(adminId: string, clubId: string, userId: str
  * Update a member's role (admin only)
  */
 export async function updateMemberRole(adminId: string, clubId: string, userId: string, newRole: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Update member role permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can update member roles');
+  }
 
   const { error } = await supabase
     .from('club_members')
