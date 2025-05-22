@@ -74,7 +74,7 @@ const UserTierBadge: React.FC<UserTierBadgeProps> = ({
   const badge = (
     <Badge
       variant="outline"
-      className={`${badgeProps.className} ${sizeClasses[size]} flex items-center justify-center rounded-full ${className}`}
+      className={`${badgeProps.className} ${sizeClasses[size]} flex items-center justify-center rounded-full flex-shrink-0 ${className}`}
     >
       {badgeProps.icon}
     </Badge>

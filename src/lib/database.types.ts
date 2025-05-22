@@ -864,6 +864,7 @@ export type Database = {
           allow_chats: boolean | null
           bio: string | null
           created_at: string | null
+          displayname: string | null
           email: string
           favorite_author: string | null
           favorite_genre: string | null
@@ -876,6 +877,7 @@ export type Database = {
           allow_chats?: boolean | null
           bio?: string | null
           created_at?: string | null
+          displayname?: string | null
           email: string
           favorite_author?: string | null
           favorite_genre?: string | null
@@ -888,6 +890,7 @@ export type Database = {
           allow_chats?: boolean | null
           bio?: string | null
           created_at?: string | null
+          displayname?: string | null
           email?: string
           favorite_author?: string | null
           favorite_genre?: string | null

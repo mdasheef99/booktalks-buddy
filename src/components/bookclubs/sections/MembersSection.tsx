@@ -27,6 +27,8 @@ const MembersSection: React.FC<MembersSectionProps> = ({ members }) => {
                 userId={member.user_id}
                 linkToProfile
                 withRole={member.role}
+                displayFormat="full"
+                showTierBadge={true}
               />
             </div>
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { MessageSquare, ArrowUpRight, Trash2, Eye, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PostReactions from '../PostReactions';
+import { ReportButton } from '@/components/reporting/ReportButton';
 
 interface CommentActionsProps {
   postId: string;
@@ -17,6 +18,10 @@ interface CommentActionsProps {
   replyCount: number;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  // Report functionality props
+  postUserId?: string;
+  postContent?: string;
+  clubId?: string;
 }
 
 const CommentActions: React.FC<CommentActionsProps> = ({
@@ -33,6 +38,9 @@ const CommentActions: React.FC<CommentActionsProps> = ({
   replyCount,
   isCollapsed,
   onToggleCollapse,
+  postUserId,
+  postContent,
+  clubId,
 }) => {
   return (
     <div className="flex items-center gap-2 mt-2 ml-5 opacity-70 group-hover:opacity-100 transition-opacity">
@@ -65,6 +73,18 @@ const CommentActions: React.FC<CommentActionsProps> = ({
           >
             <ArrowUpRight className="h-5 w-5" />
           </button>
+        )}
+
+        {/* Report button - only shown to non-authors if not deleted */}
+        {!isDeleted && !isAuthor && postUserId && (
+          <ReportButton
+            targetType="discussion_post"
+            targetId={postId}
+            targetUserId={postUserId}
+            targetContent={postContent}
+            clubId={clubId}
+            variant="icon-only"
+          />
         )}
 
         {/* Delete button - only shown to the author or moderators if not already deleted */}

@@ -49,7 +49,7 @@ const CommentHeader: React.FC<CommentHeaderProps> = ({
           <UserAvatar userId={userId} size="xs" />
           <div className="flex items-baseline gap-1.5">
             <span className="text-[0.85rem] font-medium text-gray-600">
-              <UserName userId={userId} linkToProfile showTierBadge={true} />
+              <UserName userId={userId} linkToProfile showTierBadge={true} displayFormat="full" />
             </span>
             <span className="text-[0.75rem] text-gray-400 opacity-60 group-hover:opacity-100 transition-opacity">
               {new Date(createdAt).toLocaleString(undefined, {

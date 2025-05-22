@@ -33,6 +33,8 @@ import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminEventsPage from "./pages/admin/AdminEventsPage";
 import CreateEventPage from "./pages/admin/CreateEventPage";
 import EditEventPage from "./pages/admin/EditEventPage";
+import ModerationPage from "./pages/admin/ModerationPage";
+import ReportingSystemTest from "./components/testing/ReportingSystemTest";
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
 import TopicDetail from "./components/discussions/TopicDetail";
@@ -146,6 +148,8 @@ function App() {
               <Route path="events" element={<AdminEventsPage />} />
               <Route path="events/create" element={<CreateEventPage />} />
               <Route path="events/edit/:eventId" element={<EditEventPage />} />
+              <Route path="moderation" element={<ModerationPage />} />
+              <Route path="test-reporting" element={<ReportingSystemTest />} />
             </Route>
 
             {/* Catch-all route */}

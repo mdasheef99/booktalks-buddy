@@ -9,6 +9,7 @@ import { useLoadProfiles } from '@/contexts/UserProfileContext';
 import { supabase } from '@/lib/supabase';
 import UserAvatar from '@/components/common/UserAvatar';
 import UserName from '@/components/common/UserName';
+import { ReportButton } from '@/components/reporting/ReportButton';
 
 interface Post {
   id: string;
@@ -178,10 +179,22 @@ const TopicDetail: React.FC = () => {
                 <UserAvatar userId={post.user_id} size="md" />
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <UserName userId={post.user_id} linkToProfile className="font-medium" />
-                    <p className="text-xs text-gray-400">
-                      {new Date(post.created_at).toLocaleString()}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <UserName userId={post.user_id} linkToProfile className="font-medium" displayFormat="full" />
+                      <p className="text-xs text-gray-400">
+                        {new Date(post.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                    {user?.id !== post.user_id && (
+                      <ReportButton
+                        targetType="discussion_post"
+                        targetId={post.id}
+                        targetUserId={post.user_id}
+                        targetContent={post.content}
+                        clubId={clubId}
+                        variant="icon-only"
+                      />
+                    )}
                   </div>
                   <p className="mt-2">{post.content}</p>
                 </div>

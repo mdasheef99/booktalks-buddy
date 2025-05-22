@@ -858,12 +858,81 @@ export type Database = {
           },
         ]
       }
+      reports: {
+        Row: {
+          id: string
+          reporter_id: string
+          reporter_username: string
+          target_type: string
+          target_id: string | null
+          target_user_id: string | null
+          target_username: string | null
+          reason: string
+          description: string
+          severity: string
+          club_id: string | null
+          store_id: string | null
+          status: string
+          priority: number
+          resolved_by: string | null
+          resolved_at: string | null
+          resolution_action: string | null
+          resolution_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reporter_id: string
+          reporter_username: string
+          target_type: string
+          target_id?: string | null
+          target_user_id?: string | null
+          target_username?: string | null
+          reason: string
+          description: string
+          severity: string
+          club_id?: string | null
+          store_id?: string | null
+          status?: string
+          priority?: number
+          resolved_by?: string | null
+          resolved_at?: string | null
+          resolution_action?: string | null
+          resolution_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reporter_id?: string
+          reporter_username?: string
+          target_type?: string
+          target_id?: string | null
+          target_user_id?: string | null
+          target_username?: string | null
+          reason?: string
+          description?: string
+          severity?: string
+          club_id?: string | null
+          store_id?: string | null
+          status?: string
+          priority?: number
+          resolved_by?: string | null
+          resolved_at?: string | null
+          resolution_action?: string | null
+          resolution_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       users: {
         Row: {
           account_tier: string
           allow_chats: boolean | null
           bio: string | null
           created_at: string | null
+          displayname: string | null
           email: string
           favorite_author: string | null
           favorite_genre: string | null
@@ -876,6 +945,7 @@ export type Database = {
           allow_chats?: boolean | null
           bio?: string | null
           created_at?: string | null
+          displayname?: string | null
           email: string
           favorite_author?: string | null
           favorite_genre?: string | null
@@ -888,6 +958,7 @@ export type Database = {
           allow_chats?: boolean | null
           bio?: string | null
           created_at?: string | null
+          displayname?: string | null
           email?: string
           favorite_author?: string | null
           favorite_genre?: string | null

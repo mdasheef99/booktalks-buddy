@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, BarChart, Bell, RefreshCw } from 'lucide-react';
+import { ArrowLeft, BarChart, Bell, RefreshCw, Shield } from 'lucide-react';
 import {
   useAdminStats,
   useTimeRangeFilter,
@@ -99,6 +99,15 @@ const AdminDashboardPage: React.FC = () => {
             >
               <BarChart className="h-4 w-4 text-bookconnect-brown" />
               View Analytics
+            </Button>
+
+            <Button
+              onClick={() => navigate('/admin/moderation')}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Shield className="h-4 w-4 text-bookconnect-brown" />
+              Moderation
             </Button>
 
             {stats.pendingJoinRequests > 0 && (

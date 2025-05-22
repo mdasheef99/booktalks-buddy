@@ -238,6 +238,9 @@ const ThreadedComment: React.FC<ThreadedCommentProps> = ({
               replyCount={post.replies.length}
               isCollapsed={isCollapsed}
               onToggleCollapse={handleToggleAllReplies}
+              postUserId={post.user_id}
+              postContent={post.content}
+              clubId={clubId}
             />
 
             {/* Reply form */}

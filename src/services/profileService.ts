@@ -1,15 +1,48 @@
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/integrations/supabase/types';
+
+// Type for database user row
+type DatabaseUser = Database['public']['Tables']['users']['Row'];
 
 export interface UserProfile {
   id: string;
   username: string | null;
   email: string | null;
   avatar_url: string | null;
-  displayname: string | null;
+  displayname: string | null; // User-customizable display name
   favorite_author: string | null;
   favorite_genre: string | null;
   bio: string | null;
-  account_tier?: string | null;
+  account_tier: string | null; // Made consistent with database (not optional)
+}
+
+// Type for profile updates (only updatable fields)
+export type ProfileUpdateData = Partial<Pick<UserProfile, 'displayname' | 'bio' | 'favorite_author' | 'favorite_genre'>>;
+
+// Type for profile creation
+export interface ProfileCreateData {
+  id: string;
+  username: string;
+  email: string;
+  displayname?: string | null;
+}
+
+// Type for the specific fields we select from the database
+type SelectedUserFields = Pick<DatabaseUser, 'id' | 'username' | 'email' | 'displayname' | 'favorite_author' | 'favorite_genre' | 'bio' | 'account_tier'>;
+
+// Helper function to convert selected database fields to UserProfile
+function createUserProfileFromDatabaseRow(data: SelectedUserFields): UserProfile {
+  return {
+    id: data.id,
+    username: data.username,
+    email: data.email,
+    displayname: data.displayname,
+    avatar_url: null, // Not stored in database yet
+    favorite_author: data.favorite_author,
+    favorite_genre: data.favorite_genre,
+    bio: data.bio,
+    account_tier: data.account_tier
+  };
 }
 
 // In-memory cache for profiles
@@ -82,7 +115,7 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
     // Fetch user data
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
       .in('id', idsToFetch);
 
     if (error) throw error;
@@ -90,20 +123,9 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
     // Add fetched profiles to cache and result
     if (data) {
       data.forEach(profile => {
-        // Create a properly typed UserProfile object with all required fields
-        const profileWithDefaults: UserProfile = {
-          id: profile.id,
-          username: profile.username,
-          email: profile.email,
-          displayname: profile.username || `User ${profile.id.substring(0, 4)}`,
-          avatar_url: null,
-          favorite_author: profile.favorite_author,
-          favorite_genre: profile.favorite_genre,
-          bio: profile.bio,
-          account_tier: profile.account_tier
-        };
-        profileCache[profile.id] = profileWithDefaults;
-        result.set(profile.id, profileWithDefaults);
+        const userProfile = createUserProfileFromDatabaseRow(profile);
+        profileCache[profile.id] = userProfile;
+        result.set(profile.id, userProfile);
       });
     }
 
@@ -168,7 +190,7 @@ async function fetchSingleProfile(userId: string): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
       .eq('id', userId)
       .single();
 
@@ -179,22 +201,117 @@ async function fetchSingleProfile(userId: string): Promise<UserProfile | null> {
       throw error;
     }
 
-    // Create a properly typed UserProfile object with all required fields
-    const profileWithDefaults: UserProfile = {
-      id: data.id,
-      username: data.username,
-      email: data.email,
-      displayname: data.username || `User ${data.id.substring(0, 4)}`,
-      avatar_url: null, // Set default value for avatar_url
-      favorite_author: data.favorite_author,
-      favorite_genre: data.favorite_genre,
-      bio: data.bio,
-      account_tier: data.account_tier
-    };
-
-    return profileWithDefaults;
+    // Convert database row to UserProfile
+    return createUserProfileFromDatabaseRow(data);
   } catch (error) {
     console.error(`Error fetching profile for user ${userId}:`, error);
+    return null;
+  }
+}
+
+// Update user profile with display name support
+export async function updateUserProfile(
+  userId: string,
+  updates: ProfileUpdateData
+): Promise<UserProfile | null> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', userId)
+      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .single();
+
+    if (error) throw error;
+
+    // Update cache
+    if (data) {
+      const updatedProfile = createUserProfileFromDatabaseRow(data);
+      profileCache[userId] = updatedProfile;
+      return updatedProfile;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    return null;
+  }
+}
+
+// Create user profile with username and display name
+export async function createUserProfile(
+  profileData: ProfileCreateData
+): Promise<UserProfile | null> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{
+        id: profileData.id,
+        username: profileData.username.trim(),
+        email: profileData.email,
+        displayname: profileData.displayname?.trim() || null
+      }])
+      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .single();
+
+    if (error) throw error;
+
+    if (data) {
+      const newProfile = createUserProfileFromDatabaseRow(data);
+      profileCache[profileData.id] = newProfile;
+      return newProfile;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error creating user profile:', error);
+    return null;
+  }
+}
+
+// Backward compatibility function for old signature
+export async function createUserProfileLegacy(
+  userId: string,
+  username: string,
+  email: string,
+  displayName?: string
+): Promise<UserProfile | null> {
+  return createUserProfile({
+    id: userId,
+    username,
+    email,
+    displayname: displayName || null
+  });
+}
+
+/**
+ * Get user profile by username (for dual-identity system)
+ * @param username Username to look up
+ * @returns User profile or null if not found
+ */
+export async function getUserProfileByUsername(username: string): Promise<UserProfile | null> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .eq('username', username)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') { // No rows returned
+        return null;
+      }
+      throw error;
+    }
+
+    const profile = createUserProfileFromDatabaseRow(data);
+
+    // Cache the result
+    profileCache[data.id] = profile;
+
+    return profile;
+  } catch (error) {
+    console.error(`Error fetching profile for username ${username}:`, error);
     return null;
   }
 }

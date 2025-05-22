@@ -8,7 +8,8 @@ import {
   LogOut,
   ArrowLeft,
   BarChart,
-  Calendar
+  Calendar,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -91,6 +92,18 @@ const AdminLayout: React.FC = () => {
           >
             <UserPlus className="h-5 w-5 mr-3" />
             Join Requests
+          </NavLink>
+
+          <NavLink
+            to="/admin/moderation"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
+                : 'text-white/70 hover:bg-white/10'}`
+            }
+          >
+            <Shield className="h-5 w-5 mr-3" />
+            Moderation
           </NavLink>
 
           {canManageEvents && (

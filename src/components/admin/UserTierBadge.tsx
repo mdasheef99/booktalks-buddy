@@ -52,7 +52,7 @@ export function UserTierBadge({ tier, className = '', showTooltip = true }: User
   const badge = (
     <Badge
       variant="outline"
-      className={`p-0.5 h-5 w-5 flex items-center justify-center rounded-full ${badgeProps.className} ${className}`}
+      className={`p-0.5 h-5 w-5 flex items-center justify-center rounded-full flex-shrink-0 ${badgeProps.className} ${className}`}
     >
       {badgeProps.icon}
     </Badge>
