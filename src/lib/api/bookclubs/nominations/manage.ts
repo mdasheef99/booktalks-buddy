@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { getNominationById } from './retrieve';
+import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Archive a nomination
@@ -21,9 +23,28 @@ export async function archiveNomination(userId: string, nominationId: string) {
       throw new Error('Failed to find nomination');
     }
 
-    // Check if user is an admin of the club
-    if (!(await isClubAdmin(userId, nomination.club_id))) {
-      throw new Error('You must be an admin of the club to archive nominations');
+    // Get user entitlements and check club management permission
+    const entitlements = await getUserEntitlements(userId);
+
+    // Get club's store ID for contextual permission checking
+    const { data: club, error: clubError } = await supabase
+      .from('book_clubs')
+      .select('store_id')
+      .eq('id', nomination.club_id)
+      .single();
+
+    if (clubError) {
+      console.error('Error fetching club store ID:', clubError);
+      throw new Error('Failed to verify club permissions');
+    }
+
+    const canManage = canManageClub(entitlements, nomination.club_id, club.store_id);
+
+    if (!canManage) {
+      console.log('🚨 [archiveNomination] permission check failed for user:', userId);
+      console.log('📍 Club ID:', nomination.club_id);
+      console.log('🔑 User entitlements:', entitlements);
+      throw new Error('Unauthorized: Only club administrators can archive nominations');
     }
 
     // Check if nomination is already archived

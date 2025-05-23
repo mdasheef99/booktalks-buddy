@@ -2,7 +2,7 @@ import { supabase } from '../../supabase';
 import { isClubMember } from '../auth';
 import { isClubLead } from './permissions';
 import { getUserEntitlements } from '@/lib/entitlements/cache';
-import { canManageClub } from '@/lib/entitlements/permissions';
+import { canManageClub, hasContextualEntitlement } from '@/lib/entitlements/permissions';
 
 /**
  * Book Club Discussion Topics and Posts
@@ -96,22 +96,16 @@ export async function getDiscussionPosts(topicId: string) {
  * Check if user has permission to moderate content in a club
  */
 async function hasModeratorPermission(userId: string, clubId: string): Promise<boolean> {
-  // Check if user is the club lead
-  const isLead = await isClubLead(userId, clubId);
-  if (isLead) return true;
-
-  // Check if user is a moderator
-  const { data: moderator, error: moderatorError } = await supabase
-    .from('club_moderators')
-    .select('user_id')
-    .eq('club_id', clubId)
-    .eq('user_id', userId)
-    .single();
-
-  if (!moderatorError && moderator) return true;
-
-  // Check if user has club management permissions using enhanced entitlements
+  // Get user entitlements for consistent permission checking
   const entitlements = await getUserEntitlements(userId);
+
+  // Check if user has contextual Club Lead entitlement
+  const hasClubLeadEntitlement = hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId);
+  if (hasClubLeadEntitlement) return true;
+
+  // Check if user has contextual Club Moderator entitlement
+  const hasClubModeratorEntitlement = hasContextualEntitlement(entitlements, 'CLUB_MODERATOR', clubId);
+  if (hasClubModeratorEntitlement) return true;
 
   // Get club's store ID for contextual permission checking
   const { data: club } = await supabase
@@ -120,6 +114,7 @@ async function hasModeratorPermission(userId: string, clubId: string): Promise<b
     .eq('id', clubId)
     .single();
 
+  // Check if user has club management permissions using enhanced entitlements
   const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
   if (canManage) return true;
 

@@ -1,4 +1,6 @@
 import { supabase } from '../../supabase';
+import { getUserEntitlements } from '../../entitlements/cache';
+import { canManageClub } from '../../entitlements/permissions';
 
 /**
  * Book Club Current Book Management
@@ -31,9 +33,28 @@ export interface CurrentBook {
  */
 export async function setCurrentBookFromNomination(userId: string, clubId: string, nominationId: string) {
   try {
-    // Check if user is an admin of the club
-    if (!(await isClubAdmin(userId, clubId))) {
-      throw new Error('You must be an admin of the club to set the current book');
+    // Get user entitlements and check club management permission
+    const entitlements = await getUserEntitlements(userId);
+
+    // Get club's store ID for contextual permission checking
+    const { data: club, error: clubError } = await supabase
+      .from('book_clubs')
+      .select('store_id')
+      .eq('id', clubId)
+      .single();
+
+    if (clubError) {
+      console.error('Error fetching club store ID:', clubError);
+      throw new Error('Failed to verify club permissions');
+    }
+
+    const canManage = canManageClub(entitlements, clubId, club.store_id);
+
+    if (!canManage) {
+      console.log('🚨 [setCurrentBookFromNomination] permission check failed for user:', userId);
+      console.log('📍 Club ID:', clubId);
+      console.log('🔑 User entitlements:', entitlements);
+      throw new Error('Unauthorized: Only club administrators can set the current book');
     }
 
     // Get the nomination details
@@ -95,7 +116,29 @@ export async function setCurrentBookFromNomination(userId: string, clubId: strin
  * @returns The updated current book
  */
 export async function setCurrentBook(userId: string, clubId: string, book: { title: string; author: string }) {
-  if (!(await isClubAdmin(userId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(userId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club, error: clubError } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  if (clubError) {
+    console.error('Error fetching club store ID:', clubError);
+    throw new Error('Failed to verify club permissions');
+  }
+
+  const canManage = canManageClub(entitlements, clubId, club.store_id);
+
+  if (!canManage) {
+    console.log('🚨 [setCurrentBook] permission check failed for user:', userId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can set the current book');
+  }
 
   const { data, error } = await supabase
     .from('current_books')

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfiles, useLoadProfiles } from '@/contexts/UserProfileContext';
+import { useCanManageClub } from '@/lib/entitlements/hooks';
 import { getClubMembers, removeMember } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 import UserAvatar from '@/components/common/UserAvatar';
@@ -28,12 +29,42 @@ const BookClubMembers: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [removingMember, setRemovingMember] = useState(false);
-  const { user, isAdmin } = useAuth();
+  const [storeId, setStoreId] = useState<string>('');
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const isClubAdmin = clubId ? isAdmin(clubId) : false;
+
+  // Use entitlements-based permission checking
+  const { result: isClubAdmin, loading: loadingPermissions } = useCanManageClub(clubId || '', storeId);
 
   // Load profiles for all members
   useLoadProfiles(members, (member) => member.user_id);
+
+  // Fetch store ID for the club
+  useEffect(() => {
+    const fetchStoreId = async () => {
+      if (!clubId) return;
+
+      try {
+        const { data: club, error } = await supabase
+          .from('book_clubs')
+          .select('store_id')
+          .eq('id', clubId)
+          .single();
+
+        if (error) {
+          console.error('Error fetching club store ID:', error);
+          setStoreId('');
+        } else {
+          setStoreId(club.store_id || '');
+        }
+      } catch (error) {
+        console.error('Error fetching club store ID:', error);
+        setStoreId('');
+      }
+    };
+
+    fetchStoreId();
+  }, [clubId]);
 
   useEffect(() => {
     const fetchMembers = async () => {

@@ -5,7 +5,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { isClubLead } from '@/lib/api/bookclubs/permissions';
+import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { canModerateClub } from '@/lib/entitlements/permissions';
 
 /**
  * Hook to check if the current user has permission to moderate content in a club
@@ -34,83 +35,30 @@ export function useModeratorPermission(clubId: string) {
       try {
         setLoading(true);
 
-        // Check if user is the club lead
-        const isLead = await isClubLead(user.id, clubId);
+        // Get user entitlements for consistent permission checking
+        const entitlements = await getUserEntitlements(user.id);
 
-        if (isLead) {
+        // Get club's store ID for contextual permission checking
+        const { data: club, error: clubError } = await supabase
+          .from('book_clubs')
+          .select('store_id')
+          .eq('id', clubId)
+          .single();
+
+        if (clubError) {
+          console.error('Error fetching club store:', clubError);
           if (isMounted) {
-            setHasPermission(true);
+            setHasPermission(false);
             setLoading(false);
           }
           return;
         }
 
-        // Check if user is a moderator
-        try {
-          const { data: moderator, error: moderatorError } = await supabase
-            .from('club_moderators')
-            .select('user_id')
-            .eq('club_id', clubId)
-            .eq('user_id', user.id)
-            .single();
+        // Use entitlements-based moderation permission checking
+        const canModerate = canModerateClub(entitlements, clubId, club.store_id);
 
-          if (!moderatorError && moderator) {
-            if (isMounted) {
-              setHasPermission(true);
-              setLoading(false);
-            }
-            return;
-          }
-        } catch (error) {
-          console.error('Error checking moderator status:', error);
-          // Continue to next check rather than failing completely
-        }
-
-        // Check if user is a store admin
-        try {
-          const { data: club, error: clubError } = await supabase
-            .from('book_clubs')
-            .select('store_id')
-            .eq('id', clubId)
-            .single();
-
-          if (clubError) {
-            console.error('Error fetching club store:', clubError);
-            if (isMounted) {
-              setHasPermission(false);
-              setLoading(false);
-            }
-            return;
-          }
-
-          try {
-            const { data: storeAdmin, error: storeAdminError } = await supabase
-              .from('store_administrators')
-              .select('user_id')
-              .eq('store_id', club.store_id)
-              .eq('user_id', user.id)
-              .single();
-
-            if (!storeAdminError && storeAdmin) {
-              if (isMounted) {
-                setHasPermission(true);
-                setLoading(false);
-              }
-              return;
-            }
-          } catch (error) {
-            console.error('Error checking store admin status:', error);
-            // Continue to final permission check
-          }
-
-          if (isMounted) {
-            setHasPermission(false);
-          }
-        } catch (error) {
-          console.error('Error in store admin permission check:', error);
-          if (isMounted) {
-            setHasPermission(false);
-          }
+        if (isMounted) {
+          setHasPermission(canModerate);
         }
       } catch (error) {
         console.error('Error checking moderator permission:', error);

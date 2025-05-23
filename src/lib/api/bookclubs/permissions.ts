@@ -85,11 +85,11 @@ export async function canManageSpecificClub(
   entitlements: string[]
 ): Promise<boolean> {
   try {
-    // Check if user is the club lead
-    const isLead = await isClubLead(userId, clubId);
+    // Check if user has contextual Club Lead entitlement
+    const hasClubLeadEntitlement = hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId);
 
-    // If user is the lead, they can manage the club
-    if (isLead) {
+    // If user has club lead entitlement, they can manage the club
+    if (hasClubLeadEntitlement) {
       return true;
     }
 

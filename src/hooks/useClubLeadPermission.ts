@@ -5,11 +5,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserEntitlements } from '@/lib/entitlements/cache';
-import { isClubLead, hasStoreAdminPermission, canManageSpecificClub } from '@/lib/api/bookclubs/permissions';
+import { hasStoreAdminPermission, canManageSpecificClub } from '@/lib/api/bookclubs/permissions';
 
 /**
  * Hook to check if the current user has permission to manage a club as a lead
- * 
+ *
  * @param clubId The ID of the club to check
  * @returns An object containing the permission status and loading state
  */
@@ -35,10 +35,10 @@ export function useClubLeadPermission(clubId: string) {
 
         // Get the user's entitlements
         const entitlements = await getUserEntitlements(user.id);
-        
+
         // Check if the user can manage this specific club
         const canManage = await canManageSpecificClub(user.id, clubId, entitlements);
-        
+
         if (isMounted) {
           setHasPermission(canManage);
         }
