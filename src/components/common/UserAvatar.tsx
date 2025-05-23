@@ -73,7 +73,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
             {avatar}
           </TooltipTrigger>
           <TooltipContent>
-            <p>{profile.username || 'Unknown User'}</p>
+            <p>{profile.displayname ? `${profile.displayname} (@${profile.username})` : profile.username || 'Unknown User'}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

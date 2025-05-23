@@ -13,6 +13,7 @@ type UserTierBadgeProps = {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   showTooltip?: boolean;
+  showFreeTier?: boolean; // Option to show "Free" badge for free tier users
 };
 
 /**
@@ -23,6 +24,7 @@ const UserTierBadge: React.FC<UserTierBadgeProps> = ({
   className = '',
   size = 'md',
   showTooltip = true,
+  showFreeTier = false,
 }) => {
   // Default to 'free' if tier is not provided
   const userTier = tier || 'free';
@@ -67,7 +69,14 @@ const UserTierBadge: React.FC<UserTierBadgeProps> = ({
       };
       break;
     default:
-      // Free tier - no badge displayed
+      // Free tier - show badge only if showFreeTier is true
+      if (showFreeTier) {
+        return (
+          <Badge variant="outline" className={`text-xs py-0.5 px-2 ${className}`}>
+            Free
+          </Badge>
+        );
+      }
       return null;
   }
 

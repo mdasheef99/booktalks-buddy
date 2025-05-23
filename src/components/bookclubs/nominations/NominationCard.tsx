@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import NominationManagementModal from './NominationManagementModal';
 import SkeletonBookCover from './SkeletonBookCover';
 import LoadingButton from './LoadingButton';
+import { ReportButton } from '@/components/reporting/ReportButton';
 
 interface NominationCardProps {
   nomination: Nomination;
@@ -185,6 +186,20 @@ const NominationCard: React.FC<NominationCardProps> = ({
                 </LoadingButton>
               )}
 
+              {/* Report button for non-admin users */}
+              {!isAdmin && user && nomination.user_id !== user.id && (
+                <ReportButton
+                  targetType="nomination"
+                  targetId={nomination.id}
+                  targetUserId={nomination.user_id}
+                  targetTitle={`Book nomination: ${nomination.book.title}`}
+                  targetContent={`Book: ${nomination.book.title} by ${nomination.book.author}`}
+                  clubId={clubId}
+                  variant="icon-only"
+                  size="sm"
+                />
+              )}
+
               {isAdmin && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -203,6 +218,17 @@ const NominationCard: React.FC<NominationCardProps> = ({
                     >
                       Manage Nomination
                     </DropdownMenuItem>
+                    {user && nomination.user_id !== user.id && (
+                      <ReportButton
+                        targetType="nomination"
+                        targetId={nomination.id}
+                        targetUserId={nomination.user_id}
+                        targetTitle={`Book nomination: ${nomination.book.title}`}
+                        targetContent={`Book: ${nomination.book.title} by ${nomination.book.author}`}
+                        clubId={clubId}
+                        variant="dropdown-item"
+                      />
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}

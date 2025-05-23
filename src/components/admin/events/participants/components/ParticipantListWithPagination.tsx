@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users } from 'lucide-react';
 import { ParticipantListWithPaginationProps } from '../types';
+import UserName from '@/components/common/UserName';
 
 /**
  * A component that displays a paginated list of participants
@@ -103,7 +104,12 @@ const ParticipantListWithPagination: React.FC<ParticipantListWithPaginationProps
             className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg"
           >
             <div>
-              <p className="font-medium">{participant.user.username || 'Anonymous'}</p>
+              <UserName
+                userId={participant.user_id}
+                displayFormat="full"
+                showTierBadge={true}
+                className="font-medium"
+              />
               <p className="text-sm text-gray-600">{participant.user.email}</p>
             </div>
             <div className="flex items-center">

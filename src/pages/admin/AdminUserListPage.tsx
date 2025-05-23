@@ -7,7 +7,7 @@ import { Search, Mail, UserPlus, ArrowLeft, ChevronDown, ChevronUp } from 'lucid
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { UserTierManager } from '@/components/admin/UserTierManager';
-import { UserTierBadge } from '@/components/admin/UserTierBadge';
+import UserTierBadge from '@/components/common/UserTierBadge';
 import { UserSubscriptionInfo } from '@/components/admin/UserSubscriptionInfo';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -225,7 +225,7 @@ const AdminUserListPage: React.FC = () => {
                       />
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <UserTierBadge tier={user.account_tier || 'free'} />
+                        <UserTierBadge tier={user.account_tier || 'free'} showFreeTier={true} />
                         <span className="text-sm text-muted-foreground">(Store required for tier management)</span>
                       </div>
                     )}
