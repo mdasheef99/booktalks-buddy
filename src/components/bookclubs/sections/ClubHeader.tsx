@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Database } from '@/integrations/supabase/types';
 import { useCanManageClub } from '@/lib/entitlements/hooks';
-import { ClubManagementPanel } from '../management';
 import { supabase } from '@/lib/supabase';
 import { ReportButton } from '@/components/reporting/ReportButton';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,11 +30,10 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
   handleCancelRequest
 }) => {
   const navigate = useNavigate();
-  const [managementPanelOpen, setManagementPanelOpen] = useState(false);
   const { user } = useAuth();
 
   // Get the store ID for the club dynamically
-  const [storeId, setStoreId] = useState<string>('');
+  const [storeId, setStoreId] = React.useState<string>('');
 
   useEffect(() => {
     const fetchStoreId = async () => {
@@ -63,6 +61,10 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
 
   // Check if the user can manage this club using entitlements
   const { result: canManage } = useCanManageClub(clubId, storeId);
+
+  const handleManageClub = () => {
+    navigate(`/book-club/${clubId}/manage`);
+  };
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
@@ -128,7 +130,7 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
           {canManage && (
             <Button
               variant="outline"
-              onClick={() => setManagementPanelOpen(true)}
+              onClick={handleManageClub}
             >
               <Settings className="h-4 w-4 mr-2" />
               Manage Club
@@ -136,15 +138,6 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
           )}
         </div>
       </div>
-
-      {/* Club Management Panel */}
-      {canManage && (
-        <ClubManagementPanel
-          clubId={clubId}
-          open={managementPanelOpen}
-          onClose={() => setManagementPanelOpen(false)}
-        />
-      )}
     </div>
   );
 };

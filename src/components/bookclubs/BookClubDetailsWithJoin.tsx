@@ -16,6 +16,7 @@ import DiscussionsSection from './sections/DiscussionsSection';
 import NominationsSection from './sections/NominationsSection';
 import JoinClubSection from './sections/JoinClubSection';
 import PendingMembershipSection from './sections/PendingMembershipSection';
+import EventsSection from './sections/EventsSection';
 
 interface BookClubDetailsWithJoinProps {}
 
@@ -100,6 +101,17 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
         {isMember && (
           <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
             <NominationsSection
+              clubId={clubId || ''}
+              isMember={isMember}
+              isAdmin={isAdmin}
+            />
+          </div>
+        )}
+
+        {/* Club Events - Only show for members */}
+        {isMember && (
+          <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 transition-all duration-300 hover:shadow-lg">
+            <EventsSection
               clubId={clubId || ''}
               isMember={isMember}
               isAdmin={isAdmin}

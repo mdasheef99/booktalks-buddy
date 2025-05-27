@@ -29,6 +29,7 @@ export const PRIVILEGED_ENTITLEMENTS = [
   'CAN_ACCESS_PREMIUM_CONTENT',
   'CAN_JOIN_PREMIUM_CLUBS',
   'CAN_ACCESS_PREMIUM_EVENTS',
+  'CAN_INITIATE_DIRECT_MESSAGES', // Can start conversations with other members
   ...MEMBER_ENTITLEMENTS
 ];
 
@@ -67,6 +68,7 @@ export const CLUB_LEAD_ENTITLEMENTS = [
   'CAN_MANAGE_CLUB_JOIN_REQUESTS',
   'CAN_REMOVE_CLUB_MEMBERS',
   'CAN_ASSIGN_CLUB_MODERATORS',
+  'CAN_MANAGE_CLUB_EVENTS', // Club leads can create and manage events within their clubs
   ...CLUB_MODERATOR_ENTITLEMENTS
 ];
 

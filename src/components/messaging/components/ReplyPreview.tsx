@@ -22,18 +22,18 @@ function truncateContent(content: string, maxLength: number = 100): string {
   return content.substring(0, maxLength) + '...';
 }
 
-export function ReplyPreview({ 
-  replyingTo, 
-  onCancel, 
-  className = '' 
+export function ReplyPreview({
+  replyingTo,
+  onCancel,
+  className = ''
 }: ReplyPreviewProps) {
   return (
-    <div className={`bg-gray-50 border-l-4 border-bookconnect-sage p-3 mx-4 ${className}`}>
-      <div className="flex items-start justify-between gap-2">
+    <div className={`bg-gradient-to-r from-bookconnect-sage/5 to-bookconnect-sage/10 border-l-4 border-bookconnect-sage p-4 mx-6 rounded-r-xl shadow-sm ${className}`}>
+      <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           {/* Replying to header */}
-          <div className="flex items-center gap-1 mb-1">
-            <span className="text-xs font-medium text-bookconnect-sage">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm font-semibold text-bookconnect-sage">
               Replying to
             </span>
             <UserName
@@ -43,23 +43,23 @@ export function ReplyPreview({
                 displayname: replyingTo.sender.displayname
               }}
               showBoth={false}
-              className="text-xs font-medium text-gray-700"
+              className="text-sm font-semibold text-gray-700"
             />
           </div>
-          
+
           {/* Original message content */}
-          <div className="text-sm text-gray-600 leading-relaxed">
+          <div className="text-base text-gray-700 leading-relaxed font-medium">
             {truncateContent(replyingTo.content)}
           </div>
         </div>
-        
+
         {/* Cancel button */}
         <button
           onClick={onCancel}
-          className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
+          className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 hover:bg-white/60 rounded-full transition-all duration-200 hover:scale-105"
           aria-label="Cancel reply"
         >
-          <X size={16} />
+          <X size={18} />
         </button>
       </div>
     </div>
@@ -82,16 +82,16 @@ interface ReplyIndicatorProps {
   className?: string;
 }
 
-export function ReplyIndicator({ 
-  repliedMessage, 
-  onClick, 
-  className = '' 
+export function ReplyIndicator({
+  repliedMessage,
+  onClick,
+  className = ''
 }: ReplyIndicatorProps) {
   return (
-    <div 
+    <div
       className={`
-        bg-gray-100 border-l-2 border-gray-300 p-2 mb-2 rounded-r-md cursor-pointer
-        hover:bg-gray-150 transition-colors
+        bg-gradient-to-r from-gray-50 to-gray-100/50 border-l-3 border-bookconnect-sage/60 p-3 mb-3 rounded-r-lg cursor-pointer
+        hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:border-bookconnect-sage transition-all duration-200 hover:shadow-sm
         ${className}
       `}
       onClick={onClick}
@@ -104,18 +104,18 @@ export function ReplyIndicator({
         }
       } : undefined}
     >
-      <div className="flex items-center gap-1 mb-1">
-        <span className="text-xs text-gray-500">↳ Replying to</span>
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-sm text-bookconnect-sage font-semibold">↳ Replying to</span>
         <UserName
           user={{
             username: repliedMessage.sender.username,
             displayname: repliedMessage.sender.displayname
           }}
           showBoth={false}
-          className="text-xs font-medium text-gray-600"
+          className="text-sm font-semibold text-gray-700"
         />
       </div>
-      <div className="text-xs text-gray-600 leading-relaxed">
+      <div className="text-sm text-gray-700 leading-relaxed font-medium">
         {truncateContent(repliedMessage.content, 80)}
       </div>
     </div>

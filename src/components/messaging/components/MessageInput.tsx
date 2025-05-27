@@ -107,10 +107,11 @@ export function MessageInput({
   const canSend = message.trim().length > 0 && !disabled;
 
   return (
-    <div className={`p-4 border-t bg-white ${className}`}>
+    <div className={`px-6 py-5 border-t bg-gradient-to-t from-white to-gray-50/30 shadow-lg ${className}`}>
       <div className={`
-        flex gap-2 items-end transition-all duration-200
-        ${isFocused ? 'ring-2 ring-bookconnect-sage/20 rounded-lg p-2' : ''}
+        flex gap-3 items-end transition-all duration-200 bg-white rounded-2xl shadow-sm border border-gray-200
+        ${isFocused ? 'ring-2 ring-bookconnect-sage/30 border-bookconnect-sage/50 shadow-md' : 'hover:shadow-md'}
+        p-3
       `}>
         {/* Message textarea */}
         <div className="flex-1 relative">
@@ -123,8 +124,8 @@ export function MessageInput({
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
             className={`
-              min-h-[40px] max-h-[120px] resize-none border-gray-300
-              focus:border-bookconnect-sage focus:ring-bookconnect-sage
+              min-h-[44px] max-h-[120px] resize-none border-0 bg-transparent text-base
+              focus:ring-0 focus:border-0 placeholder:text-gray-500 font-medium
               ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
             `}
             disabled={disabled}
@@ -156,18 +157,18 @@ export function MessageInput({
           disabled={!canSend}
           size="sm"
           className={`
-            flex-shrink-0 h-10 w-10 p-0
+            flex-shrink-0 h-11 w-11 p-0 rounded-full transition-all duration-200
             ${canSend
-              ? 'bg-bookconnect-sage hover:bg-bookconnect-sage/90'
+              ? 'bg-gradient-to-r from-bookconnect-sage to-bookconnect-sage/90 hover:from-bookconnect-sage/90 hover:to-bookconnect-sage shadow-md hover:shadow-lg hover:scale-105'
               : 'bg-gray-300 cursor-not-allowed'
             }
           `}
           aria-label="Send message"
         >
           {disabled ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <Send className="h-4 w-4" />
+            <Send className="h-5 w-5" />
           )}
         </Button>
       </div>

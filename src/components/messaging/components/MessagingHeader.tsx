@@ -1,6 +1,6 @@
 /**
  * Direct Messaging System - Messaging Header Component
- * 
+ *
  * Shared header component for messaging pages with consistent styling,
  * navigation, and action buttons across the messaging interface.
  */
@@ -20,16 +20,16 @@ interface MessagingHeaderProps {
  * Shared header component for messaging pages
  * Provides consistent styling and layout across all messaging screens
  */
-export function MessagingHeader({ 
-  title, 
-  backButton, 
-  action, 
+export function MessagingHeader({
+  title,
+  backButton,
+  action,
   subtitle,
-  className = '' 
+  className = ''
 }: MessagingHeaderProps) {
   return (
     <header className={`
-      p-4 border-b bg-bookconnect-sage text-white shadow-sm
+      px-6 py-5 border-b bg-gradient-to-r from-bookconnect-sage to-bookconnect-sage/95 text-white shadow-lg backdrop-blur-sm
       ${className}
     `}>
       <div className="flex items-center justify-between">
@@ -37,11 +37,11 @@ export function MessagingHeader({
         <div className="flex items-center flex-1 min-w-0">
           {backButton}
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold truncate">
+            <h1 className="text-xl font-bold truncate tracking-tight">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-sm text-white/80 truncate mt-0.5">
+              <p className="text-sm text-white/90 truncate mt-1 font-medium">
                 {subtitle}
               </p>
             )}
@@ -50,7 +50,7 @@ export function MessagingHeader({
 
         {/* Right side: Action button */}
         {action && (
-          <div className="flex-shrink-0 ml-3">
+          <div className="flex-shrink-0 ml-4">
             {action}
           </div>
         )}
@@ -62,16 +62,16 @@ export function MessagingHeader({
 /**
  * Simple messaging header with just title
  */
-export function SimpleMessagingHeader({ 
-  title, 
-  className = '' 
-}: { 
-  title: string; 
-  className?: string; 
+export function SimpleMessagingHeader({
+  title,
+  className = ''
+}: {
+  title: string;
+  className?: string;
 }) {
   return (
-    <MessagingHeader 
-      title={title} 
+    <MessagingHeader
+      title={title}
       className={className}
     />
   );
@@ -80,12 +80,12 @@ export function SimpleMessagingHeader({
 /**
  * Messaging header with back navigation
  */
-export function MessagingHeaderWithBack({ 
-  title, 
-  onBack, 
+export function MessagingHeaderWithBack({
+  title,
+  onBack,
   action,
   subtitle,
-  className = '' 
+  className = ''
 }: {
   title: string;
   onBack: () => void;
@@ -102,20 +102,20 @@ export function MessagingHeaderWithBack({
           onClick={onBack}
           variant="ghost"
           size="sm"
-          className="mr-3 text-white hover:bg-white/10 p-2"
-          aria-label="Go back"
+          className="mr-4 text-white hover:bg-white/20 active:bg-white/30 p-2.5 rounded-full transition-all duration-200 hover:scale-105"
+          aria-label="Go back to messages"
         >
-          <svg 
-            className="h-5 w-5" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
+            strokeWidth={2.5}
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M15 19l-7-7 7-7" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
             />
           </svg>
         </Button>
@@ -129,13 +129,13 @@ export function MessagingHeaderWithBack({
 /**
  * Messaging header with action button
  */
-export function MessagingHeaderWithAction({ 
-  title, 
-  actionLabel, 
-  onAction, 
+export function MessagingHeaderWithAction({
+  title,
+  actionLabel,
+  onAction,
   actionDisabled = false,
   actionVariant = "secondary",
-  className = '' 
+  className = ''
 }: {
   title: string;
   actionLabel: string;
@@ -166,14 +166,14 @@ export function MessagingHeaderWithAction({
 /**
  * Conversation header with participant info
  */
-export function ConversationHeader({ 
-  participantName, 
+export function ConversationHeader({
+  participantName,
   participantUsername,
-  onBack, 
+  onBack,
   isOnline = false,
   lastSeen,
   action,
-  className = '' 
+  className = ''
 }: {
   participantName: string;
   participantUsername?: string;
@@ -183,12 +183,12 @@ export function ConversationHeader({
   action?: React.ReactNode;
   className?: string;
 }) {
-  const subtitle = isOnline 
-    ? 'Online' 
-    : lastSeen 
-    ? `Last seen ${lastSeen}` 
-    : participantUsername 
-    ? `@${participantUsername}` 
+  const subtitle = isOnline
+    ? 'Online'
+    : lastSeen
+    ? `Last seen ${lastSeen}`
+    : participantUsername
+    ? `@${participantUsername}`
     : undefined;
 
   return (
@@ -205,10 +205,10 @@ export function ConversationHeader({
 /**
  * Loading header skeleton
  */
-export function MessagingHeaderSkeleton({ 
+export function MessagingHeaderSkeleton({
   showBackButton = false,
   showAction = false,
-  className = '' 
+  className = ''
 }: {
   showBackButton?: boolean;
   showAction?: boolean;
@@ -240,10 +240,10 @@ export function MessagingHeaderSkeleton({
 /**
  * Error header component
  */
-export function MessagingHeaderError({ 
+export function MessagingHeaderError({
   title = "Error",
   onRetry,
-  className = '' 
+  className = ''
 }: {
   title?: string;
   onRetry?: () => void;
@@ -257,10 +257,10 @@ export function MessagingHeaderError({
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path 
-              fillRule="evenodd" 
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" 
-              clipRule="evenodd" 
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
             />
           </svg>
           <h1 className="text-xl font-bold">{title}</h1>

@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Edit, PlusCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit, PlusCircle, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { UserMetadata, READING_FREQUENCY_LABELS } from './types';
 import UserTierBadge from '@/components/common/UserTierBadge';
 
@@ -41,6 +41,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <CardContent className="pt-0 relative">
         {/* Position buttons in top right corner, horizontally adjacent */}
         <div className="absolute top-0 right-0 flex flex-row gap-2 z-10 p-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-bookconnect-brown/30 text-bookconnect-brown hover:bg-bookconnect-cream bg-white"
+            onClick={() => navigate('/messages')}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Messages
+          </Button>
+
           <Button
             variant="outline"
             size="sm"

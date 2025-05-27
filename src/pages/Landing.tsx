@@ -8,15 +8,20 @@ import { GenreDialog } from "@/components/dialogs/GenreDialog";
 import { LoginDialog } from "@/components/dialogs/LoginDialog";
 
 // Import the new component sections
+import CarouselSection from "@/components/landing/CarouselSection";
 import HeroSection from "@/components/landing/HeroSection";
+import PromotionalBannersSection from "@/components/landing/PromotionalBannersSection";
 import EventsSection from "@/components/landing/events";
 import BookClubsSection from "@/components/landing/BookClubsSection";
 import QuoteSection from "@/components/landing/QuoteSection";
+import { CommunityShowcaseSection } from "@/components/landing/CommunityShowcaseSection";
 import FooterSection from "@/components/landing/FooterSection";
+import { useStoreId } from "@/hooks/useStoreId";
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { storeId } = useStoreId();
   const [usernameDialogOpen, setUsernameDialogOpen] = useState(false);
   const [genreDialogOpen, setGenreDialogOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
@@ -71,8 +76,14 @@ const Landing = () => {
         />
       </Helmet>
 
+      {/* Carousel Section - Featured Books */}
+      <CarouselSection storeId={storeId} />
+
       {/* Hero Section */}
       <HeroSection handleStartChatting={handleOpenUsernameDialog} />
+
+      {/* Promotional Banners Section */}
+      <PromotionalBannersSection storeId={storeId} />
 
       {/* Events Section */}
       <EventsSection handleEventsClick={handleEventsClick} />
@@ -83,8 +94,11 @@ const Landing = () => {
         handleBookClubsClick={handleBookClubsClick}
       />
 
+      {/* Community Showcase Section */}
+      <CommunityShowcaseSection storeId={storeId} />
+
       {/* Quote Section */}
-      <QuoteSection />
+      <QuoteSection storeId={storeId} />
 
       {/* Footer Section */}
       <FooterSection

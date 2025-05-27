@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getUserConversations, canInitiateConversations } from '@/lib/api/messaging';
 import { ConversationItem } from '../components/ConversationItem';
 import { MessagingHeader } from '../components/MessagingHeader';
+import { CompactNotificationBell } from '@/components/notifications/NotificationBell';
 import { toast } from 'sonner';
 
 /**
@@ -141,16 +142,19 @@ export function ConversationListPage() {
       <MessagingHeader
         title="Messages"
         action={
-          <Button
-            onClick={handleNewMessage}
-            size="sm"
-            variant="secondary"
-            className="flex items-center gap-2 bg-bookconnect-sage hover:bg-bookconnect-sage/90 text-white"
-            disabled={!canInitiate}
-          >
-            <Plus className="h-4 w-4" />
-            New
-          </Button>
+          <div className="flex items-center gap-2">
+            <CompactNotificationBell className="text-white hover:bg-white/10" />
+            <Button
+              onClick={handleNewMessage}
+              size="sm"
+              variant="secondary"
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              disabled={!canInitiate}
+            >
+              <Plus className="h-4 w-4" />
+              New
+            </Button>
+          </div>
         }
       />
 

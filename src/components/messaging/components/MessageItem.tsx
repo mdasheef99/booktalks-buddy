@@ -59,13 +59,13 @@ export const MessageItem = memo<MessageItemProps>(function MessageItem({
   return (
     <div
       className={`
-        flex ${isOwn ? 'justify-end' : 'justify-start'} group transition-all duration-300
-        ${isHighlighted ? 'bg-yellow-100 rounded-lg p-2 -m-2' : ''}
+        flex ${isOwn ? 'justify-end' : 'justify-start'} group transition-all duration-300 mb-4
+        ${isHighlighted ? 'bg-yellow-100/50 rounded-xl p-3 -m-3 shadow-lg' : ''}
         ${className}
       `}
       data-message-id={message.id}
     >
-      <div className="max-w-md lg:max-w-xl relative">
+      <div className="max-w-lg lg:max-w-2xl relative">
         {/* Reply indicator for replied messages */}
         {message.replied_message && (
           <ReplyIndicator
@@ -77,10 +77,10 @@ export const MessageItem = memo<MessageItemProps>(function MessageItem({
 
         <div
           className={`
-            px-5 py-4 rounded-lg shadow-sm relative min-h-[70px]
+            px-6 py-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 relative min-h-[80px]
             ${isOwn
-              ? 'bg-bookconnect-sage text-white'
-              : 'bg-gray-200 text-gray-900'
+              ? 'bg-gradient-to-br from-bookconnect-sage to-bookconnect-sage/90 text-white shadow-bookconnect-sage/20'
+              : 'bg-white text-gray-900 border border-gray-100 shadow-gray-200/50'
             }
           `}
         >
@@ -98,7 +98,7 @@ export const MessageItem = memo<MessageItemProps>(function MessageItem({
 
           {/* Sender name for received messages */}
           {!isOwn && showSender && (
-            <div className="text-xs font-medium mb-1 opacity-75">
+            <div className="text-xs font-semibold mb-2 opacity-80">
               <UserName
                 user={{
                   id: message.sender_id,
@@ -111,14 +111,17 @@ export const MessageItem = memo<MessageItemProps>(function MessageItem({
           )}
 
           {/* Message content */}
-          <div className="text-sm whitespace-pre-wrap break-words leading-relaxed pr-8">
+          <div className={`
+            text-base whitespace-pre-wrap break-words leading-relaxed pr-10 font-medium
+            ${isOwn ? 'text-white' : 'text-gray-800'}
+          `}>
             {message.content}
           </div>
 
           {/* Timestamp */}
           <div className={`
-            text-xs mt-1 text-right
-            ${isOwn ? 'text-white/70' : 'text-gray-500'}
+            text-xs mt-3 text-right font-medium
+            ${isOwn ? 'text-white/60' : 'text-gray-400'}
           `}>
             {messageTime}
           </div>

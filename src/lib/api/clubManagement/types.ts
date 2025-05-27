@@ -41,6 +41,12 @@ export interface ClubModerator {
   member_management_access: boolean;
   created_at: string;
   updated_at: string;
+  // User profile data (joined from users table)
+  user?: {
+    username: string;
+    email: string;
+    display_name?: string;
+  };
 }
 
 // =====================================================

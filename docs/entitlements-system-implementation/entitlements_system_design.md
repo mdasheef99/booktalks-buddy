@@ -30,7 +30,7 @@ This document outlines the design of the entitlements-based authorization system
 - `CAN_ACCESS_PREMIUM_EVENTS` - Can access premium events
 
 ### Privileged Plus Member Entitlements
-- `CAN_CREATE_CLUB` - Can create new book clubs
+- `CAN_CREATE_UNLIMITED_CLUBS` - Can create unlimited book clubs
 - `CAN_JOIN_EXCLUSIVE_CLUBS` - Can join clubs with 'privileged_plus' access tier
 - `CAN_ACCESS_EXCLUSIVE_CONTENT` - Can access exclusive content sections
 
@@ -95,7 +95,7 @@ function calculateUserEntitlements(userId) {
       'CAN_ACCESS_PREMIUM_EVENTS'
     );
   }
-  
+
   if (userTier === 'privileged_plus') {
     entitlements.push(
       'CAN_CREATE_CLUB',
@@ -108,7 +108,7 @@ function calculateUserEntitlements(userId) {
   const storeRoles = getStoreRoles(userId);
   for (const role of storeRoles) {
     entitlements.push(`STORE_${role.role.toUpperCase()}_${role.storeId}`);
-    
+
     if (role.role === 'manager') {
       entitlements.push(
         'CAN_MANAGE_USER_TIERS',
@@ -118,7 +118,7 @@ function calculateUserEntitlements(userId) {
         'CAN_ASSIGN_CLUB_LEADS'
       );
     }
-    
+
     if (role.role === 'owner') {
       entitlements.push(
         'CAN_MANAGE_USER_TIERS',
@@ -211,12 +211,12 @@ function canManageClub(user, clubId) {
 ```
 function AdminButton({ clubId }) {
   const { user } = useAuth();
-  const canManage = useEntitlement(user, 'CAN_MANAGE_CLUB_SETTINGS') && 
+  const canManage = useEntitlement(user, 'CAN_MANAGE_CLUB_SETTINGS') &&
                     (hasContextualEntitlement(user, 'CLUB_LEAD', clubId) ||
                      hasEntitlement(user, 'CAN_MANAGE_ALL_CLUBS'));
-  
+
   if (!canManage) return null;
-  
+
   return <Button>Manage Club</Button>;
 }
 ```
@@ -234,7 +234,7 @@ const adminRoutes = [
 
 function AdminNav() {
   const { user } = useAuth();
-  
+
   return (
     <nav>
       {adminRoutes

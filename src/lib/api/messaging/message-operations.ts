@@ -17,6 +17,7 @@ import {
   validateMessageContent,
   formatMessagingError
 } from './utils';
+import { createNotificationFromTemplate } from '@/lib/api/notifications/operations';
 
 // =========================
 // Message Sending
@@ -136,7 +137,42 @@ export async function sendMessage(
       .update({ updated_at: new Date().toISOString() })
       .eq('id', conversationId);
 
-    // 8. Return complete message with all data
+    // 8. Create notification for other participants
+    try {
+      // Get other participants (excluding sender)
+      const { data: otherParticipants } = await supabase
+        .from('conversation_participants')
+        .select('user_id')
+        .eq('conversation_id', conversationId)
+        .neq('user_id', senderId);
+
+      // Create notifications for each participant
+      if (otherParticipants && otherParticipants.length > 0) {
+        const senderDisplayName = senderData?.displayname || senderData?.username || 'Someone';
+        const messagePreview = content.length > 50 ? content.substring(0, 50) + '...' : content;
+
+        for (const participant of otherParticipants) {
+          await createNotificationFromTemplate({
+            template_name: 'new_message',
+            user_id: participant.user_id,
+            variables: {
+              sender_name: senderDisplayName,
+              message_preview: messagePreview
+            },
+            data: {
+              conversation_id: conversationId,
+              message_id: message.id,
+              sender_id: senderId
+            }
+          });
+        }
+      }
+    } catch (notificationError) {
+      // Don't fail message sending if notification creation fails
+      console.warn('Failed to create message notification:', notificationError);
+    }
+
+    // 9. Return complete message with all data
     const completeMessage = {
       id: message.id,
       conversation_id: message.conversation_id,

@@ -241,7 +241,7 @@ export function MessageThreadPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto h-screen flex flex-col bg-white">
+    <div className="max-w-2xl mx-auto h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white shadow-xl">
       {/* Header */}
       <ConversationHeader
         participantName={otherParticipant?.displayname || otherParticipant?.username || 'Loading...'}
@@ -251,17 +251,17 @@ export function MessageThreadPage() {
       />
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 bg-gradient-to-b from-gray-50/30 to-transparent">
         {isLoading ? (
           // Loading skeleton
-          <div className="space-y-4">
-            {[...Array(10)].map((_, i) => (
-              <div key={i} className={`animate-pulse flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs p-3 rounded-lg ${
-                  i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'
+          <div className="space-y-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className={`animate-pulse flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'} mb-4`}>
+                <div className={`max-w-lg p-5 rounded-2xl shadow-md ${
+                  i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-100'
                 }`}>
-                  <div className="h-4 bg-gray-400 rounded w-24 mb-2"></div>
-                  <div className="h-3 bg-gray-400 rounded w-16"></div>
+                  <div className="h-5 bg-gray-300 rounded w-32 mb-3"></div>
+                  <div className="h-4 bg-gray-300 rounded w-20"></div>
                 </div>
               </div>
             ))}
@@ -344,37 +344,39 @@ export function MessageThreadPage() {
  */
 export function MessageThreadSkeleton() {
   return (
-    <div className="max-w-md mx-auto h-screen flex flex-col bg-white">
+    <div className="max-w-2xl mx-auto h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white shadow-xl">
       {/* Header skeleton */}
-      <div className="p-4 border-b bg-bookconnect-sage animate-pulse">
+      <div className="px-6 py-5 border-b bg-gradient-to-r from-bookconnect-sage to-bookconnect-sage/95 animate-pulse">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-white/20 rounded mr-3"></div>
+          <div className="w-10 h-10 bg-white/20 rounded-full mr-4"></div>
           <div className="flex-1">
-            <div className="h-6 bg-white/20 rounded w-32 mb-1"></div>
-            <div className="h-4 bg-white/20 rounded w-24"></div>
+            <div className="h-6 bg-white/20 rounded w-40 mb-2"></div>
+            <div className="h-4 bg-white/20 rounded w-28"></div>
           </div>
         </div>
       </div>
 
       {/* Messages skeleton */}
-      <div className="flex-1 p-4 space-y-4">
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className={`animate-pulse flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs p-3 rounded-lg ${
-              i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'
+      <div className="flex-1 px-6 py-6 space-y-6 bg-gradient-to-b from-gray-50/30 to-transparent">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className={`animate-pulse flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'} mb-4`}>
+            <div className={`max-w-lg p-5 rounded-2xl shadow-md ${
+              i % 2 === 0 ? 'bg-gray-200' : 'bg-gray-100'
             }`}>
-              <div className="h-4 bg-gray-400 rounded w-24 mb-2"></div>
-              <div className="h-3 bg-gray-400 rounded w-16"></div>
+              <div className="h-5 bg-gray-300 rounded w-36 mb-3"></div>
+              <div className="h-4 bg-gray-300 rounded w-24"></div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Input skeleton */}
-      <div className="p-4 border-t animate-pulse">
-        <div className="flex gap-2">
-          <div className="flex-1 h-10 bg-gray-200 rounded"></div>
-          <div className="w-10 h-10 bg-gray-200 rounded"></div>
+      <div className="px-6 py-5 border-t bg-gradient-to-t from-white to-gray-50/30 animate-pulse">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-3">
+          <div className="flex gap-3">
+            <div className="flex-1 h-11 bg-gray-200 rounded-xl"></div>
+            <div className="w-11 h-11 bg-gray-200 rounded-full"></div>
+          </div>
         </div>
       </div>
     </div>

@@ -22,7 +22,13 @@ const CreateBookClubForm: React.FC = () => {
   const [creationStep, setCreationStep] = useState<'idle' | 'creating' | 'adding-member' | 'complete'>('idle');
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { result: canCreateClub, loading: loadingEntitlement } = useHasEntitlement('CAN_CREATE_CLUB');
+  // Check for either limited or unlimited club creation entitlements
+  const { result: canCreateLimitedClubs, loading: loadingLimitedEntitlement } = useHasEntitlement('CAN_CREATE_LIMITED_CLUBS');
+  const { result: canCreateUnlimitedClubs, loading: loadingUnlimitedEntitlement } = useHasEntitlement('CAN_CREATE_UNLIMITED_CLUBS');
+
+  // User can create clubs if they have either entitlement
+  const canCreateClub = canCreateLimitedClubs || canCreateUnlimitedClubs;
+  const loadingEntitlement = loadingLimitedEntitlement || loadingUnlimitedEntitlement;
 
   // Validate club name
   const validateClubName = (name: string): string | null => {

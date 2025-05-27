@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminRouteGuard from "./components/routeguards/AdminRouteGuard";
 import MemberRouteGuard from "./components/routeguards/MemberRouteGuard";
 import GlobalAdminRouteGuard from "./components/routeguards/GlobalAdminRouteGuard";
+import { StoreOwnerRouteGuard } from "./components/routeguards/StoreOwnerRouteGuard";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserProfileProvider } from "./contexts/UserProfileContext";
@@ -34,6 +35,10 @@ import AdminEventsPage from "./pages/admin/AdminEventsPage";
 import CreateEventPage from "./pages/admin/CreateEventPage";
 import EditEventPage from "./pages/admin/EditEventPage";
 import ModerationPage from "./pages/admin/ModerationPage";
+import CarouselManagement from "@/pages/admin/store/CarouselManagement";
+import BannerManagement from "@/pages/admin/store/BannerManagement";
+import { QuoteManagement } from "@/pages/admin/store/QuoteManagement";
+import { CommunityShowcaseManagement } from "@/pages/admin/store/CommunityShowcaseManagement";
 import ReportingSystemTest from "./components/testing/ReportingSystemTest";
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
@@ -41,6 +46,7 @@ import TopicDetail from "./components/discussions/TopicDetail";
 import ReplyForm from "./components/discussions/ReplyForm";
 import BookClubMembers from "./components/admin/BookClubMembers";
 import BookClubSettings from "./components/admin/BookClubSettings";
+import ClubManagementPage from "./pages/ClubManagementPage";
 import Events from "./pages/Events";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import BookNominationsPage from "./pages/BookNominationsPage";
@@ -48,6 +54,16 @@ import BookNominationFormPage from "./pages/BookNominationFormPage";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";
+
+// Direct Messaging Components
+import { ConversationListPage } from "./components/messaging/pages/ConversationListPage";
+import { MessageThreadPage } from "./components/messaging/pages/MessageThreadPage";
+import { NewConversationPage } from "./components/messaging/pages/NewConversationPage";
+import {
+  ConversationListErrorBoundary,
+  MessageThreadErrorBoundary,
+  NewConversationErrorBoundary
+} from "./components/messaging/components/MessagingErrorBoundary";
 
 function App() {
   return (
@@ -74,6 +90,23 @@ function App() {
               <Route path="/events" element={<Events />} />
               <Route path="/events/:eventId" element={<EventDetailsPage />} />
               <Route path="/search" element={<Search />} />
+
+              {/* Direct Messaging Routes */}
+              <Route path="/messages" element={
+                <ConversationListErrorBoundary>
+                  <ConversationListPage />
+                </ConversationListErrorBoundary>
+              } />
+              <Route path="/messages/new" element={
+                <NewConversationErrorBoundary>
+                  <NewConversationPage />
+                </NewConversationErrorBoundary>
+              } />
+              <Route path="/messages/:conversationId" element={
+                <MessageThreadErrorBoundary>
+                  <MessageThreadPage />
+                </MessageThreadErrorBoundary>
+              } />
             </Route>
 
             {/* Routes outside main layout - Anonymous Chat Section */}
@@ -118,6 +151,11 @@ function App() {
 
             {/* Club Admin-protected routes */}
             <Route element={<Layout />}>
+              <Route path="/book-club/:clubId/manage" element={
+                <AdminRouteGuard>
+                  <ClubManagementPage />
+                </AdminRouteGuard>
+              } />
               <Route path="/book-club/:clubId/members" element={
                 <AdminRouteGuard>
                   <BookClubMembers />
@@ -150,6 +188,21 @@ function App() {
               <Route path="events/edit/:eventId" element={<EditEventPage />} />
               <Route path="moderation" element={<ModerationPage />} />
               <Route path="test-reporting" element={<ReportingSystemTest />} />
+
+              {/* Store Management Routes - Store Owner Only */}
+              <Route path="store-management/*" element={
+                <StoreOwnerRouteGuard>
+                  <Routes>
+                    <Route index element={<Navigate to="landing-page" replace />} />
+                    <Route path="landing-page" element={<div>Store Management Dashboard - Coming Soon</div>} />
+                    <Route path="carousel" element={<CarouselManagement />} />
+                    <Route path="banners" element={<BannerManagement />} />
+                    <Route path="community" element={<CommunityShowcaseManagement />} />
+                    <Route path="quotes" element={<QuoteManagement />} />
+                    <Route path="analytics" element={<div>Landing Page Analytics - Coming Soon</div>} />
+                  </Routes>
+                </StoreOwnerRouteGuard>
+              } />
             </Route>
 
             {/* Catch-all route */}

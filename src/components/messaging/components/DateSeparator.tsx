@@ -45,20 +45,20 @@ export function DateSeparator({ date, className = '' }: DateSeparatorProps) {
   const formattedDate = formatMessageDate(date);
 
   return (
-    <div className={`flex items-center justify-center my-4 ${className}`}>
-      <div className="flex items-center w-full max-w-xs">
+    <div className={`flex items-center justify-center my-8 ${className}`}>
+      <div className="flex items-center w-full max-w-md">
         {/* Left line */}
-        <div className="flex-1 h-px bg-gray-300"></div>
-        
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent to-gray-300"></div>
+
         {/* Date text */}
-        <div className="px-3 py-1 bg-gray-100 rounded-full">
-          <span className="text-xs font-medium text-gray-600">
+        <div className="px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-50 rounded-full shadow-sm border border-gray-200/50">
+          <span className="text-sm font-semibold text-gray-700">
             {formattedDate}
           </span>
         </div>
-        
+
         {/* Right line */}
-        <div className="flex-1 h-px bg-gray-300"></div>
+        <div className="flex-1 h-px bg-gradient-to-l from-transparent to-gray-300"></div>
       </div>
     </div>
   );
@@ -70,7 +70,7 @@ export function DateSeparator({ date, className = '' }: DateSeparatorProps) {
 export function isDifferentDay(date1: string, date2: string): boolean {
   const d1 = new Date(date1);
   const d2 = new Date(date2);
-  
+
   return (
     d1.getFullYear() !== d2.getFullYear() ||
     d1.getMonth() !== d2.getMonth() ||
@@ -87,13 +87,13 @@ export function groupMessagesByDate<T extends { sent_at: string }>(messages: T[]
 
   messages.forEach((message) => {
     const messageDate = message.sent_at;
-    
+
     // Add date separator if this is a new day
     if (!lastDate || isDifferentDay(lastDate, messageDate)) {
       grouped.push({ type: 'date', date: messageDate });
       lastDate = messageDate;
     }
-    
+
     // Add the message
     grouped.push({ type: 'message', message });
   });

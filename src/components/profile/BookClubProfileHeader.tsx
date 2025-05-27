@@ -3,8 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookClubProfile, uploadProfileAvatar } from '@/lib/api/profile';
-import { Edit, Upload, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit, Upload, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useMessagingButton } from '@/components/messaging/hooks/useMessaging';
 
 interface BookClubProfileHeaderProps {
   profile: BookClubProfile;
@@ -20,6 +21,9 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
   onProfileUpdated
 }) => {
   const [uploading, setUploading] = useState(false);
+
+  // Messaging functionality for other users' profiles
+  const messagingButton = useMessagingButton(isCurrentUser ? undefined : profile.username);
 
   // Get initials for avatar fallback
   const getInitials = () => {
@@ -87,9 +91,10 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
   return (
     <Card className="mb-6 overflow-hidden shadow-md">
       <div className="h-32 bg-gradient-to-r from-bookconnect-cream to-amber-100 relative">
-        {/* Position Edit Profile button in top right - only for current user */}
-        {isCurrentUser && (
-          <div className="absolute top-4 right-4">
+        {/* Position buttons in top right */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          {/* Edit Profile button - only for current user */}
+          {isCurrentUser && (
             <Button
               variant="outline"
               size="sm"
@@ -99,8 +104,22 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
               <Edit className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>
-          </div>
-        )}
+          )}
+
+          {/* Message User button - only for other users */}
+          {!isCurrentUser && (
+            <Button
+              variant={messagingButton.variant}
+              size="sm"
+              className="bg-white hover:bg-gray-100 shadow-sm"
+              onClick={messagingButton.onClick}
+              disabled={messagingButton.disabled}
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              {messagingButton.children}
+            </Button>
+          )}
+        </div>
       </div>
       <CardContent className="pt-0 relative">
         <div className="flex flex-col md:flex-row gap-6 -mt-16 items-start">

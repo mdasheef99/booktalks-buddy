@@ -171,6 +171,14 @@ export const useClubDetails = (clubId: string | undefined) => {
         }, () => {
           fetchData();
         })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'club_meetings',
+          filter: `club_id=eq.${clubId}`
+        }, () => {
+          fetchData();
+        })
         .subscribe();
 
       return () => {

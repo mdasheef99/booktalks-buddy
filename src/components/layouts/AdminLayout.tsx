@@ -9,16 +9,24 @@ import {
   ArrowLeft,
   BarChart,
   Calendar,
-  Shield
+  Shield,
+  Store,
+  Settings,
+  Image,
+  MessageSquare,
+  Quote,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHasEntitlement } from '@/lib/entitlements/hooks';
+import { useStoreOwnerAccess } from '@/hooks/useStoreOwnerAccess';
 
 const AdminLayout: React.FC = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { result: canManageEvents } = useHasEntitlement('CAN_MANAGE_EVENTS');
+  const { isStoreOwner, storeName, loading: storeAccessLoading } = useStoreOwnerAccess();
 
   const handleLogout = async () => {
     await signOut();
@@ -118,6 +126,97 @@ const AdminLayout: React.FC = () => {
               <Calendar className="h-5 w-5 mr-3" />
               Events
             </NavLink>
+          )}
+
+          {/* Store Management Section - Only for Store Owners */}
+          {isStoreOwner && !storeAccessLoading && (
+            <>
+              <div className="pt-4 pb-2 border-t border-white/20">
+                <div className="flex items-center px-3 py-2">
+                  <Store className="h-4 w-4 mr-2 text-white/50" />
+                  <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                    Store Management
+                  </span>
+                </div>
+                {storeName && (
+                  <p className="px-3 text-xs text-white/40 mb-2">
+                    {storeName}
+                  </p>
+                )}
+              </div>
+
+              <NavLink
+                to="/admin/store-management"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Settings className="h-5 w-5 mr-3" />
+                Landing Page
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/carousel"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Image className="h-4 w-4 mr-3" />
+                Carousel
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/banners"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <MessageSquare className="h-4 w-4 mr-3" />
+                Banners
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/community"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Users className="h-4 w-4 mr-3" />
+                Community
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/quotes"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Quote className="h-4 w-4 mr-3" />
+                Quotes
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/analytics"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <TrendingUp className="h-4 w-4 mr-3" />
+                Analytics
+              </NavLink>
+            </>
           )}
         </nav>
 
