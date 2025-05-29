@@ -35,6 +35,9 @@ import AdminEventsPage from "./pages/admin/AdminEventsPage";
 import CreateEventPage from "./pages/admin/CreateEventPage";
 import EditEventPage from "./pages/admin/EditEventPage";
 import ModerationPage from "./pages/admin/ModerationPage";
+import { StoreManagementDashboard } from "@/pages/admin/store/StoreManagementDashboard";
+import { HeroCustomization } from "@/pages/admin/store/HeroCustomization";
+import { LandingPageAnalytics } from "@/pages/admin/store/LandingPageAnalytics";
 import CarouselManagement from "@/pages/admin/store/CarouselManagement";
 import BannerManagement from "@/pages/admin/store/BannerManagement";
 import { QuoteManagement } from "@/pages/admin/store/QuoteManagement";
@@ -194,12 +197,13 @@ function App() {
                 <StoreOwnerRouteGuard>
                   <Routes>
                     <Route index element={<Navigate to="landing-page" replace />} />
-                    <Route path="landing-page" element={<div>Store Management Dashboard - Coming Soon</div>} />
+                    <Route path="landing-page" element={<StoreManagementDashboard />} />
+                    <Route path="hero" element={<HeroCustomization />} />
                     <Route path="carousel" element={<CarouselManagement />} />
                     <Route path="banners" element={<BannerManagement />} />
                     <Route path="community" element={<CommunityShowcaseManagement />} />
                     <Route path="quotes" element={<QuoteManagement />} />
-                    <Route path="analytics" element={<div>Landing Page Analytics - Coming Soon</div>} />
+                    <Route path="analytics" element={<LandingPageAnalytics />} />
                   </Routes>
                 </StoreOwnerRouteGuard>
               } />

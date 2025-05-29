@@ -65,7 +65,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const errorMessage = err instanceof Error ? err.message : 'Upload failed';
       setError(errorMessage);
       onUploadError?.(errorMessage);
-      
+
       // Remove preview on error
       if (previewUrl && previewUrl !== currentImageUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -74,7 +74,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     } finally {
       setUploading(false);
       setProgress(null);
-      
+
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -88,7 +88,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     }
     setPreviewUrl(null);
     setError(null);
-    
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -101,7 +101,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
-  const maxSizeMB = uploadOptions.maxSizeBytes 
+  const maxSizeMB = uploadOptions.maxSizeBytes
     ? (uploadOptions.maxSizeBytes / (1024 * 1024)).toFixed(1)
     : '5';
 
@@ -116,8 +116,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         onClick={triggerFileSelect}
         className={`
           relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
-          ${disabled || uploading 
-            ? 'border-gray-200 bg-gray-50 cursor-not-allowed' 
+          ${disabled || uploading
+            ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
             : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
           }
           ${previewUrl ? 'border-solid' : ''}
@@ -229,6 +229,8 @@ export const useImageUpload = (uploadOptions: ImageUploadOptions) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleUploadComplete = (result: ImageUploadResult) => {
+    console.log('🔍 useImageUpload - Upload completed with result:', result);
+    console.log('🔍 useImageUpload - Setting imageUrl to:', result.url);
     setImageUrl(result.url);
     setError(null);
   };

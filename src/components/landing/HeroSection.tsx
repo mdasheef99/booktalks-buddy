@@ -1,12 +1,18 @@
 
+import React from "react";
 import { BookOpen, BookIcon, Library, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useHeroCustomization } from "@/hooks/useHeroCustomization";
+import { FONT_STYLE_CONFIGS, CHAT_BUTTON_CONFIGS } from "@/lib/api/store/heroCustomization";
+import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
   handleStartChatting: () => void;
+  storeId?: string;
 }
 
-const HeroSection = ({ handleStartChatting }: HeroSectionProps) => {
+const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
+  const { data: heroCustomization, isLoading } = useHeroCustomization(storeId);
   return (
     <div
       className="relative min-h-[65vh] flex items-center justify-center text-center px-4 py-24 md:py-36 overflow-hidden"
@@ -49,17 +55,58 @@ const HeroSection = ({ handleStartChatting }: HeroSectionProps) => {
           Join our community of book lovers and connect anonymously through your shared passion for reading
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-          <Button
-            onClick={handleStartChatting}
-            size="lg"
-            className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white px-8 py-7 text-xl rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg group"
-          >
-            <BookOpen className="mr-2" />
-            Start Chatting Anonymously
-            <ArrowRight className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-          </Button>
-        </div>
+        {/* Custom Hero Quote Section */}
+        {heroCustomization?.hasCustomQuote && (
+          <div className="mb-10 max-w-3xl mx-auto">
+            <div className="relative">
+              {/* Quote Icon */}
+              <div className="absolute -top-4 -left-4 text-white/20">
+                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14 17h3l2-4V7h-6v6h3M6 17h3l2-4V7H5v6h3z"/>
+                </svg>
+              </div>
+
+              {/* Quote Text */}
+              <blockquote
+                className={cn(
+                  "text-xl md:text-2xl text-white/95 italic leading-relaxed mb-4",
+                  FONT_STYLE_CONFIGS[heroCustomization.fontStyle as keyof typeof FONT_STYLE_CONFIGS]?.className
+                )}
+              >
+                "{heroCustomization.quote}"
+              </blockquote>
+
+              {/* Quote Author */}
+              {heroCustomization.author && (
+                <cite className="text-white/80 text-sm md:text-base not-italic">
+                  — {heroCustomization.author}
+                </cite>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Chat Button Section */}
+        {heroCustomization?.chatButton.enabled && (
+          <div className={cn(
+            "flex flex-col sm:flex-row gap-4 items-center",
+            CHAT_BUTTON_CONFIGS.positions[heroCustomization.chatButton.position as keyof typeof CHAT_BUTTON_CONFIGS.positions]?.className || "justify-center"
+          )}>
+            <Button
+              onClick={handleStartChatting}
+              size="lg"
+              className={cn(
+                "text-white rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg group",
+                CHAT_BUTTON_CONFIGS.sizes[heroCustomization.chatButton.size as keyof typeof CHAT_BUTTON_CONFIGS.sizes]?.className || "px-8 py-7 text-xl",
+                CHAT_BUTTON_CONFIGS.colorSchemes[heroCustomization.chatButton.colorScheme as keyof typeof CHAT_BUTTON_CONFIGS.colorSchemes]?.className || "bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+              )}
+            >
+              <BookOpen className="mr-2" />
+              {heroCustomization.chatButton.text}
+              <ArrowRight className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </Button>
+          </div>
+        )}
 
         <div className="mt-12 flex justify-center">
           <div className="animate-bounce p-2 bg-white/10 rounded-full backdrop-blur-sm">

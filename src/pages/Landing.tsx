@@ -80,7 +80,7 @@ const Landing = () => {
       <CarouselSection storeId={storeId} />
 
       {/* Hero Section */}
-      <HeroSection handleStartChatting={handleOpenUsernameDialog} />
+      <HeroSection handleStartChatting={handleOpenUsernameDialog} storeId={storeId} />
 
       {/* Promotional Banners Section */}
       <PromotionalBannersSection storeId={storeId} />

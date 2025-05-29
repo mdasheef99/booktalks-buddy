@@ -60,13 +60,21 @@ export const BookEntryModal: React.FC<BookEntryModalProps> = ({
     setValidationErrors(newErrors);
   };
 
-  // Initialize image URL when editing item changes
+  // Initialize image URL when editing item changes (only for edit mode)
   useEffect(() => {
-    setImageUrl(editingItem?.book_image_url || null);
-    if (!editingItem) {
+    if (editingItem) {
+      // Only set image URL when editing an existing item
+      setImageUrl(editingItem.book_image_url || null);
+    }
+    // Don't clear image when creating new item - let user uploads persist
+  }, [editingItem, setImageUrl]);
+
+  // Clear image when modal closes (for new items only)
+  useEffect(() => {
+    if (!isOpen && !editingItem) {
       clearImage();
     }
-  }, [editingItem, setImageUrl, clearImage]);
+  }, [isOpen, editingItem, clearImage]);
 
   // Create validation function that uses the validation hook
   const validateFormData = () => {
@@ -75,6 +83,9 @@ export const BookEntryModal: React.FC<BookEntryModalProps> = ({
 
   // Handle form submission with validation
   const onSubmit = (e: React.FormEvent) => {
+    console.log('🔍 BookEntryModal - Form submission started');
+    console.log('📷 BookEntryModal - Current imageUrl:', imageUrl);
+    console.log('📝 BookEntryModal - Form data:', formData);
     handleSubmit(e, imageUrl, validateFormData);
   };
 

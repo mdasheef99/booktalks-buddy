@@ -25,7 +25,7 @@ export const initializeFormData = (editingItem?: CarouselItem | null): BookFormD
       is_active: editingItem.is_active
     };
   }
-  
+
   return { ...DEFAULT_FORM_VALUES };
 };
 
@@ -37,13 +37,20 @@ export const prepareCreateData = (
   imageUrl: string | null,
   storeId: string
 ): CreateCarouselItemData => {
+  console.log('🔍 prepareCreateData - Input imageUrl:', imageUrl);
+  console.log('🔍 prepareCreateData - Input formData:', formData);
+
   const baseData = prepareBaseData(formData, imageUrl);
-  
-  return {
+  console.log('🔍 prepareCreateData - Prepared baseData:', baseData);
+
+  const result = {
     ...baseData,
     store_id: storeId,
     position: formData.position ? parseInt(formData.position) : undefined as any
   };
+
+  console.log('🔍 prepareCreateData - Final result:', result);
+  return result;
 };
 
 /**
@@ -60,7 +67,10 @@ export const prepareUpdateData = (
  * Prepare base data common to both create and update operations
  */
 const prepareBaseData = (formData: BookFormData, imageUrl: string | null) => {
-  return {
+  console.log('🔍 prepareBaseData - Input imageUrl:', imageUrl);
+  console.log('🔍 prepareBaseData - Processing image URL...');
+
+  const result = {
     book_title: formData.book_title.trim(),
     book_author: formData.book_author.trim(),
     book_isbn: formData.book_isbn.trim() || undefined,
@@ -72,6 +82,9 @@ const prepareBaseData = (formData: BookFormData, imageUrl: string | null) => {
     click_destination_url: formData.click_destination_url.trim() || undefined,
     is_active: formData.is_active
   };
+
+  console.log('🔍 prepareBaseData - Final book_image_url:', result.book_image_url);
+  return result;
 };
 
 /**

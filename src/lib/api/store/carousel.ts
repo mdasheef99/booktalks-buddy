@@ -115,13 +115,20 @@ export class CarouselAPI {
    * Create a new carousel item
    */
   static async createCarouselItem(itemData: CreateCarouselItemData): Promise<CarouselItem> {
+    console.log('🔍 CarouselAPI.createCarouselItem - Input data:', itemData);
+    console.log('🔍 CarouselAPI.createCarouselItem - book_image_url:', itemData.book_image_url);
+
+    const insertData = {
+      ...itemData,
+      display_order: itemData.position,
+      is_active: itemData.is_active ?? true
+    };
+
+    console.log('🔍 CarouselAPI.createCarouselItem - Insert data:', insertData);
+
     const { data, error } = await supabase
       .from('store_carousel_items')
-      .insert({
-        ...itemData,
-        display_order: itemData.position,
-        is_active: itemData.is_active ?? true
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -130,6 +137,7 @@ export class CarouselAPI {
       throw new Error('Failed to create carousel item');
     }
 
+    console.log('🔍 CarouselAPI.createCarouselItem - Created item:', data);
     return data;
   }
 
@@ -137,11 +145,11 @@ export class CarouselAPI {
    * Update a carousel item
    */
   static async updateCarouselItem(
-    itemId: string, 
+    itemId: string,
     updates: UpdateCarouselItemData
   ): Promise<CarouselItem> {
     const updateData: any = { ...updates };
-    
+
     // Update display_order if position is changed
     if (updates.position !== undefined) {
       updateData.display_order = updates.position;
@@ -181,7 +189,7 @@ export class CarouselAPI {
    * Reorder carousel items
    */
   static async reorderCarouselItems(
-    storeId: string, 
+    storeId: string,
     itemPositions: { id: string; position: number }[]
   ): Promise<void> {
     // Use a transaction to update all positions atomically
@@ -194,9 +202,9 @@ export class CarouselAPI {
     for (const update of updates) {
       const { error } = await supabase
         .from('store_carousel_items')
-        .update({ 
-          position: update.position, 
-          display_order: update.display_order 
+        .update({
+          position: update.position,
+          display_order: update.display_order
         })
         .eq('id', update.id)
         .eq('store_id', storeId);
