@@ -34,6 +34,17 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
   const { result: canManage, loading } = useCanManageUserTiers(storeId);
   const { user } = useAuth();
 
+  // Debug logging for UserTierManager
+  React.useEffect(() => {
+    console.log('🎯 UserTierManager Debug Info:');
+    console.log('  userId:', userId);
+    console.log('  currentTier:', currentTier);
+    console.log('  storeId:', storeId);
+    console.log('  canManage:', canManage);
+    console.log('  loading:', loading);
+    console.log('  currentUser:', user?.id);
+  }, [userId, currentTier, storeId, canManage, loading, user?.id]);
+
   const handleTierChange = (value: string) => {
     setTier(value);
   };
@@ -79,6 +90,17 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
       // Parse payment amount to number if provided
       const amount = paymentAmount ? parseFloat(paymentAmount) : undefined;
 
+      console.log('🔄 Starting tier update process:');
+      console.log('  Current user:', user.id);
+      console.log('  Target user:', userId);
+      console.log('  From tier:', currentTier);
+      console.log('  To tier:', tier);
+      console.log('  Store ID:', storeId);
+      console.log('  Subscription type:', tier !== 'free' ? subscriptionType : 'none');
+      console.log('  Payment amount:', amount);
+      console.log('  Payment reference:', paymentReference);
+      console.log('  Notes:', paymentNotes);
+
       // Call our API function to update the user's tier
       await updateUserTier(
         user.id,
@@ -91,6 +113,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
         paymentNotes || undefined
       );
 
+      console.log('✅ Tier update completed successfully');
       toast.success('User tier updated successfully');
 
       // Reset payment fields after successful update
@@ -102,6 +125,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
         onTierUpdated(tier);
       }
     } catch (error: any) {
+      console.error('❌ Tier update failed:', error);
       toast.error(error.message || 'Failed to update user tier');
       setTier(currentTier); // Reset to current tier on error
     } finally {

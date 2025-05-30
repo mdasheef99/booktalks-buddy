@@ -68,17 +68,40 @@ export async function updateUserTier(
   }
 
   try {
+    console.log('📊 Updating user tier in database...');
+
+    // First check if the user exists and we can access them
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('id, account_tier')
+      .eq('id', userId)
+      .single();
+
+    if (checkError) {
+      console.error('❌ Cannot access user for update:', checkError);
+      throw new Error('Cannot access user for tier update: ' + checkError.message);
+    }
+
+    console.log('📋 Current user data:', existingUser);
+
     // Update the user's tier in the database
     const { data: userData, error: userError } = await supabase
       .from('users')
       .update({ account_tier: tier })
       .eq('id', userId)
-      .select()
-      .single();
+      .select();
 
     if (userError) {
+      console.error('❌ Database update failed:', userError);
       throw new Error('Failed to update user tier: ' + userError.message);
     }
+
+    if (!userData || userData.length === 0) {
+      console.error('❌ No rows updated');
+      throw new Error('No user was updated - check permissions');
+    }
+
+    console.log('✅ User tier updated in database:', userData[0]);
 
     // Invalidate the user's entitlements cache since their tier has changed
     invalidateUserEntitlements(userId);
@@ -90,6 +113,8 @@ export async function updateUserTier(
 
     // If upgrading to a paid tier, create a subscription and payment record
     if (tier !== 'free' && subscriptionType) {
+      console.log('💳 Creating subscription and payment record...');
+
       // Use the helper function to create subscription and payment in one transaction
       const { data: subscriptionId, error: subscriptionError } = await supabase
         .rpc('create_subscription_with_payment', {
@@ -104,8 +129,11 @@ export async function updateUserTier(
         });
 
       if (subscriptionError) {
+        console.error('❌ Subscription creation failed:', subscriptionError);
         throw new Error('Failed to create subscription and payment: ' + subscriptionError.message);
       }
+
+      console.log('✅ Subscription and payment created:', subscriptionId);
     }
 
     return {

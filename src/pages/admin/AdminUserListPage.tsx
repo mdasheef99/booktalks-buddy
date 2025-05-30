@@ -10,6 +10,7 @@ import { UserTierManager } from '@/components/admin/UserTierManager';
 import UserTierBadge from '@/components/common/UserTierBadge';
 import { UserSubscriptionInfo } from '@/components/admin/UserSubscriptionInfo';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useStoreOwnerAccess } from '@/hooks/useStoreOwnerAccess';
 
 interface User {
   id: string;
@@ -29,31 +30,29 @@ const AdminUserListPage: React.FC = () => {
   const [showInviteForm, setShowInviteForm] = useState(false);
   const navigate = useNavigate();
 
-  // Store ID for the current store
-  const [storeId, setStoreId] = useState<string | null>(null);
+  // Use proper store owner access hook
+  const {
+    isStoreOwner,
+    storeId,
+    storeName,
+    loading: storeAccessLoading,
+    error: storeAccessError
+  } = useStoreOwnerAccess();
+
+  // Debug logging for store owner access
+  React.useEffect(() => {
+    console.log('🔍 AdminUserListPage Debug Info:');
+    console.log('  isStoreOwner:', isStoreOwner);
+    console.log('  storeId:', storeId);
+    console.log('  storeName:', storeName);
+    console.log('  storeAccessLoading:', storeAccessLoading);
+    console.log('  storeAccessError:', storeAccessError);
+  }, [isStoreOwner, storeId, storeName, storeAccessLoading, storeAccessError]);
 
   useEffect(() => {
-    const fetchStoreAndUsers = async () => {
+    const fetchUsers = async () => {
       try {
-        // First, try to fetch the store ID
-        const { data: storeData, error: storeError } = await supabase
-          .from('stores')
-          .select('id')
-          .limit(1)
-          .single();
-
-        if (storeError) {
-          console.error('Error fetching store:', storeError);
-          toast.error('Failed to load store information. Some features may be limited.');
-        } else if (storeData) {
-          console.log('Store found:', storeData.id);
-          setStoreId(storeData.id);
-        } else {
-          console.warn('No store found in the database');
-          toast.warning('No store found. Please create a store first to enable all admin features.');
-        }
-
-        // Then fetch users with their account tiers
+        // Fetch users with their account tiers
         const { data, error } = await supabase
           .from('users')
           .select('id, username, email, favorite_genre, favorite_author, account_tier')
@@ -70,7 +69,7 @@ const AdminUserListPage: React.FC = () => {
       }
     };
 
-    fetchStoreAndUsers();
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -109,7 +108,8 @@ const AdminUserListPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  // Show loading state while either users or store access is loading
+  if (loading || storeAccessLoading) {
     return (
       <div className="animate-pulse space-y-4">
         <div className="h-8 w-64 bg-gray-300 rounded"></div>
@@ -119,6 +119,24 @@ const AdminUserListPage: React.FC = () => {
           <div className="h-20 bg-gray-300 rounded"></div>
           <div className="h-20 bg-gray-300 rounded"></div>
         </div>
+      </div>
+    );
+  }
+
+  // Show error state if there's an issue with store access
+  if (storeAccessError) {
+    return (
+      <div className="max-w-md mx-auto mt-8">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600 mb-4">
+              Unable to verify store owner access: {storeAccessError}
+            </p>
+            <Button onClick={() => navigate('/admin/dashboard')} variant="outline">
+              Back to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -134,7 +152,19 @@ const AdminUserListPage: React.FC = () => {
         Back to Dashboard
       </Button>
 
-      <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">User Management</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-serif text-bookconnect-brown">User Management</h1>
+        {isStoreOwner && storeName && (
+          <p className="text-muted-foreground mt-2">
+            Managing users for <span className="font-medium">{storeName}</span>
+          </p>
+        )}
+        {!isStoreOwner && (
+          <p className="text-amber-600 mt-2">
+            Store Owner access required for tier management features
+          </p>
+        )}
+      </div>
 
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
         <div className="relative w-full md:w-96">
@@ -208,27 +238,46 @@ const AdminUserListPage: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col gap-4">
-                    {storeId ? (
-                      <UserTierManager
-                        userId={user.id}
-                        currentTier={user.account_tier || 'free'}
-                        storeId={storeId}
-                        onTierUpdated={(newTier) => {
-                          // Update the local state when tier changes
-                          setUsers(users.map(u =>
-                            u.id === user.id ? { ...u, account_tier: newTier } : u
-                          ));
-                          setFilteredUsers(filteredUsers.map(u =>
-                            u.id === user.id ? { ...u, account_tier: newTier } : u
-                          ));
-                        }}
-                      />
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <UserTierBadge tier={user.account_tier || 'free'} showFreeTier={true} />
-                        <span className="text-sm text-muted-foreground">(Store required for tier management)</span>
-                      </div>
-                    )}
+                    {(() => {
+                      // Debug logging for conditional rendering
+                      console.log('🎨 Conditional Rendering Debug for user:', user.id);
+                      console.log('  isStoreOwner:', isStoreOwner);
+                      console.log('  storeId:', storeId);
+                      console.log('  condition (isStoreOwner && storeId):', isStoreOwner && storeId);
+
+                      if (isStoreOwner && storeId) {
+                        console.log('  ✅ Rendering UserTierManager');
+                        return (
+                          <UserTierManager
+                            userId={user.id}
+                            currentTier={user.account_tier || 'free'}
+                            storeId={storeId}
+                            onTierUpdated={(newTier) => {
+                              // Update the local state when tier changes
+                              setUsers(users.map(u =>
+                                u.id === user.id ? { ...u, account_tier: newTier } : u
+                              ));
+                              setFilteredUsers(filteredUsers.map(u =>
+                                u.id === user.id ? { ...u, account_tier: newTier } : u
+                              ));
+                            }}
+                          />
+                        );
+                      } else {
+                        console.log('  ❌ Rendering UserTierBadge only');
+                        return (
+                          <div className="flex items-center space-x-2">
+                            <UserTierBadge tier={user.account_tier || 'free'} showFreeTier={true} />
+                            <span className="text-sm text-muted-foreground">
+                              {!isStoreOwner
+                                ? "(Store Owner access required)"
+                                : "(Store required for tier management)"
+                              }
+                            </span>
+                          </div>
+                        );
+                      }
+                    })()}
 
                     <Button
                       variant="outline"

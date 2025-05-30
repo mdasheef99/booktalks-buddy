@@ -4,7 +4,7 @@
  * This module provides React hooks for using entitlements in components.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserEntitlements } from './cache';
 import {
@@ -190,6 +190,28 @@ export function useCanManageStore(storeId: string) {
 export function useCanManageUserTiers(storeId: string) {
   const { entitlements, loading } = useEntitlements();
   const result = canManageUserTiers(entitlements, storeId);
+
+  // Debug logging for useCanManageUserTiers
+  React.useEffect(() => {
+    console.log('🔐 useCanManageUserTiers Debug Info:');
+    console.log('  storeId:', storeId);
+    console.log('  entitlements:', entitlements);
+    console.log('  loading:', loading);
+    console.log('  result:', result);
+
+    // Check specific entitlements
+    const hasUserTiersEntitlement = entitlements.includes('CAN_MANAGE_USER_TIERS');
+    const hasStoreOwnerEntitlement = entitlements.includes(`STORE_OWNER_${storeId}`);
+    const hasStoreManagerEntitlement = entitlements.includes(`STORE_MANAGER_${storeId}`);
+    const hasManageAllStoresEntitlement = entitlements.includes('CAN_MANAGE_ALL_STORES');
+    const hasPlatformSettingsEntitlement = entitlements.includes('CAN_MANAGE_PLATFORM_SETTINGS');
+
+    console.log('  hasUserTiersEntitlement:', hasUserTiersEntitlement);
+    console.log('  hasStoreOwnerEntitlement:', hasStoreOwnerEntitlement);
+    console.log('  hasStoreManagerEntitlement:', hasStoreManagerEntitlement);
+    console.log('  hasManageAllStoresEntitlement:', hasManageAllStoresEntitlement);
+    console.log('  hasPlatformSettingsEntitlement:', hasPlatformSettingsEntitlement);
+  }, [entitlements, loading, result, storeId]);
 
   return { result, loading };
 }

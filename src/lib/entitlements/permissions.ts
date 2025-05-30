@@ -108,6 +108,10 @@ export function canManageUserTiers(
 ): boolean {
   return (
     hasEntitlement(entitlements, 'CAN_MANAGE_USER_TIERS') && (
+      // Platform owners can manage user tiers in any store
+      hasEntitlement(entitlements, 'CAN_MANAGE_ALL_STORES') ||
+      hasEntitlement(entitlements, 'CAN_MANAGE_PLATFORM_SETTINGS') ||
+      // Store-specific permissions
       hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId) ||
       hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId)
     )

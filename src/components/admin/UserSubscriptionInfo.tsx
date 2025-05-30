@@ -25,25 +25,25 @@ export function UserSubscriptionInfo({ userId }: UserSubscriptionInfoProps) {
           .eq('user_id', userId)
           .eq('is_active', true)
           .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
 
-        if (subscriptionError && subscriptionError.code !== 'PGRST116') {
-          // PGRST116 is the error code for "no rows returned"
+        if (subscriptionError) {
           console.error('Error fetching subscription:', subscriptionError);
         }
 
-        if (subscriptionData) {
-          setSubscription(subscriptionData);
+        const subscription = subscriptionData && subscriptionData.length > 0 ? subscriptionData[0] : null;
+
+        if (subscription) {
+          setSubscription(subscription);
 
           // Fetch payment records for this subscription
           const { data: paymentData, error: paymentError } = await supabase
             .from('payment_records')
             .select(`
               *,
-              recorded_by_user:recorded_by(id, display_name, email)
+              recorded_by_user:recorded_by(id, displayname, email)
             `)
-            .eq('subscription_id', subscriptionData.id)
+            .eq('subscription_id', subscription.id)
             .order('payment_date', { ascending: false });
 
           if (paymentError) {
@@ -131,7 +131,7 @@ export function UserSubscriptionInfo({ userId }: UserSubscriptionInfoProps) {
                       <div className="text-xs mt-1">{payment.notes}</div>
                     )}
                     <div className="text-xs text-muted-foreground mt-1">
-                      Recorded by: {payment.recorded_by_user?.display_name || payment.recorded_by_user?.email || 'Unknown'}
+                      Recorded by: {payment.recorded_by_user?.displayname || payment.recorded_by_user?.email || 'Unknown'}
                     </div>
                   </div>
                 ))}
