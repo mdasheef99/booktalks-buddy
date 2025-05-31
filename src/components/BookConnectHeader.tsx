@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { UserRound } from "lucide-react";
 import { ProfileDialog } from "./profile";
 import { Button } from "./ui/button";
-import { NotificationBell } from "./notifications/NotificationBell";
 
 interface BookConnectHeaderProps {
   externalProfileDialog?: {
@@ -33,9 +32,6 @@ const BookConnectHeader: React.FC<BookConnectHeaderProps> = ({ externalProfileDi
         {/* Header actions - hidden on events pages */}
         {!isEventsPage && (
           <div className="flex items-center gap-2">
-            {/* Notification Bell */}
-            <NotificationBell className="text-bookconnect-brown hover:bg-bookconnect-terracotta/10" />
-
             {/* Profile icon button */}
             <Button
               variant="ghost"

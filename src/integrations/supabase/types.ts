@@ -15,6 +15,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          is_exclusive: boolean | null
+          is_premium: boolean | null
           lead_user_id: string
           name: string
           privacy: string | null
@@ -26,6 +28,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_exclusive?: boolean | null
+          is_premium?: boolean | null
           lead_user_id: string
           name: string
           privacy?: string | null
@@ -37,6 +41,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_exclusive?: boolean | null
+          is_premium?: boolean | null
           lead_user_id?: string
           name?: string
           privacy?: string | null
@@ -205,6 +211,226 @@ export type Database = {
           },
         ]
       }
+      club_analytics_snapshots: {
+        Row: {
+          active_members_week: number | null
+          club_id: string
+          created_at: string | null
+          current_book_progress: number | null
+          discussion_count: number | null
+          id: string
+          meeting_attendance_rate: number | null
+          meetings_this_month: number | null
+          member_count: number | null
+          new_members_month: number | null
+          posts_count: number | null
+          posts_this_week: number | null
+          reading_completion_rate: number | null
+          snapshot_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          active_members_week?: number | null
+          club_id: string
+          created_at?: string | null
+          current_book_progress?: number | null
+          discussion_count?: number | null
+          id?: string
+          meeting_attendance_rate?: number | null
+          meetings_this_month?: number | null
+          member_count?: number | null
+          new_members_month?: number | null
+          posts_count?: number | null
+          posts_this_week?: number | null
+          reading_completion_rate?: number | null
+          snapshot_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          active_members_week?: number | null
+          club_id?: string
+          created_at?: string | null
+          current_book_progress?: number | null
+          discussion_count?: number | null
+          id?: string
+          meeting_attendance_rate?: number | null
+          meetings_this_month?: number | null
+          member_count?: number | null
+          new_members_month?: number | null
+          posts_count?: number | null
+          posts_this_week?: number | null
+          reading_completion_rate?: number | null
+          snapshot_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_analytics_snapshots_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_event_notifications: {
+        Row: {
+          club_id: string
+          created_at: string | null
+          dismissed_at: string | null
+          id: string
+          is_dismissed: boolean | null
+          meeting_id: string | null
+          message: string | null
+          notification_type: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string | null
+          dismissed_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          meeting_id?: string | null
+          message?: string | null
+          notification_type?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string | null
+          dismissed_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          meeting_id?: string | null
+          message?: string | null
+          notification_type?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_event_notifications_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_event_notifications_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "club_meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_meeting_rsvps: {
+        Row: {
+          club_id: string
+          id: string
+          meeting_id: string
+          rsvp_at: string | null
+          rsvp_status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          id?: string
+          meeting_id: string
+          rsvp_at?: string | null
+          rsvp_status: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          id?: string
+          meeting_id?: string
+          rsvp_at?: string | null
+          rsvp_status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_meeting_rsvps_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_meeting_rsvps_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "club_meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_meetings: {
+        Row: {
+          club_id: string
+          created_at: string | null
+          created_by: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_recurring: boolean | null
+          max_attendees: number | null
+          meeting_type: string | null
+          recurrence_pattern: Json | null
+          scheduled_at: string
+          title: string
+          updated_at: string | null
+          virtual_link: string | null
+        }
+        Insert: {
+          club_id: string
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_recurring?: boolean | null
+          max_attendees?: number | null
+          meeting_type?: string | null
+          recurrence_pattern?: Json | null
+          scheduled_at: string
+          title: string
+          updated_at?: string | null
+          virtual_link?: string | null
+        }
+        Update: {
+          club_id?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_recurring?: boolean | null
+          max_attendees?: number | null
+          meeting_type?: string | null
+          recurrence_pattern?: Json | null
+          scheduled_at?: string
+          title?: string
+          updated_at?: string | null
+          virtual_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_meetings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_members: {
         Row: {
           club_id: string
@@ -236,21 +462,48 @@ export type Database = {
       }
       club_moderators: {
         Row: {
+          analytics_access: boolean | null
+          appointed_at: string | null
+          appointed_by: string | null
           assigned_at: string | null
           assigned_by_user_id: string | null
           club_id: string
+          content_moderation_access: boolean | null
+          customization_access: boolean | null
+          is_active: boolean | null
+          meeting_management_access: boolean | null
+          member_management_access: boolean | null
+          role: string | null
           user_id: string
         }
         Insert: {
+          analytics_access?: boolean | null
+          appointed_at?: string | null
+          appointed_by?: string | null
           assigned_at?: string | null
           assigned_by_user_id?: string | null
           club_id: string
+          content_moderation_access?: boolean | null
+          customization_access?: boolean | null
+          is_active?: boolean | null
+          meeting_management_access?: boolean | null
+          member_management_access?: boolean | null
+          role?: string | null
           user_id: string
         }
         Update: {
+          analytics_access?: boolean | null
+          appointed_at?: string | null
+          appointed_by?: string | null
           assigned_at?: string | null
           assigned_by_user_id?: string | null
           club_id?: string
+          content_moderation_access?: boolean | null
+          customization_access?: boolean | null
+          is_active?: boolean | null
+          meeting_management_access?: boolean | null
+          member_management_access?: boolean | null
+          role?: string | null
           user_id?: string
         }
         Relationships: [
@@ -259,6 +512,71 @@ export type Database = {
             columns: ["club_id"]
             isOneToOne: false
             referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          joined_at: string | null
+          last_read_at: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          store_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          store_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          store_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
             referencedColumns: ["id"]
           },
         ]
@@ -308,6 +626,64 @@ export type Database = {
             columns: ["nomination_id"]
             isOneToOne: false
             referencedRelation: "book_nominations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      direct_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          deleted_at: string | null
+          id: string
+          is_deleted: boolean | null
+          reply_to_id: string | null
+          retention_expires_at: string | null
+          sender_id: string | null
+          sent_at: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          reply_to_id?: string | null
+          retention_expires_at?: string | null
+          sender_id?: string | null
+          sent_at?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          deleted_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          reply_to_id?: string | null
+          retention_expires_at?: string | null
+          sender_id?: string | null
+          sent_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -587,6 +963,100 @@ export type Database = {
           },
         ]
       }
+      moderation_actions: {
+        Row: {
+          action_type: string
+          club_id: string | null
+          created_at: string | null
+          duration_hours: number | null
+          expires_at: string | null
+          id: string
+          moderator_id: string
+          moderator_role: string
+          moderator_username: string
+          reason: string
+          related_report_id: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          revoked_reason: string | null
+          severity: string
+          status: string
+          store_id: string | null
+          target_id: string
+          target_type: string
+          target_user_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          action_type: string
+          club_id?: string | null
+          created_at?: string | null
+          duration_hours?: number | null
+          expires_at?: string | null
+          id?: string
+          moderator_id: string
+          moderator_role: string
+          moderator_username: string
+          reason: string
+          related_report_id?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revoked_reason?: string | null
+          severity: string
+          status?: string
+          store_id?: string | null
+          target_id: string
+          target_type: string
+          target_user_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          club_id?: string | null
+          created_at?: string | null
+          duration_hours?: number | null
+          expires_at?: string | null
+          id?: string
+          moderator_id?: string
+          moderator_role?: string
+          moderator_username?: string
+          reason?: string
+          related_report_id?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revoked_reason?: string | null
+          severity?: string
+          status?: string
+          store_id?: string | null
+          target_id?: string
+          target_type?: string
+          target_user_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_related_report_id_fkey"
+            columns: ["related_report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_records: {
         Row: {
           amount: number | null
@@ -731,6 +1201,125 @@ export type Database = {
         }
         Relationships: []
       }
+      report_evidence: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          evidence_data: Json
+          evidence_type: string
+          id: string
+          report_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          evidence_data: Json
+          evidence_type: string
+          id?: string
+          report_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          evidence_data?: Json
+          evidence_type?: string
+          id?: string
+          report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_evidence_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          club_id: string | null
+          created_at: string | null
+          description: string
+          id: string
+          priority: number | null
+          reason: string
+          reporter_id: string
+          reporter_username: string
+          resolution_action: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          store_id: string | null
+          target_id: string | null
+          target_type: string
+          target_user_id: string | null
+          target_username: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          priority?: number | null
+          reason: string
+          reporter_id: string
+          reporter_username: string
+          resolution_action?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string
+          store_id?: string | null
+          target_id?: string | null
+          target_type: string
+          target_user_id?: string | null
+          target_username?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          priority?: number | null
+          reason?: string
+          reporter_id?: string
+          reporter_username?: string
+          resolution_action?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          store_id?: string | null
+          target_id?: string | null
+          target_type?: string
+          target_user_id?: string | null
+          target_username?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_activity: {
         Row: {
           context_id: string
@@ -790,18 +1379,467 @@ export type Database = {
           },
         ]
       }
+      store_carousel_items: {
+        Row: {
+          book_author: string
+          book_image_alt: string | null
+          book_image_url: string | null
+          book_isbn: string | null
+          book_title: string
+          click_destination_url: string | null
+          created_at: string | null
+          custom_description: string | null
+          display_order: number | null
+          featured_badge: string | null
+          id: string
+          is_active: boolean | null
+          overlay_text: string | null
+          position: number
+          store_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          book_author: string
+          book_image_alt?: string | null
+          book_image_url?: string | null
+          book_isbn?: string | null
+          book_title: string
+          click_destination_url?: string | null
+          created_at?: string | null
+          custom_description?: string | null
+          display_order?: number | null
+          featured_badge?: string | null
+          id?: string
+          is_active?: boolean | null
+          overlay_text?: string | null
+          position: number
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          book_author?: string
+          book_image_alt?: string | null
+          book_image_url?: string | null
+          book_isbn?: string | null
+          book_title?: string
+          click_destination_url?: string | null
+          created_at?: string | null
+          custom_description?: string | null
+          display_order?: number | null
+          featured_badge?: string | null
+          id?: string
+          is_active?: boolean | null
+          overlay_text?: string | null
+          position?: number
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_carousel_items_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_community_showcase: {
+        Row: {
+          activity_feed_limit: number | null
+          created_at: string | null
+          featured_member_id: string | null
+          id: string
+          max_spotlights_display: number | null
+          show_activity_feed: boolean | null
+          show_community_metrics: boolean | null
+          show_member_spotlights: boolean | null
+          show_testimonials: boolean | null
+          spotlight_description: string | null
+          spotlight_end_date: string | null
+          spotlight_rotation_days: number | null
+          spotlight_start_date: string | null
+          spotlight_type: string | null
+          store_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          activity_feed_limit?: number | null
+          created_at?: string | null
+          featured_member_id?: string | null
+          id?: string
+          max_spotlights_display?: number | null
+          show_activity_feed?: boolean | null
+          show_community_metrics?: boolean | null
+          show_member_spotlights?: boolean | null
+          show_testimonials?: boolean | null
+          spotlight_description?: string | null
+          spotlight_end_date?: string | null
+          spotlight_rotation_days?: number | null
+          spotlight_start_date?: string | null
+          spotlight_type?: string | null
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          activity_feed_limit?: number | null
+          created_at?: string | null
+          featured_member_id?: string | null
+          id?: string
+          max_spotlights_display?: number | null
+          show_activity_feed?: boolean | null
+          show_community_metrics?: boolean | null
+          show_member_spotlights?: boolean | null
+          show_testimonials?: boolean | null
+          spotlight_description?: string | null
+          spotlight_end_date?: string | null
+          spotlight_rotation_days?: number | null
+          spotlight_start_date?: string | null
+          spotlight_type?: string | null
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_community_showcase_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_custom_quotes: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          quote_author: string | null
+          quote_category: string | null
+          quote_source: string | null
+          quote_tags: string[] | null
+          quote_text: string
+          rotation_enabled: boolean | null
+          start_date: string | null
+          store_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          quote_author?: string | null
+          quote_category?: string | null
+          quote_source?: string | null
+          quote_tags?: string[] | null
+          quote_text: string
+          rotation_enabled?: boolean | null
+          start_date?: string | null
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          quote_author?: string | null
+          quote_category?: string | null
+          quote_source?: string | null
+          quote_tags?: string[] | null
+          quote_text?: string
+          rotation_enabled?: boolean | null
+          start_date?: string | null
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_custom_quotes_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_landing_analytics: {
+        Row: {
+          element_id: string | null
+          element_type: string | null
+          event_type: string
+          id: string
+          interaction_data: Json | null
+          ip_address: unknown | null
+          page_url: string | null
+          referrer_url: string | null
+          section_name: string | null
+          session_id: string | null
+          store_id: string | null
+          timestamp: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          element_id?: string | null
+          element_type?: string | null
+          event_type: string
+          id?: string
+          interaction_data?: Json | null
+          ip_address?: unknown | null
+          page_url?: string | null
+          referrer_url?: string | null
+          section_name?: string | null
+          session_id?: string | null
+          store_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          element_id?: string | null
+          element_type?: string | null
+          event_type?: string
+          id?: string
+          interaction_data?: Json | null
+          ip_address?: unknown | null
+          page_url?: string | null
+          referrer_url?: string | null
+          section_name?: string | null
+          session_id?: string | null
+          store_id?: string | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_landing_analytics_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_landing_customization: {
+        Row: {
+          chat_button_color_scheme: string | null
+          chat_button_position: string | null
+          chat_button_size: string | null
+          chat_button_text: string | null
+          created_at: string | null
+          hero_font_style: string | null
+          hero_quote: string | null
+          hero_quote_author: string | null
+          id: string
+          is_chat_button_enabled: boolean | null
+          sections_enabled: Json | null
+          store_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          chat_button_color_scheme?: string | null
+          chat_button_position?: string | null
+          chat_button_size?: string | null
+          chat_button_text?: string | null
+          created_at?: string | null
+          hero_font_style?: string | null
+          hero_quote?: string | null
+          hero_quote_author?: string | null
+          id?: string
+          is_chat_button_enabled?: boolean | null
+          sections_enabled?: Json | null
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          chat_button_color_scheme?: string | null
+          chat_button_position?: string | null
+          chat_button_size?: string | null
+          chat_button_text?: string | null
+          created_at?: string | null
+          hero_font_style?: string | null
+          hero_quote?: string | null
+          hero_quote_author?: string | null
+          id?: string
+          is_chat_button_enabled?: boolean | null
+          sections_enabled?: Json | null
+          store_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_landing_customization_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_promotional_banners: {
+        Row: {
+          animation_duration: number | null
+          animation_type: string | null
+          background_color: string | null
+          banner_image_alt: string | null
+          banner_image_url: string | null
+          content_type: string | null
+          created_at: string | null
+          cta_text: string | null
+          cta_url: string | null
+          display_duration: number | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          priority_order: number | null
+          start_date: string | null
+          store_id: string | null
+          subtitle: string | null
+          text_color: string | null
+          text_content: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          animation_duration?: number | null
+          animation_type?: string | null
+          background_color?: string | null
+          banner_image_alt?: string | null
+          banner_image_url?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          cta_text?: string | null
+          cta_url?: string | null
+          display_duration?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority_order?: number | null
+          start_date?: string | null
+          store_id?: string | null
+          subtitle?: string | null
+          text_color?: string | null
+          text_content?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          animation_duration?: number | null
+          animation_type?: string | null
+          background_color?: string | null
+          banner_image_alt?: string | null
+          banner_image_url?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          cta_text?: string | null
+          cta_url?: string | null
+          display_duration?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority_order?: number | null
+          start_date?: string | null
+          store_id?: string | null
+          subtitle?: string | null
+          text_color?: string | null
+          text_content?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_promotional_banners_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_testimonials: {
+        Row: {
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          customer_name: string | null
+          display_order: number | null
+          id: string
+          is_anonymous: boolean | null
+          is_featured: boolean | null
+          rating: number | null
+          source_type: string | null
+          source_url: string | null
+          store_id: string | null
+          testimonial_text: string
+          updated_at: string | null
+        }
+        Insert: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          display_order?: number | null
+          id?: string
+          is_anonymous?: boolean | null
+          is_featured?: boolean | null
+          rating?: number | null
+          source_type?: string | null
+          source_url?: string | null
+          store_id?: string | null
+          testimonial_text: string
+          updated_at?: string | null
+        }
+        Update: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          display_order?: number | null
+          id?: string
+          is_anonymous?: boolean | null
+          is_featured?: boolean | null
+          rating?: number | null
+          source_type?: string | null
+          source_url?: string | null
+          store_id?: string | null
+          testimonial_text?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_testimonials_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
+          allow_public_club_creation: boolean | null
           description: string | null
           id: string
           name: string
         }
         Insert: {
+          allow_public_club_creation?: boolean | null
           description?: string | null
           id?: string
           name: string
         }
         Update: {
+          allow_public_club_creation?: boolean | null
           description?: string | null
           id?: string
           name?: string
@@ -858,78 +1896,92 @@ export type Database = {
           },
         ]
       }
-      reports: {
+      user_warnings: {
         Row: {
-          id: string
-          reporter_id: string
-          reporter_username: string
-          target_type: string
-          target_id: string | null
-          target_user_id: string | null
-          target_username: string | null
-          reason: string
-          description: string
-          severity: string
+          acknowledged_at: string | null
           club_id: string | null
+          created_at: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          issued_by: string
+          reason: string
+          related_action_id: string | null
+          related_report_id: string | null
+          severity: string
           store_id: string | null
-          status: string
-          priority: number
-          resolved_by: string | null
-          resolved_at: string | null
-          resolution_action: string | null
-          resolution_notes: string | null
-          created_at: string
-          updated_at: string
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          id?: string
-          reporter_id: string
-          reporter_username: string
-          target_type: string
-          target_id?: string | null
-          target_user_id?: string | null
-          target_username?: string | null
-          reason: string
-          description: string
-          severity: string
+          acknowledged_at?: string | null
           club_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_by: string
+          reason: string
+          related_action_id?: string | null
+          related_report_id?: string | null
+          severity: string
           store_id?: string | null
-          status?: string
-          priority?: number
-          resolved_by?: string | null
-          resolved_at?: string | null
-          resolution_action?: string | null
-          resolution_notes?: string | null
-          created_at?: string
-          updated_at?: string
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          id?: string
-          reporter_id?: string
-          reporter_username?: string
-          target_type?: string
-          target_id?: string | null
-          target_user_id?: string | null
-          target_username?: string | null
-          reason?: string
-          description?: string
-          severity?: string
+          acknowledged_at?: string | null
           club_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_by?: string
+          reason?: string
+          related_action_id?: string | null
+          related_report_id?: string | null
+          severity?: string
           store_id?: string | null
-          status?: string
-          priority?: number
-          resolved_by?: string | null
-          resolved_at?: string | null
-          resolution_action?: string | null
-          resolution_notes?: string | null
-          created_at?: string
-          updated_at?: string
+          updated_at?: string | null
+          user_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "user_warnings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_warnings_related_action_id_fkey"
+            columns: ["related_action_id"]
+            isOneToOne: false
+            referencedRelation: "moderation_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_warnings_related_report_id_fkey"
+            columns: ["related_report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_warnings_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {
           account_tier: string
           allow_chats: boolean | null
+          allow_direct_messages: boolean | null
+          avatar_url: string | null
           bio: string | null
           created_at: string | null
           displayname: string | null
@@ -938,11 +1990,13 @@ export type Database = {
           favorite_genre: string | null
           id: string
           membership_tier: string
-          username: string | null
+          username: string
         }
         Insert: {
           account_tier?: string
           allow_chats?: boolean | null
+          allow_direct_messages?: boolean | null
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           displayname?: string | null
@@ -951,11 +2005,13 @@ export type Database = {
           favorite_genre?: string | null
           id: string
           membership_tier?: string
-          username?: string | null
+          username: string
         }
         Update: {
           account_tier?: string
           allow_chats?: boolean | null
+          allow_direct_messages?: boolean | null
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           displayname?: string | null
@@ -964,7 +2020,7 @@ export type Database = {
           favorite_genre?: string | null
           id?: string
           membership_tier?: string
-          username?: string | null
+          username?: string
         }
         Relationships: []
       }
@@ -980,6 +2036,22 @@ export type Database = {
       can_moderate_content: {
         Args: { club_id: string }
         Returns: boolean
+      }
+      cleanup_expired_messages: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      create_daily_analytics_snapshot: {
+        Args: { p_club_id: string }
+        Returns: undefined
+      }
+      create_meeting_notifications: {
+        Args: {
+          p_meeting_id: string
+          p_club_id: string
+          p_notification_type?: string
+        }
+        Returns: undefined
       }
       create_subscription_with_payment: {
         Args: {
@@ -1008,6 +2080,93 @@ export type Database = {
           tier: string
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_club_analytics_summary: {
+        Args: { p_club_id: string }
+        Returns: {
+          member_count: number
+          active_members_week: number
+          discussion_count: number
+          posts_count: number
+          reading_completion_rate: number
+          total_meetings: number
+          upcoming_meetings: number
+          meetings_this_month: number
+        }[]
+      }
+      get_club_meeting_analytics: {
+        Args: { p_club_id: string }
+        Returns: {
+          total_meetings: number
+          upcoming_meetings: number
+          meetings_this_month: number
+          avg_duration_minutes: number
+          most_common_type: string
+        }[]
+      }
+      get_club_meeting_rsvp_stats: {
+        Args: { p_club_id: string }
+        Returns: {
+          meeting_id: string
+          meeting_title: string
+          scheduled_at: string
+          total_rsvps: number
+          going_count: number
+          maybe_count: number
+          not_going_count: number
+          response_rate: number
+        }[]
+      }
+      get_club_meetings: {
+        Args: {
+          p_club_id: string
+          p_upcoming_only?: boolean
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          id: string
+          club_id: string
+          title: string
+          description: string
+          meeting_type: string
+          scheduled_at: string
+          duration_minutes: number
+          virtual_link: string
+          max_attendees: number
+          is_recurring: boolean
+          recurrence_pattern: Json
+          created_by: string
+          created_at: string
+          updated_at: string
+          creator_username: string
+        }[]
+      }
+      get_meeting_rsvp_stats: {
+        Args: { p_meeting_id: string }
+        Returns: {
+          total_rsvps: number
+          going_count: number
+          maybe_count: number
+          not_going_count: number
+          response_rate: number
+        }[]
+      }
+      get_unread_message_count: {
+        Args: { conversation_id: string; user_id: string }
+        Returns: number
+      }
+      get_user_message_retention_days: {
+        Args: { user_id: string }
+        Returns: number
+      }
+      get_user_retention_info: {
+        Args: { user_id: string }
+        Returns: {
+          tier: string
+          retention_days: number
+          expires_at: string
         }[]
       }
       has_account_tier: {
@@ -1041,6 +2200,18 @@ export type Database = {
       is_store_administrator: {
         Args: { store_id: string; required_role?: string }
         Returns: boolean
+      }
+      is_user_conversation_participant: {
+        Args: { p_conversation_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      soft_delete_expired_messages: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      test_messaging_rls_policies: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       update_role_activity: {
         Args: {

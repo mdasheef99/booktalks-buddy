@@ -1,6 +1,6 @@
 /**
  * Test data factories for BookConnect
- * 
+ *
  * These factories create consistent test data for use across test files.
  * Each factory has sensible defaults and accepts overrides for specific test cases.
  */
@@ -60,16 +60,7 @@ interface EventParticipant {
   updated_at: string;
 }
 
-interface Notification {
-  id: string;
-  user_id: string;
-  type: string;
-  content: string;
-  is_read: boolean;
-  created_at: string;
-  related_id?: string;
-  related_type?: string;
-}
+
 
 /**
  * Creates an event with default values
@@ -141,22 +132,7 @@ export const createEventParticipant = (overrides: Partial<EventParticipant> = {}
   ...overrides
 });
 
-/**
- * Creates a notification with default values
- * @param overrides Optional properties to override defaults
- * @returns A Notification object
- */
-export const createNotification = (overrides: Partial<Notification> = {}): Notification => ({
-  id: 'test-notification-id',
-  user_id: 'test-user-id',
-  type: 'event_created',
-  content: 'A new event has been created',
-  is_read: false,
-  created_at: '2023-07-02T12:00:00Z',
-  related_id: 'test-event-id',
-  related_type: 'event',
-  ...overrides
-});
+
 
 /**
  * Creates multiple events with sequential IDs
@@ -165,7 +141,7 @@ export const createNotification = (overrides: Partial<Notification> = {}): Notif
  * @returns Array of Event objects
  */
 export const createEvents = (count: number, baseOverrides: Partial<Event> = {}): Event[] => {
-  return Array.from({ length: count }, (_, index) => 
+  return Array.from({ length: count }, (_, index) =>
     createEvent({
       id: `test-event-id-${index + 1}`,
       title: `Test Event ${index + 1}`,

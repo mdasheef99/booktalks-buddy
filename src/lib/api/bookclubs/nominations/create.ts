@@ -36,50 +36,9 @@ export async function nominateBook(userId: string, clubId: string, book: Book) {
 
     console.log(`Book saved with ID: ${bookId}, checking for existing nominations`);
 
-    // Check if this book is already nominated in this club
-    const { data: existingNomination, error: checkError } = await supabase
-      .from('book_nominations')
-      .select('id, status')
-      .eq('club_id', clubId)
-      .eq('book_id', bookId)
-      .maybeSingle();
-
-    if (checkError) {
-      console.error('Error checking for existing nomination:', checkError);
-      throw new Error('Failed to check for existing nomination');
-    }
-
-    // If the book is already nominated and active, return an error
-    if (existingNomination && existingNomination.status === 'active') {
-      throw new Error('This book has already been nominated in this club');
-    }
-
-    // If the book was previously nominated but archived, reactivate it
-    if (existingNomination && existingNomination.status === 'archived') {
-      console.log(`Reactivating archived nomination: ${existingNomination.id}`);
-
-      const { data: updatedNomination, error: updateError } = await supabase
-        .from('book_nominations')
-        .update({
-          status: 'active',
-          nominated_by: userId,
-          nominated_at: new Date().toISOString()
-        })
-        .eq('id', existingNomination.id)
-        .select('*')
-        .single();
-
-      if (updateError) {
-        console.error('Error reactivating nomination:', updateError);
-        throw new Error('Failed to reactivate nomination');
-      }
-
-      console.log(`Nomination reactivated successfully`);
-      return getNominationById(updatedNomination.id, userId);
-    }
-
-    // Otherwise, create a new nomination
-    console.log(`Creating new nomination for book ID: ${bookId}`);
+    // Use a more robust approach to handle the unique constraint
+    // First, try to insert the nomination directly and handle constraint violations
+    console.log(`Attempting to create nomination for book ID: ${bookId}`);
 
     const { data: nomination, error: insertError } = await supabase
       .from('book_nominations')
@@ -92,13 +51,82 @@ export async function nominateBook(userId: string, clubId: string, book: Book) {
       .select('id')
       .single();
 
-    if (insertError) {
-      console.error('Error creating nomination:', insertError);
-      throw new Error('Failed to nominate book');
+    // If insertion succeeds, we're done
+    if (!insertError && nomination) {
+      console.log(`Nomination created successfully with ID: ${nomination.id}`);
+      return getNominationById(nomination.id, userId);
     }
 
-    console.log(`Nomination created successfully with ID: ${nomination.id}`);
-    return getNominationById(nomination.id, userId);
+    // Handle constraint violation (duplicate nomination)
+    if (insertError && insertError.code === '23505' && insertError.message.includes('unique_book_per_club')) {
+      console.log(`Book already nominated in this club, checking existing nomination status`);
+
+      // Get the existing nomination to determine what to do
+      const { data: existingNomination, error: checkError } = await supabase
+        .from('book_nominations')
+        .select('id, status, nominated_by')
+        .eq('club_id', clubId)
+        .eq('book_id', bookId)
+        .single();
+
+      if (checkError) {
+        console.error('Error fetching existing nomination:', checkError);
+        throw new Error('This book has already been nominated in this club');
+      }
+
+      // Handle different nomination statuses
+      if (existingNomination.status === 'active') {
+        throw new Error('This book has already been nominated in this club');
+      }
+
+      if (existingNomination.status === 'selected') {
+        throw new Error('This book has already been selected as the current book for this club');
+      }
+
+      // If the nomination is archived, reactivate it
+      if (existingNomination.status === 'archived') {
+        console.log(`Reactivating archived nomination: ${existingNomination.id}`);
+
+        const { data: updatedNomination, error: updateError } = await supabase
+          .from('book_nominations')
+          .update({
+            status: 'active',
+            nominated_by: userId,
+            nominated_at: new Date().toISOString()
+          })
+          .eq('id', existingNomination.id)
+          .select('*')
+          .single();
+
+        if (updateError) {
+          console.error('Error reactivating nomination:', updateError);
+          throw new Error('Failed to reactivate nomination');
+        }
+
+        console.log(`Nomination reactivated successfully`);
+        return getNominationById(updatedNomination.id, userId);
+      }
+
+      // Fallback for unknown status
+      throw new Error('This book has already been nominated in this club');
+    }
+
+    // Handle other insertion errors
+    if (insertError) {
+      console.error('Error creating nomination:', insertError);
+
+      // Provide more specific error messages
+      if (insertError.code === '23503') {
+        throw new Error('Invalid book or club reference');
+      } else if (insertError.code === '23502') {
+        throw new Error('Missing required nomination information');
+      } else {
+        throw new Error(`Failed to nominate book: ${insertError.message}`);
+      }
+    }
+
+    // This should never be reached, but just in case
+    throw new Error('Unexpected error in nomination process');
   } catch (error) {
     console.error('Unexpected error nominating book:', error);
     if (error instanceof Error) {

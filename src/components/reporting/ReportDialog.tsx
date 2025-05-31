@@ -161,9 +161,27 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({
       }
     } catch (error) {
       console.error('Error submitting report:', error);
+
+      // Provide more specific error messages based on error type
+      let errorMessage = "Unable to submit your report. Please try again.";
+      let errorTitle = "Submission failed";
+
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "Network error. Please check your connection and try again.";
+          errorTitle = "Connection error";
+        } else if (error.message.includes('unauthorized') || error.message.includes('permission')) {
+          errorMessage = "You don't have permission to submit this report.";
+          errorTitle = "Permission denied";
+        } else if (error.message.includes('rate limit')) {
+          errorMessage = "Too many reports submitted. Please wait before submitting another.";
+          errorTitle = "Rate limit exceeded";
+        }
+      }
+
       toast({
-        title: "Submission failed",
-        description: "Unable to submit your report. Please try again.",
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -175,8 +193,8 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto w-[95vw] sm:w-full">
+        <DialogHeader className="sticky top-0 bg-white pb-4 border-b">
           <DialogTitle className="flex items-center gap-2">
             <Flag className="h-5 w-5 text-red-500" />
             Report {TARGET_TYPE_LABELS[targetType]}
@@ -240,7 +258,7 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({
           </div>
 
           {/* Severity Notice */}
-          {reason === 'hate_speech' || reason === 'harassment' && (
+          {(reason === 'hate_speech' || reason === 'harassment') && (
             <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
               <div className="flex items-center gap-2 text-red-700">
                 <AlertTriangle className="h-4 w-4" />
@@ -264,20 +282,28 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sticky bottom-0 bg-white border-t mt-6 pt-4">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!reason || !description.trim() || isSubmitting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 disabled:opacity-50 w-full sm:w-auto"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Report'}
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Submitting...
+                </div>
+              ) : (
+                'Submit Report'
+              )}
             </Button>
           </div>
         </div>
