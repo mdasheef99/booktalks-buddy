@@ -24,7 +24,17 @@ type SubscriptionType = 'monthly' | 'annual';
  * Component for managing a user's account tier
  */
 export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }: UserTierManagerProps) {
-  const [tier, setTier] = useState(currentTier);
+  // Convert legacy tier to new tier format for display
+  const convertToNewTier = (legacyTier: string) => {
+    switch (legacyTier) {
+      case 'free': return 'MEMBER';
+      case 'privileged': return 'PRIVILEGED';
+      case 'privileged_plus': return 'PRIVILEGED_PLUS';
+      default: return legacyTier;
+    }
+  };
+
+  const [tier, setTier] = useState(convertToNewTier(currentTier));
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [subscriptionType, setSubscriptionType] = useState<'monthly' | 'annual'>('monthly');
@@ -68,7 +78,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
   };
 
   const openConfirmDialog = () => {
-    if (tier === currentTier) return;
+    if (tier === convertToNewTier(currentTier)) return;
     setIsDialogOpen(true);
   };
 
@@ -77,7 +87,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
   };
 
   const updateTier = async () => {
-    if (tier === currentTier) return;
+    if (tier === convertToNewTier(currentTier)) return;
     if (!user) {
       toast.error('You must be logged in to update user tiers');
       return;
@@ -96,7 +106,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
       console.log('  From tier:', currentTier);
       console.log('  To tier:', tier);
       console.log('  Store ID:', storeId);
-      console.log('  Subscription type:', tier !== 'free' ? subscriptionType : 'none');
+      console.log('  Subscription type:', tier !== 'MEMBER' ? subscriptionType : 'none');
       console.log('  Payment amount:', amount);
       console.log('  Payment reference:', paymentReference);
       console.log('  Notes:', paymentNotes);
@@ -107,7 +117,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
         userId,
         tier,
         storeId,
-        tier !== 'free' ? subscriptionType : undefined,
+        tier !== 'MEMBER' ? subscriptionType : undefined,
         paymentReference || undefined,
         amount,
         paymentNotes || undefined
@@ -127,7 +137,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
     } catch (error: any) {
       console.error('❌ Tier update failed:', error);
       toast.error(error.message || 'Failed to update user tier');
-      setTier(currentTier); // Reset to current tier on error
+      setTier(convertToNewTier(currentTier)); // Reset to current tier on error
     } finally {
       setIsUpdating(false);
     }
@@ -152,9 +162,9 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
           <SelectValue placeholder="Select tier" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="free">Free</SelectItem>
-          <SelectItem value="privileged">Privileged</SelectItem>
-          <SelectItem value="privileged_plus">Privileged Plus</SelectItem>
+          <SelectItem value="MEMBER">Member (Free)</SelectItem>
+          <SelectItem value="PRIVILEGED">Privileged</SelectItem>
+          <SelectItem value="PRIVILEGED_PLUS">Privileged Plus</SelectItem>
         </SelectContent>
       </Select>
 
@@ -164,7 +174,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
             variant="outline"
             size="sm"
             onClick={openConfirmDialog}
-            disabled={isUpdating || tier === currentTier}
+            disabled={isUpdating || tier === convertToNewTier(currentTier)}
           >
             {isUpdating ? 'Updating...' : 'Update'}
           </Button>
@@ -174,11 +184,11 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
             <DialogTitle>Confirm Tier Update</DialogTitle>
             <DialogDescription>
               You are about to update this user's tier to <strong>{tier}</strong>.
-              {tier !== 'free' && ' Please provide the subscription details below.'}
+              {tier !== 'MEMBER' && ' Please provide the subscription details below.'}
             </DialogDescription>
           </DialogHeader>
 
-          {tier !== 'free' && (
+          {tier !== 'MEMBER' && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="subscription-type">Subscription Type</Label>

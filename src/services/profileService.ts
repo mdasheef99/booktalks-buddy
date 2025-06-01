@@ -1,8 +1,4 @@
 import { supabase } from '@/lib/supabase';
-import type { Database } from '@/integrations/supabase/types';
-
-// Type for database user row
-type DatabaseUser = Database['public']['Tables']['users']['Row'];
 
 export interface UserProfile {
   id: string;
@@ -16,7 +12,7 @@ export interface UserProfile {
   favorite_author: string | null;
   favorite_genre: string | null;
   bio: string | null;
-  account_tier: string | null; // Made consistent with database (not optional)
+  membership_tier: string | null; // New tier system
 }
 
 // Type for profile updates (only updatable fields)
@@ -43,7 +39,7 @@ type SelectedUserFields = {
   favorite_author: string | null;
   favorite_genre: string | null;
   bio: string | null;
-  account_tier: string;
+  membership_tier: string;
 };
 
 
@@ -62,7 +58,7 @@ function createUserProfileFromDatabaseRow(data: SelectedUserFields): UserProfile
     favorite_author: data.favorite_author,
     favorite_genre: data.favorite_genre,
     bio: data.bio,
-    account_tier: data.account_tier
+    membership_tier: data.membership_tier
   };
 }
 
@@ -136,7 +132,7 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
     // Fetch user data including all avatar columns (using type assertion since columns exist)
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, membership_tier')
       .in('id', idsToFetch) as any;
 
     if (error) throw error;
@@ -165,7 +161,7 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           favorite_author: null,
           favorite_genre: null,
           bio: null,
-          account_tier: null
+          membership_tier: null
         };
         profileCache[id] = placeholder;
         result.set(id, placeholder);
@@ -191,7 +187,7 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           favorite_author: null,
           favorite_genre: null,
           bio: null,
-          account_tier: null
+          membership_tier: null
         };
         result.set(id, placeholder);
       }
@@ -217,7 +213,7 @@ async function fetchSingleProfile(userId: string): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, membership_tier')
       .eq('id', userId)
       .single() as any;
 
@@ -246,7 +242,7 @@ export async function updateUserProfile(
       .from('users')
       .update(updates)
       .eq('id', userId)
-      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, membership_tier')
       .single() as any;
 
     if (error) throw error;
@@ -278,7 +274,7 @@ export async function createUserProfile(
         email: profileData.email,
         displayname: profileData.displayname?.trim() || null
       }])
-      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, membership_tier')
       .single() as any;
 
     if (error) throw error;
@@ -320,7 +316,7 @@ export async function getUserProfileByUsername(username: string): Promise<UserPr
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, membership_tier')
       .eq('username', username)
       .single() as any;
 

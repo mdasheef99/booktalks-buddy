@@ -62,15 +62,18 @@ export function verifyUserProfileInterface(): boolean {
       username: 'test_user',
       email: 'test@example.com',
       avatar_url: null,
+      avatar_thumbnail_url: null,
+      avatar_medium_url: null,
+      avatar_full_url: null,
       displayname: 'Test Display Name',
       favorite_author: 'Test Author',
       favorite_genre: 'Test Genre',
       bio: 'Test bio',
-      account_tier: 'free'
+      membership_tier: 'MEMBER'
     };
 
     // Verify all required fields are present
-    const requiredFields = ['id', 'username', 'email', 'avatar_url', 'displayname', 'favorite_author', 'favorite_genre', 'bio', 'account_tier'];
+    const requiredFields = ['id', 'username', 'email', 'avatar_url', 'avatar_thumbnail_url', 'avatar_medium_url', 'avatar_full_url', 'displayname', 'favorite_author', 'favorite_genre', 'bio', 'membership_tier'];
     const missingFields = requiredFields.filter(field => !(field in testProfile));
     
     if (missingFields.length > 0) {
@@ -200,33 +203,42 @@ export const MOCK_USER_PROFILES: UserProfile[] = [
     username: 'bookworm_jane',
     email: 'jane@example.com',
     avatar_url: null,
+    avatar_thumbnail_url: null,
+    avatar_medium_url: null,
+    avatar_full_url: null,
     displayname: 'Jane Smith',
     favorite_author: 'Jane Austen',
     favorite_genre: 'Classic Literature',
     bio: 'Avid reader and book club enthusiast',
-    account_tier: 'privileged'
+    membership_tier: 'PRIVILEGED'
   },
   {
     id: 'user-2',
     username: 'reader_bob',
     email: 'bob@example.com',
     avatar_url: null,
+    avatar_thumbnail_url: null,
+    avatar_medium_url: null,
+    avatar_full_url: null,
     displayname: null, // No display name set
     favorite_author: 'Stephen King',
     favorite_genre: 'Horror',
     bio: 'Love scary stories!',
-    account_tier: 'free'
+    membership_tier: 'MEMBER'
   },
   {
     id: 'user-3',
     username: 'literature_lover',
     email: 'lover@example.com',
     avatar_url: null,
+    avatar_thumbnail_url: null,
+    avatar_medium_url: null,
+    avatar_full_url: null,
     displayname: 'Literary Enthusiast',
     favorite_author: 'Virginia Woolf',
     favorite_genre: 'Modernist Literature',
     bio: 'Exploring the depths of human consciousness through literature',
-    account_tier: 'privileged_plus'
+    membership_tier: 'PRIVILEGED_PLUS'
   }
 ];
 

@@ -73,7 +73,7 @@ export async function updateUserTier(
     // First check if the user exists and we can access them
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
-      .select('id, account_tier')
+      .select('id, membership_tier')
       .eq('id', userId)
       .single();
 
@@ -84,10 +84,16 @@ export async function updateUserTier(
 
     console.log('📋 Current user data:', existingUser);
 
+    // Validate tier value
+    const validTiers = ['MEMBER', 'PRIVILEGED', 'PRIVILEGED_PLUS'];
+    if (!validTiers.includes(tier)) {
+      throw new Error(`Invalid tier: ${tier}. Must be one of: ${validTiers.join(', ')}`);
+    }
+
     // Update the user's tier in the database
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .update({ account_tier: tier })
+      .update({ membership_tier: tier })
       .eq('id', userId)
       .select();
 
@@ -112,7 +118,7 @@ export async function updateUserTier(
     }
 
     // If upgrading to a paid tier, create a subscription and payment record
-    if (tier !== 'free' && subscriptionType) {
+    if (tier !== 'MEMBER' && subscriptionType) {
       console.log('💳 Creating subscription and payment record...');
 
       // Use the helper function to create subscription and payment in one transaction

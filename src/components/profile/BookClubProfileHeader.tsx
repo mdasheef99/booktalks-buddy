@@ -6,6 +6,8 @@ import { Edit, Upload, ChevronDown, ChevronUp, MessageCircle } from 'lucide-reac
 import { toast } from 'sonner';
 import { useMessagingButton } from '@/components/messaging/hooks/useMessaging';
 import { ProfileAvatarLarge } from '@/components/ui/SmartAvatar';
+import { ProfileImageModal } from './ProfileImageModal';
+import { hasAvatar } from '@/utils/avatarUtils';
 
 interface BookClubProfileHeaderProps {
   profile: BookClubProfile;
@@ -21,9 +23,20 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
   onProfileUpdated
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
 
   // Messaging functionality for other users' profiles
   const messagingButton = useMessagingButton(isCurrentUser ? undefined : profile.username);
+
+  // Check if user has a profile image that can be viewed
+  const hasProfileImage = hasAvatar(profile as any);
+
+  // Handle avatar click for image viewing
+  const handleAvatarClick = () => {
+    if (!isCurrentUser && hasProfileImage) {
+      setImageModalOpen(true);
+    }
+  };
 
 
 
@@ -117,11 +130,25 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
         <div className="px-4 pb-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12">
             {/* Avatar positioned for mobile-first design with responsive sizing */}
-            <div className="relative">
+            <div className="relative group">
               <ProfileAvatarLarge
                 profile={profile as any}
-                className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-white shadow-lg transition-all duration-200"
+                className={`w-20 h-20 sm:w-24 sm:h-24 border-4 border-white shadow-lg transition-all duration-200 ${
+                  !isCurrentUser && hasProfileImage
+                    ? 'cursor-pointer hover:shadow-xl hover:scale-105 hover:border-bookconnect-terracotta/50'
+                    : ''
+                }`}
+                onClick={handleAvatarClick}
+                clickable={!isCurrentUser && hasProfileImage}
+                alt={hasProfileImage ? `Click to view ${profile?.displayname || profile?.username || 'user'}'s profile picture` : undefined}
               />
+
+              {/* Clickable indicator tooltip */}
+              {!isCurrentUser && hasProfileImage && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  Click to view full size
+                </div>
+              )}
 
               {/* Only show upload option for current user with improved mobile UX */}
               {isCurrentUser && (
@@ -264,6 +291,13 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
           )}
         </div>
       </CardContent>
+
+      {/* Profile Image Modal */}
+      <ProfileImageModal
+        isOpen={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        profile={profile as any}
+      />
     </Card>
   );
 };

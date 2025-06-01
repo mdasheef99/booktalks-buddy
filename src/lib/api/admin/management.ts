@@ -94,10 +94,10 @@ export async function inviteMember(adminId: string, clubId: string, inviteeEmail
 }
 
 /**
- * Update a user's account tier
+ * Update a user's membership tier
  * @param adminId - ID of the admin making the change
  * @param userId - ID of the user to update
- * @param tier - New tier ('free', 'privileged', or 'privileged_plus')
+ * @param tier - New tier ('MEMBER', 'PRIVILEGED', or 'PRIVILEGED_PLUS')
  * @param storeId - ID of the store context
  * @param subscriptionType - Type of subscription ('monthly' or 'annual')
  * @param paymentReference - Optional reference for the payment
@@ -120,16 +120,19 @@ export async function updateUserTier(
     throw new Error('You do not have permission to manage user tiers');
   }
 
-  // Validate the tier
-  if (!['free', 'privileged', 'privileged_plus'].includes(tier)) {
-    throw new Error('Invalid tier. Must be one of: free, privileged, privileged_plus');
-  }
+  // Note: Tier validation is now done inside the try block
 
   try {
+    // Validate tier value
+    const validTiers = ['MEMBER', 'PRIVILEGED', 'PRIVILEGED_PLUS'];
+    if (!validTiers.includes(tier)) {
+      throw new Error(`Invalid tier: ${tier}. Must be one of: ${validTiers.join(', ')}`);
+    }
+
     // Update the user's tier in the database
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .update({ account_tier: tier })
+      .update({ membership_tier: tier })
       .eq('id', userId)
       .select()
       .single();
@@ -147,7 +150,7 @@ export async function updateUserTier(
     }
 
     // If upgrading to a paid tier, create a subscription and payment record
-    if (tier !== 'free' && subscriptionType) {
+    if (tier !== 'MEMBER' && subscriptionType) {
       // Use the helper function to create subscription and payment in one transaction
       const { data: subscriptionId, error: subscriptionError } = await supabase
         .rpc('create_subscription_with_payment', {
@@ -171,7 +174,7 @@ export async function updateUserTier(
       message: 'User tier updated successfully',
       user: {
         id: userData.id,
-        account_tier: userData.account_tier
+        membership_tier: userData.membership_tier
       }
     };
   } catch (error: any) {

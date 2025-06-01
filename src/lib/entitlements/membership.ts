@@ -45,23 +45,17 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
       console.warn('Could not check platform owner status:', error);
     }
 
-    // 2. Get user's membership tier (prefer new column, fallback to old)
+    // 2. Get user's membership tier
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('membership_tier, account_tier')
+      .select('membership_tier')
       .eq('id', userId)
       .single();
 
     if (userError) throw userError;
 
-    // Use new membership_tier column, fallback to mapped account_tier
-    let membershipTier = user?.membership_tier || 'MEMBER';
-    if (!user?.membership_tier && user?.account_tier) {
-      // Fallback mapping for backward compatibility
-      membershipTier = user.account_tier === 'free' ? 'MEMBER' :
-                      user.account_tier === 'privileged' ? 'PRIVILEGED' :
-                      user.account_tier === 'privileged_plus' ? 'PRIVILEGED_PLUS' : 'MEMBER';
-    }
+    // Use membership_tier column
+    const membershipTier = user?.membership_tier || 'MEMBER';
 
     // Add tier-based entitlements
     if (membershipTier === 'PRIVILEGED' || membershipTier === 'PRIVILEGED_PLUS') {
