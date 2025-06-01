@@ -9,6 +9,7 @@ import { BookClubProfile, ClubMembership, getBookClubProfile, getUserClubMembers
 import { supabase } from '@/lib/supabase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, BookOpen } from 'lucide-react';
+import { BackButton } from '@/components/ui/BackButton';
 
 const BookClubProfilePage: React.FC = () => {
   const { username, userId } = useParams<{ username?: string; userId?: string }>();
@@ -259,6 +260,17 @@ const BookClubProfilePage: React.FC = () => {
       <div className="min-h-screen bg-bookconnect-cream">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
+            {/* Back Button */}
+            <div className="mb-4">
+              <BackButton
+                fallbackRoute="/book-clubs"
+                variant="outline"
+                size="sm"
+                label="Back"
+                showTooltip={true}
+              />
+            </div>
+
             <div className="animate-pulse space-y-6">
               <div className="h-64 bg-gray-200 rounded-lg"></div>
               <div className="h-48 bg-gray-200 rounded-lg"></div>
@@ -273,9 +285,22 @@ const BookClubProfilePage: React.FC = () => {
     return (
       <div className="min-h-screen bg-bookconnect-cream">
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
-            <p className="mb-6">The profile you're looking for doesn't exist or you don't have permission to view it.</p>
+          <div className="max-w-4xl mx-auto">
+            {/* Back Button */}
+            <div className="mb-4">
+              <BackButton
+                fallbackRoute="/book-clubs"
+                variant="outline"
+                size="sm"
+                label="Back"
+                showTooltip={true}
+              />
+            </div>
+
+            <div className="text-center">
+              <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
+              <p className="mb-6">The profile you're looking for doesn't exist or you don't have permission to view it.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -286,6 +311,17 @@ const BookClubProfilePage: React.FC = () => {
     <div className="min-h-screen bg-bookconnect-cream">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          {/* Back Button */}
+          <div className="mb-4">
+            <BackButton
+              fallbackRoute="/book-clubs"
+              variant="outline"
+              size="sm"
+              label="Back"
+              showTooltip={true}
+            />
+          </div>
+
           {/* Profile Header */}
           <BookClubProfileHeader
             profile={profile}

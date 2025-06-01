@@ -102,10 +102,10 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
             <Button
               variant="outline"
               size="sm"
-              className="bg-white hover:bg-gray-100 shadow-sm"
+              className="bg-white hover:bg-bookconnect-cream border-bookconnect-brown/30 text-bookconnect-brown hover:text-bookconnect-brown shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 font-medium"
               onClick={onEditProfile}
             >
-              <Edit className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:rotate-12" />
               Edit Profile
             </Button>
           )}
@@ -113,13 +113,22 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
           {/* Message User button - only for other users */}
           {!isCurrentUser && (
             <Button
-              variant={messagingButton.variant}
+              variant="default"
               size="sm"
-              className="bg-white hover:bg-gray-100 shadow-sm"
+              className={`
+                shadow-lg border-0 font-medium transition-all duration-200 transform hover:scale-105 active:scale-95
+                ${messagingButton.children === 'Message'
+                  ? 'bg-bookconnect-brown hover:bg-bookconnect-brown/90 text-white hover:shadow-xl'
+                  : 'bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white hover:shadow-xl'
+                }
+                ${messagingButton.disabled ? 'opacity-50 cursor-not-allowed hover:scale-100' : ''}
+              `}
               onClick={messagingButton.onClick}
               disabled={messagingButton.disabled}
             >
-              <MessageCircle className="h-4 w-4 mr-2" />
+              <MessageCircle className={`h-4 w-4 mr-2 transition-transform duration-200 ${
+                messagingButton.children === 'Message' ? 'group-hover:rotate-12' : ''
+              }`} />
               {messagingButton.children}
             </Button>
           )}
@@ -199,10 +208,10 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-white hover:bg-gray-100 shadow-sm flex-1"
+                  className="flex-1 bg-white hover:bg-bookconnect-cream border-bookconnect-brown/30 text-bookconnect-brown hover:text-bookconnect-brown shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 font-medium"
                   onClick={onEditProfile}
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:rotate-12" />
                   Edit Profile
                 </Button>
               )}
@@ -210,13 +219,22 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
               {/* Message button - only for other users */}
               {!isCurrentUser && (
                 <Button
-                  variant={messagingButton.variant}
+                  variant="default"
                   size="sm"
-                  className="bg-white hover:bg-gray-100 shadow-sm flex-1"
+                  className={`
+                    flex-1 shadow-lg border-0 font-medium transition-all duration-200 transform hover:scale-105 active:scale-95
+                    ${messagingButton.children === 'Message'
+                      ? 'bg-bookconnect-brown hover:bg-bookconnect-brown/90 text-white hover:shadow-xl'
+                      : 'bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white hover:shadow-xl'
+                    }
+                    ${messagingButton.disabled ? 'opacity-50 cursor-not-allowed hover:scale-100' : ''}
+                  `}
                   onClick={messagingButton.onClick}
                   disabled={messagingButton.disabled}
                 >
-                  <MessageCircle className="h-4 w-4 mr-2" />
+                  <MessageCircle className={`h-4 w-4 mr-2 transition-transform duration-200 ${
+                    messagingButton.children === 'Message' ? 'group-hover:rotate-12' : ''
+                  }`} />
                   {messagingButton.children}
                 </Button>
               )}
