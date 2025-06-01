@@ -22,7 +22,8 @@ const BookClubProfileSettings: React.FC<BookClubProfileSettingsProps> = ({
   onCancel,
   onProfileUpdated
 }) => {
-  const [username, setUsername] = useState(profile.username || '');
+  // Username is read-only, not editable
+  const username = profile.username || '';
   const [bio, setBio] = useState(profile.bio || '');
   const [favoriteGenres, setFavoriteGenres] = useState<string[]>(profile.favorite_genres || []);
   const [favoriteAuthors, setFavoriteAuthors] = useState<string[]>(profile.favorite_authors || []);
@@ -81,9 +82,8 @@ const BookClubProfileSettings: React.FC<BookClubProfileSettingsProps> = ({
         throw authError;
       }
 
-      // Then, update the users table
+      // Then, update the users table (username is read-only, not updated)
       const updatedProfile = await updateBookClubProfile(profile.id, {
-        username,
         bio,
         favorite_genres: favoriteGenres,
         favorite_authors: favoriteAuthors
@@ -113,15 +113,24 @@ const BookClubProfileSettings: React.FC<BookClubProfileSettingsProps> = ({
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6">
-          {/* Username */}
+          {/* Username - Read Only */}
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              placeholder="Your display name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                id="username"
+                value={username}
+                readOnly
+                disabled
+                className="bg-gray-50 text-gray-600 cursor-not-allowed"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <span className="text-xs text-gray-500">Read-only</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">
+              Username cannot be changed after account creation
+            </p>
           </div>
           {/* Bio */}
           <div className="space-y-2">

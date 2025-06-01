@@ -1982,6 +1982,9 @@ export type Database = {
           allow_chats: boolean | null
           allow_direct_messages: boolean | null
           avatar_url: string | null
+          avatar_thumbnail_url: string | null
+          avatar_medium_url: string | null
+          avatar_full_url: string | null
           bio: string | null
           created_at: string | null
           displayname: string | null
@@ -1997,6 +2000,9 @@ export type Database = {
           allow_chats?: boolean | null
           allow_direct_messages?: boolean | null
           avatar_url?: string | null
+          avatar_thumbnail_url?: string | null
+          avatar_medium_url?: string | null
+          avatar_full_url?: string | null
           bio?: string | null
           created_at?: string | null
           displayname?: string | null
@@ -2012,6 +2018,9 @@ export type Database = {
           allow_chats?: boolean | null
           allow_direct_messages?: boolean | null
           avatar_url?: string | null
+          avatar_thumbnail_url?: string | null
+          avatar_medium_url?: string | null
+          avatar_full_url?: string | null
           bio?: string | null
           created_at?: string | null
           displayname?: string | null

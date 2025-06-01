@@ -43,6 +43,7 @@ import BannerManagement from "@/pages/admin/store/BannerManagement";
 import { QuoteManagement } from "@/pages/admin/store/QuoteManagement";
 import { CommunityShowcaseManagement } from "@/pages/admin/store/CommunityShowcaseManagement";
 import ReportingSystemTest from "./components/testing/ReportingSystemTest";
+// Username validation debug tools removed - issues resolved
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
 import TopicDetail from "./components/discussions/TopicDetail";
@@ -191,6 +192,7 @@ function App() {
               <Route path="events/edit/:eventId" element={<EditEventPage />} />
               <Route path="moderation" element={<ModerationPage />} />
               <Route path="test-reporting" element={<ReportingSystemTest />} />
+              {/* Username debug route removed - validation issues resolved */}
 
               {/* Store Management Routes - Store Owner Only */}
               <Route path="store-management/*" element={

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Edit, PlusCircle, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { UserMetadata, READING_FREQUENCY_LABELS } from './types';
 import UserTierBadge from '@/components/common/UserTierBadge';
+import { ProfileAvatarLarge } from '@/components/ui/SmartAvatar';
 
 interface ProfileHeaderProps {
   user: any;
@@ -22,16 +22,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const navigate = useNavigate();
   const [bioExpanded, setBioExpanded] = useState(false);
 
-  // Get initials for avatar fallback
-  const getInitials = () => {
-    if (!user?.email) return '?';
 
-    const email = user.email;
-    const namePart = email.split('@')[0];
-
-    if (namePart.length <= 2) return namePart.toUpperCase();
-    return namePart.substring(0, 2).toUpperCase();
-  };
 
   return (
     <Card className="mb-6 overflow-hidden border-bookconnect-brown/20 shadow-md">
@@ -76,12 +67,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex flex-col">
           {/* Avatar and name section */}
           <div className="flex items-start -mt-16 mb-6">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-              <AvatarImage src={userMetadata.avatar_url} alt="Profile" />
-              <AvatarFallback className="bg-bookconnect-terracotta/20 text-bookconnect-terracotta text-xl font-serif">
-                {getInitials()}
-              </AvatarFallback>
-            </Avatar>
+            <ProfileAvatarLarge
+              profile={userMetadata as any}
+              className="border-4 border-white shadow-lg"
+            />
 
             <div className="ml-4 mt-4">
               <div className="flex items-center gap-2">

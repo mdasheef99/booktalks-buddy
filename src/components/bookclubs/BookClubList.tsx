@@ -87,17 +87,13 @@ export const BookClubList: React.FC = () => {
     const fetchBookClubs = async () => {
       try {
         if (!user?.id) {
-          console.log('User not authenticated, skipping fetch');
           setLoading(false);
           return;
         }
 
-        console.log('Fetching book clubs for user:', user.id);
         const clubs = await getClubs(user.id);
-        console.log('Fetched clubs:', clubs);
         setBookClubs(clubs);
       } catch (error) {
-        console.error('Error fetching book clubs:', error);
         toast.error('Failed to load book clubs');
       } finally {
         setLoading(false);
@@ -116,20 +112,17 @@ export const BookClubList: React.FC = () => {
           schema: 'public',
           table: 'book_clubs'
         }, (payload) => {
-          console.log('Change received:', payload);
           fetchBookClubs(); // Refresh the list when changes occur
         })
         .subscribe();
 
       return () => {
-        console.log('Unsubscribing from book_clubs_channel');
         subscription.unsubscribe();
       };
     }
   }, [user?.id]); // Add user?.id as dependency to re-run when user changes
 
 
-  console.log('Loading state:', loading);
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">

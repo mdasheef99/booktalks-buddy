@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ClubMember } from '@/lib/services/clubManagementService';
 import MemberCard from './MemberCard';
+import { ListAvatar } from '@/components/ui/SmartAvatar';
 
 // =====================================================
 // Types
@@ -160,31 +161,10 @@ const MemberSelectionGrid: React.FC<MemberSelectionGridProps> = ({
             >
               {/* Avatar */}
               <div className="flex-shrink-0">
-                {member.avatar_url ? (
-                  <img
-                    src={member.avatar_url}
-                    alt={`${member.display_name || member.username} avatar`}
-                    className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallback = target.nextElementSibling as HTMLElement;
-                      if (fallback) {
-                        fallback.style.display = 'flex';
-                      }
-                    }}
-                  />
-                ) : null}
-
-                <div
-                  className={`
-                    h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600
-                    flex items-center justify-center text-white font-bold text-lg
-                    ${member.avatar_url ? 'hidden' : 'flex'}
-                  `}
-                >
-                  {((member.display_name || member.username || 'U').slice(0, 2)).toUpperCase()}
-                </div>
+                <ListAvatar
+                  profile={member as any}
+                  className="border-2 border-gray-200"
+                />
               </div>
 
               {/* Member Info */}

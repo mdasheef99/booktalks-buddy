@@ -65,10 +65,17 @@ export const cacheStats: CacheStats = {
 
 /**
  * Helper function to log debug messages
+ * Reduced verbosity for cleaner development experience
  */
 export function logDebug(message: string, ...args: any[]): void {
   if (CACHE_CONFIG.DEBUG) {
-    console.debug(`[EntitlementsCache] ${message}`, ...args);
+    // Only log important cache events, not every hit/miss
+    const importantEvents = ['Updated cache configuration', 'Initialized', 'Error', 'Failed'];
+    const isImportant = importantEvents.some(event => message.includes(event));
+
+    if (isImportant) {
+      console.debug(`[EntitlementsCache] ${message}`, ...args);
+    }
   }
 }
 

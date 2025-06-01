@@ -15,6 +15,7 @@ import ProfileHeader from '@/components/profile/enhanced/ProfileHeader';
 import ProfilePreferences from '@/components/profile/enhanced/ProfilePreferences';
 import ProfileAvailability from '@/components/profile/enhanced/ProfileAvailability';
 import { UserMetadata, ClubMembership } from '@/components/profile/enhanced/types';
+import { getUserProfile, clearProfileCache } from '@/services/profileService';
 
 const EnhancedProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -38,13 +39,31 @@ const EnhancedProfilePage: React.FC = () => {
       try {
         setLoading(true);
 
-        // Get user data from Supabase Auth
-        const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
+        // Get profile data from database (includes avatar URLs)
+        const userProfile = await getUserProfile(user.id);
 
+        // Get auth metadata for additional fields
+        const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
 
-        // Set user metadata
-        setUserMetadata(userData?.user_metadata || {});
+        // Combine database profile data with auth metadata
+        const combinedMetadata: UserMetadata = {
+          // Database fields (primary source for avatar URLs)
+          display_name: userProfile.displayname,
+          username: userProfile.username,
+          avatar_url: userProfile.avatar_url,
+          avatar_thumbnail_url: userProfile.avatar_thumbnail_url,
+          avatar_medium_url: userProfile.avatar_medium_url,
+          avatar_full_url: userProfile.avatar_full_url,
+          bio: userProfile.bio,
+          // Auth metadata fields (fallback for preferences)
+          reading_frequency: userData?.user_metadata?.reading_frequency,
+          favorite_genres: userData?.user_metadata?.favorite_genres || [],
+          favorite_authors: userData?.user_metadata?.favorite_authors || [],
+          preferred_meeting_times: userData?.user_metadata?.preferred_meeting_times || []
+        };
+
+        setUserMetadata(combinedMetadata);
 
         // Fetch club memberships
         try {
@@ -68,13 +87,34 @@ const EnhancedProfilePage: React.FC = () => {
   // Handle profile update
   const handleProfileUpdated = async () => {
     try {
-      // Refresh user data
-      const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
+      // Clear profile cache to ensure fresh data
+      clearProfileCache();
 
+      // Get fresh profile data from database
+      const userProfile = await getUserProfile(user.id);
+
+      // Get auth metadata for additional fields
+      const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
-      // Update user metadata
-      setUserMetadata(userData?.user_metadata || {});
+      // Combine database profile data with auth metadata
+      const combinedMetadata: UserMetadata = {
+        // Database fields (primary source for avatar URLs)
+        display_name: userProfile.displayname,
+        username: userProfile.username,
+        avatar_url: userProfile.avatar_url,
+        avatar_thumbnail_url: userProfile.avatar_thumbnail_url,
+        avatar_medium_url: userProfile.avatar_medium_url,
+        avatar_full_url: userProfile.avatar_full_url,
+        bio: userProfile.bio,
+        // Auth metadata fields (fallback for preferences)
+        reading_frequency: userData?.user_metadata?.reading_frequency,
+        favorite_genres: userData?.user_metadata?.favorite_genres || [],
+        favorite_authors: userData?.user_metadata?.favorite_authors || [],
+        preferred_meeting_times: userData?.user_metadata?.preferred_meeting_times || []
+      };
+
+      setUserMetadata(combinedMetadata);
 
       // Exit edit mode
       setEditMode(false);

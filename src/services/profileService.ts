@@ -8,7 +8,10 @@ export interface UserProfile {
   id: string;
   username: string | null;
   email: string | null;
-  avatar_url: string | null;
+  avatar_url: string | null; // Legacy field for backward compatibility
+  avatar_thumbnail_url: string | null; // 100x100 for navigation/small elements
+  avatar_medium_url: string | null; // 300x300 for lists/cards
+  avatar_full_url: string | null; // 600x600 for profile pages
   displayname: string | null; // User-customizable display name
   favorite_author: string | null;
   favorite_genre: string | null;
@@ -17,7 +20,7 @@ export interface UserProfile {
 }
 
 // Type for profile updates (only updatable fields)
-export type ProfileUpdateData = Partial<Pick<UserProfile, 'displayname' | 'bio' | 'favorite_author' | 'favorite_genre'>>;
+export type ProfileUpdateData = Partial<Pick<UserProfile, 'displayname' | 'bio' | 'favorite_author' | 'favorite_genre' | 'avatar_url' | 'avatar_thumbnail_url' | 'avatar_medium_url' | 'avatar_full_url'>>;
 
 // Type for profile creation
 export interface ProfileCreateData {
@@ -28,7 +31,22 @@ export interface ProfileCreateData {
 }
 
 // Type for the specific fields we select from the database
-type SelectedUserFields = Pick<DatabaseUser, 'id' | 'username' | 'email' | 'displayname' | 'favorite_author' | 'favorite_genre' | 'bio' | 'account_tier'>;
+type SelectedUserFields = {
+  id: string;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  avatar_thumbnail_url?: string | null;
+  avatar_medium_url?: string | null;
+  avatar_full_url?: string | null;
+  displayname: string | null;
+  favorite_author: string | null;
+  favorite_genre: string | null;
+  bio: string | null;
+  account_tier: string;
+};
+
+
 
 // Helper function to convert selected database fields to UserProfile
 function createUserProfileFromDatabaseRow(data: SelectedUserFields): UserProfile {
@@ -36,8 +54,11 @@ function createUserProfileFromDatabaseRow(data: SelectedUserFields): UserProfile
     id: data.id,
     username: data.username,
     email: data.email,
+    avatar_url: data.avatar_url,
+    avatar_thumbnail_url: data.avatar_thumbnail_url || null,
+    avatar_medium_url: data.avatar_medium_url || null,
+    avatar_full_url: data.avatar_full_url || null,
     displayname: data.displayname,
-    avatar_url: null, // Not stored in database yet
     favorite_author: data.favorite_author,
     favorite_genre: data.favorite_genre,
     bio: data.bio,
@@ -112,17 +133,17 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
 
   // Fetch missing profiles in batch
   try {
-    // Fetch user data
+    // Fetch user data including all avatar columns (using type assertion since columns exist)
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
-      .in('id', idsToFetch);
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .in('id', idsToFetch) as any;
 
     if (error) throw error;
 
     // Add fetched profiles to cache and result
     if (data) {
-      data.forEach(profile => {
+      data.forEach((profile: any) => {
         const userProfile = createUserProfileFromDatabaseRow(profile);
         profileCache[profile.id] = userProfile;
         result.set(profile.id, userProfile);
@@ -138,6 +159,9 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           email: null,
           displayname: `User ${id.substring(0, 4)}`,
           avatar_url: null,
+          avatar_thumbnail_url: null,
+          avatar_medium_url: null,
+          avatar_full_url: null,
           favorite_author: null,
           favorite_genre: null,
           bio: null,
@@ -161,6 +185,9 @@ export async function getUserProfiles(userIds: string[]): Promise<Map<string, Us
           email: null,
           displayname: `User ${id.substring(0, 4)}`,
           avatar_url: null,
+          avatar_thumbnail_url: null,
+          avatar_medium_url: null,
+          avatar_full_url: null,
           favorite_author: null,
           favorite_genre: null,
           bio: null,
@@ -190,9 +217,9 @@ async function fetchSingleProfile(userId: string): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
       .eq('id', userId)
-      .single();
+      .single() as any;
 
     if (error) {
       if (error.code === 'PGRST116') { // No rows returned
@@ -219,8 +246,8 @@ export async function updateUserProfile(
       .from('users')
       .update(updates)
       .eq('id', userId)
-      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
-      .single();
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .single() as any;
 
     if (error) throw error;
 
@@ -251,8 +278,8 @@ export async function createUserProfile(
         email: profileData.email,
         displayname: profileData.displayname?.trim() || null
       }])
-      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
-      .single();
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .single() as any;
 
     if (error) throw error;
 
@@ -293,9 +320,9 @@ export async function getUserProfileByUsername(username: string): Promise<UserPr
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, username, email, displayname, favorite_author, favorite_genre, bio, account_tier')
+      .select('id, username, email, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, displayname, favorite_author, favorite_genre, bio, account_tier')
       .eq('username', username)
-      .single();
+      .single() as any;
 
     if (error) {
       if (error.code === 'PGRST116') { // No rows returned

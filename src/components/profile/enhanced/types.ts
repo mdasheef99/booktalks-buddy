@@ -4,6 +4,9 @@ export interface UserMetadata {
   display_name?: string;
   username?: string;
   avatar_url?: string;
+  avatar_thumbnail_url?: string;
+  avatar_medium_url?: string;
+  avatar_full_url?: string;
   bio?: string;
   reading_frequency?: string;
   favorite_genres?: string[];

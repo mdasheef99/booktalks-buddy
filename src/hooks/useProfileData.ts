@@ -15,9 +15,10 @@ import { ChatRequest } from "@/components/profile/ChatRequestsList";
 export function useProfileData() {
   const { toast } = useToast();
   // Use anon_username as primary source, fall back to username
-  const [username, setUsername] = useState<string>(() => 
+  const [username, setUsername] = useState<string>(() =>
     localStorage.getItem("anon_username") || localStorage.getItem("username") || ""
   );
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [favoriteAuthor, setFavoriteAuthor] = useState("");
   const [favoriteGenre, setFavoriteGenre] = useState<string>(() => {
     try {
@@ -42,11 +43,12 @@ export function useProfileData() {
       const profileData = await loadProfileData();
       if (profileData) {
         if (profileData.username) setUsername(profileData.username);
+        if (profileData.displayName !== undefined) setDisplayName(profileData.displayName);
         if (profileData.favoriteAuthor) setFavoriteAuthor(profileData.favoriteAuthor);
         if (profileData.favoriteGenre) setFavoriteGenre(profileData.favoriteGenre);
         if (profileData.bio) setBio(profileData.bio);
         if (profileData.allowChats !== null) setAllowChats(profileData.allowChats);
-        
+
         if (profileData.username) {
           localStorage.setItem("username", profileData.username);
           localStorage.setItem("anon_username", profileData.username);
@@ -93,10 +95,10 @@ export function useProfileData() {
 
   const handleSaveProfile = async () => {
     setIsLoading(true);
-    
+
     try {
       const success = await saveProfile(
-        username,
+        username, // Username is read-only, but still passed for identification
         favoriteAuthor,
         favoriteGenre,
         bio,
@@ -166,10 +168,15 @@ export function useProfileData() {
     }
   };
   
+  // Handler for display name updates
+  const handleDisplayNameUpdate = (newDisplayName: string | null) => {
+    setDisplayName(newDisplayName);
+  };
+
   return {
     // State
-    username,
-    setUsername,
+    username, // Read-only
+    displayName,
     favoriteAuthor,
     setFavoriteAuthor,
     favoriteGenre,
@@ -181,11 +188,12 @@ export function useProfileData() {
     chatRequests,
     activeChatsCount,
     isLoading,
-    
+
     // Methods
     initialize,
     setupRealtimeSubscription,
     handleSaveProfile,
-    handleChatActionRequest
+    handleChatActionRequest,
+    handleDisplayNameUpdate
   };
 }

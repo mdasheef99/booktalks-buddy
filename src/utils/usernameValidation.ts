@@ -97,25 +97,107 @@ export function validateUsername(username: string): UsernameValidationResult {
 }
 
 // Check username availability against database
-export async function checkUsernameAvailability(username: string): Promise<boolean> {
+export async function checkUsernameAvailability(username: string, excludeUserId?: string): Promise<boolean> {
   try {
-    const { supabase } = await import('@/lib/supabase');
-    
-    const { data, error } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', username)
-      .single();
+    const { supabase } = await import('@/integrations/supabase/client');
 
-    if (error && error.code === 'PGRST116') {
-      // No rows returned - username is available
-      return true;
+    // Normalize username for case-insensitive comparison
+    const normalizedUsername = username.toLowerCase().trim();
+
+    console.log(`🔍 [checkUsernameAvailability] Checking: "${username}" (normalized: "${normalizedUsername}")`);
+
+    if (!normalizedUsername) {
+      console.log(`❌ [checkUsernameAvailability] Empty username after normalization`);
+      return false;
     }
 
-    return false; // Username exists or other error
+    // Build query with case-insensitive search using ilike
+    console.log(`🔍 [checkUsernameAvailability] Building ilike query for: "${normalizedUsername}"`);
+
+    let query = supabase
+      .from('users')
+      .select('id, username')
+      .ilike('username', normalizedUsername)
+      .limit(5);
+
+    // Exclude current user if editing their own profile
+    if (excludeUserId) {
+      query = query.neq('id', excludeUserId);
+      console.log(`🔄 [checkUsernameAvailability] Excluding user ID: ${excludeUserId}`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('❌ [checkUsernameAvailability] Database error:', error);
+      return false; // Assume unavailable on error for safety
+    }
+
+    console.log(`📊 [checkUsernameAvailability] Query results:`, data);
+    console.log(`📊 [checkUsernameAvailability] Found ${data?.length || 0} matching records`);
+
+    if (data && data.length > 0) {
+      console.log(`⚠️ [checkUsernameAvailability] Existing usernames found:`, data.map(u => ({ id: u.id, username: u.username })));
+    }
+
+    // Username is available if no matching records found
+    const isAvailable = !data || data.length === 0;
+    console.log(`${isAvailable ? '✅' : '❌'} [checkUsernameAvailability] Username "${username}" is ${isAvailable ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
+
+    return isAvailable;
   } catch (error) {
-    console.error('Error checking username availability:', error);
+    console.error('💥 [checkUsernameAvailability] Unexpected error:', error);
     return false; // Assume unavailable on error for safety
+  }
+}
+
+// Comprehensive username validation including availability check
+export async function validateUsernameComprehensive(username: string, excludeUserId?: string): Promise<UsernameValidationResult & { isAvailable?: boolean }> {
+  console.log(`🔬 [validateUsernameComprehensive] Starting validation for: "${username}"`);
+
+  // First check format validation
+  const formatValidation = validateUsername(username);
+  console.log(`📝 [validateUsernameComprehensive] Format validation result:`, formatValidation);
+
+  if (!formatValidation.isValid) {
+    console.log(`❌ [validateUsernameComprehensive] Format validation failed, returning early`);
+    return {
+      ...formatValidation,
+      isAvailable: false
+    };
+  }
+
+  // Then check availability
+  try {
+    console.log(`🔍 [validateUsernameComprehensive] Checking availability...`);
+    const isAvailable = await checkUsernameAvailability(username, excludeUserId);
+    console.log(`📊 [validateUsernameComprehensive] Availability result: ${isAvailable}`);
+
+    if (!isAvailable) {
+      const suggestions = generateUsernameSuggestions(username);
+      console.log(`💡 [validateUsernameComprehensive] Generated suggestions:`, suggestions);
+
+      return {
+        isValid: false,
+        errors: ['Username is already taken'],
+        suggestions,
+        isAvailable: false
+      };
+    }
+
+    console.log(`✅ [validateUsernameComprehensive] Username "${username}" is valid and available`);
+    return {
+      isValid: true,
+      errors: [],
+      isAvailable: true
+    };
+  } catch (error) {
+    console.error(`💥 [validateUsernameComprehensive] Error during availability check:`, error);
+    return {
+      isValid: false,
+      errors: ['Unable to check username availability. Please try again.'],
+      isAvailable: false
+    };
   }
 }
 
@@ -123,7 +205,7 @@ export async function checkUsernameAvailability(username: string): Promise<boole
 export function generateUsernameSuggestions(baseUsername: string): string[] {
   const suggestions: string[] = [];
   const cleanBase = baseUsername.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-  
+
   if (cleanBase.length >= 3) {
     suggestions.push(
       `${cleanBase}${Math.floor(Math.random() * 1000)}`,

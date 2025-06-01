@@ -4,7 +4,10 @@ export interface BookClubProfile {
   id: string;
   email: string;
   username: string;
-  avatar_url: string | null;
+  avatar_url: string | null; // Legacy field for backward compatibility
+  avatar_thumbnail_url: string | null; // 100x100 for navigation/small elements
+  avatar_medium_url: string | null; // 300x300 for lists/cards
+  avatar_full_url: string | null; // 600x600 for profile pages
   bio: string | null;
   favorite_genres: string[] | null;
   favorite_authors: string[] | null;
@@ -38,7 +41,7 @@ export async function getBookClubProfile(userId: string): Promise<BookClubProfil
 
   const { data, error } = await supabase
     .from('users')
-    .select('id, email, username, avatar_url, bio, favorite_genres, favorite_authors, created_at')
+    .select('id, email, username, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url, bio, favorite_genres, favorite_authors, created_at')
     .eq('id', userId)
     .single();
 
@@ -204,35 +207,20 @@ export async function getUserClubMemberships(userId: string): Promise<ClubMember
 }
 
 /**
- * Upload a profile avatar
+ * Upload a profile avatar using the new multi-tier system
  * @param userId User ID
  * @param file File to upload
- * @returns URL of the uploaded avatar
+ * @returns URL of the uploaded avatar (full size for backward compatibility)
+ * @deprecated Use ProfileImageService.uploadAvatar instead for multi-tier support
  */
 export async function uploadProfileAvatar(userId: string, file: File): Promise<string> {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${userId}-${Date.now()}.${fileExt}`;
-  const filePath = `avatars/${fileName}`;
+  // Import ProfileImageService dynamically to avoid circular dependencies
+  const { ProfileImageService } = await import('@/services/ProfileImageService');
 
-  // Upload the file
-  const { error: uploadError } = await supabase.storage
-    .from('profiles')
-    .upload(filePath, file);
-
-  if (uploadError) throw uploadError;
-
-  // Get the public URL
-  const { data } = supabase.storage
-    .from('profiles')
-    .getPublicUrl(filePath);
-
-  // Update the user profile
-  const { error: updateError } = await supabase
-    .from('users')
-    .update({ avatar_url: data.publicUrl })
-    .eq('id', userId);
-
-  if (updateError) throw updateError;
-
-  return data.publicUrl;
+  try {
+    const avatarUrls = await ProfileImageService.uploadAvatar(file, userId);
+    return avatarUrls.full; // Return full size for backward compatibility
+  } catch (error) {
+    throw new Error(`Avatar upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

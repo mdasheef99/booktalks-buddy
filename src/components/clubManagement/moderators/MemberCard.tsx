@@ -8,6 +8,7 @@ import React from 'react';
 import { User, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ClubMember } from '@/lib/services/clubManagementService';
+import { CardAvatar } from '@/components/ui/SmartAvatar';
 
 // =====================================================
 // Types
@@ -55,14 +56,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
     }
   };
 
-  const getInitials = (displayName: string, username: string) => {
-    const name = displayName || username || 'U';
-    const words = name.split(' ');
-    if (words.length >= 2) {
-      return `${words[0][0]}${words[1][0]}`.toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
-  };
+
 
   return (
     <Card
@@ -87,33 +81,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
       <CardContent className="p-4 text-center">
         {/* Avatar */}
         <div className="mb-3 flex justify-center">
-          {member.avatar_url ? (
-            <img
-              src={member.avatar_url}
-              alt={`${member.display_name || member.username} avatar`}
-              className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-              onError={(e) => {
-                // Fallback to initials if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) {
-                  fallback.style.display = 'flex';
-                }
-              }}
-            />
-          ) : null}
-          
-          {/* Fallback avatar with initials */}
-          <div
-            className={`
-              h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 
-              flex items-center justify-center text-white font-semibold text-sm
-              ${member.avatar_url ? 'hidden' : 'flex'}
-            `}
-          >
-            {getInitials(member.display_name, member.username)}
-          </div>
+          <CardAvatar
+            profile={member as any}
+            className="border-2 border-gray-200"
+          />
         </div>
 
         {/* Member Info */}

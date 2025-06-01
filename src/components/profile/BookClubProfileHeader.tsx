@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookClubProfile, uploadProfileAvatar } from '@/lib/api/profile';
 import { Edit, Upload, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessagingButton } from '@/components/messaging/hooks/useMessaging';
+import { ProfileAvatarLarge } from '@/components/ui/SmartAvatar';
 
 interface BookClubProfileHeaderProps {
   profile: BookClubProfile;
@@ -25,15 +25,7 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
   // Messaging functionality for other users' profiles
   const messagingButton = useMessagingButton(isCurrentUser ? undefined : profile.username);
 
-  // Get initials for avatar fallback
-  const getInitials = () => {
-    if (!profile.username) return '?';
 
-    const nameParts = profile.username.split(' ');
-    if (nameParts.length === 1) return nameParts[0].substring(0, 2).toUpperCase();
-
-    return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
-  };
 
   // Format join date
   const formatJoinDate = () => {
@@ -85,8 +77,7 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
     setBioExpanded(!bioExpanded);
   };
 
-  // Log the isCurrentUser value to debug
-  console.log('BookClubProfileHeader - isCurrentUser:', isCurrentUser);
+
 
   return (
     <Card className="mb-6 overflow-hidden shadow-md">
@@ -122,108 +113,155 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
         </div>
       </div>
       <CardContent className="pt-0 relative">
-        <div className="flex flex-col md:flex-row gap-6 -mt-16 items-start">
-          {/* Avatar positioned in top left */}
-          <div className="relative ml-4 md:ml-0">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-              <AvatarImage src={profile.avatar_url || ''} alt={profile.username} />
-              <AvatarFallback className="text-xl bg-bookconnect-terracotta/20 text-bookconnect-terracotta">
-                {getInitials()}
-              </AvatarFallback>
-            </Avatar>
+        {/* Mobile-first responsive layout */}
+        <div className="px-4 pb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12">
+            {/* Avatar positioned for mobile-first design with responsive sizing */}
+            <div className="relative">
+              <ProfileAvatarLarge
+                profile={profile as any}
+                className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-white shadow-lg transition-all duration-200"
+              />
 
-            {/* Only show upload option for current user */}
-            {isCurrentUser && (
-              <div className="absolute bottom-0 right-0">
-                <label htmlFor="avatar-upload" className="cursor-pointer">
-                  <div className="h-8 w-8 rounded-full bg-bookconnect-brown text-white flex items-center justify-center hover:bg-bookconnect-brown/90 transition-colors shadow-sm">
-                    {uploading ? (
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Upload className="h-4 w-4" />
-                    )}
-                  </div>
-                  <input
-                    id="avatar-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarUpload}
-                    disabled={uploading}
-                  />
-                </label>
-              </div>
-            )}
-          </div>
-
-          <div className="flex-1 mt-4 md:mt-0">
-            <h1 className="text-2xl font-bold text-bookconnect-brown">{profile.username}</h1>
-            {/* Only show email for current user */}
-            {isCurrentUser && <p className="text-sm text-gray-500">{profile.email}</p>}
-            <p className="text-sm text-gray-500">Member since {formatJoinDate()}</p>
-
-            {/* Bio with Read More/Less functionality */}
-            {profile.bio && (
-              <div className="mt-3">
-                <h3 className="text-sm font-medium text-gray-600 mb-1">About</h3>
-                <div className="text-gray-700 break-words whitespace-pre-wrap bg-bookconnect-cream/30 p-3 rounded-md">
-                  {bioIsTruncated && !bioExpanded
-                    ? `${profile.bio.substring(0, maxBioLength)}...`
-                    : profile.bio}
-                </div>
-                {bioIsTruncated && (
-                  <button
-                    onClick={toggleBioExpansion}
-                    className="text-bookconnect-terracotta hover:text-bookconnect-terracotta/80 text-sm flex items-center mt-1"
+              {/* Only show upload option for current user with improved mobile UX */}
+              {isCurrentUser && (
+                <div className="absolute bottom-0 right-0">
+                  <label
+                    htmlFor="avatar-upload"
+                    className="cursor-pointer group"
+                    aria-label="Upload new profile picture"
                   >
-                    {bioExpanded ? (
-                      <>
-                        Read less <ChevronUp className="h-3 w-3 ml-1" />
-                      </>
-                    ) : (
-                      <>
-                        Read more <ChevronDown className="h-3 w-3 ml-1" />
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
+                    <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-bookconnect-brown text-white flex items-center justify-center hover:bg-bookconnect-brown/90 transition-all duration-200 shadow-lg group-hover:shadow-xl group-active:scale-95">
+                      {uploading ? (
+                        <div className="h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Upload className="h-3 w-3 sm:h-4 sm:w-4 transition-transform group-hover:scale-110" />
+                      )}
+                    </div>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                      disabled={uploading}
+                      aria-describedby="avatar-upload-help"
+                    />
+                  </label>
 
-            {/* Reading preferences */}
-            {profile.favorite_genres && profile.favorite_genres.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Favorite Genres</h3>
-                <div className="flex flex-wrap gap-2">
-                  {profile.favorite_genres.map((genre, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm"
-                    >
-                      {genre}
-                    </span>
-                  ))}
+                  {/* Hidden help text for screen readers */}
+                  <div id="avatar-upload-help" className="sr-only">
+                    Upload a new profile picture. Supported formats: JPEG, PNG, WebP, GIF. Maximum size: 2MB.
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Favorite Authors */}
-            {profile.favorite_authors && profile.favorite_authors.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-600 mb-1">Favorite Authors</h3>
-                <div className="flex flex-wrap gap-2">
-                  {profile.favorite_authors.map((author, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm"
-                    >
-                      {author}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Profile info section with better mobile layout */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-bookconnect-brown truncate">{profile.username}</h1>
+              {/* Only show email for current user */}
+              {isCurrentUser && <p className="text-sm text-gray-500 truncate">{profile.email}</p>}
+              <p className="text-sm text-gray-500">Member since {formatJoinDate()}</p>
+            </div>
+
+            {/* Action buttons positioned for mobile */}
+            <div className="flex gap-2 w-full sm:w-auto">
+              {/* Edit Profile button - only for current user */}
+              {isCurrentUser && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white hover:bg-gray-100 shadow-sm flex-1 sm:flex-none"
+                  onClick={onEditProfile}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              )}
+
+              {/* Message button - only for other users */}
+              {!isCurrentUser && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white hover:bg-gray-100 shadow-sm flex-1 sm:flex-none"
+                  onClick={messagingButton.onClick}
+                  disabled={messagingButton.disabled}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  {messagingButton.children}
+                </Button>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Profile content section with improved spacing */}
+        <div className="px-4 pb-4 space-y-4">
+          {/* Bio with Read More/Less functionality */}
+          {profile.bio && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-2">About</h3>
+              <div className="text-gray-700 break-words whitespace-pre-wrap bg-bookconnect-cream/30 p-3 rounded-md text-sm">
+                {bioIsTruncated && !bioExpanded
+                  ? `${profile.bio.substring(0, maxBioLength)}...`
+                  : profile.bio}
+              </div>
+              {bioIsTruncated && (
+                <button
+                  onClick={toggleBioExpansion}
+                  aria-expanded={bioExpanded}
+                  aria-controls="user-bio"
+                  className="text-bookconnect-terracotta hover:text-bookconnect-terracotta/80 text-sm flex items-center mt-2"
+                >
+                  {bioExpanded ? (
+                    <>
+                      Read less <ChevronUp className="h-3 w-3 ml-1" />
+                    </>
+                  ) : (
+                    <>
+                      Read more <ChevronDown className="h-3 w-3 ml-1" />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Reading preferences with improved mobile layout */}
+          {profile.favorite_genres && profile.favorite_genres.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-2">Favorite Genres</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {profile.favorite_genres.map((genre, index) => (
+                  <span
+                    key={index}
+                    className="px-2.5 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm border border-bookconnect-brown/10"
+                  >
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Favorite Authors with improved mobile layout */}
+          {profile.favorite_authors && profile.favorite_authors.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-2">Favorite Authors</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {profile.favorite_authors.map((author, index) => (
+                  <span
+                    key={index}
+                    className="px-2.5 py-1 bg-bookconnect-cream text-bookconnect-brown text-xs rounded-full shadow-sm border border-bookconnect-brown/10"
+                  >
+                    {author}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
