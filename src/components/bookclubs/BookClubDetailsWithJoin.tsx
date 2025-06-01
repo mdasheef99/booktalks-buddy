@@ -94,7 +94,12 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
 
         {/* Current Book */}
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
-          <CurrentBookSection currentBook={currentBook} />
+          <CurrentBookSection
+            currentBook={currentBook}
+            clubId={clubId || ''}
+            isMember={isMember}
+            canManageClub={canManageClub}
+          />
         </div>
 
         {/* Book Nominations - Only show for members */}
@@ -121,7 +126,7 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
 
         {/* Members */}
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
-          <MembersSection members={members} />
+          <MembersSection members={members} clubId={clubId || ''} />
         </div>
 
         {/* Discussion Topics - Only show for members */}

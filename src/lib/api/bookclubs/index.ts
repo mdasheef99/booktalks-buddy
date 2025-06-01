@@ -9,3 +9,4 @@ export * from './books';
 export * from './events';
 export * from './participants';
 export * from './notifications';
+export * from './progress';

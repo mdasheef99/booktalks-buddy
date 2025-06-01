@@ -20,6 +20,7 @@ export type Database = {
           lead_user_id: string
           name: string
           privacy: string | null
+          progress_tracking_enabled: boolean | null
           store_id: string | null
           updated_at: string | null
         }
@@ -33,6 +34,7 @@ export type Database = {
           lead_user_id: string
           name: string
           privacy?: string | null
+          progress_tracking_enabled?: boolean | null
           store_id?: string | null
           updated_at?: string | null
         }
@@ -46,6 +48,7 @@ export type Database = {
           lead_user_id?: string
           name?: string
           privacy?: string | null
+          progress_tracking_enabled?: boolean | null
           store_id?: string | null
           updated_at?: string | null
         }
@@ -959,6 +962,75 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_reading_progress: {
+        Row: {
+          book_id: string | null
+          club_id: string
+          created_at: string
+          current_progress: number | null
+          finished_at: string | null
+          id: string
+          is_private: boolean
+          last_updated: string
+          notes: string | null
+          progress_percentage: number | null
+          progress_type: "percentage" | "chapter" | "page" | null
+          started_at: string | null
+          status: "not_started" | "reading" | "finished"
+          total_progress: number | null
+          user_id: string
+        }
+        Insert: {
+          book_id?: string | null
+          club_id: string
+          created_at?: string
+          current_progress?: number | null
+          finished_at?: string | null
+          id?: string
+          is_private?: boolean
+          last_updated?: string
+          notes?: string | null
+          progress_percentage?: number | null
+          progress_type?: "percentage" | "chapter" | "page" | null
+          started_at?: string | null
+          status?: "not_started" | "reading" | "finished"
+          total_progress?: number | null
+          user_id: string
+        }
+        Update: {
+          book_id?: string | null
+          club_id?: string
+          created_at?: string
+          current_progress?: number | null
+          finished_at?: string | null
+          id?: string
+          is_private?: boolean
+          last_updated?: string
+          notes?: string | null
+          progress_percentage?: number | null
+          progress_type?: "percentage" | "chapter" | "page" | null
+          started_at?: string | null
+          status?: "not_started" | "reading" | "finished"
+          total_progress?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_reading_progress_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_reading_progress_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -2116,6 +2188,16 @@ export type Database = {
           maybe_count: number
           not_going_count: number
           response_rate: number
+        }[]
+      }
+      get_club_reading_stats: {
+        Args: { p_club_id: string }
+        Returns: {
+          total_members: number
+          not_started_count: number
+          reading_count: number
+          finished_count: number
+          completion_percentage: number
         }[]
       }
       get_club_meetings: {
