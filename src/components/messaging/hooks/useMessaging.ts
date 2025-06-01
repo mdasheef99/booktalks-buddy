@@ -93,7 +93,7 @@ export function useMessaging(options: UseMessagingOptions = {}) {
 
     if (!canInitiate) {
       if (showToasts) {
-        toast.error('Upgrade to Privileged+ to start conversations');
+        toast.error('Upgrade to Privileged tier to start conversations');
       }
       return;
     }
@@ -126,7 +126,7 @@ export function useMessaging(options: UseMessagingOptions = {}) {
 
     if (!canInitiate) {
       if (showToasts) {
-        toast.error('Upgrade to Privileged+ to start conversations');
+        toast.error('Upgrade to Privileged tier to start conversations');
       }
       return;
     }
@@ -148,11 +148,12 @@ export function useMessaging(options: UseMessagingOptions = {}) {
    */
   const getUpgradeMessage = () => {
     if (!permissions) return 'Upgrade to start conversations';
-    
-    if (permissions.tier === 'Free') {
-      return 'Upgrade to Privileged to start conversations';
+
+    // For MEMBER tier users, suggest upgrading to PRIVILEGED
+    if (permissions.tier === 'Free' || permissions.tier === 'Member') {
+      return 'Upgrade to Privileged tier to start conversations';
     }
-    
+
     return 'Upgrade required to start conversations';
   };
 
@@ -206,8 +207,8 @@ export function useProfileMessaging(targetUsername?: string) {
  * Hook for messaging button states and labels
  */
 export function useMessagingButton(targetUsername?: string) {
-  const { canMessage, handleMessageUser, isStarting, canInitiate } = useProfileMessaging(targetUsername);
-  
+  const { canMessage, handleMessageUser, isStarting, canInitiate, upgradeMessage } = useProfileMessaging(targetUsername);
+
   const getButtonProps = () => {
     if (!targetUsername) {
       return {
@@ -232,7 +233,7 @@ export function useMessagingButton(targetUsername?: string) {
         disabled: false,
         children: 'Upgrade to Message',
         onClick: () => {
-          toast.info('Upgrade to Privileged+ to start conversations');
+          toast.info(upgradeMessage);
         },
         variant: 'outline' as const
       };

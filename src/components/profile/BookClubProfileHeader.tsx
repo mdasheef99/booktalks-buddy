@@ -95,8 +95,8 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
   return (
     <Card className="mb-6 overflow-hidden shadow-md">
       <div className="h-32 bg-gradient-to-r from-bookconnect-cream to-amber-100 relative">
-        {/* Position buttons in top right */}
-        <div className="absolute top-4 right-4 flex gap-2">
+        {/* Position buttons in top right - desktop only */}
+        <div className="absolute top-4 right-4 hidden sm:flex gap-2">
           {/* Edit Profile button - only for current user */}
           {isCurrentUser && (
             <Button
@@ -192,14 +192,14 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
               <p className="text-sm text-gray-500">Member since {formatJoinDate()}</p>
             </div>
 
-            {/* Action buttons positioned for mobile */}
-            <div className="flex gap-2 w-full sm:w-auto">
+            {/* Action buttons positioned for mobile - mobile only */}
+            <div className="flex gap-2 w-full sm:hidden">
               {/* Edit Profile button - only for current user */}
               {isCurrentUser && (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-white hover:bg-gray-100 shadow-sm flex-1 sm:flex-none"
+                  className="bg-white hover:bg-gray-100 shadow-sm flex-1"
                   onClick={onEditProfile}
                 >
                   <Edit className="h-4 w-4 mr-2" />
@@ -210,9 +210,9 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
               {/* Message button - only for other users */}
               {!isCurrentUser && (
                 <Button
-                  variant="outline"
+                  variant={messagingButton.variant}
                   size="sm"
-                  className="bg-white hover:bg-gray-100 shadow-sm flex-1 sm:flex-none"
+                  className="bg-white hover:bg-gray-100 shadow-sm flex-1"
                   onClick={messagingButton.onClick}
                   disabled={messagingButton.disabled}
                 >

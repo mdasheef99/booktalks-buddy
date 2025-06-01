@@ -196,17 +196,17 @@ export async function hasRetentionTier(
 export async function getUserMessagingTier(userId: string): Promise<string> {
   try {
     const entitlements = await getUserEntitlements(userId);
-    
+
     if (hasEntitlement(entitlements, 'CAN_SEND_DIRECT_MESSAGES')) {
       return 'Privileged Plus';
     } else if (hasEntitlement(entitlements, 'CAN_INITIATE_DIRECT_MESSAGES')) {
       return 'Privileged';
     } else {
-      return 'Free';
+      return 'Member';
     }
   } catch (error) {
     console.error('Error getting user messaging tier:', error);
-    return 'Free';
+    return 'Member';
   }
 }
 
@@ -246,7 +246,7 @@ export async function canUpgradeForMessaging(userId: string): Promise<{
       // Can upgrade to Privileged
       return {
         can_upgrade: true,
-        current_tier: 'Free',
+        current_tier: 'Member',
         next_tier: 'Privileged',
         benefits: [
           'Start conversations with other members',
@@ -334,7 +334,7 @@ export async function getUserMessagingPermissions(userId: string, storeId?: stri
       can_initiate: false,
       can_reply: true,
       can_admin: false,
-      tier: 'Free',
+      tier: 'Member',
       retention_days: 30,
       upgrade_available: true
     };
