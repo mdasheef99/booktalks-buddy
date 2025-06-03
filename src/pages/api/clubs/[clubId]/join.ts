@@ -72,41 +72,73 @@ async function joinClubHandler(req: NextApiRequest, res: NextApiResponse) {
 
     // Handle private club join requests
     if (club.privacy === 'private') {
-      // For private clubs, create a join request instead of direct membership
-      const { data: existingRequest } = await supabase
-        .from('club_join_requests')
-        .select('id, status')
+      // Check for existing membership or pending request
+      const { data: existingMember } = await supabase
+        .from('club_members')
+        .select('role')
         .eq('user_id', userId)
         .eq('club_id', clubId)
         .single();
 
-      if (existingRequest) {
+      if (existingMember) {
+        const message = existingMember.role === 'pending'
+          ? 'Your join request is pending approval'
+          : 'You are already a member of this club';
+
         return res.status(400).json({
           error: 'Join request already exists',
-          status: existingRequest.status,
-          message: existingRequest.status === 'pending' 
-            ? 'Your join request is pending approval'
-            : `Your previous join request was ${existingRequest.status}`
+          message
         });
       }
 
-      // Create join request
-      const { data: joinRequest, error: requestError } = await supabase
-        .from('club_join_requests')
+      // Parse answers from request body if provided
+      const answers = req.body.answers;
+      let joinAnswersData = null;
+
+      if (answers && Array.isArray(answers)) {
+        // Get question details for validation
+        const { data: questions } = await supabase
+          .from('club_join_questions')
+          .select('*')
+          .eq('club_id', clubId);
+
+        if (questions && questions.length > 0) {
+          // Build answers data with question context
+          const answersWithContext = answers.map(answer => {
+            const question = questions.find(q => q.id === answer.question_id);
+            return {
+              question_id: answer.question_id,
+              question_text: question?.question_text || '',
+              answer: answer.answer,
+              is_required: question?.is_required || false
+            };
+          });
+
+          joinAnswersData = {
+            answers: answersWithContext,
+            submitted_at: new Date().toISOString()
+          };
+        }
+      }
+
+      // Create pending membership with answers
+      const { data: membership, error: membershipError } = await supabase
+        .from('club_members')
         .insert({
           user_id: userId,
           club_id: clubId,
-          status: 'pending',
-          requested_at: new Date().toISOString()
+          role: 'pending',
+          join_answers: joinAnswersData,
+          joined_at: new Date().toISOString()
         })
         .select()
         .single();
 
-      if (requestError) {
-        console.error('Error creating join request:', requestError);
+      if (membershipError) {
+        console.error('Error creating join request:', membershipError);
         return res.status(500).json({
           error: 'Failed to create join request',
-          details: requestError.message
+          details: membershipError.message
         });
       }
 
@@ -120,7 +152,7 @@ async function joinClubHandler(req: NextApiRequest, res: NextApiResponse) {
         metadata: {
           clubName: club.name,
           privacy: club.privacy,
-          requestId: joinRequest.id,
+          hasAnswers: !!joinAnswersData,
           timestamp: Date.now()
         }
       });
@@ -128,11 +160,11 @@ async function joinClubHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json({
         success: true,
         message: 'Join request submitted successfully',
+        requires_approval: true,
         joinRequest: {
-          id: joinRequest.id,
-          status: 'pending',
           clubName: club.name,
-          requestedAt: joinRequest.requested_at
+          status: 'pending',
+          requestedAt: membership.joined_at
         }
       });
     }

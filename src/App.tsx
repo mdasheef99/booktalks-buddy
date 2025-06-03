@@ -6,6 +6,7 @@ import { StoreOwnerRouteGuard } from "./components/routeguards/StoreOwnerRouteGu
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserProfileProvider } from "./contexts/UserProfileContext";
+import { HelmetProvider } from "react-helmet-async";
 import Layout from "./components/Layout";
 import AdminLayout from "./components/layouts/AdminLayout";
 import Landing from "./pages/Landing";
@@ -72,9 +73,10 @@ import {
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <AuthProvider>
-          <UserProfileProvider>
+      <HelmetProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <UserProfileProvider>
             <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
@@ -214,10 +216,11 @@ function App() {
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
             </Routes>
-          </UserProfileProvider>
-        </AuthProvider>
-        <Toaster />
-      </BrowserRouter>
+            </UserProfileProvider>
+          </AuthProvider>
+          <Toaster />
+        </BrowserRouter>
+      </HelmetProvider>
     </>
   );
 }

@@ -140,7 +140,10 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
         {!isMember && !isPending && (
           <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
             <JoinClubSection
+              clubId={clubId || ''}
+              clubName={club.name || 'Book Club'}
               clubPrivacy={club.privacy || 'public'}
+              joinQuestionsEnabled={club.join_questions_enabled || false}
               actionInProgress={actionInProgress}
               handleJoinClub={handleJoinClub}
             />

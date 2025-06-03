@@ -15,7 +15,7 @@ export type ActivityFeedType = 'discussion' | 'member_join' | 'book_set' | 'club
 export interface UserData {
   username: string;
   displayname?: string;
-  account_tier: string;
+  membership_tier: string;
   created_at: string;
 }
 
@@ -116,7 +116,7 @@ export interface StoreUser {
   id: string;
   username: string;
   displayname?: string;
-  account_tier: string;
+  membership_tier: string;
   created_at: string;
   first_joined: string;
 }

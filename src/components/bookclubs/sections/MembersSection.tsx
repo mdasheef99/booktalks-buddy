@@ -6,6 +6,7 @@ import UserName from '@/components/common/UserName';
 import { Database } from '@/integrations/supabase/types';
 import { ProgressIndicator, MemberProgressSummary, useProgressRealtime } from '@/components/bookclubs/progress';
 import { useAuth } from '@/contexts/AuthContext';
+import ClubMemberCount from '../ClubMemberCount';
 
 type ClubMember = Database['public']['Tables']['club_members']['Row'];
 
@@ -38,10 +39,18 @@ const MembersSection: React.FC<MembersSectionProps> = ({ members, clubId }) => {
   };
   return (
     <Card className="p-6">
-      <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
-        <Users className="h-5 w-5" />
-        Members ({members.length})
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Members
+        </h2>
+        <ClubMemberCount
+          clubId={clubId}
+          initialCount={members.length}
+          size="medium"
+          realTimeUpdates={true}
+        />
+      </div>
       <div className="space-y-3">
         {members.map((member) => {
           const progress = getMemberProgress(member.user_id);

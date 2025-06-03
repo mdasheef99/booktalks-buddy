@@ -26,6 +26,9 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { getClubDetails, updateBookClub } from '@/lib/api/bookclubs';
+import JoinQuestionsManager from '@/components/bookclubs/questions/JoinQuestionsManager';
+import ClubPhotoUpload from '../photos/ClubPhotoUpload';
+import type { ClubPhotoData } from '@/lib/services/clubPhotoService';
 
 // Define the form schema
 const formSchema = z.object({
@@ -50,6 +53,9 @@ const ClubSettingsPanel: React.FC<ClubSettingsPanelProps> = ({ clubId }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [clubData, setClubData] = useState<any>(null);
+  const [questionsEnabled, setQuestionsEnabled] = useState(false);
+  const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
 
   // Initialize the form
   const form = useForm<FormValues>({
@@ -69,14 +75,17 @@ const ClubSettingsPanel: React.FC<ClubSettingsPanelProps> = ({ clubId }) => {
 
       try {
         setLoading(true);
-        const clubData = await getClubDetails(clubId);
+        const clubDetails = await getClubDetails(clubId);
+        setClubData(clubDetails);
+        setQuestionsEnabled(clubDetails.join_questions_enabled || false);
+        setCurrentPhoto(clubDetails.cover_photo_url || null);
 
         // Set form values
         form.reset({
-          name: clubData.name,
-          description: clubData.description || '',
-          privacy: clubData.privacy || 'public',
-          access_tier_required: clubData.access_tier_required || 'free',
+          name: clubDetails.name,
+          description: clubDetails.description || '',
+          privacy: clubDetails.privacy || 'public',
+          access_tier_required: clubDetails.access_tier_required || 'free',
         });
       } catch (error) {
         console.error('Error loading club details:', error);
@@ -88,6 +97,17 @@ const ClubSettingsPanel: React.FC<ClubSettingsPanelProps> = ({ clubId }) => {
 
     loadClubDetails();
   }, [clubId, user?.id, form]);
+
+  // Handle questions toggle
+  const handleToggleQuestions = (enabled: boolean) => {
+    setQuestionsEnabled(enabled);
+  };
+
+  // Handle questions change
+  const handleQuestionsChange = () => {
+    // Refresh club data if needed
+    console.log('Questions changed for club:', clubId);
+  };
 
   // Handle form submission
   const onSubmit = async (values: FormValues) => {
@@ -121,16 +141,17 @@ const ClubSettingsPanel: React.FC<ClubSettingsPanelProps> = ({ clubId }) => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5" />
-          Club Settings
-        </CardTitle>
-        <CardDescription>
-          Manage your book club's basic information and settings.
-        </CardDescription>
-      </CardHeader>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Club Settings
+          </CardTitle>
+          <CardDescription>
+            Manage your book club's basic information and settings.
+          </CardDescription>
+        </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -171,6 +192,24 @@ const ClubSettingsPanel: React.FC<ClubSettingsPanelProps> = ({ clubId }) => {
                 </FormItem>
               )}
             />
+
+            {/* Club Photo Management */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Club Photo</h3>
+              <ClubPhotoUpload
+                clubId={clubId}
+                mode="management"
+                currentPhotoUrl={currentPhoto}
+                onUploadComplete={(result: ClubPhotoData) => {
+                  setCurrentPhoto(result.coverPhotoUrl);
+                  toast.success('Club photo updated successfully');
+                }}
+                onUploadError={(error: string) => {
+                  toast.error(`Photo upload failed: ${error}`);
+                }}
+                disabled={submitting}
+              />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
@@ -248,6 +287,17 @@ const ClubSettingsPanel: React.FC<ClubSettingsPanelProps> = ({ clubId }) => {
         </Form>
       </CardContent>
     </Card>
+
+    {/* Join Request Questions Management - Only for Private Clubs */}
+    {clubData && clubData.privacy === 'private' && (
+      <JoinQuestionsManager
+        clubId={clubId}
+        questionsEnabled={questionsEnabled}
+        onToggleQuestions={handleToggleQuestions}
+        onQuestionsChange={handleQuestionsChange}
+      />
+    )}
+    </div>
   );
 };
 

@@ -23,7 +23,7 @@ export async function getUserTier(userId: string) {
   // Get the user's tier
   const { data, error } = await supabase
     .from('users')
-    .select('account_tier')
+    .select('membership_tier')
     .eq('id', userId)
     .single();
 
@@ -31,7 +31,7 @@ export async function getUserTier(userId: string) {
     throw new Error('User not found');
   }
 
-  return { tier: data.account_tier };
+  return { tier: data.membership_tier };
 }
 
 /**

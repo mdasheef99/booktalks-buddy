@@ -57,7 +57,7 @@ export const deduplicateStoreUsers = (members: any[]): StoreUser[] => {
         id: member.users.id,
         username: member.users.username,
         displayname: member.users.displayname,
-        account_tier: member.users.account_tier,
+        membership_tier: member.users.membership_tier,
         created_at: member.users.created_at,
         first_joined: member.joined_at
       });

@@ -8,7 +8,9 @@ import BookClubProfileSettings from '@/components/profile/BookClubProfileSetting
 import { BookClubProfile, ClubMembership, getBookClubProfile, getUserClubMemberships } from '@/lib/api/profile';
 import { supabase } from '@/lib/supabase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, BookOpen } from 'lucide-react';
+import { Users } from 'lucide-react';
+
+
 import { BackButton } from '@/components/ui/BackButton';
 
 const BookClubProfilePage: React.FC = () => {
@@ -344,10 +346,7 @@ const BookClubProfilePage: React.FC = () => {
                   <Users className="h-4 w-4" />
                   Book Clubs
                 </TabsTrigger>
-                <TabsTrigger value="books" className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Reading
-                </TabsTrigger>
+
               </TabsList>
 
               <TabsContent value="clubs">
@@ -358,15 +357,7 @@ const BookClubProfilePage: React.FC = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="books">
-                <div className="bg-white rounded-lg shadow p-6 text-center">
-                  <BookOpen className="h-12 w-12 mx-auto text-gray-300 mb-2" />
-                  <h3 className="text-lg font-medium mb-2">Reading History</h3>
-                  <p className="text-gray-500">
-                    Your reading history will appear here as you participate in book clubs.
-                  </p>
-                </div>
-              </TabsContent>
+
             </Tabs>
           )}
         </div>

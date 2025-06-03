@@ -91,6 +91,69 @@ export class ClubMembersService {
   }
 
   /**
+   * Get real-time member count with subscription
+   */
+  async getMemberCountRealtime(clubId: string): Promise<{
+    count: number;
+    subscription: any;
+  }> {
+    // Get initial count
+    const initialCount = await this.getMemberCountCached(clubId);
+
+    // Set up real-time subscription
+    const subscription = supabase
+      .channel(`member_count_${clubId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'club_members',
+        filter: `club_id=eq.${clubId}`
+      }, async () => {
+        // Invalidate cache and get fresh count
+        const cacheKey = CacheKeys.memberCount(clubId);
+        clubCacheService.invalidate(cacheKey);
+        await this.getMemberCountCached(clubId);
+      })
+      .subscribe();
+
+    return {
+      count: initialCount,
+      subscription
+    };
+  }
+
+  /**
+   * Get cached member count
+   */
+  async getMemberCountCached(clubId: string): Promise<number> {
+    const cacheKey = CacheKeys.memberCount(clubId);
+
+    return withCache(
+      cacheKey,
+      () => this.fetchMemberCount(clubId),
+      CacheExpiry.MEDIUM, // 5 minutes
+      true
+    );
+  }
+
+  /**
+   * Fetch member count from database
+   */
+  private async fetchMemberCount(clubId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('club_members')
+      .select('user_id', { count: 'exact', head: true })
+      .eq('club_id', clubId);
+
+    if (error) {
+      console.error('Error fetching member count:', error);
+      return 0;
+    }
+
+    return count || 0;
+  }
+
+  /**
    * Check if a user is a member of a club
    */
   async isMember(clubId: string, userId: string): Promise<boolean> {

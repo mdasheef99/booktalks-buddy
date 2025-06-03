@@ -18,7 +18,7 @@ interface User {
   email: string | null;
   favorite_genre: string | null;
   favorite_author: string | null;
-  account_tier: string;
+  membership_tier: string;
 }
 
 const AdminUserListPage: React.FC = () => {
@@ -52,10 +52,10 @@ const AdminUserListPage: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fetch users with their account tiers
+        // Fetch users with their membership tiers
         const { data, error } = await supabase
           .from('users')
-          .select('id, username, email, favorite_genre, favorite_author, account_tier')
+          .select('id, username, email, favorite_genre, favorite_author, membership_tier')
           .order('username');
 
         if (error) throw error;
@@ -250,15 +250,15 @@ const AdminUserListPage: React.FC = () => {
                         return (
                           <UserTierManager
                             userId={user.id}
-                            currentTier={user.account_tier || 'free'}
+                            currentTier={user.membership_tier || 'MEMBER'}
                             storeId={storeId}
                             onTierUpdated={(newTier) => {
                               // Update the local state when tier changes
                               setUsers(users.map(u =>
-                                u.id === user.id ? { ...u, account_tier: newTier } : u
+                                u.id === user.id ? { ...u, membership_tier: newTier } : u
                               ));
                               setFilteredUsers(filteredUsers.map(u =>
-                                u.id === user.id ? { ...u, account_tier: newTier } : u
+                                u.id === user.id ? { ...u, membership_tier: newTier } : u
                               ));
                             }}
                           />
@@ -267,7 +267,7 @@ const AdminUserListPage: React.FC = () => {
                         console.log('  ❌ Rendering UserTierBadge only');
                         return (
                           <div className="flex items-center space-x-2">
-                            <UserTierBadge tier={user.account_tier || 'free'} showFreeTier={true} />
+                            <UserTierBadge tier={user.membership_tier || 'MEMBER'} showFreeTier={true} />
                             <span className="text-sm text-muted-foreground">
                               {!isStoreOwner
                                 ? "(Store Owner access required)"
@@ -290,7 +290,7 @@ const AdminUserListPage: React.FC = () => {
                 </div>
 
                 {/* Subscription information - only show for privileged users */}
-                {user.account_tier && user.account_tier !== 'free' && (
+                {user.membership_tier && user.membership_tier !== 'MEMBER' && (
                   <Collapsible className="mt-4 border-t pt-4">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-medium">Subscription Information</h4>

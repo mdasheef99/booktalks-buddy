@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { getClubs } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import ClubPhotoDisplay from './photos/ClubPhotoDisplay';
+import ClubMemberCount from './ClubMemberCount';
 
 type BookClub = Database['public']['Tables']['book_clubs']['Row'];
 type BookClubInsert = Database['public']['Tables']['book_clubs']['Insert'];
@@ -35,29 +37,59 @@ const BookClubCard: React.FC<BookClubCardProps> = ({ club, onClick }) => {
 
   return (
     <Card
-      className="overflow-hidden cursor-pointer h-64 flex flex-col"
+      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
       onClick={onClick}
     >
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-center gap-3 mb-4">
-          <Users className="h-6 w-6 text-primary" />
-          <h3 className="text-xl font-semibold">{club.name}</h3>
+      {/* Photo Section */}
+      <div className="h-48">
+        <ClubPhotoDisplay
+          photoUrl={club.cover_photo_url}
+          thumbnailUrl={club.cover_photo_thumbnail_url}
+          clubName={club.name}
+          size="medium"
+          aspectRatio="16:9"
+          className="w-full h-full"
+        />
+      </div>
+
+      {/* Content Section */}
+      <div className="p-4 flex flex-col">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-lg font-semibold line-clamp-1">{club.name}</h3>
+          <ClubMemberCount
+            clubId={club.id}
+            initialCount={0} // Will be fetched by the component
+            size="small"
+            realTimeUpdates={false} // Disable for performance in lists
+          />
         </div>
-        <div className="h-20 overflow-hidden relative mb-2">
+
+        <div className="h-16 overflow-hidden relative mb-3">
           <p
             ref={descriptionRef}
-            className="text-muted-foreground max-h-20"
+            className="text-muted-foreground text-sm max-h-16 line-clamp-3"
           >
             {club.description || 'No description available'}
           </p>
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
+          {isOverflowing && (
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent"></div>
+          )}
         </div>
-        <div className="mt-auto">
+
+        <div className="flex items-center justify-between mt-auto">
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            club.privacy === 'private'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-green-100 text-green-800'
+          }`}>
+            {club.privacy || 'public'}
+          </span>
+
           {isOverflowing && (
             <Button
               variant="ghost"
               size="sm"
-              className="text-primary hover:text-primary/80 p-0 h-auto font-medium"
+              className="text-primary hover:text-primary/80 p-0 h-auto font-medium text-xs"
               onClick={(e) => {
                 e.stopPropagation();
                 onClick();

@@ -1,60 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Users, UserPlus, UserX, Check, X, Search, Loader2 } from 'lucide-react';
+import { Users, UserPlus, Search, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getClubJoinRequests, approveJoinRequest, rejectJoinRequest } from '@/lib/api/bookclubs/requests';
 import { getClubMembers, removeMember } from '@/lib/api/bookclubs/members';
+import { useClubJoinRequests } from '@/hooks/useJoinRequestQuestions';
+import JoinRequestReviewModal from '@/components/bookclubs/questions/JoinRequestReviewModal';
+import MembersTab from './MembersTab';
+import JoinRequestsTab from './JoinRequestsTab';
+import MemberRemovalDialog from './MemberRemovalDialog';
+import type {
+  MemberManagementPanelProps,
+  Member,
+  JoinRequest,
+  EnhancedJoinRequest
+} from './types';
 
-interface Member {
-  user_id: string;
-  club_id: string;
-  role: string;
-  joined_at: string;
-  user?: {
-    username?: string;
-    email?: string;
-    display_name?: string;
-  };
-}
 
-interface JoinRequest {
-  user_id: string;
-  club_id: string;
-  requested_at: string;
-  status: string;
-  user?: {
-    username?: string;
-    email?: string;
-    display_name?: string;
-  };
-}
-
-interface MemberManagementPanelProps {
-  clubId: string;
-}
 
 /**
  * Member Management Panel Component
@@ -72,6 +38,11 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({ clubId })
   const [loading, setLoading] = useState(true);
   const [processingAction, setProcessingAction] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+
+  // Use the new join requests hook
+  const { requests: newJoinRequests, loading: loadingNewRequests, refreshRequests } = useClubJoinRequests(clubId);
 
   // Load members and join requests
   useEffect(() => {
@@ -216,35 +187,36 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({ clubId })
     }
   };
 
-  // Handle join request approval
-  const handleApproveRequest = async (userId: string) => {
-    if (!clubId || !user?.id) return;
+  // Handle viewing join request details
+  const handleViewRequest = (request: any) => {
+    setSelectedRequest(request);
+    setReviewModalOpen(true);
+  };
+
+  // Handle join request approval from modal
+  const handleApproveFromModal = async () => {
+    if (!selectedRequest || !user?.id) return;
 
     try {
       setProcessingAction(true);
-      await approveJoinRequest(user.id, clubId, userId);
+      // Use the existing approval API - we'll need to update this to work with our new schema
+      await approveJoinRequest(user.id, clubId, selectedRequest.user_id);
 
-      // Update the join requests list
-      setJoinRequests(joinRequests.filter(request => request.user_id !== userId));
-      setFilteredRequests(filteredRequests.filter(request => request.user_id !== userId));
+      // Refresh the requests list
+      await refreshRequests();
 
       // Reload members to include the newly approved member
       const membersData = await getClubMembers(clubId);
-
-      // Process member data to ensure it matches the expected format
       const processedMembers: Member[] = membersData.map(member => {
-        // Create a default user object
         const userObj = {
           username: 'Unknown',
           email: '',
           display_name: 'Unknown User'
         };
 
-        // Try to extract user data if available
         try {
           const userValue = member.user;
           if (typeof userValue === 'object' && userValue !== null) {
-            // Use type assertion to handle the user object
             const userObject = userValue as any;
             if (userObject.username) userObj.username = userObject.username;
             if (userObject.email) userObj.email = userObject.email;
@@ -275,7 +247,48 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({ clubId })
     }
   };
 
-  // Handle join request rejection
+  // Handle join request rejection from modal
+  const handleRejectFromModal = async () => {
+    if (!selectedRequest || !user?.id) return;
+
+    try {
+      setProcessingAction(true);
+      await rejectJoinRequest(user.id, clubId, selectedRequest.user_id);
+
+      // Refresh the requests list
+      await refreshRequests();
+
+      toast.success('Join request rejected');
+    } catch (error) {
+      console.error('Error rejecting join request:', error);
+      toast.error('Failed to reject join request');
+    } finally {
+      setProcessingAction(false);
+    }
+  };
+
+  // Handle join request approval (legacy)
+  const handleApproveRequest = async (userId: string) => {
+    if (!clubId || !user?.id) return;
+
+    try {
+      setProcessingAction(true);
+      await approveJoinRequest(user.id, clubId, userId);
+
+      // Update the join requests list
+      setJoinRequests(joinRequests.filter(request => request.user_id !== userId));
+      setFilteredRequests(filteredRequests.filter(request => request.user_id !== userId));
+
+      toast.success('Join request approved');
+    } catch (error) {
+      console.error('Error approving join request:', error);
+      toast.error('Failed to approve join request');
+    } finally {
+      setProcessingAction(false);
+    }
+  };
+
+  // Handle join request rejection (legacy)
   const handleRejectRequest = async (userId: string) => {
     if (!clubId || !user?.id) return;
 
@@ -349,139 +362,59 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({ clubId })
             </TabsList>
 
             <TabsContent value="members">
-              {filteredMembers.length > 0 ? (
-                <div className="border rounded-md">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Member</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Joined</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredMembers.map((member) => (
-                        <TableRow key={member.user_id}>
-                          <TableCell className="font-medium">
-                            {member.user?.display_name || member.user?.username || 'Unknown User'}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={member.role === 'admin' ? 'default' : 'outline'}>
-                              {member.role === 'admin' ? 'Admin' : 'Member'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {new Date(member.joined_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setMemberToRemove(member.user_id)}
-                              disabled={processingAction || member.user_id === user?.id}
-                            >
-                              <UserX className="h-4 w-4 mr-1" />
-                              Remove
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center p-8 border rounded-md">
-                  <p className="text-gray-500">No members found</p>
-                </div>
-              )}
+              <MembersTab
+                members={filteredMembers}
+                loading={loading}
+                processingAction={processingAction}
+                currentUserId={user?.id}
+                onRemoveMember={setMemberToRemove}
+              />
             </TabsContent>
 
             <TabsContent value="requests">
-              {filteredRequests.length > 0 ? (
-                <div className="border rounded-md">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Requested</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredRequests.map((request) => (
-                        <TableRow key={request.user_id}>
-                          <TableCell className="font-medium">
-                            {request.user?.display_name || request.user?.username || 'Unknown User'}
-                          </TableCell>
-                          <TableCell>
-                            {new Date(request.requested_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => handleApproveRequest(request.user_id)}
-                                disabled={processingAction}
-                              >
-                                <Check className="h-4 w-4 mr-1" />
-                                Approve
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleRejectRequest(request.user_id)}
-                                disabled={processingAction}
-                              >
-                                <X className="h-4 w-4 mr-1" />
-                                Reject
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center p-8 border rounded-md">
-                  <p className="text-gray-500">No pending join requests</p>
-                </div>
-              )}
+              <JoinRequestsTab
+                legacyRequests={filteredRequests}
+                enhancedRequests={newJoinRequests}
+                loading={loading}
+                processingAction={processingAction}
+                onViewRequest={handleViewRequest}
+                onApproveRequest={handleApproveRequest}
+                onRejectRequest={handleRejectRequest}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
 
-      {/* Confirmation dialog for member removal */}
-      <AlertDialog open={!!memberToRemove} onOpenChange={(open) => !open && setMemberToRemove(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Member</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove this member from the club? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={processingAction}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => memberToRemove && handleRemoveMember(memberToRemove)}
-              disabled={processingAction}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {processingAction ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Removing...
-                </>
-              ) : (
-                <>Remove</>
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Member removal confirmation dialog */}
+      <MemberRemovalDialog
+        isOpen={!!memberToRemove}
+        memberToRemove={memberToRemove}
+        processingAction={processingAction}
+        onConfirm={handleRemoveMember}
+        onCancel={() => setMemberToRemove(null)}
+      />
+
+      {/* Join Request Review Modal */}
+      {selectedRequest && (
+        <JoinRequestReviewModal
+          isOpen={reviewModalOpen}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setSelectedRequest(null);
+          }}
+          joinRequest={{
+            user_id: selectedRequest.user_id,
+            username: selectedRequest.username,
+            display_name: selectedRequest.display_name,
+            requested_at: selectedRequest.requested_at,
+            answers: selectedRequest.answers || []
+          }}
+          onApprove={handleApproveFromModal}
+          onReject={handleRejectFromModal}
+          isLoading={processingAction}
+        />
+      )}
     </>
   );
 };

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { UsernameDialog } from "@/components/dialogs/UsernameDialog";
 import { GenreDialog } from "@/components/dialogs/GenreDialog";
 import { LoginDialog } from "@/components/dialogs/LoginDialog";

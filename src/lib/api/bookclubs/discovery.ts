@@ -25,10 +25,10 @@ export async function getDiscoverableClubs(
   console.log(`[getDiscoverableClubs] Called with userId: ${userId}, limit: ${limit}, offset: ${offset}, filter: ${filter}, search: ${search}`);
 
   try {
-    // Build the query for clubs
+    // Build the query for clubs - include join_questions_enabled
     let query = supabase
       .from('book_clubs')
-      .select('*', { count: 'exact' });
+      .select('*, join_questions_enabled', { count: 'exact' });
 
     // Apply privacy filter if specified
     if (filter === 'public') {
@@ -79,6 +79,17 @@ export async function getDiscoverableClubs(
         user_status: userStatus
       };
     });
+
+    // Debug logging (remove in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[getDiscoverableClubs] Enhanced clubs:', enhancedClubs.map(club => ({
+        id: club.id,
+        name: club.name,
+        privacy: club.privacy,
+        join_questions_enabled: club.join_questions_enabled,
+        user_status: club.user_status
+      })));
+    }
 
     return {
       clubs: enhancedClubs,

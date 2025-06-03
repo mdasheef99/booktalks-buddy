@@ -6,20 +6,29 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { createBookClub } from '@/lib/api';
+import { createBookClub, createBookClubWithQuestions, createBookClubWithPhoto } from '@/lib/api/bookclubs/clubs';
 import { useHasEntitlement } from '@/lib/entitlements/hooks';
 import UpgradeAccountModal from './UpgradeAccountModal';
+import EmbeddedQuestionManager from './questions/EmbeddedQuestionManager';
+import ClubPhotoUpload from './photos/ClubPhotoUpload';
+import type { NewQuestionData } from './questions/types';
+import type { ClubPhotoData } from '@/lib/services/clubPhotoService';
 
 const CreateBookClubForm: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('public');
+  const [joinQuestionsEnabled, setJoinQuestionsEnabled] = useState(false);
+  const [questions, setQuestions] = useState<NewQuestionData[]>([]);
   const [loading, setLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
-  const [creationStep, setCreationStep] = useState<'idle' | 'creating' | 'adding-member' | 'complete'>('idle');
+  const [creationStep, setCreationStep] = useState<'idle' | 'creating' | 'adding-member' | 'adding-questions' | 'complete'>('idle');
+  const [photoData, setPhotoData] = useState<ClubPhotoData | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   // Check for either limited or unlimited club creation entitlements
@@ -39,6 +48,25 @@ const CreateBookClubForm: React.FC = () => {
     return null;
   };
 
+  // Validate questions
+  const validateQuestions = (): string | null => {
+    if (privacy === 'private' && joinQuestionsEnabled) {
+      if (questions.length === 0) {
+        return 'At least one question is required when questions are enabled';
+      }
+
+      for (const question of questions) {
+        if (!question.question_text.trim()) {
+          return 'All questions must have text';
+        }
+        if (question.question_text.length > 200) {
+          return 'Question text must be 200 characters or less';
+        }
+      }
+    }
+    return null;
+  };
+
   // Get button text based on current creation step
   const getButtonTextForStep = (): string => {
     switch (creationStep) {
@@ -46,6 +74,8 @@ const CreateBookClubForm: React.FC = () => {
         return 'Creating club...';
       case 'adding-member':
         return 'Setting up membership...';
+      case 'adding-questions':
+        return 'Adding questions...';
       case 'complete':
         return 'Success!';
       default:
@@ -115,10 +145,17 @@ const CreateBookClubForm: React.FC = () => {
     e.preventDefault();
 
     // Validate club name
-    const error = validateClubName(name);
-    if (error) {
-      setNameError(error);
-      toast.error(error);
+    const nameError = validateClubName(name);
+    if (nameError) {
+      setNameError(nameError);
+      toast.error(nameError);
+      return;
+    }
+
+    // Validate questions
+    const questionsError = validateQuestions();
+    if (questionsError) {
+      toast.error(questionsError);
       return;
     }
 
@@ -137,20 +174,38 @@ const CreateBookClubForm: React.FC = () => {
     setCreationStep('creating');
 
     try {
-      // Step 1: Create the book club
-      const club = await createBookClub(user.id, {
+      const clubData = {
         name: name.trim(),
         description: description.trim(),
-        privacy
-      });
+        privacy,
+        join_questions_enabled: privacy === 'private' ? joinQuestionsEnabled : false,
+        photoData: photoData || undefined
+      };
 
-      // Step 2: Creator is automatically added as admin in the backend
-      setCreationStep('adding-member');
+      let club: any;
 
-      // Short delay to show the step progress
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Use enhanced API if we have questions to create
+      if (privacy === 'private' && joinQuestionsEnabled && questions.length > 0) {
+        // Step 1: Create the book club with questions
+        club = await createBookClubWithQuestions(user.id, clubData, questions);
 
-      // Step 3: Complete
+        // Step 2: Creator is automatically added as admin in the backend
+        setCreationStep('adding-member');
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // Step 3: Questions are created as part of the transaction
+        setCreationStep('adding-questions');
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } else {
+        // Step 1: Create the book club with photo support
+        club = await createBookClubWithPhoto(user.id, clubData);
+
+        // Step 2: Creator is automatically added as admin in the backend
+        setCreationStep('adding-member');
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // Final step: Complete
       setCreationStep('complete');
       toast.success('Book club created successfully');
 
@@ -175,6 +230,40 @@ const CreateBookClubForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle privacy change
+  const handlePrivacyChange = (value: string) => {
+    setPrivacy(value);
+    // Reset join questions when switching to public
+    if (value === 'public') {
+      setJoinQuestionsEnabled(false);
+      setQuestions([]);
+    }
+  };
+
+  // Handle questions toggle
+  const handleToggleQuestions = (enabled: boolean) => {
+    setJoinQuestionsEnabled(enabled);
+    if (!enabled) {
+      setQuestions([]);
+    }
+  };
+
+  // Handle questions change
+  const handleQuestionsChange = (newQuestions: NewQuestionData[]) => {
+    setQuestions(newQuestions);
+  };
+
+  // Handle photo upload
+  const handlePhotoUploadComplete = (result: ClubPhotoData) => {
+    setPhotoData(result);
+    setPhotoError(null);
+  };
+
+  const handlePhotoUploadError = (error: string) => {
+    setPhotoError(error);
+    setPhotoData(null);
   };
 
   return (
@@ -241,9 +330,30 @@ const CreateBookClubForm: React.FC = () => {
 
         <div>
           <label className="block text-sm font-medium mb-2">
+            Club Photo (Optional)
+          </label>
+          <ClubPhotoUpload
+            mode="creation"
+            onUploadComplete={handlePhotoUploadComplete}
+            onUploadError={handlePhotoUploadError}
+            disabled={loading}
+            className="mb-2"
+          />
+          {photoError && (
+            <p className="text-sm text-red-600 mt-1">{photoError}</p>
+          )}
+          {photoData && (
+            <p className="text-sm text-green-600 mt-1">
+              Photo uploaded successfully
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
             Privacy Setting
           </label>
-          <RadioGroup value={privacy} onValueChange={setPrivacy} className="flex space-x-4">
+          <RadioGroup value={privacy} onValueChange={handlePrivacyChange} className="flex space-x-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="public" id="public" />
               <Label htmlFor="public">Public</Label>
@@ -259,6 +369,17 @@ const CreateBookClubForm: React.FC = () => {
               : 'Only invited members can join this club'}
           </p>
         </div>
+
+        {/* Join Request Questions Section - Only for Private Clubs */}
+        {privacy === 'private' && (
+          <EmbeddedQuestionManager
+            questionsEnabled={joinQuestionsEnabled}
+            onToggleQuestions={handleToggleQuestions}
+            onQuestionsChange={handleQuestionsChange}
+            initialQuestions={questions}
+            loading={loading}
+          />
+        )}
 
         <div className="flex justify-end space-x-3 pt-4">
           <Button

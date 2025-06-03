@@ -17,6 +17,7 @@ export type Database = {
           id: string
           is_exclusive: boolean | null
           is_premium: boolean | null
+          join_questions_enabled: boolean | null
           lead_user_id: string
           name: string
           privacy: string | null
@@ -31,6 +32,7 @@ export type Database = {
           id?: string
           is_exclusive?: boolean | null
           is_premium?: boolean | null
+          join_questions_enabled?: boolean | null
           lead_user_id: string
           name: string
           privacy?: string | null
@@ -45,6 +47,7 @@ export type Database = {
           id?: string
           is_exclusive?: boolean | null
           is_premium?: boolean | null
+          join_questions_enabled?: boolean | null
           lead_user_id?: string
           name?: string
           privacy?: string | null
@@ -162,6 +165,64 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      book_reviews: {
+        Row: {
+          id: string
+          user_id: string
+          book_id: string
+          reading_list_item_id: string | null
+          rating: number | null
+          review_text: string | null
+          is_private: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          book_id: string
+          reading_list_item_id?: string | null
+          rating?: number | null
+          review_text?: string | null
+          is_private?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          book_id?: string
+          reading_list_item_id?: string | null
+          rating?: number | null
+          review_text?: string | null
+          is_private?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_reviews_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_reviews_reading_list_item_id_fkey"
+            columns: ["reading_list_item_id"]
+            isOneToOne: false
+            referencedRelation: "reading_list_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chat_messages: {
         Row: {
@@ -434,24 +495,65 @@ export type Database = {
           },
         ]
       }
+      club_join_questions: {
+        Row: {
+          id: string
+          club_id: string
+          question_text: string
+          is_required: boolean
+          display_order: number
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          club_id: string
+          question_text: string
+          is_required?: boolean
+          display_order: number
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          club_id?: string
+          question_text?: string
+          is_required?: boolean
+          display_order?: number
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_join_questions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "book_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_members: {
         Row: {
           club_id: string
           joined_at: string | null
           role: string
           user_id: string
+          join_answers: Json | null
         }
         Insert: {
           club_id: string
           joined_at?: string | null
           role: string
           user_id: string
+          join_answers?: Json | null
         }
         Update: {
           club_id?: string
           joined_at?: string | null
           role?: string
           user_id?: string
+          join_answers?: Json | null
         }
         Relationships: [
           {
@@ -1893,6 +1995,57 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_list_items: {
+        Row: {
+          id: string
+          user_id: string
+          book_id: string
+          added_at: string
+          list_order: number
+          is_private: boolean
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          book_id: string
+          added_at?: string
+          list_order?: number
+          is_private?: boolean
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          book_id?: string
+          added_at?: string
+          list_order?: number
+          is_private?: boolean
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_list_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reading_list_items_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
             referencedColumns: ["id"]
           },
         ]

@@ -146,6 +146,7 @@ export const CacheKeys = {
   moderators: (clubId: string) => `moderators:${clubId}`,
   members: (clubId: string) => `members:${clubId}`,
   eligibleMembers: (clubId: string) => `eligible:${clubId}`,
+  memberCount: (clubId: string) => `memberCount:${clubId}`,
   // Phase 3: Events/Meetings cache keys
   meetings: (clubId: string, options?: any) =>
     `meetings:${clubId}:${JSON.stringify(options || {})}`,

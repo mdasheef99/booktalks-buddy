@@ -10,6 +10,7 @@ export interface BookClub {
   privacy: string | null;
   created_at: string;
   user_status: string;
+  join_questions_enabled?: boolean;
 }
 
 interface UseClubDiscoveryProps {

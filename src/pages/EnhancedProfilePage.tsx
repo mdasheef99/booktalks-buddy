@@ -5,10 +5,12 @@ import { useAuth } from '@/contexts/AuthContext';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Book, Clock, ArrowLeft } from 'lucide-react';
+import { Book, Clock, ArrowLeft, BookOpen } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUserClubMemberships } from '@/lib/api/profile';
 import ProfileForm from '@/components/profile/ProfileForm';
+
+
 
 // Import our new components
 import ProfileHeader from '@/components/profile/enhanced/ProfileHeader';
@@ -197,7 +199,6 @@ const EnhancedProfilePage: React.FC = () => {
           />
 
           {/* Profile Content */}
-          {/* We could add a BookClubs tab here in the future */}
           <Tabs defaultValue="preferences" className="mt-6">
             <div className="flex justify-end mb-4">
               <TabsList className="bg-bookconnect-cream border border-bookconnect-brown/20">
@@ -208,6 +209,7 @@ const EnhancedProfilePage: React.FC = () => {
                   <Book className="h-4 w-4" />
                   Reading Preferences
                 </TabsTrigger>
+
                 <TabsTrigger
                   value="availability"
                   className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
@@ -222,6 +224,8 @@ const EnhancedProfilePage: React.FC = () => {
             <TabsContent value="preferences">
               <ProfilePreferences userMetadata={userMetadata} />
             </TabsContent>
+
+
 
             {/* Availability Tab */}
             <TabsContent value="availability">

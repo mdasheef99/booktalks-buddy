@@ -1,21 +1,32 @@
 import { supabase } from '../../supabase';
 import { getUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageClub } from '@/lib/entitlements/permissions';
+import type { CreateQuestionRequest } from '@/types/join-request-questions';
+import { ClubPhotoService, type ClubPhotoData } from '@/lib/services/clubPhotoService';
 
 /**
  * Book Club CRUD operations
  */
 
 /**
- * Create a new book club
+ * Create a new book club with optional join request questions
  */
-export async function createBookClub(userId: string, club: { name: string; description?: string; privacy?: string }) {
+export async function createBookClub(
+  userId: string,
+  club: {
+    name: string;
+    description?: string;
+    privacy?: string;
+    join_questions_enabled?: boolean;
+  }
+) {
   if (!club.name) throw new Error('Club name is required');
 
   console.log('Creating book club with data:', {
     name: club.name,
     description: club.description,
     privacy: club.privacy,
+    join_questions_enabled: club.join_questions_enabled,
     lead_user_id: userId,
     access_tier_required: 'free'
   });
@@ -27,6 +38,7 @@ export async function createBookClub(userId: string, club: { name: string; descr
       name: club.name,
       description: club.description,
       privacy: club.privacy,
+      join_questions_enabled: club.join_questions_enabled || false,
       lead_user_id: userId,
       access_tier_required: 'free' // Default to free access tier
     }])
@@ -48,6 +60,92 @@ export async function createBookClub(userId: string, club: { name: string; descr
   if (memberError) {
     console.error('Error adding creator as admin:', memberError);
     throw memberError;
+  }
+
+  return data;
+}
+
+/**
+ * Create a new book club with optional photo data
+ */
+export async function createBookClubWithPhoto(
+  userId: string,
+  club: {
+    name: string;
+    description?: string;
+    privacy?: string;
+    join_questions_enabled?: boolean;
+    photoData?: ClubPhotoData;
+  }
+) {
+  if (!club.name) throw new Error('Club name is required');
+
+  console.log('Creating book club with photo:', {
+    name: club.name,
+    description: club.description,
+    privacy: club.privacy,
+    join_questions_enabled: club.join_questions_enabled,
+    hasPhoto: !!club.photoData,
+    lead_user_id: userId,
+    access_tier_required: 'free'
+  });
+
+  // Create club data without photo URLs initially
+  const clubData = {
+    name: club.name,
+    description: club.description,
+    privacy: club.privacy,
+    join_questions_enabled: club.join_questions_enabled || false,
+    lead_user_id: userId,
+    access_tier_required: 'free'
+  };
+
+  const { data, error } = await supabase
+    .from('book_clubs')
+    .insert([clubData])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating book club:', error);
+    throw error;
+  }
+
+  console.log('Book club created successfully:', data);
+
+  // Add creator as admin member
+  const { error: memberError } = await supabase
+    .from('club_members')
+    .insert([{ user_id: userId, club_id: data.id, role: 'admin' }]);
+
+  if (memberError) {
+    console.error('Error adding creator as member:', memberError);
+    throw memberError;
+  }
+
+  // If photo data exists, move photos from temp folder to club folder
+  if (club.photoData) {
+    try {
+      console.log('🔄 [CLUB CREATION] Starting photo move process for club:', data.id);
+      console.log('📸 [CLUB CREATION] Photo data received:', club.photoData);
+
+      const movedPhotoData = await ClubPhotoService.movePhotosToClubFolder(data.id, club.photoData);
+
+      console.log('✅ [CLUB CREATION] Photos moved successfully:', movedPhotoData);
+      console.log('🔍 [CLUB CREATION] Final club data after photo move:', data);
+    } catch (photoError) {
+      console.error('❌ [CLUB CREATION] Error moving photos:', photoError);
+      console.error('❌ [CLUB CREATION] Photo error details:', {
+        message: photoError.message,
+        stack: photoError.stack,
+        clubId: data.id,
+        photoData: club.photoData
+      });
+      // Don't fail the club creation if photo moving fails
+      // The club is created successfully, just without photos
+    }
+  } else {
+    console.log('ℹ️ [CLUB CREATION] No photo data provided for club:', data.id);
   }
 
   return data;
@@ -233,3 +331,112 @@ export async function getClubDetails(clubId: string) {
 
 // Alias for listBookClubs
 export const getClubs = listBookClubs;
+
+/**
+ * Create a new book club with initial questions in a single transaction
+ */
+export async function createBookClubWithQuestions(
+  userId: string,
+  club: {
+    name: string;
+    description?: string;
+    privacy?: string;
+    join_questions_enabled?: boolean;
+  },
+  questions: CreateQuestionRequest[] = []
+) {
+  if (!club.name) throw new Error('Club name is required');
+
+  // Validate questions if provided
+  if (questions.length > 5) {
+    throw new Error('Maximum of 5 questions allowed per club');
+  }
+
+  // Validate each question
+  for (const question of questions) {
+    if (!question.question_text?.trim()) {
+      throw new Error('All questions must have text');
+    }
+    if (question.question_text.length > 200) {
+      throw new Error('Question text must be 200 characters or less');
+    }
+  }
+
+  console.log('Creating book club with questions:', {
+    name: club.name,
+    description: club.description,
+    privacy: club.privacy,
+    join_questions_enabled: club.join_questions_enabled,
+    lead_user_id: userId,
+    questions_count: questions.length
+  });
+
+  try {
+    // Step 1: Create the book club
+    const { data: clubData, error: clubError } = await supabase
+      .from('book_clubs')
+      .insert([{
+        name: club.name,
+        description: club.description,
+        privacy: club.privacy,
+        join_questions_enabled: club.join_questions_enabled || false,
+        lead_user_id: userId,
+        access_tier_required: 'free'
+      }])
+      .select()
+      .single();
+
+    if (clubError) {
+      console.error('Error creating book club:', clubError);
+      throw clubError;
+    }
+
+    console.log('Book club created successfully:', clubData);
+
+    // Step 2: Add creator as admin member
+    const { error: memberError } = await supabase
+      .from('club_members')
+      .insert([{ user_id: userId, club_id: clubData.id, role: 'admin' }]);
+
+    if (memberError) {
+      console.error('Error adding creator as admin:', memberError);
+      // Try to clean up the club if member creation fails
+      await supabase.from('book_clubs').delete().eq('id', clubData.id);
+      throw memberError;
+    }
+
+    // Step 3: Create questions if provided and questions are enabled
+    if (club.join_questions_enabled && questions.length > 0) {
+      console.log('Creating questions for club:', clubData.id, 'Questions:', questions);
+
+      const questionsToInsert = questions.map((question, index) => ({
+        club_id: clubData.id,
+        question_text: question.question_text.trim(),
+        is_required: question.is_required || false,
+        display_order: index + 1
+      }));
+
+      console.log('Questions to insert:', questionsToInsert);
+
+      const { data: insertedQuestions, error: questionsError } = await supabase
+        .from('club_join_questions')
+        .insert(questionsToInsert)
+        .select();
+
+      if (questionsError) {
+        console.error('Error creating questions:', questionsError);
+        // Try to clean up the club and membership if questions creation fails
+        await supabase.from('club_members').delete().eq('club_id', clubData.id);
+        await supabase.from('book_clubs').delete().eq('id', clubData.id);
+        throw questionsError;
+      }
+
+      console.log('Questions created successfully:', insertedQuestions);
+    }
+
+    return clubData;
+  } catch (error) {
+    console.error('Error in createBookClubWithQuestions:', error);
+    throw error;
+  }
+}
