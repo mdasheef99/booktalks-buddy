@@ -11,6 +11,7 @@ interface CarouselControlsProps {
 /**
  * Carousel dot indicators and controls
  * Shows current position and allows direct navigation
+ * Optimized for single-slide carousel display
  */
 export const CarouselControls: React.FC<CarouselControlsProps> = ({
   totalItems,
@@ -32,9 +33,9 @@ export const CarouselControls: React.FC<CarouselControlsProps> = ({
     });
   }, [api]);
 
-  // Calculate number of dots based on total items and visible items
-  const totalSlides = Math.ceil(totalItems / visibleItems);
-  
+  // For single-slide carousel, each item gets its own dot
+  const totalSlides = visibleItems === 1 ? totalItems : Math.ceil(totalItems / visibleItems);
+
   // Don't show controls if only one slide
   if (totalSlides <= 1) {
     return null;

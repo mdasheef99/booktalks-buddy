@@ -27,17 +27,17 @@ interface BookCarouselProps {
 }
 
 /**
- * Responsive book carousel component
- * - Mobile: 2-3 books visible
- * - Desktop: 6 books visible
- * - Auto-slide functionality
+ * Single-book carousel component with prominent display
+ * - Shows one book at a time across all screen sizes
+ * - Auto-slide functionality (4-5 second intervals)
  * - Touch/swipe support via Embla
+ * - Smooth transitions and navigation controls
  */
 export const BookCarousel: React.FC<BookCarouselProps> = ({
   items,
   onItemClick,
   autoSlide = true,
-  autoSlideDelay = 5000
+  autoSlideDelay = 4000
 }) => {
   const autoplayRef = useRef(
     autoSlide ? Autoplay({ delay: autoSlideDelay, stopOnInteraction: true }) : null
@@ -56,18 +56,19 @@ export const BookCarousel: React.FC<BookCarouselProps> = ({
     <div className="relative">
       <Carousel
         opts={{
-          align: "start",
-          loop: items.length > 3,
+          align: "center",
+          loop: items.length > 1,
           skipSnaps: false,
+          slidesToScroll: 1,
         }}
         plugins={autoplayRef.current ? [autoplayRef.current] : []}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-4">
           {items.map((item) => (
             <CarouselItem
               key={item.id}
-              className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/4 xl:basis-1/6"
+              className="pl-4 basis-full"
             >
               <BookCard
                 item={item}
@@ -77,8 +78,8 @@ export const BookCarousel: React.FC<BookCarouselProps> = ({
           ))}
         </CarouselContent>
 
-        {/* Navigation Controls - Only show if more than visible items */}
-        {items.length > 3 && (
+        {/* Navigation Controls - Show if more than one item */}
+        {items.length > 1 && (
           <>
             <CarouselPrevious className="hidden md:flex -left-12 bg-white/90 hover:bg-white border-gray-200 shadow-lg" />
             <CarouselNext className="hidden md:flex -right-12 bg-white/90 hover:bg-white border-gray-200 shadow-lg" />
@@ -88,7 +89,7 @@ export const BookCarousel: React.FC<BookCarouselProps> = ({
         {/* Carousel Controls (dots indicator) - Must be inside Carousel context */}
         <CarouselControls
           totalItems={items.length}
-          visibleItems={6} // Desktop view
+          visibleItems={1} // Single book view
           className="mt-6"
         />
       </Carousel>
