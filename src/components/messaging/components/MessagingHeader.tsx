@@ -170,6 +170,7 @@ export function ConversationHeader({
   participantName,
   participantUsername,
   onBack,
+  onGoBack,
   isOnline = false,
   lastSeen,
   action,
@@ -178,6 +179,7 @@ export function ConversationHeader({
   participantName: string;
   participantUsername?: string;
   onBack: () => void;
+  onGoBack?: () => void;
   isOnline?: boolean;
   lastSeen?: string;
   action?: React.ReactNode;
@@ -191,12 +193,42 @@ export function ConversationHeader({
     ? `@${participantUsername}`
     : undefined;
 
+  // Add browser back button alongside existing actions
+  const combinedAction = (
+    <div className="flex items-center gap-3">
+      {onGoBack && (
+        <Button
+          onClick={onGoBack}
+          variant="ghost"
+          size="sm"
+          className="text-white hover:bg-white/20 active:bg-white/30 p-2.5 rounded-full transition-all duration-200 hover:scale-105"
+          aria-label="Go back to previous page"
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </Button>
+      )}
+      {action}
+    </div>
+  );
+
   return (
     <MessagingHeaderWithBack
       title={participantName}
       subtitle={subtitle}
       onBack={onBack}
-      action={action}
+      action={combinedAction}
       className={className}
     />
   );

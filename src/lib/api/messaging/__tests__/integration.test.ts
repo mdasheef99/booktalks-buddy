@@ -276,7 +276,7 @@ describe('Messaging API Integration Tests', () => {
 
       mockSupabaseClient.from.mockReturnValueOnce(conversationsMock);
 
-      const result = await getUserConversations('user-123');
+      const result = await getUserConversations({ userId: 'user-123' });
 
       expect(result.conversations).toHaveLength(1);
       expect(result.total_count).toBe(1);
@@ -293,7 +293,7 @@ describe('Messaging API Integration Tests', () => {
 
       mockSupabaseClient.from.mockReturnValueOnce(conversationsMock);
 
-      const result = await getUserConversations('user-123');
+      const result = await getUserConversations({ userId: 'user-123' });
 
       expect(result.conversations).toHaveLength(0);
       expect(result.total_count).toBe(0);
@@ -307,7 +307,7 @@ describe('Messaging API Integration Tests', () => {
 
       mockSupabaseClient.from.mockReturnValueOnce(conversationsMock);
 
-      await expect(getUserConversations('user-123')).rejects.toThrow(
+      await expect(getUserConversations({ userId: 'user-123' })).rejects.toThrow(
         'Failed to load conversations'
       );
     });

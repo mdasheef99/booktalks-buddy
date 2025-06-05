@@ -44,11 +44,7 @@ const EnhancedProfilePage: React.FC = () => {
         // Get profile data from database (includes avatar URLs)
         const userProfile = await getUserProfile(user.id);
 
-        // Get auth metadata for additional fields
-        const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
-
-        // Combine database profile data with auth metadata
+        // Combine database profile data with auth metadata from useAuth hook
         const combinedMetadata: UserMetadata = {
           // Database fields (primary source for avatar URLs)
           display_name: userProfile.displayname,
@@ -59,10 +55,10 @@ const EnhancedProfilePage: React.FC = () => {
           avatar_full_url: userProfile.avatar_full_url,
           bio: userProfile.bio,
           // Auth metadata fields (fallback for preferences)
-          reading_frequency: userData?.user_metadata?.reading_frequency,
-          favorite_genres: userData?.user_metadata?.favorite_genres || [],
-          favorite_authors: userData?.user_metadata?.favorite_authors || [],
-          preferred_meeting_times: userData?.user_metadata?.preferred_meeting_times || []
+          reading_frequency: user?.user_metadata?.reading_frequency,
+          favorite_genres: user?.user_metadata?.favorite_genres || [],
+          favorite_authors: user?.user_metadata?.favorite_authors || [],
+          preferred_meeting_times: user?.user_metadata?.preferred_meeting_times || []
         };
 
         setUserMetadata(combinedMetadata);
@@ -95,11 +91,7 @@ const EnhancedProfilePage: React.FC = () => {
       // Get fresh profile data from database
       const userProfile = await getUserProfile(user.id);
 
-      // Get auth metadata for additional fields
-      const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-
-      // Combine database profile data with auth metadata
+      // Combine database profile data with auth metadata from useAuth hook
       const combinedMetadata: UserMetadata = {
         // Database fields (primary source for avatar URLs)
         display_name: userProfile.displayname,
@@ -110,10 +102,10 @@ const EnhancedProfilePage: React.FC = () => {
         avatar_full_url: userProfile.avatar_full_url,
         bio: userProfile.bio,
         // Auth metadata fields (fallback for preferences)
-        reading_frequency: userData?.user_metadata?.reading_frequency,
-        favorite_genres: userData?.user_metadata?.favorite_genres || [],
-        favorite_authors: userData?.user_metadata?.favorite_authors || [],
-        preferred_meeting_times: userData?.user_metadata?.preferred_meeting_times || []
+        reading_frequency: user?.user_metadata?.reading_frequency,
+        favorite_genres: user?.user_metadata?.favorite_genres || [],
+        favorite_authors: user?.user_metadata?.favorite_authors || [],
+        preferred_meeting_times: user?.user_metadata?.preferred_meeting_times || []
       };
 
       setUserMetadata(combinedMetadata);

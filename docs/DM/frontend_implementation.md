@@ -188,7 +188,7 @@ export function MessageThreadPage() {
     error
   } = useQuery({
     queryKey: ['messages', conversationId],
-    queryFn: () => getConversationMessages(conversationId!, user!.id),
+    queryFn: () => getConversationMessages({ conversationId: conversationId!, userId: user!.id }),
     enabled: !!conversationId && !!user?.id
   });
 

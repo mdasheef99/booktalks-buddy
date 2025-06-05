@@ -8,12 +8,12 @@ interface UseScrollAnimationOptions {
 
 export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
   const {
-    threshold = 0.1,
-    rootMargin = '0px 0px -50px 0px',
+    threshold = 0.05, // Reduced threshold for easier triggering
+    rootMargin = '0px 0px 0px 0px', // Removed negative margins
     triggerOnce = true
   } = options;
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // START VISIBLE by default
   const [hasTriggered, setHasTriggered] = useState(false);
   const elementRef = useRef<HTMLElement>(null);
 
@@ -47,10 +47,32 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
 
     observer.observe(element);
 
+    // IMMEDIATE FALLBACK: Check if element is already in viewport
+    const checkVisibility = () => {
+      const rect = element.getBoundingClientRect();
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+      if (isInViewport && !isVisible) {
+        console.warn('🔧 Element in viewport but observer not triggered, forcing visibility');
+        setIsVisible(true);
+      }
+    };
+
+    // Check immediately
+    checkVisibility();
+
+    // FALLBACK: If element is not visible after 1 second, force visibility
+    const fallbackTimer = setTimeout(() => {
+      if (!isVisible) {
+        console.warn('🔧 Intersection Observer fallback triggered for element');
+        setIsVisible(true);
+      }
+    }, 1000);
+
     return () => {
       observer.unobserve(element);
+      clearTimeout(fallbackTimer);
     };
-  }, [threshold, rootMargin, triggerOnce, hasTriggered]);
+  }, [threshold, rootMargin, triggerOnce, hasTriggered, isVisible]);
 
   return { elementRef, isVisible };
 };
@@ -60,8 +82,7 @@ export const useStaggeredAnimation = (itemCount: number, options: UseScrollAnima
   const { elementRef, isVisible } = useScrollAnimation(options);
   
   const getStaggerClass = (index: number) => {
-    if (!isVisible) return 'opacity-0';
-
+    // Always show content immediately, just apply stagger animation
     const staggerIndex = Math.min(index + 1, 4); // Max 4 stagger classes
     return `animate-stagger-${staggerIndex}`;
   };
@@ -72,15 +93,16 @@ export const useStaggeredAnimation = (itemCount: number, options: UseScrollAnima
 // Hook for section animations
 export const useSectionAnimation = (animationType: 'fade-up' | 'fade-scale' = 'fade-up') => {
   const { elementRef, isVisible } = useScrollAnimation({
-    threshold: 0.2,
-    rootMargin: '0px 0px -100px 0px'
+    threshold: 0.1, // Reduced from 0.2 to 0.1 for earlier triggering
+    rootMargin: '0px 0px 0px 0px' // Removed negative bottom margin that was preventing triggering
   });
 
-  const animationClass = isVisible
-    ? animationType === 'fade-up'
-      ? 'animate-fade-in-up'
-      : 'animate-fade-in-scale'
-    : 'opacity-0 translate-y-5';
+  // Always show content immediately with animation
+  const animationClass = animationType === 'fade-up'
+    ? 'animate-fade-in-up'
+    : 'animate-fade-in-scale';
+
+
 
   return { elementRef, isVisible, animationClass };
 };

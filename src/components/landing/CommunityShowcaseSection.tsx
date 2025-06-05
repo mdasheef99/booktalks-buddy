@@ -21,6 +21,8 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
 
 
 
+
+
   // Show skeleton loading state briefly
   if (loading) {
     return (

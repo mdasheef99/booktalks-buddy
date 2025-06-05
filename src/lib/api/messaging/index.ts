@@ -25,14 +25,34 @@ export {
   updateConversationTimestamp
 } from './message-operations';
 
-// Data Retrieval Functions
+// Data Retrieval Functions (from modular structure)
 export {
   getUserConversations,
   getConversationMessages,
   searchConversationMessages,
   getConversationStats,
-  verifyDatabaseTables
-} from './data-retrieval';
+  verifyDatabaseTables,
+  getUserConversationsDefault,
+  getConversationMessagesDefault,
+  searchMessagesDefault,
+  getConversationById,
+  getMessageById,
+  getUserMessagingStats,
+  getConversationTimeline,
+  getMostActiveConversations,
+  isUserParticipant,
+  getConversationParticipants,
+  getUserInfo,
+  getUsersInfo,
+  getLastMessage,
+  getMessageCount,
+  getConversationCreatedAt,
+  conversationExists,
+  getConversationStoreId,
+  batchGetSenderInfo,
+  areAllTablesAccessible,
+  getTableStatusReport
+} from './data-retrieval/';
 
 // =========================
 // Permission Functions
@@ -120,7 +140,14 @@ export type {
   StoreContext,
   MessagingConfig,
   MessageAnalytics,
-  ConversationAnalytics
+  ConversationAnalytics,
+
+  // Data retrieval types
+  DatabaseTableStatus,
+  ConversationStatsResult,
+  MessageSearchOptions,
+  ConversationQueryOptions,
+  MessageQueryOptions
 } from './types';
 
 // =========================

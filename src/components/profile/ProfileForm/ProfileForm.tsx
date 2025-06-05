@@ -147,9 +147,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         onToggleMeetingTime={toggleMeetingTime}
       />
 
-      {/* Reading List Section */}
-      <ReadingListSection />
-
       {/* Form Actions */}
       <div className="flex justify-between pt-4 border-t border-gray-100">
         <Button

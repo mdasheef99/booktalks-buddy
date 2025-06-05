@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useStoreOwnerContext } from '@/components/routeguards/StoreOwnerRouteGuard';
-import { AnalyticsAPI, PerformanceAlert, BasicRecommendation, EnhancedAnalytics, SectionAnalytics } from '@/lib/api/store/analytics';
+import { AnalyticsAPI, PerformanceAlert, BasicRecommendation, EnhancedAnalytics, SectionAnalytics } from '@/lib/api/store/analytics/';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

@@ -57,7 +57,7 @@ export function MessageThreadPage() {
     error: messagesError
   } = useQuery({
     queryKey: ['messages', conversationId],
-    queryFn: () => getConversationMessages(conversationId!, user!.id),
+    queryFn: () => getConversationMessages({ conversationId: conversationId!, userId: user!.id }),
     enabled: !!conversationId && !!user?.id,
     refetchOnWindowFocus: false
   });
@@ -200,6 +200,13 @@ export function MessageThreadPage() {
   };
 
   /**
+   * Handle navigation back to previous page using browser history
+   */
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
+  /**
    * Get other participant info for header
    */
   const getOtherParticipant = () => {
@@ -247,6 +254,7 @@ export function MessageThreadPage() {
         participantName={otherParticipant?.displayname || otherParticipant?.username || 'Loading...'}
         participantUsername={otherParticipant?.username}
         onBack={handleBack}
+        onGoBack={handleGoBack}
         isOnline={false} // TODO: Implement online status
       />
 

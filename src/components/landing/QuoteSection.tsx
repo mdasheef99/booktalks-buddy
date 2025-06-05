@@ -15,6 +15,8 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({ storeId }) => {
 
 
 
+
+
   // Show skeleton loading state briefly
   if (loading) {
     return (
