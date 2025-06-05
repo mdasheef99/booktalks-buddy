@@ -120,7 +120,7 @@ export const PromotionalBannersSection: React.FC<PromotionalBannersSectionProps>
 
   // Main banners section
   return (
-    <section className="py-8 bg-gradient-to-r from-bookconnect-terracotta/5 to-bookconnect-sage/5 border-y border-bookconnect-sage/10">
+    <section className="py-16 md:py-20 bg-gradient-to-br from-bookconnect-sage/5 to-bookconnect-sage/10 border-y border-bookconnect-sage/20">
       <div className="container mx-auto px-4">
         {/* Section Header (optional, can be hidden for seamless banners) */}
         {bannerItems && bannerItems.length > 1 && (

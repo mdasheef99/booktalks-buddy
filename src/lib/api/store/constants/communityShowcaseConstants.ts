@@ -136,7 +136,7 @@ export const QUERY_SELECTORS = {
       id,
       username,
       displayname,
-      account_tier,
+      membership_tier,
       created_at
     ),
     book_clubs!inner(store_id)

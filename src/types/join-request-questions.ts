@@ -42,8 +42,9 @@ export interface ReorderQuestionsRequest {
 export interface JoinRequestAnswer {
   question_id: string;
   question_text: string;
-  answer: string;
+  answer_text: string;
   is_required: boolean;
+  display_order: number;
 }
 
 export interface SubmitAnswersRequest {
@@ -54,7 +55,10 @@ export interface SubmitAnswersRequest {
 }
 
 export interface JoinAnswersData {
-  answers: JoinRequestAnswer[];
+  answers: Array<{
+    question_id: string;
+    answer: string;
+  }>;
   submitted_at: string;
 }
 
@@ -126,6 +130,7 @@ export interface JoinRequestReviewModalProps {
     display_name: string;
     requested_at: string;
     answers: JoinRequestAnswer[];
+    has_answers: boolean;
   };
   onApprove: () => Promise<void>;
   onReject: () => Promise<void>;

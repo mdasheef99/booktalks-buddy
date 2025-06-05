@@ -52,6 +52,30 @@ export class QuotesAPI {
   }
 
   /**
+   * Fetch only currently active quotes for a store (OPTIMIZED)
+   */
+  static async getActiveStoreQuotes(storeId: string): Promise<CustomQuote[]> {
+    const now = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('store_custom_quotes')
+      .select('*')
+      .eq('store_id', storeId)
+      .eq('is_active', true)
+      .or(`start_date.is.null,start_date.lte.${now}`)
+      .or(`end_date.is.null,end_date.gt.${now}`)
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching active store quotes:', error);
+      throw new Error('Failed to fetch active quotes');
+    }
+
+    return data || [];
+  }
+
+  /**
    * Get current active quote for display
    */
   static async getCurrentActiveQuote(storeId: string): Promise<CustomQuote | null> {

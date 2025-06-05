@@ -74,7 +74,7 @@ const UserNameDebugTest: React.FC = () => {
         const { supabase } = await import('@/lib/supabase');
         const { data, error } = await supabase
           .from('users')
-          .select('id, username, displayname, account_tier')
+          .select('id, username, displayname, membership_tier')
           .limit(10);
 
         if (error) {

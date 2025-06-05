@@ -18,30 +18,46 @@ export const useCustomQuotes = (storeId?: string): UseCustomQuotesResult => {
   const [currentQuote, setCurrentQuote] = useState<CustomQuote | null>(null);
   const [rotationIndex, setRotationIndex] = useState(0);
 
-  // Fetch all active quotes for the store
+
+
+  // Fetch active quotes for the store (OPTIMIZED - database-level filtering)
   const {
     data: allQuotes = [],
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['store-quotes', storeId],
+    queryKey: ['store-quotes-active', storeId],
     queryFn: async () => {
       if (!storeId) return [];
-      
-      const now = new Date().toISOString();
-      const quotes = await QuotesAPI.getStoreQuotes(storeId);
-      
-      // Filter for currently active quotes
-      return quotes.filter(quote => 
-        quote.is_active &&
-        (!quote.start_date || quote.start_date <= now) &&
-        (!quote.end_date || quote.end_date > now)
-      );
+
+      try {
+        // Use optimized API that filters at database level
+        return await QuotesAPI.getActiveStoreQuotes(storeId);
+      } catch (optimizedError) {
+        console.warn('Optimized quotes API failed, falling back to legacy:', optimizedError);
+
+        // Fallback to legacy client-side filtering
+        const now = new Date().toISOString();
+        const quotes = await QuotesAPI.getStoreQuotes(storeId);
+
+        return quotes.filter(quote =>
+          quote.is_active &&
+          (!quote.start_date || quote.start_date <= now) &&
+          (!quote.end_date || quote.end_date > now)
+        );
+      }
     },
     enabled: !!storeId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes
+    retry: (failureCount, error) => {
+      // Retry up to 2 times for network errors, but not for data errors
+      if (failureCount < 2 && error?.message?.includes('Failed to fetch')) {
+        return true;
+      }
+      return false;
+    },
   });
 
   // Quote rotation logic

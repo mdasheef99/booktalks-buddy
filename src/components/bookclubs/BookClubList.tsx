@@ -1,29 +1,33 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
-import { getClubs } from '@/lib/api';
+import { getClubs, getCreatedClubs, getJoinedClubs } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 import ClubPhotoDisplay from './photos/ClubPhotoDisplay';
 import ClubMemberCount from './ClubMemberCount';
 
-type BookClub = Database['public']['Tables']['book_clubs']['Row'];
-type BookClubInsert = Database['public']['Tables']['book_clubs']['Insert'];
-type ClubMember = Database['public']['Tables']['club_members']['Row'];
-type ClubMemberInsert = Database['public']['Tables']['club_members']['Insert'];
+// Extended type to include photo properties that may not be in generated types
+type BookClub = Database['public']['Tables']['book_clubs']['Row'] & {
+  cover_photo_url?: string | null;
+  cover_photo_thumbnail_url?: string | null;
+};
 
 // BookClubCard component to handle individual club cards
+interface BookClubListProps {
+  clubType?: 'all' | 'created' | 'joined';
+}
+
 interface BookClubCardProps {
   club: BookClub;
   onClick: () => void;
 }
 
 const BookClubCard: React.FC<BookClubCardProps> = ({ club, onClick }) => {
-  const navigate = useNavigate();
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
 
@@ -104,15 +108,11 @@ const BookClubCard: React.FC<BookClubCardProps> = ({ club, onClick }) => {
   );
 };
 
-export const BookClubList: React.FC = () => {
+export const BookClubList: React.FC<BookClubListProps> = ({ clubType = 'all' }) => {
   const [bookClubs, setBookClubs] = useState<BookClub[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Check if we're coming from club details
-  const fromClubDetails = location.state?.fromClubDetails;
 
   // Fetch book clubs
   useEffect(() => {
@@ -123,7 +123,18 @@ export const BookClubList: React.FC = () => {
           return;
         }
 
-        const clubs = await getClubs(user.id);
+        let clubs: BookClub[];
+        switch (clubType) {
+          case 'created':
+            clubs = await getCreatedClubs(user.id);
+            break;
+          case 'joined':
+            clubs = await getJoinedClubs(user.id);
+            break;
+          default:
+            clubs = await getClubs(user.id);
+            break;
+        }
         setBookClubs(clubs);
       } catch (error) {
         toast.error('Failed to load book clubs');
@@ -143,7 +154,7 @@ export const BookClubList: React.FC = () => {
           event: '*',
           schema: 'public',
           table: 'book_clubs'
-        }, (payload) => {
+        }, () => {
           fetchBookClubs(); // Refresh the list when changes occur
         })
         .subscribe();
@@ -152,7 +163,7 @@ export const BookClubList: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [user?.id]); // Add user?.id as dependency to re-run when user changes
+  }, [user?.id, clubType]); // Add user?.id and clubType as dependencies
 
 
   if (loading) {

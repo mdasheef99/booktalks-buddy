@@ -50,14 +50,14 @@ export const sortActivitiesByDate = (activities: ActivityFeedItem[]): ActivityFe
  */
 export const deduplicateStoreUsers = (members: any[]): StoreUser[] => {
   const uniqueUsers = new Map();
-  
+
   members?.forEach(member => {
     if (!uniqueUsers.has(member.user_id)) {
       uniqueUsers.set(member.user_id, {
         id: member.users.id,
         username: member.users.username,
         displayname: member.users.displayname,
-        membership_tier: member.users.membership_tier,
+        membership_tier: member.users.membership_tier || 'MEMBER',
         created_at: member.users.created_at,
         first_joined: member.joined_at
       });

@@ -7,6 +7,7 @@ import { BookClub } from './hooks/useClubDiscovery';
 import JoinRequestModal from './questions/JoinRequestModal';
 import { getClubQuestions } from '@/lib/api/bookclubs/questions';
 import { useJoinRequest } from '@/hooks/useJoinRequestQuestions';
+import { useIsMobile } from '@/hooks/use-mobile';
 import ClubPhotoDisplay from './photos/ClubPhotoDisplay';
 import ClubMemberCount from './ClubMemberCount';
 import type { ClubJoinQuestion, SubmitAnswersRequest } from '@/types/join-request-questions';
@@ -40,6 +41,7 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
   const [modalMode, setModalMode] = useState<'preview' | 'submit'>('preview');
   
   const { submitJoinRequest, loading: submittingRequest } = useJoinRequest();
+  const isMobile = useIsMobile();
 
   // Debug logging (remove in production)
   if (process.env.NODE_ENV === 'development') {
@@ -93,23 +95,8 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
         console.log(`📝 Question count: ${result.questions.length}`);
         setQuestions(result.questions);
       } else {
-        console.log(`❌ API failed for ${club.name}, trying direct database access:`, result.error || 'Unknown error');
-
-        // Fallback: Direct database access
-        const { supabase } = await import('@/lib/supabase');
-        const { data: directQuestions, error: directError } = await supabase
-          .from('club_join_questions')
-          .select('*')
-          .eq('club_id', club.id)
-          .order('display_order', { ascending: true });
-
-        if (directError) {
-          console.error(`💥 Direct database access also failed for ${club.name}:`, directError);
-          setQuestions([]);
-        } else {
-          console.log(`✅ Direct database access succeeded for ${club.name}:`, directQuestions?.length || 0, 'questions');
-          setQuestions(directQuestions || []);
-        }
+        console.log(`❌ No questions found for ${club.name}:`, result.error || 'Unknown error');
+        setQuestions([]);
       }
     } catch (error) {
       console.error(`💥 Error loading questions for ${club.name}:`, error);
@@ -196,6 +183,7 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
             onViewClub(club.id);
           }}
           variant="outline"
+          className={isMobile ? 'h-12' : ''}
         >
           View Club
         </Button>
@@ -212,6 +200,7 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
           }}
           variant="outline"
           disabled={isLoading}
+          className={isMobile ? 'h-12' : ''}
         >
           {isLoading ? 'Cancelling...' : 'Cancel Request'}
         </Button>
@@ -231,12 +220,12 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
           : 'Submit your join request';
 
         return (
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className={`flex ${isMobile ? 'flex-col' : 'flex-col sm:flex-row'} gap-2`}>
             <Button
               onClick={handleViewQuestions}
               disabled={isLoading || loadingQuestions}
               variant="outline"
-              className="bg-bookconnect-brown text-white hover:bg-bookconnect-brown/90 border-bookconnect-brown"
+              className={`bg-bookconnect-brown text-white hover:bg-bookconnect-brown/90 border-bookconnect-brown ${isMobile ? 'h-12' : ''}`}
             >
               <Eye className="h-4 w-4 mr-2" />
               View Questions
@@ -249,7 +238,7 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
                 canSubmitJoinRequest
                   ? 'bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              } ${isMobile ? 'h-12' : ''}`}
             >
               {isLoading ? 'Processing...' : 'Request to Join'}
             </Button>
@@ -257,11 +246,11 @@ const EnhancedDiscoveryBookClubCard: React.FC<EnhancedDiscoveryBookClubCardProps
         );
       }
 
-      // If no questions loaded yet, show loading state or fallback
+      // If no questions loaded yet, show loading state
       if (loadingQuestions) {
         console.log(`⏳ Showing loading state for ${club.name}`);
         return (
-          <Button disabled variant="outline">
+          <Button disabled variant="outline" className={isMobile ? 'h-12' : ''}>
             Loading Questions...
           </Button>
         );

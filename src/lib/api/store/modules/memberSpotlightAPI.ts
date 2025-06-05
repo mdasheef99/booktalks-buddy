@@ -62,7 +62,7 @@ export class MemberSpotlightAPI {
     // Fetch user data from the users table (not auth.users)
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('id, username, displayname, account_tier, created_at')
+      .select('id, username, displayname, membership_tier, created_at')
       .in('id', userIds);
 
     if (usersError) {
@@ -73,7 +73,7 @@ export class MemberSpotlightAPI {
         userData: {
           username: 'Unknown User',
           displayname: 'Unknown User',
-          account_tier: 'free',
+          membership_tier: 'MEMBER',
           created_at: new Date().toISOString()
         }
       }));
@@ -120,7 +120,7 @@ export class MemberSpotlightAPI {
     // Fetch user data separately
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id, username, displayname, account_tier, created_at')
+      .select('id, username, displayname, membership_tier, created_at')
       .eq('id', spotlightData.featured_member_id)
       .single();
 
@@ -132,7 +132,7 @@ export class MemberSpotlightAPI {
         userData: {
           username: 'Unknown User',
           displayname: 'Unknown User',
-          account_tier: 'free',
+          membership_tier: 'MEMBER',
           created_at: new Date().toISOString()
         }
       };
@@ -205,7 +205,7 @@ export class MemberSpotlightAPI {
       // This works because of the emergency RLS policy: "Allow authenticated users to view all profiles"
       const { data: allUsers, error: usersError } = await supabase
         .from('users')
-        .select('id, username, displayname, account_tier, created_at')
+        .select('id, username, displayname, membership_tier, created_at')
         .order('username');
 
       if (usersError) {
@@ -278,7 +278,7 @@ export class MemberSpotlightAPI {
         id: user.id,
         username: user.username || '',
         displayname: user.displayname || undefined,
-        account_tier: user.account_tier || 'free',
+        membership_tier: user.membership_tier || 'MEMBER',
         created_at: user.created_at || '',
         first_joined: userJoinMap.get(user.id) || user.created_at || ''
       }));

@@ -24,6 +24,17 @@ export async function submitJoinRequestWithAnswers(
   answers?: SubmitAnswersRequest
 ): Promise<JoinRequestResponse> {
   try {
+    // Get current user using consistent authentication pattern
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        message: 'Authentication required',
+        error: 'AUTH_REQUIRED'
+      };
+    }
+
     // First, check if the club requires questions
     const { data: clubData, error: clubError } = await supabase
       .from('book_clubs')
@@ -55,35 +66,12 @@ export async function submitJoinRequestWithAnswers(
     // Prepare join answers data
     let joinAnswersData: JoinAnswersData | null = null;
     if (answers && answers.answers.length > 0) {
-      // Get question details for the answers
-      const { data: questions, error: questionsError } = await supabase
-        .from('club_join_questions')
-        .select('*')
-        .eq('club_id', clubId)
-        .in('id', answers.answers.map(a => a.question_id));
-
-      if (questionsError) {
-        console.error('Error fetching questions:', questionsError);
-        return {
-          success: false,
-          message: 'Failed to validate questions',
-          error: questionsError.message
-        };
-      }
-
-      // Build the answers data with question context
-      const answersWithContext: JoinRequestAnswer[] = answers.answers.map(answer => {
-        const question = questions.find(q => q.id === answer.question_id);
-        return {
-          question_id: answer.question_id,
-          question_text: question?.question_text || '',
-          answer: answer.answer,
-          is_required: question?.is_required || false
-        };
-      });
-
+      // Store raw answer data (database constraint expects simple format)
       joinAnswersData = {
-        answers: answersWithContext,
+        answers: answers.answers.map(answer => ({
+          question_id: answer.question_id,
+          answer: answer.answer
+        })),
         submitted_at: new Date().toISOString()
       };
     }
@@ -96,9 +84,9 @@ export async function submitJoinRequestWithAnswers(
       .from('club_members')
       .insert({
         club_id: clubId,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: user.id,
         role: role,
-        join_answers: joinAnswersData
+        join_answers: joinAnswersData as any // Cast to Json type for Supabase
       })
       .select()
       .single();
@@ -168,7 +156,7 @@ export async function getJoinRequestAnswers(
     // Get user information
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('username, display_name')
+      .select('username, displayname')
       .eq('id', userId)
       .single();
 
@@ -180,16 +168,40 @@ export async function getJoinRequestAnswers(
       };
     }
 
-    // Parse answers data
-    const answersData = memberData.join_answers as JoinAnswersData | null;
-    
+    // Parse answers data with type safety
+    const answersData = memberData.join_answers ?
+      (memberData.join_answers as unknown as JoinAnswersData) : null;
+
+    // Get club questions to enrich the raw answer data
+    const { data: questions, error: questionsError } = await supabase
+      .from('club_join_questions')
+      .select('id, question_text, is_required, display_order')
+      .eq('club_id', clubId)
+      .order('display_order', { ascending: true });
+
+    if (questionsError) {
+      console.warn('Could not fetch club questions:', questionsError);
+    }
+
+    // Process raw answers into enriched format
+    const processedAnswers: JoinRequestAnswer[] = answersData?.answers?.map(answer => {
+      const question = questions?.find(q => q.id === answer.question_id);
+      return {
+        question_id: answer.question_id,
+        question_text: question?.question_text || '',
+        answer_text: answer.answer,
+        is_required: question?.is_required || false,
+        display_order: question?.display_order || 0
+      };
+    }).sort((a, b) => a.display_order - b.display_order) || [];
+
     return {
       success: true,
-      answers: answersData?.answers || [],
+      answers: processedAnswers,
       user_info: {
         user_id: userId,
         username: userData.username,
-        display_name: userData.display_name
+        display_name: userData.displayname || userData.username
       },
       submitted_at: answersData?.submitted_at
     };
@@ -218,15 +230,10 @@ export async function getClubJoinRequests(clubId: string): Promise<{
   error?: string;
 }> {
   try {
-    // Get pending join requests
+    // Get pending join requests without join
     const { data: requests, error: requestsError } = await supabase
       .from('club_members')
-      .select(`
-        user_id,
-        joined_at,
-        join_answers,
-        users!inner(username, display_name)
-      `)
+      .select('user_id, joined_at, join_answers')
       .eq('club_id', clubId)
       .eq('role', 'pending')
       .order('joined_at', { ascending: false });
@@ -239,16 +246,69 @@ export async function getClubJoinRequests(clubId: string): Promise<{
       };
     }
 
+    if (!requests || requests.length === 0) {
+      return {
+        success: true,
+        requests: []
+      };
+    }
+
+    // Get user details separately
+    const userIds = requests.map(r => r.user_id);
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, username, displayname')
+      .in('id', userIds);
+
+    if (usersError) {
+      console.warn('Could not fetch user details:', usersError);
+    }
+
+    // Get club questions for answer processing
+    const { data: questions, error: questionsError } = await supabase
+      .from('club_join_questions')
+      .select('id, question_text, is_required, display_order')
+      .eq('club_id', clubId)
+      .order('display_order', { ascending: true });
+
+    if (questionsError) {
+      console.warn('Could not fetch club questions:', questionsError);
+    }
+
     // Format the response
     const formattedRequests = requests.map(request => {
-      const answersData = request.join_answers as JoinAnswersData | null;
+      const user = users?.find(u => u.id === request.user_id);
+      const answersData = request.join_answers ?
+        (request.join_answers as unknown as JoinAnswersData) : null;
+
+      // Process answers with question context
+      let processedAnswers: JoinRequestAnswer[] = [];
+      if (answersData?.answers && questions) {
+        processedAnswers = answersData.answers
+          .map(answer => {
+            const question = questions.find(q => q.id === answer.question_id);
+            if (question) {
+              return {
+                question_id: question.id,
+                question_text: question.question_text,
+                answer_text: answer.answer || '',
+                is_required: question.is_required,
+                display_order: question.display_order
+              };
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.display_order - b.display_order);
+      }
+
       return {
         user_id: request.user_id,
-        username: request.users.username,
-        display_name: request.users.display_name,
+        username: user?.username || `user_${request.user_id.substring(0, 8)}`,
+        display_name: user?.displayname || user?.username || `User ${request.user_id.substring(0, 8)}`,
         requested_at: request.joined_at || new Date().toISOString(),
         has_answers: !!answersData?.answers?.length,
-        answers: answersData?.answers || []
+        answers: processedAnswers
       };
     });
 

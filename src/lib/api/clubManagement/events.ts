@@ -296,7 +296,7 @@ export async function getClubEvents(clubId: string): Promise<any[]> {
 // =====================================================
 
 /**
- * Create or update an RSVP for a club meeting
+ * Create or update an RSVP for a club meeting with attendee limit validation
  */
 export async function upsertMeetingRSVP(
   meetingId: string,
@@ -305,6 +305,33 @@ export async function upsertMeetingRSVP(
   rsvpStatus: RSVPStatus
 ): Promise<ClubMeetingRSVP> {
   try {
+    // First, get meeting details to check attendee limits
+    const { data: meeting, error: meetingError } = await supabase
+      .from('club_meetings')
+      .select('max_attendees, title')
+      .eq('id', meetingId)
+      .single();
+
+    if (meetingError) throw meetingError;
+
+    // If changing to 'going' and there's an attendee limit, check current count
+    if (rsvpStatus === 'going' && meeting.max_attendees) {
+      const { data: currentRSVPs, error: countError } = await supabase
+        .from('club_meeting_rsvps')
+        .select('user_id')
+        .eq('meeting_id', meetingId)
+        .eq('rsvp_status', 'going')
+        .neq('user_id', userId); // Exclude current user
+
+      if (countError) throw countError;
+
+      const currentGoingCount = currentRSVPs?.length || 0;
+
+      if (currentGoingCount >= meeting.max_attendees) {
+        throw new Error(`Meeting "${meeting.title}" is full. Maximum attendees: ${meeting.max_attendees}, Current attendees: ${currentGoingCount}`);
+      }
+    }
+
     const { data, error } = await supabase
       .from('club_meeting_rsvps')
       .upsert([{
@@ -318,10 +345,20 @@ export async function upsertMeetingRSVP(
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // Handle database trigger errors for attendee limits
+      if (error.code === 'P0001' && error.message.includes('Meeting is full')) {
+        throw new Error(error.message);
+      }
+      throw error;
+    }
 
     return data;
   } catch (error) {
+    // Re-throw attendee limit errors with original message
+    if (error instanceof Error && error.message.includes('full')) {
+      throw error;
+    }
     handleAPIError(error, 'upsert meeting RSVP');
   }
 }

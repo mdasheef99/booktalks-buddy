@@ -25,6 +25,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 import type { JoinRequestReviewModalProps } from '@/types/join-request-questions';
 
 export default function JoinRequestReviewModal({
@@ -37,6 +38,7 @@ export default function JoinRequestReviewModal({
 }: JoinRequestReviewModalProps) {
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleApprove = async () => {
     setIsApproving(true);
@@ -85,7 +87,7 @@ export default function JoinRequestReviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={`${isMobile ? 'max-w-[95vw]' : 'max-w-3xl'} max-h-[90vh] overflow-y-auto`}>
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-bookconnect-brown">
             Review Join Request
@@ -203,11 +205,12 @@ export default function JoinRequestReviewModal({
         </div>
 
         {/* Action buttons */}
-        <div className="flex justify-end space-x-3 pt-4 border-t">
+        <div className={`${isMobile ? 'flex flex-col space-y-3' : 'flex justify-end space-x-3'} pt-4 border-t`}>
           <Button
             onClick={onClose}
             variant="outline"
             disabled={isApproving || isRejecting || isLoading}
+            className={isMobile ? 'h-12' : ''}
           >
             Close
           </Button>
@@ -215,6 +218,7 @@ export default function JoinRequestReviewModal({
             onClick={handleReject}
             variant="destructive"
             disabled={isApproving || isRejecting || isLoading}
+            className={isMobile ? 'h-12' : ''}
           >
             {isRejecting ? (
               <>
@@ -231,7 +235,7 @@ export default function JoinRequestReviewModal({
           <Button
             onClick={handleApprove}
             disabled={isApproving || isRejecting || isLoading}
-            className="bg-green-600 hover:bg-green-700"
+            className={`bg-green-600 hover:bg-green-700 ${isMobile ? 'h-12' : ''}`}
           >
             {isApproving ? (
               <>
@@ -256,8 +260,9 @@ interface AnswerCardProps {
   answer: {
     question_id: string;
     question_text: string;
-    answer: string;
+    answer_text: string;
     is_required: boolean;
+    display_order: number;
   };
   index: number;
 }
@@ -278,17 +283,17 @@ function AnswerCard({ answer, index }: AnswerCardProps) {
           )}
         </div>
         <div className="text-xs text-gray-500">
-          {answer.answer.length} characters
+          {answer.answer_text.length} characters
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <p className="text-sm font-medium text-gray-900">
           {answer.question_text}
         </p>
         <div className="bg-white p-3 rounded border">
           <p className="text-sm text-gray-700 whitespace-pre-wrap">
-            {answer.answer}
+            {answer.answer_text}
           </p>
         </div>
       </div>

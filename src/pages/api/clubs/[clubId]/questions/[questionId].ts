@@ -1,18 +1,14 @@
 /**
  * API endpoint for managing individual club join request questions
- * 
- * PUT /api/clubs/[clubId]/questions/[questionId] - Update a question
- * DELETE /api/clubs/[clubId]/questions/[questionId] - Delete a question
+ *
+ * PUT /api/clubs/[clubId]/questions/[questionId] - Update a question (authenticated, club lead only)
+ * DELETE /api/clubs/[clubId]/questions/[questionId] - Delete a question (authenticated, club lead only)
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { withAuth, validateClubLead } from '@/lib/api/middleware/auth';
 import type { UpdateQuestionRequest } from '@/types/join-request-questions';
-
-// Create server-side Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+import { QUESTION_CONSTRAINTS } from '@/types/join-request-questions';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { clubId, questionId } = req.query;
@@ -31,131 +27,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  // Get current user from Authorization header
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
-      success: false,
-      error: 'Authentication required'
-    });
-  }
+  // All operations require authentication
+  const authResult = await withAuth(req, res);
+  if (!authResult) return; // Auth middleware handles response
 
-  const token = authHeader.substring(7);
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  const { supabase, user } = authResult;
 
-  if (authError || !user) {
-    return res.status(401).json({
-      success: false,
-      error: 'Authentication required'
-    });
-  }
-
-  // Verify user is club lead
-  const { data: club, error: clubError } = await supabase
-    .from('book_clubs')
-    .select('lead_user_id')
-    .eq('id', clubId)
-    .single();
-
-  if (clubError || !club) {
-    return res.status(404).json({
-      success: false,
-      error: 'Club not found'
-    });
-  }
-
-  if (club.lead_user_id !== user.id) {
+  // Verify user is club lead using RLS-enabled query
+  const isClubLead = await validateClubLead(supabase, clubId, user.id);
+  if (!isClubLead) {
     return res.status(403).json({
       success: false,
       error: 'Only club leads can manage questions'
     });
   }
 
-  // Verify question belongs to this club
+  // Verify question exists and belongs to this club using RLS
   const { data: question, error: questionError } = await supabase
     .from('club_join_questions')
-    .select('club_id')
+    .select('id, club_id')
     .eq('id', questionId)
+    .eq('club_id', clubId)
     .single();
 
   if (questionError || !question) {
     return res.status(404).json({
       success: false,
-      error: 'Question not found'
-    });
-  }
-
-  if (question.club_id !== clubId) {
-    return res.status(403).json({
-      success: false,
-      error: 'Question does not belong to this club'
+      error: 'Question not found or access denied'
     });
   }
 
   try {
     switch (req.method) {
       case 'PUT':
-        const updateData: UpdateQuestionRequest = req.body;
-
-        // Validate input if provided
-        if (updateData.question_text !== undefined) {
-          if (!updateData.question_text.trim() || updateData.question_text.length > 200) {
-            return res.status(400).json({
-              success: false,
-              error: 'Question text must be between 1 and 200 characters'
-            });
-          }
-        }
-
-        const updateFields: any = {};
-        if (updateData.question_text !== undefined) {
-          updateFields.question_text = updateData.question_text.trim();
-        }
-        if (updateData.is_required !== undefined) {
-          updateFields.is_required = updateData.is_required;
-        }
-        if (updateData.display_order !== undefined) {
-          updateFields.display_order = updateData.display_order;
-        }
-
-        const { data: updatedQuestion, error: updateError } = await supabase
-          .from('club_join_questions')
-          .update(updateFields)
-          .eq('id', questionId)
-          .select()
-          .single();
-
-        if (updateError) {
-          console.error('Error updating club question:', updateError);
-          return res.status(400).json({
-            success: false,
-            error: updateError.message
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          question: updatedQuestion
-        });
-
+        return await handleUpdateQuestion(req, res, supabase, questionId);
       case 'DELETE':
-        const { error: deleteError } = await supabase
-          .from('club_join_questions')
-          .delete()
-          .eq('id', questionId);
-
-        if (deleteError) {
-          console.error('Error deleting club question:', deleteError);
-          return res.status(400).json({
-            success: false,
-            error: deleteError.message
-          });
-        }
-
-        return res.status(200).json({
-          success: true
-        });
-
+        return await handleDeleteQuestion(req, res, supabase, questionId);
       default:
         return res.status(405).json({
           success: false,
@@ -169,4 +76,94 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       error: 'Internal server error'
     });
   }
+}
+
+/**
+ * Handle PUT requests - Update question
+ */
+async function handleUpdateQuestion(req: NextApiRequest, res: NextApiResponse, supabase: any, questionId: string) {
+  const updateData: UpdateQuestionRequest = req.body;
+
+  // Validate input if provided
+  if (updateData.question_text !== undefined) {
+    if (!updateData.question_text.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Question text cannot be empty'
+      });
+    }
+
+    if (updateData.question_text.length > QUESTION_CONSTRAINTS.MAX_QUESTION_LENGTH) {
+      return res.status(400).json({
+        success: false,
+        error: `Question text must be ${QUESTION_CONSTRAINTS.MAX_QUESTION_LENGTH} characters or less`
+      });
+    }
+  }
+
+  if (updateData.display_order !== undefined) {
+    if (updateData.display_order < QUESTION_CONSTRAINTS.MIN_DISPLAY_ORDER ||
+        updateData.display_order > QUESTION_CONSTRAINTS.MAX_DISPLAY_ORDER) {
+      return res.status(400).json({
+        success: false,
+        error: `Display order must be between ${QUESTION_CONSTRAINTS.MIN_DISPLAY_ORDER} and ${QUESTION_CONSTRAINTS.MAX_DISPLAY_ORDER}`
+      });
+    }
+  }
+
+  // Build update fields
+  const updateFields: any = {};
+  if (updateData.question_text !== undefined) {
+    updateFields.question_text = updateData.question_text.trim();
+  }
+  if (updateData.is_required !== undefined) {
+    updateFields.is_required = updateData.is_required;
+  }
+  if (updateData.display_order !== undefined) {
+    updateFields.display_order = updateData.display_order;
+  }
+
+  // Update using RLS-enabled client
+  const { data: updatedQuestion, error: updateError } = await supabase
+    .from('club_join_questions')
+    .update(updateFields)
+    .eq('id', questionId)
+    .select()
+    .single();
+
+  if (updateError) {
+    console.error('Error updating club question:', updateError);
+    return res.status(400).json({
+      success: false,
+      error: updateError.message
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    question: updatedQuestion
+  });
+}
+
+/**
+ * Handle DELETE requests - Delete question
+ */
+async function handleDeleteQuestion(req: NextApiRequest, res: NextApiResponse, supabase: any, questionId: string) {
+  // Delete using RLS-enabled client
+  const { error: deleteError } = await supabase
+    .from('club_join_questions')
+    .delete()
+    .eq('id', questionId);
+
+  if (deleteError) {
+    console.error('Error deleting club question:', deleteError);
+    return res.status(400).json({
+      success: false,
+      error: deleteError.message
+    });
+  }
+
+  return res.status(200).json({
+    success: true
+  });
 }

@@ -39,6 +39,7 @@ import ModerationPage from "./pages/admin/ModerationPage";
 import { StoreManagementDashboard } from "@/pages/admin/store/StoreManagementDashboard";
 import { HeroCustomization } from "@/pages/admin/store/HeroCustomization";
 import { LandingPageAnalytics } from "@/pages/admin/store/LandingPageAnalytics";
+import { BookClubAnalytics } from "@/pages/admin/store/BookClubAnalytics";
 import CarouselManagement from "@/pages/admin/store/CarouselManagement";
 import BannerManagement from "@/pages/admin/store/BannerManagement";
 import { QuoteManagement } from "@/pages/admin/store/QuoteManagement";
@@ -208,6 +209,7 @@ function App() {
                     <Route path="community" element={<CommunityShowcaseManagement />} />
                     <Route path="quotes" element={<QuoteManagement />} />
                     <Route path="analytics" element={<LandingPageAnalytics />} />
+                    <Route path="book-club-analytics" element={<BookClubAnalytics />} />
                   </Routes>
                 </StoreOwnerRouteGuard>
               } />

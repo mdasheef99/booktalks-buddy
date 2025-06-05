@@ -77,8 +77,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <h1 className="text-2xl font-bold font-serif text-bookconnect-brown">
                   {userMetadata.display_name || userMetadata.username || user.email?.split('@')[0] || 'BookClub Member'}
                 </h1>
-                {user.account_tier && (
-                  <UserTierBadge tier={user.account_tier} size="md" />
+                {user.membership_tier && (
+                  <UserTierBadge tier={user.membership_tier} size="md" />
                 )}
               </div>
               <p className="text-sm text-gray-600">{user.email}</p>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useHeroCustomization } from "@/hooks/useHeroCustomization";
 import { FONT_STYLE_CONFIGS, CHAT_BUTTON_CONFIGS } from "@/lib/api/store/heroCustomization";
 import { cn } from "@/lib/utils";
+import { useSectionAnimation } from "../../hooks/useScrollAnimation";
 
 interface HeroSectionProps {
   handleStartChatting: () => void;
@@ -13,14 +14,12 @@ interface HeroSectionProps {
 
 const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
   const { data: heroCustomization, isLoading } = useHeroCustomization(storeId);
+  const { elementRef, animationClass } = useSectionAnimation('fade-scale');
   return (
     <div
-      className="relative min-h-[65vh] flex items-center justify-center text-center px-4 py-24 md:py-36 overflow-hidden"
+      className="relative min-h-[65vh] flex items-center justify-center text-center px-4 py-24 md:py-36 overflow-hidden bg-cover bg-center"
       style={{
-        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed"
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')"
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -40,18 +39,18 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
         </div>
       </div>
 
-      <div className="z-10 max-w-4xl animate-fade-in">
+      <div ref={elementRef} className={cn("z-10 max-w-4xl", animationClass)}>
         <span className="inline-block px-4 py-1 rounded-full bg-bookconnect-terracotta/20 text-bookconnect-cream text-sm font-medium tracking-wide mb-6 backdrop-blur-sm border border-bookconnect-terracotta/30">
           Welcome to BookConnect
         </span>
 
-        <h1 className="font-serif text-4xl md:text-5xl lg:text-7xl text-white font-bold mb-6 leading-tight">
+        <h1 className="font-serif text-4xl md:text-5xl lg:text-7xl text-white font-bold mb-6 leading-tight tracking-tight">
           Connect Through <span className="relative">Books
             <span className="absolute bottom-1 left-0 w-full h-2 bg-bookconnect-terracotta/40"></span>
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base md:text-lg lg:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
           Join our community of book lovers and connect anonymously through your shared passion for reading
         </p>
 
@@ -96,20 +95,20 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
               onClick={handleStartChatting}
               size="lg"
               className={cn(
-                "text-white rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg group",
+                "text-white rounded-md button-hover-lift focus-ring-enhanced group",
                 CHAT_BUTTON_CONFIGS.sizes[heroCustomization.chatButton.size as keyof typeof CHAT_BUTTON_CONFIGS.sizes]?.className || "px-8 py-7 text-xl",
                 CHAT_BUTTON_CONFIGS.colorSchemes[heroCustomization.chatButton.colorScheme as keyof typeof CHAT_BUTTON_CONFIGS.colorSchemes]?.className || "bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
               )}
             >
-              <BookOpen className="mr-2" />
+              <BookOpen className="mr-2 icon-transition" />
               {heroCustomization.chatButton.text}
-              <ArrowRight className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 icon-transition" />
             </Button>
           </div>
         )}
 
         <div className="mt-12 flex justify-center">
-          <div className="animate-bounce p-2 bg-white/10 rounded-full backdrop-blur-sm">
+          <div className="animate-bounce p-2 bg-white/10 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
             <svg className="w-6 h-6 text-bookconnect-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
             </svg>

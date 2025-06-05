@@ -214,7 +214,19 @@ const AdminLayout: React.FC = () => {
                 }
               >
                 <TrendingUp className="h-4 w-4 mr-3" />
-                Analytics
+                Landing Analytics
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/book-club-analytics"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <BookOpen className="h-4 w-4 mr-3" />
+                Book Club Analytics
               </NavLink>
             </>
           )}

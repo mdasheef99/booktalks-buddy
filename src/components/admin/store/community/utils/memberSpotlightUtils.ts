@@ -176,12 +176,12 @@ export const sortSpotlightsByType = (spotlights: MemberSpotlight[]): MemberSpotl
 export const getMemberDisplayInfo = (user: StoreUser): MemberDisplayInfo => {
   const displayName = user.displayname || user.username;
   const initials = displayName.charAt(0).toUpperCase();
-  
+
   return {
     id: user.id,
     username: user.username,
     displayName,
-    accountTier: user.account_tier,
+    accountTier: user.membership_tier,
     avatar: '', // Could be extended to support actual avatars
     initials,
   };

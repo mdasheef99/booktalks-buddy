@@ -49,15 +49,31 @@ const RsvpButton: React.FC<RsvpButtonProps> = ({ eventId, className = '' }) => {
     try {
       setIsSubmitting(true);
       await rsvpToEvent(user.id, eventId, status);
-      
+
       // Invalidate the query to refetch the RSVP status
       queryClient.invalidateQueries({ queryKey: ['event-rsvp', eventId, user.id] });
       queryClient.invalidateQueries({ queryKey: ['event-participants', eventId] });
-      
-      toast.success(`You are ${status === 'going' ? 'going to' : status === 'maybe' ? 'maybe going to' : 'not going to'} this event`);
+
+      const statusText = status === 'going' ? 'going to' : status === 'maybe' ? 'maybe going to' : 'not going to';
+      toast.success(`You are ${statusText} this event`);
     } catch (error) {
       console.error('Error RSVPing to event:', error);
-      toast.error('Failed to RSVP to event');
+
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('full')) {
+          toast.error(error.message, {
+            duration: 5000,
+            description: 'Try RSVPing as "Maybe" or check back later if someone cancels.'
+          });
+        } else if (error.message.includes('Unauthorized')) {
+          toast.error('You must be a club member to RSVP to this event');
+        } else {
+          toast.error(error.message || 'Failed to RSVP to event');
+        }
+      } else {
+        toast.error('Failed to RSVP to event');
+      }
     } finally {
       setIsSubmitting(false);
     }

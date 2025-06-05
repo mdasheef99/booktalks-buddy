@@ -6,6 +6,8 @@ import { TestimonialCarousel } from './community/TestimonialCarousel';
 import { CommunityMetrics } from './community/CommunityMetrics';
 import { ActivityFeed } from './community/ActivityFeed';
 import { Users, Star, MessageCircle, TrendingUp } from 'lucide-react';
+import { useSectionAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
+import { cn } from '@/lib/utils';
 
 interface CommunityShowcaseSectionProps {
   storeId?: string;
@@ -13,95 +15,167 @@ interface CommunityShowcaseSectionProps {
 
 export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> = ({ storeId }) => {
   const { showcaseData, loading, error } = useCommunityShowcase(storeId);
+  const { elementRef: headerRef, animationClass: headerAnimation } = useSectionAnimation('fade-up');
+  const { elementRef: gridRef, getStaggerClass } = useStaggeredAnimation(4);
 
-  // Show loading state briefly
+
+
+
+  // Show skeleton loading state briefly
   if (loading) {
     return (
-      <div className="py-16 px-4 bg-bookconnect-cream/10 relative">
-        <div className="max-w-7xl mx-auto text-center">
-          <LoadingSpinner size="md" text="Loading community showcase..." />
+      <div className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-sage/5 to-bookconnect-sage/15 relative">
+        <div className="max-w-6xl mx-auto">
+          {/* Skeleton Header */}
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-8 w-8 bg-bookconnect-sage/20 rounded mr-3 animate-pulse"></div>
+              <div className="h-8 w-48 bg-bookconnect-sage/20 rounded animate-pulse"></div>
+            </div>
+            <div className="h-4 w-96 bg-bookconnect-sage/20 rounded mx-auto animate-pulse"></div>
+          </div>
+
+          {/* Skeleton Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            {/* Left Column Skeletons */}
+            <div className="space-y-8">
+              <div className="bg-white/90 rounded-xl p-6 border border-gray-100">
+                <div className="h-6 w-40 bg-bookconnect-sage/20 rounded mb-6 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-4 w-full bg-bookconnect-sage/20 rounded animate-pulse"></div>
+                  <div className="h-4 w-3/4 bg-bookconnect-sage/20 rounded animate-pulse"></div>
+                </div>
+              </div>
+              <div className="bg-white/90 rounded-xl p-6 border border-gray-100">
+                <div className="h-6 w-32 bg-bookconnect-sage/20 rounded mb-6 animate-pulse"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="text-center p-4 bg-bookconnect-sage/10 rounded-lg">
+                      <div className="h-6 w-12 bg-bookconnect-sage/20 rounded mx-auto mb-2 animate-pulse"></div>
+                      <div className="h-3 w-16 bg-bookconnect-sage/20 rounded mx-auto animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column Skeletons */}
+            <div className="space-y-8">
+              <div className="bg-white/90 rounded-xl p-6 border border-gray-100">
+                <div className="h-6 w-36 bg-bookconnect-sage/20 rounded mb-6 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-4 w-full bg-bookconnect-sage/20 rounded animate-pulse"></div>
+                  <div className="h-4 w-5/6 bg-bookconnect-sage/20 rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Hide entire section if no data and no error
-  if (!loading && !showcaseData && !error) {
-    return null;
-  }
-
-  // Hide section if all features are disabled
-  if (showcaseData && !showcaseData.showcaseSettings.show_member_spotlights && 
-      !showcaseData.showcaseSettings.show_testimonials && 
-      !showcaseData.showcaseSettings.show_activity_feed && 
-      !showcaseData.showcaseSettings.show_community_metrics) {
-    return null;
-  }
-
   // Check if we have any content to display
-  const hasSpotlights = showcaseData?.showcaseSettings.show_member_spotlights && 
+  const hasSpotlights = showcaseData?.showcaseSettings.show_member_spotlights &&
                        showcaseData.memberSpotlights.length > 0;
-  const hasTestimonials = showcaseData?.showcaseSettings.show_testimonials && 
+  const hasTestimonials = showcaseData?.showcaseSettings.show_testimonials &&
                          showcaseData.testimonials.length > 0;
-  const hasActivityFeed = showcaseData?.showcaseSettings.show_activity_feed && 
+  const hasActivityFeed = showcaseData?.showcaseSettings.show_activity_feed &&
                          showcaseData.activityFeed.length > 0;
   const hasMetrics = showcaseData?.showcaseSettings.show_community_metrics;
 
-  // Hide section if no actual content
-  if (!hasSpotlights && !hasTestimonials && !hasActivityFeed && !hasMetrics) {
-    return null;
-  }
+  // Determine if we should show demo content
+  const shouldShowDemo = !storeId || !showcaseData || (!hasSpotlights && !hasTestimonials && !hasActivityFeed && !hasMetrics);
+
+  // Always show the section with either real content or demo content
+  const showDemoMetrics = shouldShowDemo;
 
   return (
-    <div className="py-16 px-4 bg-bookconnect-cream/10 relative">
-      <div className="max-w-7xl mx-auto">
+    <div className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-sage/5 to-bookconnect-sage/15 relative">
+      <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <div ref={headerRef} className={cn("text-center mb-12", headerAnimation)}>
           <div className="flex items-center justify-center mb-4">
             <Users className="h-8 w-8 text-bookconnect-terracotta mr-3" />
-            <h2 className="text-3xl md:text-4xl font-bold text-bookconnect-brown">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-bookconnect-brown leading-tight">
               Our Community
             </h2>
           </div>
-          <p className="text-lg text-bookconnect-brown/70 max-w-2xl mx-auto">
-            Discover the vibrant community of readers, book lovers, and literary enthusiasts 
-            who make our bookstore a special place.
+          <p className="text-base md:text-lg text-bookconnect-brown/70 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of passionate readers who share recommendations, celebrate literary discoveries,
+            and build lasting friendships through the power of books.
           </p>
         </div>
 
+        {shouldShowDemo && (
+          <div className="mb-8 text-center">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-bookconnect-sage/20 text-bookconnect-brown">
+              Demo Content - Configure your store to show real community data
+            </span>
+          </div>
+        )}
+
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div ref={gridRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Left Column */}
           <div className="space-y-8">
-            {/* Member Spotlights */}
-            {hasSpotlights && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            {/* Member Spotlights or Demo */}
+            {(hasSpotlights || shouldShowDemo) && (
+              <div className={cn("bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-6", getStaggerClass(0))}>
                 <div className="flex items-center mb-6">
                   <Star className="h-6 w-6 text-bookconnect-terracotta mr-2" />
-                  <h3 className="text-xl font-semibold text-bookconnect-brown">
+                  <h3 className="text-xl font-serif font-semibold text-bookconnect-brown leading-tight">
                     Featured Members
                   </h3>
                 </div>
                 <div className="grid gap-4">
-                  {showcaseData.memberSpotlights
-                    .slice(0, showcaseData.showcaseSettings.max_spotlights_display)
-                    .map((spotlight) => (
-                      <MemberSpotlight key={spotlight.id} spotlight={spotlight} />
-                    ))}
+                  {hasSpotlights ? (
+                    showcaseData.memberSpotlights
+                      .slice(0, showcaseData.showcaseSettings.max_spotlights_display)
+                      .map((spotlight) => (
+                        <MemberSpotlight key={spotlight.id} spotlight={spotlight} />
+                      ))
+                  ) : (
+                    <div className="text-center py-4 text-bookconnect-brown/60">
+                      <p className="text-sm">Featured community members will appear here</p>
+                      <p className="text-xs mt-1">Configure member spotlights in your store settings</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Community Metrics */}
-            {hasMetrics && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            {(hasMetrics || shouldShowDemo) && (
+              <div className={cn("bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-6", getStaggerClass(1))}>
                 <div className="flex items-center mb-6">
                   <TrendingUp className="h-6 w-6 text-bookconnect-terracotta mr-2" />
-                  <h3 className="text-xl font-semibold text-bookconnect-brown">
+                  <h3 className="text-xl font-serif font-semibold text-bookconnect-brown leading-tight">
                     Community Stats
                   </h3>
                 </div>
-                <CommunityMetrics metrics={showcaseData.communityMetrics} />
+                {hasMetrics ? (
+                  <CommunityMetrics metrics={showcaseData.communityMetrics} />
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-bookconnect-sage/10 rounded-lg">
+                      <div className="text-2xl font-bold text-bookconnect-brown">150+</div>
+                      <div className="text-sm text-bookconnect-brown/70">Active Members</div>
+                    </div>
+                    <div className="text-center p-4 bg-bookconnect-terracotta/10 rounded-lg">
+                      <div className="text-2xl font-bold text-bookconnect-brown">25</div>
+                      <div className="text-sm text-bookconnect-brown/70">Book Clubs</div>
+                    </div>
+                    <div className="text-center p-4 bg-bookconnect-olive/10 rounded-lg">
+                      <div className="text-2xl font-bold text-bookconnect-brown">500+</div>
+                      <div className="text-sm text-bookconnect-brown/70">Books Read</div>
+                    </div>
+                    <div className="text-center p-4 bg-bookconnect-cream/50 rounded-lg">
+                      <div className="text-2xl font-bold text-bookconnect-brown">12</div>
+                      <div className="text-sm text-bookconnect-brown/70">Events This Month</div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -110,10 +184,10 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
           <div className="space-y-8">
             {/* Testimonials */}
             {hasTestimonials && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className={cn("bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-6", getStaggerClass(2))}>
                 <div className="flex items-center mb-6">
                   <MessageCircle className="h-6 w-6 text-bookconnect-terracotta mr-2" />
-                  <h3 className="text-xl font-semibold text-bookconnect-brown">
+                  <h3 className="text-xl font-serif font-semibold text-bookconnect-brown leading-tight">
                     What Our Customers Say
                   </h3>
                 </div>
@@ -123,10 +197,10 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
 
             {/* Activity Feed */}
             {hasActivityFeed && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className={cn("bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-6", getStaggerClass(3))}>
                 <div className="flex items-center mb-6">
                   <Users className="h-6 w-6 text-bookconnect-terracotta mr-2" />
-                  <h3 className="text-xl font-semibold text-bookconnect-brown">
+                  <h3 className="text-xl font-serif font-semibold text-bookconnect-brown leading-tight">
                     Recent Activity
                   </h3>
                 </div>
@@ -151,26 +225,7 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
           </div>
         )}
 
-        {/* Call to Action */}
-        {(hasSpotlights || hasTestimonials || hasActivityFeed || hasMetrics) && (
-          <div className="text-center bg-gradient-to-r from-bookconnect-sage/20 to-bookconnect-cream/20 rounded-xl p-8">
-            <h3 className="text-2xl font-semibold text-bookconnect-brown mb-4">
-              Join Our Community
-            </h3>
-            <p className="text-bookconnect-brown/70 mb-6 max-w-2xl mx-auto">
-              Become part of our growing community of book lovers. Share your thoughts, 
-              discover new reads, and connect with fellow readers.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-6 py-3 bg-bookconnect-terracotta text-white rounded-lg hover:bg-bookconnect-terracotta/90 transition-colors font-medium">
-                Browse Book Clubs
-              </button>
-              <button className="px-6 py-3 border border-bookconnect-terracotta text-bookconnect-terracotta rounded-lg hover:bg-bookconnect-terracotta/5 transition-colors font-medium">
-                Start Reading
-              </button>
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );

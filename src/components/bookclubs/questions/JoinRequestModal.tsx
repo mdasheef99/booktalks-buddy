@@ -16,10 +16,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { 
+import { useIsMobile } from '@/hooks/use-mobile';
+import type {
   JoinRequestModalProps,
   ClubJoinQuestion,
-  SubmitAnswersRequest 
+  SubmitAnswersRequest
 } from '@/types/join-request-questions';
 
 export default function JoinRequestModal({
@@ -36,6 +37,7 @@ export default function JoinRequestModal({
   const [answers, setAnswers] = useState<{ [questionId: string]: string }>({});
   const [validationErrors, setValidationErrors] = useState<{ [questionId: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMobile = useIsMobile();
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -133,7 +135,7 @@ export default function JoinRequestModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={`${isMobile ? 'max-w-[95vw]' : 'max-w-2xl'} max-h-[90vh] overflow-y-auto`}>
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-bookconnect-brown">
             {mode === 'preview' ? `Preview Questions - ${clubName}` : `Join ${clubName}`}
@@ -223,18 +225,19 @@ export default function JoinRequestModal({
         </div>
 
         {/* Action buttons */}
-        <div className="flex justify-end space-x-3 pt-4 border-t">
+        <div className={`${isMobile ? 'flex flex-col space-y-3' : 'flex justify-end space-x-3'} pt-4 border-t`}>
           <Button
             onClick={onClose}
             variant="outline"
             disabled={isSubmitting || isLoading}
+            className={isMobile ? 'h-12' : ''}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || isLoading}
-            className="bg-bookconnect-brown hover:bg-bookconnect-brown/90"
+            className={`bg-bookconnect-brown hover:bg-bookconnect-brown/90 ${isMobile ? 'h-12' : ''}`}
           >
             {isSubmitting || isLoading ? (
               <>

@@ -88,17 +88,34 @@ const EventCreationModal: React.FC<EventCreationModalProps> = ({
       newErrors.scheduled_at = 'Meeting date and time is required';
     } else {
       const scheduledDate = new Date(formData.scheduled_at);
-      if (scheduledDate <= new Date()) {
-        newErrors.scheduled_at = 'Meeting must be scheduled in the future';
+      const now = new Date();
+
+      // More precise future validation - must be at least 15 minutes in the future
+      const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60 * 1000);
+      if (scheduledDate <= fifteenMinutesFromNow) {
+        newErrors.scheduled_at = 'Meeting must be scheduled at least 15 minutes in the future';
+      }
+
+      // Check if event is too far in the future (1 year)
+      const oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+      if (scheduledDate > oneYearFromNow) {
+        newErrors.scheduled_at = 'Meeting cannot be scheduled more than 1 year in advance';
       }
     }
 
     if (formData.duration_minutes <= 0) {
       newErrors.duration_minutes = 'Duration must be greater than 0';
+    } else if (formData.duration_minutes < 15) {
+      newErrors.duration_minutes = 'Duration must be at least 15 minutes';
+    } else if (formData.duration_minutes > 480) { // 8 hours
+      newErrors.duration_minutes = 'Duration cannot exceed 8 hours';
     }
 
     if (formData.max_attendees !== null && formData.max_attendees <= 0) {
       newErrors.max_attendees = 'Max attendees must be greater than 0';
+    } else if (formData.max_attendees !== null && formData.max_attendees > 1000) {
+      newErrors.max_attendees = 'Max attendees cannot exceed 1000';
     }
 
     if (formData.virtual_link && !isValidUrl(formData.virtual_link)) {
@@ -261,12 +278,17 @@ const EventCreationModal: React.FC<EventCreationModalProps> = ({
                 id="scheduled_at"
                 type="datetime-local"
                 value={formData.scheduled_at}
+                min={new Date(Date.now() + 15 * 60 * 1000).toISOString().slice(0, 16)}
+                max={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)}
                 onChange={(e) => handleInputChange('scheduled_at', e.target.value)}
                 className={errors.scheduled_at ? 'border-red-500' : ''}
               />
               {errors.scheduled_at && (
                 <p className="text-sm text-red-600">{errors.scheduled_at}</p>
               )}
+              <p className="text-xs text-gray-500">
+                Must be at least 15 minutes in the future
+              </p>
             </div>
 
             <div className="space-y-2">

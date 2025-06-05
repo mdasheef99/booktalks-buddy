@@ -118,12 +118,37 @@ const EventForm: React.FC<EventFormProps> = ({ event, isEditing = false }) => {
       return;
     }
 
-    // Validate dates
+    // Enhanced date validation
     const startDateTime = new Date(`${startDate}T${startTime}`);
     const endDateTime = new Date(`${endDate}T${endTime}`);
+    const now = new Date();
 
-    if (endDateTime < startDateTime) {
-      toast.error('End time cannot be before start time');
+    // Check if start time is in the past
+    const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60 * 1000);
+    if (startDateTime <= fifteenMinutesFromNow) {
+      toast.error('Event start time must be at least 15 minutes in the future');
+      return;
+    }
+
+    // Check if end time is before start time
+    if (endDateTime <= startDateTime) {
+      toast.error('Event end time must be after start time');
+      return;
+    }
+
+    // Check minimum duration (15 minutes)
+    const durationMs = endDateTime.getTime() - startDateTime.getTime();
+    const durationMinutes = durationMs / (1000 * 60);
+    if (durationMinutes < 15) {
+      toast.error('Event duration must be at least 15 minutes');
+      return;
+    }
+
+    // Check if event is too far in the future (1 year)
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    if (startDateTime > oneYearFromNow) {
+      toast.error('Event cannot be scheduled more than 1 year in advance');
       return;
     }
 

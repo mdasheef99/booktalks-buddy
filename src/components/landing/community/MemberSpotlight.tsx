@@ -35,9 +35,9 @@ const SPOTLIGHT_TYPE_CONFIG = {
 };
 
 const TIER_COLORS = {
-  free: 'bg-gray-100 text-gray-700',
-  privileged: 'bg-blue-100 text-blue-700',
-  'privileged+': 'bg-purple-100 text-purple-700'
+  MEMBER: 'bg-gray-100 text-gray-700',
+  PRIVILEGED: 'bg-blue-100 text-blue-700',
+  PRIVILEGED_PLUS: 'bg-purple-100 text-purple-700'
 };
 
 export const MemberSpotlight: React.FC<MemberSpotlightProps> = ({ spotlight }) => {
@@ -111,13 +111,14 @@ export const MemberSpotlight: React.FC<MemberSpotlightProps> = ({ spotlight }) =
               <span>Since {formatMemberSince(spotlight.userData.created_at)}</span>
             </div>
             
-            {/* Account Tier */}
-            <Badge 
-              variant="outline" 
-              className={`${TIER_COLORS[spotlight.userData.account_tier as keyof typeof TIER_COLORS] || TIER_COLORS.free} text-xs`}
+            {/* Membership Tier */}
+            <Badge
+              variant="outline"
+              className={`${TIER_COLORS[spotlight.userData.membership_tier as keyof typeof TIER_COLORS] || TIER_COLORS.MEMBER} text-xs`}
             >
-              {spotlight.userData.account_tier === 'privileged+' ? 'Privileged+' : 
-               spotlight.userData.account_tier?.charAt(0).toUpperCase() + spotlight.userData.account_tier?.slice(1) || 'Free'}
+              {spotlight.userData.membership_tier === 'PRIVILEGED_PLUS' ? 'Privileged+' :
+               spotlight.userData.membership_tier === 'PRIVILEGED' ? 'Privileged' :
+               spotlight.userData.membership_tier === 'MEMBER' ? 'Member' : 'Member'}
             </Badge>
           </div>
 

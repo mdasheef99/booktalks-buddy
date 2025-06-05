@@ -333,6 +333,61 @@ export async function getClubDetails(clubId: string) {
 export const getClubs = listBookClubs;
 
 /**
+ * Get clubs created by a user (where user is the lead)
+ */
+export async function getCreatedClubs(userId: string) {
+  console.log('[getCreatedClubs] called with userId:', userId);
+
+  const { data, error } = await supabase
+    .from('book_clubs')
+    .select('*')
+    .eq('lead_user_id', userId)
+    .order('created_at', { ascending: false });
+
+  console.log('[getCreatedClubs] data:', data, 'error:', error);
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
+ * Get clubs where user is a member but not the creator
+ */
+export async function getJoinedClubs(userId: string) {
+  console.log('[getJoinedClubs] called with userId:', userId);
+
+  // First, get club IDs where user is a member (excluding pending requests)
+  const { data: memberData, error: memberError } = await supabase
+    .from('club_members')
+    .select('club_id')
+    .eq('user_id', userId)
+    .not('role', 'eq', 'pending');
+
+  console.log('[getJoinedClubs] memberData:', memberData, 'memberError:', memberError);
+
+  if (memberError) throw memberError;
+  const clubIds = memberData?.map((m) => m.club_id) ?? [];
+
+  if (clubIds.length === 0) {
+    console.log('[getJoinedClubs] No clubs found for user');
+    return [];
+  }
+
+  // Get clubs where user is member but NOT the creator
+  const { data, error } = await supabase
+    .from('book_clubs')
+    .select('*')
+    .in('id', clubIds)
+    .not('lead_user_id', 'eq', userId)
+    .order('created_at', { ascending: false });
+
+  console.log('[getJoinedClubs] book_clubs data:', data, 'error:', error);
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
  * Create a new book club with initial questions in a single transaction
  */
 export async function createBookClubWithQuestions(

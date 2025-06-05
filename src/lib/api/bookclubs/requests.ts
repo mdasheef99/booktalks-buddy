@@ -109,16 +109,20 @@ export async function approveJoinRequest(adminId: string, clubId: string, userId
       throw checkError;
     }
 
-    // Update role to member (atomic operation)
+    // Update role to member and clear join answers (atomic operation)
     const { error: updateError } = await supabase
       .from('club_members')
-      .update({ role: 'member' })
+      .update({
+        role: 'member',
+        join_answers: null // Clear answers after approval for data retention
+      })
       .eq('user_id', userId)
       .eq('club_id', clubId)
       .eq('role', 'pending'); // Ensure we only update if still pending
 
     if (updateError) throw updateError;
 
+    console.log(`✅ Join request approved: User ${userId} approved for club ${clubId} by admin ${adminId}`);
     return { success: true, message: 'Request approved successfully' };
   } catch (error: any) {
     console.error('[approveJoinRequest] Error:', error);
@@ -187,6 +191,7 @@ export async function rejectJoinRequest(adminId: string, clubId: string, userId:
 
     if (deleteError) throw deleteError;
 
+    console.log(`❌ Join request rejected: User ${userId} rejected for club ${clubId} by admin ${adminId}`);
     return { success: true, message: 'Request rejected successfully' };
   } catch (error: any) {
     console.error('[rejectJoinRequest] Error:', error);
@@ -208,10 +213,10 @@ export async function rejectJoinRequest(adminId: string, clubId: string, userId:
  */
 export async function getClubJoinRequests(clubId: string) {
   try {
-    // Get pending join requests for this club
+    // Get pending join requests for this club with answers
     const { data: pendingRequests, error: requestError } = await supabase
       .from('club_members')
-      .select('user_id, club_id, role, joined_at')
+      .select('user_id, club_id, role, joined_at, join_answers')
       .eq('club_id', clubId)
       .eq('role', 'pending')
       .order('joined_at', { ascending: false });
@@ -222,21 +227,33 @@ export async function getClubJoinRequests(clubId: string) {
       return [];
     }
 
-    // Get user details in a separate query
+    // Get user details from public.users table (separate query to avoid foreign key issues)
     const userIds = pendingRequests.map(request => request.user_id);
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('id, username, email')
+      .select('id, username, email, displayname')
       .in('id', userIds);
 
-    if (usersError) throw usersError;
+    // If users query fails, continue with basic user info (user_id only)
+    if (usersError) {
+      console.warn('Could not fetch user details, using basic info:', usersError);
+    }
 
-    // Format the response with user details
+    // Get club questions to match with answers
+    const { data: clubQuestions, error: questionsError } = await supabase
+      .from('club_join_questions')
+      .select('id, question_text, is_required, display_order')
+      .eq('club_id', clubId)
+      .order('display_order', { ascending: true });
+
+    if (questionsError) throw questionsError;
+
+    // Format the response with user details and question-answer data
     const requests = pendingRequests.map(request => {
       // Find the matching user or use a default object
       const user = users?.find(u => u.id === request.user_id) || null;
 
-      // Create a default user object
+      // Create a default user object with fallback to user_id
       const userObj = {
         username: 'Unknown',
         email: '',
@@ -245,10 +262,53 @@ export async function getClubJoinRequests(clubId: string) {
 
       // Update with actual data if available
       if (user) {
-        userObj.username = user.username || 'Unknown';
+        userObj.username = user.username || `user_${request.user_id.substring(0, 8)}`;
         userObj.email = user.email || '';
-        // Since display_name might not exist, we'll use username as a fallback
-        userObj.display_name = user.username || 'Unknown User';
+        userObj.display_name = user.displayname || user.username || `User ${request.user_id.substring(0, 8)}`;
+      } else {
+        // Fallback when user details can't be fetched
+        userObj.username = `user_${request.user_id.substring(0, 8)}`;
+        userObj.display_name = `User ${request.user_id.substring(0, 8)}`;
+      }
+
+      // Process join answers if they exist
+      let processedAnswers: Array<{
+        question_id: string;
+        question_text: string;
+        answer_text: string;
+        is_required: boolean;
+        display_order: number;
+      }> = [];
+
+      let hasAnswers = false;
+
+      if (request.join_answers && clubQuestions && clubQuestions.length > 0) {
+        try {
+          const answersData = request.join_answers as any;
+          if (answersData.answers && Array.isArray(answersData.answers)) {
+            hasAnswers = true;
+
+            // Match answers with questions
+            processedAnswers = answersData.answers
+              .map((answer: any) => {
+                const question = clubQuestions.find(q => q.id === answer.question_id);
+                if (question) {
+                  return {
+                    question_id: question.id,
+                    question_text: question.question_text,
+                    answer_text: answer.answer || '',
+                    is_required: question.is_required,
+                    display_order: question.display_order
+                  };
+                }
+                return null;
+              })
+              .filter(Boolean)
+              .sort((a, b) => a.display_order - b.display_order);
+          }
+        } catch (error) {
+          console.error('Error processing join answers:', error);
+        }
       }
 
       return {
@@ -256,7 +316,12 @@ export async function getClubJoinRequests(clubId: string) {
         club_id: request.club_id,
         requested_at: request.joined_at,
         status: request.role,
-        user: userObj
+        user: userObj,
+        answers: processedAnswers,
+        has_answers: hasAnswers,
+        // Legacy fields for backward compatibility
+        username: userObj.username,
+        display_name: userObj.display_name
       };
     });
 

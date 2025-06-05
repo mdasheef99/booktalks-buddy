@@ -50,6 +50,9 @@ export const useStoreId = () => {
   return {
     storeId,
     loading,
-    error
+    error,
+    // Helper methods for better UX
+    isReady: !loading && !error && !!storeId,
+    hasError: !!error
   };
 };

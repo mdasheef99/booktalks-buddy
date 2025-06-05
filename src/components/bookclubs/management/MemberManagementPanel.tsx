@@ -408,7 +408,8 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({ clubId })
             username: selectedRequest.username,
             display_name: selectedRequest.display_name,
             requested_at: selectedRequest.requested_at,
-            answers: selectedRequest.answers || []
+            answers: selectedRequest.answers || [],
+            has_answers: selectedRequest.has_answers || false
           }}
           onApprove={handleApproveFromModal}
           onReject={handleRejectFromModal}

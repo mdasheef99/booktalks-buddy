@@ -57,7 +57,7 @@ const RSVPButtons: React.FC<RSVPButtonsProps> = ({
   const handleRSVP = async (status: RSVPStatus) => {
     try {
       setPendingStatus(status);
-      
+
       if (userRSVP?.rsvp_status === status) {
         // If clicking the same status, remove RSVP
         await removeRSVP();
@@ -69,7 +69,20 @@ const RSVPButtons: React.FC<RSVPButtonsProps> = ({
       }
     } catch (error) {
       console.error('RSVP error:', error);
-      toast.error('Failed to update RSVP. Please try again.');
+
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('full')) {
+          toast.error(error.message, {
+            duration: 5000,
+            description: 'Try RSVPing as "Maybe" or check back later if someone cancels.'
+          });
+        } else {
+          toast.error(error.message || 'Failed to update RSVP. Please try again.');
+        }
+      } else {
+        toast.error('Failed to update RSVP. Please try again.');
+      }
     } finally {
       setPendingStatus(null);
     }

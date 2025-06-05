@@ -96,7 +96,7 @@ const EventsSection = ({ handleEventsClick }: EventsSectionProps) => {
   }
 
   return (
-    <div className="bg-bookconnect-parchment py-20 px-4">
+    <div className="bg-bookconnect-parchment py-16 md:py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <EventsHeader 
           title="Events" 

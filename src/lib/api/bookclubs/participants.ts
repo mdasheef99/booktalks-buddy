@@ -13,7 +13,7 @@ export type EventParticipantInsert = Database['public']['Tables']['event_partici
 export type EventParticipantUpdate = Database['public']['Tables']['event_participants']['Update'];
 
 /**
- * RSVP to an event
+ * RSVP to an event with attendee limit validation
  * @param userId - The ID of the user RSVPing
  * @param eventId - The ID of the event
  * @param rsvpStatus - The RSVP status ('going', 'maybe', 'not_going')
@@ -24,7 +24,7 @@ export async function rsvpToEvent(
   eventId: string,
   rsvpStatus: 'going' | 'maybe' | 'not_going'
 ): Promise<EventParticipant> {
-  // Get the event to check if it's a club event
+  // Get the event to check if it's a club event and get attendee limits
   const event = await getEvent(eventId);
 
   // If it's a club event, check if the user is a member of the club
@@ -32,6 +32,27 @@ export async function rsvpToEvent(
     const isMember = await isClubMember(userId, event.club_id);
     if (!isMember) {
       throw new Error('Unauthorized: Only club members can RSVP to club events');
+    }
+  }
+
+  // If changing to 'going' and there's a participant limit, check current count
+  if (rsvpStatus === 'going' && event.max_participants) {
+    const { data: currentParticipants, error: countError } = await supabase
+      .from('event_participants')
+      .select('user_id')
+      .eq('event_id', eventId)
+      .eq('rsvp_status', 'going')
+      .neq('user_id', userId); // Exclude current user
+
+    if (countError) {
+      console.error('Error checking participant count:', countError);
+      throw countError;
+    }
+
+    const currentGoingCount = currentParticipants?.length || 0;
+
+    if (currentGoingCount >= event.max_participants) {
+      throw new Error(`Event "${event.title}" is full. Maximum participants: ${event.max_participants}, Current participants: ${currentGoingCount}`);
     }
   }
 
@@ -62,6 +83,10 @@ export async function rsvpToEvent(
       .single();
 
     if (error) {
+      // Handle database trigger errors for attendee limits
+      if (error.code === 'P0001' && error.message.includes('Event is full')) {
+        throw new Error(error.message);
+      }
       console.error('Error updating RSVP:', error);
       throw error;
     }
@@ -82,6 +107,10 @@ export async function rsvpToEvent(
     .single();
 
   if (error) {
+    // Handle database trigger errors for attendee limits
+    if (error.code === 'P0001' && error.message.includes('Event is full')) {
+      throw new Error(error.message);
+    }
     console.error('Error creating RSVP:', error);
     throw error;
   }

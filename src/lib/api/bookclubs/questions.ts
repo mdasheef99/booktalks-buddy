@@ -30,11 +30,11 @@ export async function getClubQuestions(clubId: string): Promise<QuestionsListRes
       console.error('Invalid clubId provided to getClubQuestions:', clubId);
       return {
         success: false,
-        error: validation.error
+        error: validation.error || 'Invalid club ID'
       };
     }
 
-    // Use direct database access for public questions (no auth required)
+    // Use direct database access for public questions (no auth required, RLS handles security)
     const { data, error } = await supabase
       .from('club_join_questions')
       .select('*')
@@ -45,7 +45,7 @@ export async function getClubQuestions(clubId: string): Promise<QuestionsListRes
       console.error('Error fetching club questions:', error);
       return {
         success: false,
-        error: error.message
+        error: `Failed to fetch questions: ${error.message}`
       };
     }
 
@@ -57,7 +57,7 @@ export async function getClubQuestions(clubId: string): Promise<QuestionsListRes
     console.error('Unexpected error fetching club questions:', error);
     return {
       success: false,
-      error: 'Failed to fetch club questions'
+      error: 'Network error occurred while fetching questions'
     };
   }
 }

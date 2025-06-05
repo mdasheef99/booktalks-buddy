@@ -17,7 +17,7 @@ const FooterSection = ({ handleEventsClick, handleBookClubsClick }: FooterSectio
               <BookOpen className="h-7 w-7 mr-3 text-bookconnect-terracotta" />
               <span className="font-serif text-2xl font-semibold">BookConnect</span>
             </div>
-            <p className="text-white/70 mb-6 leading-relaxed">
+            <p className="text-base text-white/70 mb-6 leading-relaxed">
               Connecting book lovers through meaningful conversations and literary exploration since 2023.
             </p>
             <div className="flex space-x-4">
@@ -39,7 +39,7 @@ const FooterSection = ({ handleEventsClick, handleBookClubsClick }: FooterSectio
             </div>
           </div>
           <div>
-            <h3 className="font-serif text-lg font-semibold mb-6 border-b border-white/20 pb-2">Quick Links</h3>
+            <h3 className="font-serif text-lg font-semibold mb-6 border-b border-white/20 pb-2 leading-tight">Quick Links</h3>
             <ul className="space-y-3">
               <li>
                 <a href="#" className="text-white/70 hover:text-bookconnect-terracotta transition-colors">Home</a>
@@ -59,8 +59,8 @@ const FooterSection = ({ handleEventsClick, handleBookClubsClick }: FooterSectio
             </ul>
           </div>
           <div>
-            <h3 className="font-serif text-lg font-semibold mb-6 border-b border-white/20 pb-2">Newsletter</h3>
-            <p className="text-white/70 mb-4">
+            <h3 className="font-serif text-lg font-semibold mb-6 border-b border-white/20 pb-2 leading-tight">Newsletter</h3>
+            <p className="text-base text-white/70 mb-4 leading-relaxed">
               Stay updated with the latest literary events and book recommendations.
             </p>
             <div className="flex">

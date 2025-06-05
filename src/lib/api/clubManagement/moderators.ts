@@ -18,48 +18,11 @@ export async function getClubModerators(clubId: string): Promise<ClubModerator[]
   try {
     console.log('Fetching moderators for club:', clubId);
 
-    // First, try the join approach
-    const { data, error } = await supabase
-      .from('club_moderators')
-      .select(`
-        *,
-        users!inner (
-          username,
-          email,
-          displayname
-        )
-      `)
-      .eq('club_id', clubId)
-      .eq('is_active', true)
-      .order('appointed_at', { ascending: false });
-
-    if (error) {
-      console.error('Supabase join error:', error);
-
-      // Fallback: Fetch moderators without join, then fetch user data separately
-      console.log('Attempting fallback approach...');
-      return await getClubModeratorsWithFallback(clubId);
-    }
-
-    console.log('Successfully fetched moderators with join:', data?.length || 0);
-
-    // Transform the data to match our expected structure
-    const transformedData = data?.map(moderator => ({
-      ...moderator,
-      user: {
-        username: moderator.users?.username || '',
-        email: moderator.users?.email || '',
-        display_name: moderator.users?.displayname || moderator.users?.username || ''
-      }
-    })) || [];
-
-    return transformedData;
+    // Use the fallback approach directly since joins don't work
+    return await getClubModeratorsWithFallback(clubId);
   } catch (error) {
     console.error('Error fetching club moderators:', error);
-
-    // Final fallback
-    console.log('Attempting final fallback...');
-    return await getClubModeratorsWithFallback(clubId);
+    throw new Error('Failed to fetch club moderators');
   }
 }
 

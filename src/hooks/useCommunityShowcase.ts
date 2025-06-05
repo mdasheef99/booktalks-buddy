@@ -9,9 +9,11 @@ interface UseCommunityShowcaseResult {
 }
 
 /**
- * Hook for fetching community showcase data for landing page display
+ * Hook for fetching community showcase data for landing page display (OPTIMIZED)
  */
 export const useCommunityShowcase = (storeId?: string): UseCommunityShowcaseResult => {
+
+
   const {
     data: showcaseData,
     isLoading,
@@ -24,8 +26,21 @@ export const useCommunityShowcase = (storeId?: string): UseCommunityShowcaseResu
       return await CommunityShowcaseAPI.getCommunityShowcaseData(storeId);
     },
     enabled: !!storeId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 3 * 60 * 1000, // 3 minutes (reduced for more frequent updates)
+    cacheTime: 15 * 60 * 1000, // 15 minutes (increased for better offline experience)
+    retry: (failureCount, error) => {
+      // Retry up to 3 times with exponential backoff
+      if (failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    refetchOnWindowFocus: false, // Prevent unnecessary refetches
+    refetchOnReconnect: true, // Refetch when connection is restored
+    // Background refetch for stale data
+    refetchInterval: 10 * 60 * 1000, // 10 minutes background refresh
+    refetchIntervalInBackground: false, // Only when tab is active
   });
 
   return {

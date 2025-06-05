@@ -42,17 +42,45 @@ import type { CommunityShowcaseData } from './types/communityShowcaseTypes';
  */
 export class CommunityShowcaseAPI {
   /**
-   * Get complete community showcase data for landing page
+   * Get complete community showcase data for landing page (OPTIMIZED with error isolation)
    */
   static async getCommunityShowcaseData(storeId: string): Promise<CommunityShowcaseData> {
-    const [memberSpotlights, testimonials, communityMetrics, activityFeed, showcaseSettings] =
-      await Promise.all([
-        MemberSpotlightAPI.getActiveSpotlights(storeId),
-        TestimonialAPI.getApprovedTestimonials(storeId),
-        MetricsActivityAPI.getCommunityMetrics(storeId),
-        MetricsActivityAPI.getRecentActivity(storeId),
-        SettingsAPI.getShowcaseSettings(storeId)
-      ]);
+    // Use Promise.allSettled for error isolation - partial data is better than no data
+    const results = await Promise.allSettled([
+      MemberSpotlightAPI.getActiveSpotlights(storeId),
+      TestimonialAPI.getApprovedTestimonials(storeId),
+      MetricsActivityAPI.getCommunityMetrics(storeId),
+      MetricsActivityAPI.getRecentActivity(storeId),
+      SettingsAPI.getShowcaseSettings(storeId)
+    ]);
+
+    // Extract data with fallbacks for failed promises
+    const memberSpotlights = results[0].status === 'fulfilled' ? results[0].value : [];
+    const testimonials = results[1].status === 'fulfilled' ? results[1].value : [];
+    const communityMetrics = results[2].status === 'fulfilled' ? results[2].value : {
+      active_members: 0,
+      total_clubs: 0,
+      recent_discussions: 0,
+      books_discussed_this_month: 0,
+      new_members_this_month: 0,
+    };
+    const activityFeed = results[3].status === 'fulfilled' ? results[3].value : [];
+    const showcaseSettings = results[4].status === 'fulfilled' ? results[4].value : {
+      show_member_spotlights: false,
+      show_testimonials: false,
+      show_activity_feed: false,
+      show_community_metrics: false,
+      max_spotlights_display: 3,
+      activity_feed_limit: 5,
+    };
+
+    // Log any failures for monitoring
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const componentNames = ['memberSpotlights', 'testimonials', 'communityMetrics', 'activityFeed', 'showcaseSettings'];
+        console.warn(`Community showcase component ${componentNames[index]} failed:`, result.reason);
+      }
+    });
 
     return {
       memberSpotlights,

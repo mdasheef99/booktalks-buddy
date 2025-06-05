@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, Users, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Settings, Users, MessageSquare, ArrowLeft, Search, Filter, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,6 +20,8 @@ interface BookClub {
 const AdminClubManagementPage: React.FC = () => {
   const [clubs, setClubs] = useState<BookClub[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [privacyFilter, setPrivacyFilter] = useState<string>('all');
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -41,6 +45,33 @@ const AdminClubManagementPage: React.FC = () => {
 
     fetchAllClubs();
   }, []);
+
+  // Filter and search clubs
+  const filteredClubs = useMemo(() => {
+    let filtered = clubs;
+
+    // Apply privacy filter
+    if (privacyFilter !== 'all') {
+      filtered = filtered.filter(club => club.privacy === privacyFilter);
+    }
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(club =>
+        club.name.toLowerCase().includes(query) ||
+        (club.description && club.description.toLowerCase().includes(query))
+      );
+    }
+
+    return filtered;
+  }, [clubs, searchQuery, privacyFilter]);
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery('');
+    setPrivacyFilter('all');
+  };
 
   const handleCreateClub = () => {
     navigate('/book-club/new');
@@ -92,9 +123,67 @@ const AdminClubManagementPage: React.FC = () => {
         Create New Club
       </Button>
 
+      {/* Search and Filter Controls */}
+      {clubs.length > 0 && (
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search Input */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search clubs by name or description..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              {/* Privacy Filter */}
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <Select value={privacyFilter} onValueChange={setPrivacyFilter}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Privacy" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Clubs</SelectItem>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Clear Filters Button */}
+              {(searchQuery || privacyFilter !== 'all') && (
+                <Button
+                  variant="outline"
+                  onClick={clearFilters}
+                  className="flex items-center gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Clear
+                </Button>
+              )}
+            </div>
+
+            {/* Results Summary */}
+            <div className="mt-4 text-sm text-gray-600">
+              Showing {filteredClubs.length} of {clubs.length} clubs
+              {searchQuery && (
+                <span> matching "{searchQuery}"</span>
+              )}
+              {privacyFilter !== 'all' && (
+                <span> • {privacyFilter} clubs only</span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="space-y-4">
-        {clubs.length > 0 ? (
-          clubs.map((club) => (
+        {filteredClubs.length > 0 ? (
+          filteredClubs.map((club) => (
             <Card key={club.id} className="overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -146,14 +235,32 @@ const AdminClubManagementPage: React.FC = () => {
         ) : (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-muted-foreground">No book clubs found</p>
-              <Button
-                onClick={handleCreateClub}
-                className="mt-4 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Club
-              </Button>
+              {clubs.length === 0 ? (
+                <>
+                  <p className="text-muted-foreground">No book clubs found</p>
+                  <Button
+                    onClick={handleCreateClub}
+                    className="mt-4 bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Your First Club
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-muted-foreground">
+                    No clubs match your current filters
+                  </p>
+                  <Button
+                    onClick={clearFilters}
+                    variant="outline"
+                    className="mt-4"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Clear Filters
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         )}
