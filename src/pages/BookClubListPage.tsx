@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BookClubList } from '@/components/bookclubs/BookClubList';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Compass } from 'lucide-react';
+
+// Component for created clubs
+const CreatedClubsList: React.FC = () => {
+  return <BookClubList clubType="created" />;
+};
+
+// Component for joined clubs
+const JoinedClubsList: React.FC = () => {
+  return <BookClubList clubType="joined" />;
+};
 
 const BookClubListPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('created');
 
   if (!user) {
     return <Navigate to="/login" state={{ redirectTo: "/book-club" }} />;
@@ -31,7 +43,21 @@ const BookClubListPage: React.FC = () => {
               Discover Clubs
             </Button>
           </div>
-          <BookClubList />
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="created">Created Clubs</TabsTrigger>
+              <TabsTrigger value="joined">Joined Clubs</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="created">
+              <CreatedClubsList />
+            </TabsContent>
+
+            <TabsContent value="joined">
+              <JoinedClubsList />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

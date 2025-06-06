@@ -101,8 +101,8 @@ const QuickStatsRow: React.FC<QuickStatsRowProps> = ({ stats }) => {
               <span className="font-medium">{stats.avgDiscussionsPerClub}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span>Pending Requests</span>
-              <span className="font-medium">{stats.pendingJoinRequests}</span>
+              <span>Active Discussions</span>
+              <span className="font-medium">{stats.activeDiscussions || 0}</span>
             </div>
           </div>
         </CardContent>

@@ -23,9 +23,47 @@ export const useClubDetails = (clubId: string | undefined) => {
   const [topics, setTopics] = useState<DiscussionTopic[]>([]);
   const [loading, setLoading] = useState(true);
   const [userStatus, setUserStatus] = useState<string>('not-member'); // 'not-member', 'pending', 'member', 'admin'
+  const [storeId, setStoreId] = useState<string>('');
+  const [storeIdLoading, setStoreIdLoading] = useState(true);
+  const [storeIdError, setStoreIdError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // The fetchClubDetails function is now defined at the end of the hook
+  // Fetch store ID for the club
+  useEffect(() => {
+    const fetchStoreId = async () => {
+      if (!clubId) {
+        setStoreIdLoading(false);
+        return;
+      }
+
+      try {
+        setStoreIdLoading(true);
+        setStoreIdError(null);
+
+        const { data: club, error } = await supabase
+          .from('book_clubs')
+          .select('store_id')
+          .eq('id', clubId)
+          .single();
+
+        if (error) {
+          console.error('Error fetching club store ID:', error);
+          setStoreIdError('Failed to fetch store ID');
+          setStoreId('');
+        } else {
+          setStoreId(club.store_id || '');
+        }
+      } catch (error) {
+        console.error('Error fetching club store ID:', error);
+        setStoreIdError('Failed to fetch store ID');
+        setStoreId('');
+      } finally {
+        setStoreIdLoading(false);
+      }
+    };
+
+    fetchStoreId();
+  }, [clubId]);
 
   // Set up data fetching and real-time subscriptions
   useEffect(() => {
@@ -133,6 +171,14 @@ export const useClubDetails = (clubId: string | undefined) => {
         }, () => {
           fetchData();
         })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'club_meetings',
+          filter: `club_id=eq.${clubId}`
+        }, () => {
+          fetchData();
+        })
         .subscribe();
 
       return () => {
@@ -141,13 +187,16 @@ export const useClubDetails = (clubId: string | undefined) => {
     }
   }, [clubId, user?.id]);
 
-  // Get the store ID for the club
-  // Note: In a real implementation, you would fetch this from the database or from the club object
-  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
-
   // Check if the user can manage or moderate this club using entitlements
-  const { result: canManage } = useCanManageClub(clubId || '', storeId);
-  const { result: canModerate } = useCanModerateClub(clubId || '', storeId);
+  // Wait for store ID to be loaded before checking permissions
+  const { result: canManage, loading: loadingManagePermission } = useCanManageClub(
+    clubId || '',
+    storeId
+  );
+  const { result: canModerate, loading: loadingModeratePermission } = useCanModerateClub(
+    clubId || '',
+    storeId
+  );
 
   // Helper functions for status checks
   const isMember = userStatus === 'member' || userStatus === 'admin';
@@ -157,8 +206,9 @@ export const useClubDetails = (clubId: string | undefined) => {
   const isAdmin = userStatus === 'admin';
 
   // New entitlements-based checks
-  const canManageClub = canManage;
-  const canModerateClub = canModerate;
+  // Only return true if store ID is loaded and permissions are available
+  const canManageClub = !storeIdLoading && !loadingManagePermission && canManage;
+  const canModerateClub = !storeIdLoading && !loadingModeratePermission && canModerate;
 
   // Create a function to expose for external use
   const refreshClubDetails = async () => {
@@ -212,6 +262,10 @@ export const useClubDetails = (clubId: string | undefined) => {
     // New entitlements-based properties
     canManageClub,
     canModerateClub,
+    // Store ID related properties
+    storeId,
+    storeIdLoading,
+    storeIdError,
     fetchClubDetails: refreshClubDetails
   };
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -10,10 +10,15 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { Upload, Camera, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { ProfileImageService, type UploadProgress } from '@/services/ProfileImageService';
+import { getUserInitials } from '@/utils/avatarUtils';
+import { ProfileAvatar } from '@/components/ui/SmartAvatar';
+import type { UserProfile } from '@/services/profileService';
 
 // Standard avatars
 const STANDARD_AVATARS = [
@@ -30,74 +35,74 @@ const STANDARD_AVATARS = [
 interface AvatarSelectorProps {
   currentAvatarUrl: string;
   onAvatarChange: (url: string) => void;
+  onAvatarUrlsChange?: (urls: { avatarUrl: string; avatarThumbnailUrl: string; avatarMediumUrl: string; avatarFullUrl: string; }) => void;
+  userProfile?: Partial<UserProfile>;
 }
 
-const AvatarSelector: React.FC<AvatarSelectorProps> = ({ 
-  currentAvatarUrl, 
-  onAvatarChange 
+const AvatarSelector: React.FC<AvatarSelectorProps> = ({
+  currentAvatarUrl,
+  onAvatarChange,
+  onAvatarUrlsChange,
+  userProfile
 }) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  // Get initials for avatar fallback
+  // Get initials for avatar fallback using the utility function
   const getInitials = () => {
+    if (userProfile) {
+      return getUserInitials(userProfile as any);
+    }
+
+    // Fallback to email-based initials
     if (!user?.email) return '?';
-    
     const email = user.email;
     const namePart = email.split('@')[0];
-    
     if (namePart.length <= 2) return namePart.toUpperCase();
     return namePart.substring(0, 2).toUpperCase();
   };
   
-  // Handle file upload
+  // Handle file upload with multi-tier processing
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-    
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!validTypes.includes(file.type)) {
-      toast.error('Please upload a valid image file (JPEG, PNG, or GIF)');
-      return;
-    }
-    
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image size should be less than 2MB');
-      return;
-    }
-    
+
     setUploading(true);
-    
+    setUploadProgress(null);
+
     try {
-      // Create a unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-      
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('profiles')
-        .upload(filePath, file);
-        
-      if (uploadError) throw uploadError;
-      
-      // Get the public URL
-      const { data } = supabase.storage
-        .from('profiles')
-        .getPublicUrl(filePath);
-        
-      // Update avatar URL
-      onAvatarChange(data.publicUrl);
+      // Use ProfileImageService for multi-tier upload
+      const avatarUrls = await ProfileImageService.uploadAvatar(
+        file,
+        user.id,
+        (progress) => {
+          setUploadProgress(progress);
+        }
+      );
+
+      // Update with the full-size URL for backward compatibility
+      onAvatarChange(avatarUrls.full);
+
+      // If multi-tier callback is provided, update all URLs
+      if (onAvatarUrlsChange) {
+        onAvatarUrlsChange({
+          avatarUrl: avatarUrls.legacy,
+          avatarThumbnailUrl: avatarUrls.thumbnail,
+          avatarMediumUrl: avatarUrls.medium,
+          avatarFullUrl: avatarUrls.full
+        });
+      }
+
       setDialogOpen(false);
-      toast.success('Avatar uploaded successfully');
+      toast.success('Avatar uploaded successfully with optimized sizes!');
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error('Failed to upload avatar');
+      toast.error(error instanceof Error ? error.message : 'Failed to upload avatar');
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
   
@@ -113,12 +118,10 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
           <div className="relative cursor-pointer group">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-              <AvatarImage src={currentAvatarUrl} alt="Profile" />
-              <AvatarFallback className="bg-bookconnect-terracotta/20 text-bookconnect-terracotta text-xl">
-                {getInitials()}
-              </AvatarFallback>
-            </Avatar>
+            <ProfileAvatar
+              profile={userProfile as any}
+              className="border-4 border-white shadow-md"
+            />
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="h-8 w-8 text-white" />
             </div>
@@ -143,9 +146,21 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
                   className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
                 >
                   {uploading ? (
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <div className="w-8 h-8 border-2 border-bookconnect-terracotta border-t-transparent rounded-full animate-spin mb-2"></div>
-                      <p className="text-sm text-gray-500">Uploading...</p>
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 space-y-3">
+                      <div className="w-8 h-8 border-2 border-bookconnect-terracotta border-t-transparent rounded-full animate-spin"></div>
+                      {uploadProgress && (
+                        <>
+                          <div className="w-full max-w-xs">
+                            <Progress value={uploadProgress.progress} className="h-2" />
+                          </div>
+                          <p className="text-sm text-gray-600 text-center">
+                            {uploadProgress.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {uploadProgress.stage} - {Math.round(uploadProgress.progress)}%
+                          </p>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -153,7 +168,8 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
                       <p className="mb-2 text-sm text-gray-500">
                         <span className="font-semibold">Click to upload</span> or drag and drop
                       </p>
-                      <p className="text-xs text-gray-500">PNG, JPG or GIF (MAX. 2MB)</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, WebP or GIF (MAX. 5MB)</p>
+                      <p className="text-xs text-gray-400 mt-1">Auto-generates 3 optimized sizes</p>
                     </div>
                   )}
                   <input

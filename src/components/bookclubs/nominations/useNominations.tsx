@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getNominations } from '@/lib/api/bookclubs/nominations';
 import { Nomination } from '@/lib/api/bookclubs/types';
-import { isClubMember, isClubAdmin } from '@/lib/api/auth';
+import { isClubMember } from '@/lib/api/auth';
 import { supabase } from '@/lib/supabase';
+import { useCanManageClub } from '@/lib/entitlements/hooks';
 
 interface UseNominationsProps {
   clubId: string;
@@ -25,15 +26,18 @@ interface UseNominationsReturn {
 
 export function useNominations({ clubId }: UseNominationsProps): UseNominationsReturn {
   const { user } = useAuth();
-  
+
   const [nominations, setNominations] = useState<Nomination[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<'active' | 'selected' | 'archived' | 'all'>('active');
   const [sortOrder, setSortOrder] = useState<'likes' | 'newest'>('likes');
   const [isMember, setIsMember] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [clubName, setClubName] = useState<string>('');
+  const [storeId, setStoreId] = useState<string>('');
+
+  // Use enhanced entitlements hook for admin check
+  const { result: isAdmin } = useCanManageClub(clubId, storeId);
 
   useEffect(() => {
     if (!clubId || !user?.id) return;
@@ -42,35 +46,32 @@ export function useNominations({ clubId }: UseNominationsProps): UseNominationsR
       try {
         const memberStatus = await isClubMember(user.id, clubId);
         setIsMember(memberStatus);
-
-        if (memberStatus) {
-          const adminStatus = await isClubAdmin(user.id, clubId);
-          setIsAdmin(adminStatus);
-        }
       } catch (err) {
         console.error('Error checking permissions:', err);
         setError('Failed to verify club membership');
       }
     };
 
-    const fetchClubName = async () => {
+    const fetchClubData = async () => {
       try {
         const { data, error } = await supabase
           .from('book_clubs')
-          .select('name')
+          .select('name, store_id')
           .eq('id', clubId)
           .single();
 
         if (error) throw error;
         setClubName(data?.name || 'Book Club');
+        setStoreId(data?.store_id || '');
       } catch (err) {
-        console.error('Error fetching club name:', err);
+        console.error('Error fetching club data:', err);
         setClubName('Book Club');
+        setStoreId('');
       }
     };
 
     checkPermissions();
-    fetchClubName();
+    fetchClubData();
   }, [clubId, user?.id]);
 
   useEffect(() => {

@@ -3,6 +3,8 @@ import { Users, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookClub } from './hooks/useClubDiscovery';
+import ClubPhotoDisplay from './photos/ClubPhotoDisplay';
+import ClubMemberCount from './ClubMemberCount';
 
 interface DiscoveryBookClubCardProps {
   club: BookClub;
@@ -38,8 +40,28 @@ const DiscoveryBookClubCard: React.FC<DiscoveryBookClubCardProps> = ({
       onClick={() => onViewClub(club.id)}
     >
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+
+        {/* Photo Section */}
+        <div className="flex-shrink-0">
+          <ClubPhotoDisplay
+            photoUrl={club.cover_photo_url}
+            thumbnailUrl={club.cover_photo_thumbnail_url}
+            clubName={club.name}
+            size="medium"
+            aspectRatio="3:2"
+          />
+        </div>
+
         <div className="flex-1">
-          <h3 className="text-xl font-semibold">{club.name}</h3>
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="text-xl font-semibold">{club.name}</h3>
+            <ClubMemberCount
+              clubId={club.id}
+              initialCount={club.member_count || 0}
+              size="small"
+              realTimeUpdates={true}
+            />
+          </div>
 
           <div className={`relative ${expanded ? '' : 'h-20 overflow-hidden'}`}>
             <p
@@ -81,10 +103,6 @@ const DiscoveryBookClubCard: React.FC<DiscoveryBookClubCardProps> = ({
                 : 'bg-green-100 text-green-800'
             }`}>
               {club.privacy || 'public'}
-            </span>
-            <span className="text-xs text-gray-500 flex items-center">
-              <Users className="h-3 w-3 mr-1" />
-              Members
             </span>
           </div>
         </div>

@@ -1,9 +1,9 @@
 
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase, apiCall } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
-import { useToast } from '@/components/ui/use-toast';
+
 import { Session } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [clubRoles, setClubRoles] = useState<Record<string, string>>({});
   const [entitlements, setEntitlements] = useState<string[]>([]);
   const [entitlementsLoading, setEntitlementsLoading] = useState(true);
-  const { toast: uiToast } = useToast();
+
   const navigate = useNavigate();
 
   const fetchClubRoles = async () => {
@@ -91,12 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userEntitlements = await getUserEntitlements(user.id, true);
       setEntitlements(userEntitlements);
 
-      // Log cache statistics for debugging
-      if (process.env.NODE_ENV === 'development') {
-        console.debug('[AuthContext] Entitlements refreshed with force=true');
-      }
+
     } catch (error) {
-      console.error('Error refreshing entitlements:', error);
       toast.error('Failed to load user permissions');
     } finally {
       setEntitlementsLoading(false);
@@ -136,8 +132,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth state change event:", event, "User ID:", session?.user?.id, "Last known ID:", lastKnownUserId);
-
         // Only update session if it's a meaningful change
         setSession(session);
 
@@ -151,7 +145,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 lastKnownUserId === null;
 
           if (isGenuineSignIn) {
-            console.log("Genuine sign-in detected, navigating to book club");
             toast.success(`Welcome back!`);
             navigate('/book-club');
             // Update the last known user ID
@@ -182,7 +175,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Separate effect for fetching club roles when user changes
   useEffect(() => {
     if (user?.id) {
-      console.log("User ID changed, fetching club roles");
       fetchClubRoles();
     }
   }, [user?.id]);
@@ -190,8 +182,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Effect for loading entitlements when user changes
   useEffect(() => {
     if (user?.id) {
-      console.log("User ID changed, loading entitlements");
-
       // Set loading state
       setEntitlementsLoading(true);
 
@@ -199,13 +189,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       getUserEntitlements(user.id)
         .then(userEntitlements => {
           setEntitlements(userEntitlements);
-
-          if (process.env.NODE_ENV === 'development') {
-            console.debug('[AuthContext] Entitlements loaded from cache or calculated');
-          }
         })
-        .catch(error => {
-          console.error('Error loading entitlements:', error);
+        .catch(() => {
           setEntitlements([]);
         })
         .finally(() => {
@@ -221,24 +206,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
 
     try {
-      console.log("Starting sign in process with email:", email);
-      const { error, data } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error("Sign in error:", error);
         toast.error(error.message || "Failed to sign in");
         return;
       }
 
-      console.log("Sign in successful, user:", data.user);
       toast.success("Successfully signed in!");
 
       // Navigate will be handled by the auth state change listener
     } catch (error: any) {
-      console.error("Unexpected error during sign in:", error);
       toast.error(error.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -249,42 +230,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
 
     try {
-      console.log("Starting sign up process with email:", email);
+      // Create auth user with username in metadata for database trigger
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            username: username
+          }
+        }
       });
 
       if (error) {
-        console.error("Sign up error:", error);
         toast.error(error.message || "Failed to sign up");
         return;
       }
 
       if (data.user) {
-        console.log("User created, now creating profile");
-        // Create a record in the users table
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: data.user.id,
-              email,
-              username
-            }
-          ]);
-
-        if (profileError) {
-          console.error("Error creating profile:", profileError);
-          toast.error(profileError.message || "Failed to create profile");
-        } else {
-          console.log("Profile created successfully");
-          toast.success("Account created! Welcome to BookConnect!");
-          navigate('/book-club');
-        }
+        toast.success("Account created! Welcome to BookConnect!");
+        navigate('/book-club');
       }
     } catch (error: any) {
-      console.error("Unexpected error during sign up:", error);
       toast.error(error.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -297,10 +263,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Invalidate entitlements cache if user exists
       if (user?.id) {
         invalidateUserEntitlements(user.id);
-
-        if (process.env.NODE_ENV === 'development') {
-          console.debug('[AuthContext] Invalidated entitlements cache for user:', user.id);
-        }
       }
 
       await supabase.auth.signOut();

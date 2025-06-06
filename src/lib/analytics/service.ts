@@ -9,7 +9,7 @@ import { calculateTimeLimit, formatDateAsYearMonth } from './utils';
 export const fetchUserData = async () => {
   const { data, error } = await supabase
     .from('users')
-    .select('created_at, account_tier')
+    .select('created_at, membership_tier')
     .order('created_at');
 
   if (error) throw error;
@@ -171,8 +171,8 @@ export const calculateUserStats = (userData: any[]): UserStats => {
   };
 
   userData.forEach(user => {
-    if (user.account_tier && user.account_tier in tierCounts) {
-      tierCounts[user.account_tier as keyof typeof tierCounts]++;
+    if (user.membership_tier && user.membership_tier in tierCounts) {
+      tierCounts[user.membership_tier as keyof typeof tierCounts]++;
     }
   });
 

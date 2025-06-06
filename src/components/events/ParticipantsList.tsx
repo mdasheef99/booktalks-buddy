@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Check, HelpCircle, X, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import UserName from '@/components/common/UserName';
 
 // Fix for the syntax error - make sure we're importing the Card components correctly
 import { Card } from '@/components/ui/card';
@@ -167,6 +168,7 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({ eventId, className 
                   {getActiveParticipants().map((participant) => (
                     <ParticipantItem
                       key={participant.user_id}
+                      userId={participant.user_id}
                       username={participant.user?.username || 'Anonymous'}
                       email={participant.user?.email || ''}
                     />
@@ -181,8 +183,16 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({ eventId, className 
   );
 };
 
-// Helper component for displaying a participant
-const ParticipantItem = ({ username, email }: { username: string; email: string }) => {
+// Helper component for displaying a participant with dual-identity support
+const ParticipantItem = ({
+  userId,
+  username,
+  email
+}: {
+  userId: string;
+  username: string;
+  email: string;
+}) => {
   // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name
@@ -200,7 +210,12 @@ const ParticipantItem = ({ username, email }: { username: string; email: string 
         <AvatarFallback>{getInitials(username)}</AvatarFallback>
       </Avatar>
       <div>
-        <p className="text-sm font-medium">{username}</p>
+        <UserName
+          userId={userId}
+          displayFormat="full"
+          showTierBadge={true}
+          className="text-sm"
+        />
         {email && <p className="text-xs text-muted-foreground">{email}</p>}
       </div>
     </div>

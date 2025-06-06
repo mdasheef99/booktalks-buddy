@@ -277,19 +277,24 @@ export const fetchTierDistribution = async (): Promise<TierDistribution> => {
   };
 
   try {
-    // Fetch all users with their account tiers
+    // Fetch all users with their membership tiers
     const { data, error } = await supabase
       .from('users')
-      .select('account_tier');
+      .select('membership_tier');
 
     if (error) {
       console.error('Error fetching user tiers:', error);
     } else if (data) {
       // Count users by tier manually
-      data.forEach((user: { account_tier?: string }) => {
-        const tier = user.account_tier as keyof TierDistribution;
-        if (tier && tier in tierDistribution) {
-          tierDistribution[tier]++;
+      data.forEach((user: { membership_tier?: string }) => {
+        const tier = user.membership_tier;
+        // Map membership tier to tier distribution keys
+        if (tier === 'MEMBER') {
+          tierDistribution.free++;
+        } else if (tier === 'PRIVILEGED') {
+          tierDistribution.privileged++;
+        } else if (tier === 'PRIVILEGED_PLUS') {
+          tierDistribution.privileged_plus++;
         } else {
           // Default to free tier if not specified
           tierDistribution.free++;

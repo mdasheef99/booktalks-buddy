@@ -1,5 +1,8 @@
 import { supabase } from '../../supabase';
-import { isClubMember, isClubAdmin } from '../auth';
+import { isClubMember } from '../auth';
+import { isClubLead } from './permissions';
+import { getUserEntitlements } from '@/lib/entitlements/cache';
+import { canManageClub, hasContextualEntitlement } from '@/lib/entitlements/permissions';
 
 /**
  * Book Club Discussion Topics and Posts
@@ -70,7 +73,18 @@ export async function getClubTopics(userId: string, clubId: string) {
 export async function getDiscussionPosts(topicId: string) {
   const { data, error } = await supabase
     .from('discussion_posts')
-    .select('*')
+    .select(`
+      id,
+      content,
+      user_id,
+      parent_post_id,
+      topic_id,
+      created_at,
+      updated_at,
+      is_deleted,
+      deleted_by,
+      deleted_by_moderator
+    `)
     .eq('topic_id', topicId)
     .order('created_at', { ascending: true });
 
@@ -79,8 +93,37 @@ export async function getDiscussionPosts(topicId: string) {
 }
 
 /**
- * Delete a discussion post
- * Only the post author or a club admin can delete a post
+ * Check if user has permission to moderate content in a club
+ */
+async function hasModeratorPermission(userId: string, clubId: string): Promise<boolean> {
+  // Get user entitlements for consistent permission checking
+  const entitlements = await getUserEntitlements(userId);
+
+  // Check if user has contextual Club Lead entitlement
+  const hasClubLeadEntitlement = hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId);
+  if (hasClubLeadEntitlement) return true;
+
+  // Check if user has contextual Club Moderator entitlement
+  const hasClubModeratorEntitlement = hasContextualEntitlement(entitlements, 'CLUB_MODERATOR', clubId);
+  if (hasClubModeratorEntitlement) return true;
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  // Check if user has club management permissions using enhanced entitlements
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+  if (canManage) return true;
+
+  return false;
+}
+
+/**
+ * Soft delete a discussion post
+ * The post author or a club admin/moderator can delete a post
  */
 export async function deleteDiscussionPost(userId: string, postId: string) {
   // First get the post to check ownership and get the topic_id
@@ -101,20 +144,30 @@ export async function deleteDiscussionPost(userId: string, postId: string) {
 
   if (topicError || !topic) throw new Error('Topic not found');
 
-  // Check if user is the post author or a club admin
+  // Check if user is the post author or has moderator permissions
   const isAuthor = post.user_id === userId;
-  const isAdmin = await isClubAdmin(userId, topic.club_id);
+  const hasModPermission = await hasModeratorPermission(userId, topic.club_id);
 
-  if (!isAuthor && !isAdmin) throw new Error('Unauthorized');
+  if (!isAuthor && !hasModPermission) throw new Error('Unauthorized');
 
-  // Delete the post
+  // Soft delete the post
   const { error } = await supabase
     .from('discussion_posts')
-    .delete()
+    .update({
+      is_deleted: true,
+      deleted_by: userId,
+      deleted_by_moderator: hasModPermission && !isAuthor, // Only mark as deleted by moderator if it's not the author
+      deleted_at: new Date().toISOString()
+    })
     .eq('id', postId);
 
   if (error) throw error;
-  return { success: true };
+  return {
+    success: true,
+    id: postId,
+    is_deleted: true,
+    deleted_by_moderator: hasModPermission && !isAuthor
+  };
 }
 
 // Alias for addDiscussionTopic

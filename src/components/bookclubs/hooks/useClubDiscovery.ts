@@ -10,6 +10,10 @@ export interface BookClub {
   privacy: string | null;
   created_at: string;
   user_status: string;
+  join_questions_enabled?: boolean;
+  cover_photo_url?: string | null;
+  cover_photo_thumbnail_url?: string | null;
+  member_count?: number;
 }
 
 interface UseClubDiscoveryProps {

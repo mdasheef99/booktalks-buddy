@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { getDiscussionPosts } from '@/lib/api';
 import UserName from '@/components/common/UserName';
 import UserAvatar from '@/components/common/UserAvatar';
+import { ReportButton } from '@/components/reporting/ReportButton';
 import ThreadedComment from '@/components/discussions/ThreadedComment';
 import { buildThreadedPosts, ThreadedPost, resetTopicCollapseState } from '@/utils/discussion-utils';
 import { DiscussionInput } from '@/components/discussions/DiscussionInput';
@@ -190,12 +191,23 @@ const BookClubTopicDetailPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <UserAvatar userId={topic.user_id} size="sm" />
                   <p className="text-sm text-gray-500">
-                    Started by <UserName userId={topic.user_id} linkToProfile /> • {new Date(topic.created_at).toLocaleString()}
+                    Started by <UserName userId={topic.user_id} linkToProfile displayFormat="full" /> • {new Date(topic.created_at).toLocaleString()}
                   </p>
                 </div>
               </div>
 
-              <Button
+              <div className="flex items-center gap-2">
+                {user?.id !== topic.user_id && (
+                  <ReportButton
+                    targetType="discussion_topic"
+                    targetId={topic.id}
+                    targetUserId={topic.user_id}
+                    targetTitle={topic.title}
+                    clubId={clubId}
+                    variant="icon-only"
+                  />
+                )}
+                <Button
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-1 text-gray-600 hover:text-bookconnect-sage"
@@ -210,6 +222,7 @@ const BookClubTopicDetailPage: React.FC = () => {
                 <RefreshCw className="h-3.5 w-3.5" />
                 <span>Reset View</span>
               </Button>
+              </div>
             </div>
           </div>
 

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Book, MessageCircle, User, BookOpen, Award } from "lucide-react";
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
+import { ReportButton } from "@/components/reporting/ReportButton";
 
 const UserProfile = () => {
   const { username } = useParams<{ username: string }>();
@@ -169,17 +170,31 @@ const UserProfile = () => {
               </div>
 
               <CardHeader className="px-0 pb-2">
-                <CardTitle className="font-serif text-3xl text-bookconnect-brown flex items-center">
-                  {userData.username}
-                  {isCurrentUser && (
-                    <span className="ml-2 text-xs bg-bookconnect-sage/20 text-bookconnect-sage px-2 py-1 rounded-full font-sans">
-                      This is you
-                    </span>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="font-serif text-3xl text-bookconnect-brown flex items-center">
+                      {userData.username}
+                      {isCurrentUser && (
+                        <span className="ml-2 text-xs bg-bookconnect-sage/20 text-bookconnect-sage px-2 py-1 rounded-full font-sans">
+                          This is you
+                        </span>
+                      )}
+                    </CardTitle>
+                    <CardDescription className="text-bookconnect-brown/70 text-base italic">
+                      {userData.bio || "This reader hasn't added a bio yet."}
+                    </CardDescription>
+                  </div>
+                  {!isCurrentUser && userData.id && (
+                    <ReportButton
+                      targetType="user"
+                      targetUserId={userData.id}
+                      targetTitle={`User: ${userData.username}`}
+                      targetContent={userData.bio || `User profile for ${userData.username}`}
+                      variant="icon-only"
+                      className="ml-4 flex-shrink-0"
+                    />
                   )}
-                </CardTitle>
-                <CardDescription className="text-bookconnect-brown/70 text-base italic">
-                  {userData.bio || "This reader hasn't added a bio yet."}
-                </CardDescription>
+                </div>
               </CardHeader>
 
               <CardContent className="px-0 pb-6">

@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import UsernameField from "@/components/forms/UsernameField";
+import { validateUsernameComprehensive } from "@/utils/usernameValidation";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +16,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isUsernameValid, setIsUsernameValid] = useState(false);
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
 
@@ -28,10 +31,41 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all fields before submission
+    if (!email.trim()) {
+      toast.error("Email is required");
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    if (!username.trim()) {
+      toast.error("Username is required");
+      return;
+    }
+
+    if (!isUsernameValid) {
+      toast.error("Please choose a valid and available username");
+      return;
+    }
+
     setIsLoading(true);
-    
+
     try {
-      await signUp(email, password, username);
+      // Double-check username availability before signup
+      const usernameValidation = await validateUsernameComprehensive(username.trim());
+
+      if (!usernameValidation.isValid) {
+        toast.error(usernameValidation.errors[0] || "Username is not valid");
+        setIsLoading(false);
+        return;
+      }
+
+      await signUp(email, password, username.trim());
     } catch (error) {
       console.error("Error during registration:", error);
       toast.error("Failed to register. Please try again.");
@@ -72,17 +106,15 @@ const Register = () => {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium">Username</label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Choose a username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
+            <UsernameField
+              value={username}
+              onChange={setUsername}
+              onValidationChange={setIsUsernameValid}
+              placeholder="Choose a unique username"
+              required
+              showSuggestions
+              label="Username"
+            />
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">Password</label>
               <div className="relative">
@@ -113,10 +145,10 @@ const Register = () => {
                 Password must be at least 6 characters long
               </p>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !isUsernameValid || !email.trim() || !password || password.length < 6}
             >
               {isLoading ? "Creating account..." : "Create Account"}
             </Button>

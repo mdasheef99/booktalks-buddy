@@ -1,10 +1,9 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
 import { useCanManageClub } from '@/lib/entitlements/hooks';
+import { supabase } from '@/lib/supabase';
 
 interface ClubNavigationProps {
   clubId: string;
@@ -18,12 +17,28 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
   setShowLeaveConfirm
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { signOut } = useAuth();
 
-  // Get the store ID for the club
-  // Note: In a real implementation, you would fetch this from the database
-  const storeId = '00000000-0000-0000-0000-000000000000'; // Default store ID
+  // Get the store ID for the club dynamically
+  const [storeId, setStoreId] = useState<string>('');
+
+  useEffect(() => {
+    const fetchStoreId = async () => {
+      try {
+        const { data: club } = await supabase
+          .from('book_clubs')
+          .select('store_id')
+          .eq('id', clubId)
+          .single();
+
+        setStoreId(club?.store_id || '');
+      } catch (error) {
+        console.error('Error fetching club store ID:', error);
+        setStoreId('');
+      }
+    };
+
+    fetchStoreId();
+  }, [clubId]);
 
   // Check if the user can manage this club using entitlements
   const { result: canManage } = useCanManageClub(clubId, storeId);
@@ -31,16 +46,7 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
   // We don't need to check navigation state anymore
   // The "Back to Book Clubs" button should always go to the book clubs list
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast.success("You've been successfully signed out");
-      navigate('/login');
-    } catch (error) {
-      console.error("Error signing out:", error);
-      toast.error("Failed to sign out");
-    }
-  };
+
 
   return (
     <>
@@ -62,32 +68,14 @@ const ClubNavigation: React.FC<ClubNavigationProps> = ({
       </div>
 
       {/* Navigation buttons - only show for members */}
-      {isMember && (
+      {isMember && !canManage && (
         <div className="flex flex-wrap justify-center gap-3 mb-6 bg-white/80 p-4 rounded-xl shadow-sm border border-bookconnect-brown/10">
-          {/* Only show Members Management to users who can manage the club */}
-          {canManage && (
-            <Button
-              onClick={() => navigate(`/book-club/${clubId}/members`)}
-              className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 transition-all duration-200 shadow-sm hover:shadow"
-            >
-              Members Management
-            </Button>
-          )}
-          {!canManage && (
-            <Button
-              variant="outline"
-              onClick={() => setShowLeaveConfirm(true)}
-              className="border-red-200 text-red-600 hover:bg-red-50 transition-all duration-200 shadow-sm hover:shadow"
-            >
-              Leave Club
-            </Button>
-          )}
           <Button
-            onClick={handleLogout}
             variant="outline"
-            className="border-bookconnect-brown/20 text-bookconnect-brown hover:bg-bookconnect-brown/5 transition-all duration-200 shadow-sm hover:shadow"
+            onClick={() => setShowLeaveConfirm(true)}
+            className="border-red-200 text-red-600 hover:bg-red-50 transition-all duration-200 shadow-sm hover:shadow"
           >
-            <LogOut className="h-4 w-4 mr-2" /> Logout
+            Leave Club
           </Button>
         </div>
       )}

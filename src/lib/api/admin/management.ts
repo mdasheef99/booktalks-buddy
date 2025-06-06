@@ -1,7 +1,7 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
 import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
+import { canManageClub } from '@/lib/entitlements/permissions';
 
 /**
  * Admin Management Functions
@@ -11,8 +11,20 @@ import { canManageUserTiers } from '@/lib/entitlements';
  * List all members for admin view
  */
 export async function listAdminMembers(userId: string) {
-  // Check if user is a global admin (assumed via Auth metadata or separate check)
-  // For now, assume all authenticated users can list members (adjust as needed)
+  // Check if user has admin permissions
+  const entitlements = await getUserEntitlements(userId);
+
+  const hasAdminPermission = entitlements.includes('CAN_MANAGE_USER_TIERS') ||
+                            entitlements.includes('CAN_MANAGE_ALL_CLUBS') ||
+                            entitlements.includes('CAN_MANAGE_ALL_STORES') ||
+                            entitlements.includes('CAN_MANAGE_STORE_SETTINGS');
+
+  if (!hasAdminPermission) {
+    console.log('🚨 List members permission check failed for user:', userId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only administrators can list all members');
+  }
+
   const { data, error } = await supabase.from('users').select('*');
   if (error) throw error;
   return data;
@@ -23,7 +35,24 @@ export async function listAdminMembers(userId: string) {
  * Note: This is duplicated in bookclubs/members.ts for organizational purposes
  */
 export async function removeMember(adminId: string, userIdToRemove: string, clubId: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Remove member permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can remove members');
+  }
 
   const { error } = await supabase
     .from('club_members')
@@ -40,7 +69,24 @@ export async function removeMember(adminId: string, userIdToRemove: string, club
  * Note: This is duplicated in bookclubs/members.ts for organizational purposes
  */
 export async function inviteMember(adminId: string, clubId: string, inviteeEmail: string) {
-  if (!(await isClubAdmin(adminId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(adminId);
+
+  // Get club's store ID for contextual permission checking
+  const { data: club } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  const canManage = club ? canManageClub(entitlements, clubId, club.store_id) : false;
+
+  if (!canManage) {
+    console.log('🚨 Club invite permission check failed for user:', adminId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can invite members');
+  }
 
   // Implement invite logic (e.g., insert into invites table or send email)
   // Placeholder implementation:
@@ -48,10 +94,10 @@ export async function inviteMember(adminId: string, clubId: string, inviteeEmail
 }
 
 /**
- * Update a user's account tier
+ * Update a user's membership tier
  * @param adminId - ID of the admin making the change
  * @param userId - ID of the user to update
- * @param tier - New tier ('free', 'privileged', or 'privileged_plus')
+ * @param tier - New tier ('MEMBER', 'PRIVILEGED', or 'PRIVILEGED_PLUS')
  * @param storeId - ID of the store context
  * @param subscriptionType - Type of subscription ('monthly' or 'annual')
  * @param paymentReference - Optional reference for the payment
@@ -74,16 +120,19 @@ export async function updateUserTier(
     throw new Error('You do not have permission to manage user tiers');
   }
 
-  // Validate the tier
-  if (!['free', 'privileged', 'privileged_plus'].includes(tier)) {
-    throw new Error('Invalid tier. Must be one of: free, privileged, privileged_plus');
-  }
+  // Note: Tier validation is now done inside the try block
 
   try {
+    // Validate tier value
+    const validTiers = ['MEMBER', 'PRIVILEGED', 'PRIVILEGED_PLUS'];
+    if (!validTiers.includes(tier)) {
+      throw new Error(`Invalid tier: ${tier}. Must be one of: ${validTiers.join(', ')}`);
+    }
+
     // Update the user's tier in the database
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .update({ account_tier: tier })
+      .update({ membership_tier: tier })
       .eq('id', userId)
       .select()
       .single();
@@ -101,7 +150,7 @@ export async function updateUserTier(
     }
 
     // If upgrading to a paid tier, create a subscription and payment record
-    if (tier !== 'free' && subscriptionType) {
+    if (tier !== 'MEMBER' && subscriptionType) {
       // Use the helper function to create subscription and payment in one transaction
       const { data: subscriptionId, error: subscriptionError } = await supabase
         .rpc('create_subscription_with_payment', {
@@ -125,7 +174,7 @@ export async function updateUserTier(
       message: 'User tier updated successfully',
       user: {
         id: userData.id,
-        account_tier: userData.account_tier
+        membership_tier: userData.membership_tier
       }
     };
   } catch (error: any) {

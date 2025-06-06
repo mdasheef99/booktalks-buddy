@@ -107,21 +107,21 @@ export const handleChatAction = async (chatId: string, action: 'accept' | 'rejec
 };
 
 export const saveProfile = async (
-  username: string, 
-  favoriteAuthor: string, 
-  favoriteGenre: string, 
-  bio: string, 
+  username: string, // Read-only, used for identification only
+  favoriteAuthor: string,
+  favoriteGenre: string,
+  bio: string,
   allowChats: boolean
 ): Promise<boolean> => {
   try {
     // Try to save to Supabase if a user is logged in
     const { data: { session } } = await supabase.auth.getSession();
-    
+
     if (session?.user?.id) {
       const { error } = await supabase
         .from('users')
-        .update({ 
-          username, 
+        .update({
+          // Note: username is NOT updated as it's read-only
           favorite_author: favoriteAuthor,
           favorite_genre: favoriteGenre,
           bio,
@@ -131,11 +131,10 @@ export const saveProfile = async (
 
       if (error) throw error;
     }
-    
-    // Always update localStorage
-    localStorage.setItem("username", username);
+
+    // Update localStorage (but not username as it's read-only)
     localStorage.setItem("favorite_genre", favoriteGenre);
-    
+
     return true;
   } catch (error) {
     console.error("Error saving profile:", error);
@@ -151,6 +150,7 @@ export const saveProfile = async (
 
 export const loadProfileData = async (): Promise<{
   username: string;
+  displayName: string | null;
   favoriteAuthor: string;
   favoriteGenre: string;
   bio: string;
@@ -162,15 +162,16 @@ export const loadProfileData = async (): Promise<{
     if (session?.user?.id) {
       const { data, error } = await supabase
         .from('users')
-        .select('username, favorite_author, favorite_genre, bio, allow_chats')
+        .select('username, displayname, favorite_author, favorite_genre, bio, allow_chats')
         .eq('id', session.user.id)
         .single();
-      
+
       if (error) throw error;
-      
+
       if (data) {
         return {
           username: data.username || localStorage.getItem("username") || "",
+          displayName: data.displayname || null,
           favoriteAuthor: data.favorite_author || "",
           favoriteGenre: data.favorite_genre || "Fiction",
           bio: data.bio || "",
@@ -178,9 +179,10 @@ export const loadProfileData = async (): Promise<{
         };
       }
     }
-    
+
     return {
       username: localStorage.getItem("username") || "",
+      displayName: null,
       favoriteAuthor: "",
       favoriteGenre: localStorage.getItem("favorite_genre") || "Fiction",
       bio: "",

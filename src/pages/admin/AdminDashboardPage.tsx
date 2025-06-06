@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, BarChart, Bell, RefreshCw } from 'lucide-react';
+import { ArrowLeft, BarChart, RefreshCw, Shield } from 'lucide-react';
 import {
   useAdminStats,
   useTimeRangeFilter,
@@ -64,73 +64,98 @@ const AdminDashboardPage: React.FC = () => {
         Back to Book Clubs
       </Button>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-serif text-bookconnect-brown">Dashboard</h1>
-          {stats.lastUpdated && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Last updated: {new Date(stats.lastUpdated).toLocaleString()}
-            </p>
-          )}
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          {/* Time Range Filter */}
-          <TimeRangeFilter
-            timeRange={timeRange}
-            onTimeRangeChange={handleTimeRangeChange}
-          />
-
-          <div className="flex gap-2 ml-auto">
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              className="flex items-center gap-2"
-              title="Refresh dashboard data"
-            >
-              <RefreshCw className="h-4 w-4 text-bookconnect-sage" />
-              Refresh
-            </Button>
-
-            <Button
-              onClick={() => navigate('/admin/analytics')}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <BarChart className="h-4 w-4 text-bookconnect-brown" />
-              View Analytics
-            </Button>
-
-            {stats.pendingJoinRequests > 0 && (
-              <Button
-                onClick={() => navigate('/admin/requests')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Bell className="h-4 w-4 text-bookconnect-terracotta" />
-                Pending Requests
-                <Badge className="ml-1 bg-bookconnect-terracotta">{stats.pendingJoinRequests}</Badge>
-              </Button>
+      {/* Dashboard Header - Improved Layout */}
+      <div className="mb-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="flex-1">
+            <h1 className="text-4xl font-serif text-bookconnect-brown mb-2">Admin Dashboard</h1>
+            {stats.lastUpdated && (
+              <p className="text-sm text-muted-foreground">
+                Last updated: {new Date(stats.lastUpdated).toLocaleString()}
+              </p>
             )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            {/* Time Range Filter */}
+            <div className="flex-shrink-0">
+              <TimeRangeFilter
+                timeRange={timeRange}
+                onTimeRangeChange={handleTimeRangeChange}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <Button
+                onClick={handleRefresh}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 hover:bg-bookconnect-sage/10"
+                title="Refresh dashboard data"
+              >
+                <RefreshCw className="h-4 w-4 text-bookconnect-sage" />
+                <span className="hidden sm:inline">Refresh</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate('/admin/analytics')}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 hover:bg-bookconnect-brown/10"
+              >
+                <BarChart className="h-4 w-4 text-bookconnect-brown" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate('/admin/moderation')}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 hover:bg-bookconnect-brown/10"
+              >
+                <Shield className="h-4 w-4 text-bookconnect-brown" />
+                <span className="hidden sm:inline">Moderation</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Stats Row */}
-      <MainStatsRow stats={stats} timeRange={timeRange} />
+      {/* Primary Metrics Section */}
+      <div className="mb-10">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-bookconnect-brown mb-1">Key Metrics</h2>
+          <p className="text-sm text-muted-foreground">Overview of your platform's performance</p>
+        </div>
+        <MainStatsRow stats={stats} timeRange={timeRange} />
+      </div>
 
-      {/* Quick Stats Row */}
-      <QuickStatsRow stats={stats} />
+      {/* Secondary Metrics Section */}
+      <div className="mb-10">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-bookconnect-brown mb-1">Activity Overview</h2>
+          <p className="text-sm text-muted-foreground">Recent activity and engagement metrics</p>
+        </div>
+        <QuickStatsRow stats={stats} />
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <TierDistributionCard
-          tierDistribution={stats.tierDistribution}
-          totalUsers={stats.totalUsers}
-        />
+      {/* Analytics Section */}
+      <div className="mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-bookconnect-brown mb-1">Detailed Analytics</h2>
+          <p className="text-sm text-muted-foreground">User distribution and activity trends</p>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <TierDistributionCard
+            tierDistribution={stats.tierDistribution}
+            totalUsers={stats.totalUsers}
+          />
 
-        <RecentActivityCard
-          recentActivity={stats.recentActivity}
-        />
+          <RecentActivityCard
+            recentActivity={stats.recentActivity}
+          />
+        </div>
       </div>
     </div>
   );

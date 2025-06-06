@@ -6,6 +6,7 @@ import { Calendar, Clock, MapPin, Users, Video, Building } from 'lucide-react';
 import { Event } from '@/lib/supabase';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import { ReportButton } from '@/components/reporting/ReportButton';
 
 interface EventCardProps {
   event: Event;
@@ -139,21 +140,61 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
                 <Badge className="bg-amber-500 text-white">Featured</Badge>
               )}
             </div>
+            <div className="absolute top-3 right-3">
+              <ReportButton
+                targetType="event"
+                targetId={event.id}
+                targetUserId={event.created_by}
+                targetTitle={event.title}
+                targetContent={event.description}
+                clubId={event.club_id}
+                variant="icon-only"
+                size="sm"
+                className="bg-white/80 hover:bg-white text-gray-700 hover:text-red-600"
+              />
+            </div>
           </div>
         )}
 
         <div className="p-6">
           {/* Only show badges here if there's no image */}
           {!event.medium_url && (
-            <div className="flex items-center mb-2">
-              {getEventTypeBadge()}
-              {event.featured_on_landing && (
-                <Badge className="bg-amber-500 text-white">Featured</Badge>
-              )}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                {getEventTypeBadge()}
+                {event.featured_on_landing && (
+                  <Badge className="bg-amber-500 text-white">Featured</Badge>
+                )}
+              </div>
+              <ReportButton
+                targetType="event"
+                targetId={event.id}
+                targetUserId={event.created_by}
+                targetTitle={event.title}
+                targetContent={event.description}
+                clubId={event.club_id}
+                variant="icon-only"
+                size="sm"
+              />
             </div>
           )}
 
-          <h3 className="text-xl font-serif font-bold mb-2">{event.title}</h3>
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="text-xl font-serif font-bold flex-1">{event.title}</h3>
+            {event.medium_url && (
+              <ReportButton
+                targetType="event"
+                targetId={event.id}
+                targetUserId={event.created_by}
+                targetTitle={event.title}
+                targetContent={event.description}
+                clubId={event.club_id}
+                variant="icon-only"
+                size="sm"
+                className="ml-2 flex-shrink-0"
+              />
+            )}
+          </div>
 
           <div className="flex items-center text-sm mb-2">
             <Calendar className="h-4 w-4 mr-2 text-bookconnect-terracotta" />

@@ -135,15 +135,52 @@ const BookNominationFormPage: React.FC = () => {
     } catch (err: any) {
       console.error('Error nominating book:', err);
       setError(err.message || 'Failed to nominate book');
-      
-      // Determine error type
+
+      // Determine error type and provide appropriate toast feedback
       const errorMessage = err.message?.toLowerCase() || '';
+
       if (errorMessage.includes('already been nominated')) {
         setErrorType('validation');
+        toast({
+          title: "Book Already Nominated",
+          description: "This book has already been nominated in this club. Please choose a different book.",
+          variant: "destructive",
+        });
+      } else if (errorMessage.includes('already been selected')) {
+        setErrorType('validation');
+        toast({
+          title: "Book Already Selected",
+          description: "This book has already been selected as the current book for this club.",
+          variant: "destructive",
+        });
       } else if (errorMessage.includes('member')) {
         setErrorType('permission');
+        toast({
+          title: "Permission Denied",
+          description: "You must be a member of this club to nominate books.",
+          variant: "destructive",
+        });
+      } else if (errorMessage.includes('invalid book or club reference')) {
+        setErrorType('validation');
+        toast({
+          title: "Invalid Reference",
+          description: "There was an issue with the book or club information. Please try again.",
+          variant: "destructive",
+        });
+      } else if (errorMessage.includes('constraint') || errorMessage.includes('unique')) {
+        setErrorType('validation');
+        toast({
+          title: "Duplicate Nomination",
+          description: "This book has already been nominated in this club.",
+          variant: "destructive",
+        });
       } else {
         setErrorType('unknown');
+        toast({
+          title: "Nomination Failed",
+          description: err.message || "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setIsNominating(false);

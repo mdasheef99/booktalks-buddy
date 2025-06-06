@@ -1,21 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { Book, Calendar, ExternalLink } from 'lucide-react';
+import { Book, Calendar, ExternalLink, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/lib/supabase';
 import { getNominationById } from '@/lib/api/bookclubs/nominations';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  ProgressUpdateModal,
+  ProgressIndicator,
+  ProgressToggleControl,
+  ReadingProgress,
+  useProgressRealtime,
+  ClubProgressDetailsModal
+} from '@/components/bookclubs/progress';
+import {
+  getClubProgressStats
+} from '@/lib/api/bookclubs/progress';
 
 type CurrentBook = Database['public']['Tables']['current_books']['Row'];
 
 interface CurrentBookSectionProps {
   currentBook: CurrentBook | null;
+  clubId: string;
+  isMember: boolean;
+  canManageClub: boolean;
 }
 
-const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({ currentBook }) => {
+const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({
+  currentBook,
+  clubId,
+  isMember,
+  canManageClub
+}) => {
   const { user } = useAuth();
   const [bookDetails, setBookDetails] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  // Progress tracking state
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [showProgressDetailsModal, setShowProgressDetailsModal] = useState(false);
+  const [clubStats, setClubStats] = useState<any>(null);
+
+  // Real-time progress tracking
+  const {
+    userProgress,
+    progressTrackingEnabled,
+    loading: progressLoading,
+    refetch: refetchProgress
+  } = useProgressRealtime({
+    clubId,
+    userId: user?.id || '',
+    enabled: isMember && !!user?.id,
+    showToasts: true,
+    onProgressUpdate: (progress) => {
+      // Progress is automatically updated via the hook
+    },
+    onStatsUpdate: (stats) => {
+      setClubStats(stats);
+    },
+    onFeatureToggle: (enabled) => {
+      // Feature toggle is automatically handled via the hook
+    }
+  });
 
   useEffect(() => {
     const fetchBookDetails = async () => {
@@ -73,6 +119,22 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({ currentBook }) 
     fetchBookDetails();
   }, [currentBook, user?.id]);
 
+  // Fetch club statistics when progress tracking is enabled
+  useEffect(() => {
+    const fetchClubStats = async () => {
+      if (!clubId || !progressTrackingEnabled || !user?.id) return;
+
+      try {
+        const stats = await getClubProgressStats(user.id, clubId);
+        setClubStats(stats);
+      } catch (error) {
+        console.error('Error fetching club stats:', error);
+      }
+    };
+
+    fetchClubStats();
+  }, [clubId, progressTrackingEnabled, user?.id]);
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -83,6 +145,40 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({ currentBook }) 
     });
   };
 
+  // Progress tracking handlers
+  const handleProgressUpdated = async (progress: ReadingProgress) => {
+    // Progress will be automatically updated via real-time subscription
+    // Optionally refetch to ensure consistency
+    await refetchProgress();
+  };
+
+  const handleProgressToggle = async (enabled: boolean) => {
+    // Feature toggle will be automatically handled via real-time subscription
+    // Optionally refetch to ensure consistency
+    await refetchProgress();
+  };
+
+  const handleStatsClick = () => {
+    setShowProgressDetailsModal(true);
+  };
+
+  const getProgressDisplay = (progress: ReadingProgress | null) => {
+    if (!progress) return 'Not Started';
+
+    if (progress.status === 'not_started') return 'Not Started';
+    if (progress.status === 'finished') return 'Finished';
+
+    if (progress.progress_type === 'percentage' && progress.progress_percentage !== null) {
+      return `${progress.progress_percentage}%`;
+    } else if (progress.progress_type === 'chapter' && progress.current_progress && progress.total_progress) {
+      return `Chapter ${progress.current_progress}/${progress.total_progress}`;
+    } else if (progress.progress_type === 'page' && progress.current_progress && progress.total_progress) {
+      return `Page ${progress.current_progress}/${progress.total_progress}`;
+    }
+
+    return 'Reading';
+  };
+
   return (
     <>
       <div className="flex justify-between items-center mb-4">
@@ -90,6 +186,16 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({ currentBook }) 
           <Book className="h-5 w-5 text-bookconnect-terracotta" />
           Current Book
         </h2>
+        {/* Progress tracking toggle for club leads */}
+        {canManageClub && (
+          <ProgressToggleControl
+            clubId={clubId}
+            enabled={progressTrackingEnabled}
+            onToggle={handleProgressToggle}
+            canManage={canManageClub}
+            loading={progressLoading}
+          />
+        )}
       </div>
 
       {currentBook && bookDetails ? (
@@ -127,16 +233,106 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({ currentBook }) 
               </p>
             )}
 
-            {bookDetails.google_books_id && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2"
-                onClick={() => window.open(`https://books.google.com/books?id=${bookDetails.google_books_id}`, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View on Google Books
-              </Button>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {bookDetails.google_books_id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(`https://books.google.com/books?id=${bookDetails.google_books_id}`, '_blank')}
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View on Google Books
+                </Button>
+              )}
+
+              {/* Progress update button for members when tracking is enabled */}
+              {isMember && progressTrackingEnabled && (
+                <Button
+                  size="sm"
+                  onClick={() => setShowProgressModal(true)}
+                  className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+                >
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Update My Progress
+                </Button>
+              )}
+            </div>
+
+            {/* User's current progress display */}
+            {isMember && progressTrackingEnabled && (
+              <div className="mt-4 space-y-3">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <ProgressIndicator
+                        status={userProgress?.status || 'not_started'}
+                        progressDisplay={getProgressDisplay(userProgress)}
+                        isPrivate={userProgress?.is_private || false}
+                        size="md"
+                        lastUpdated={userProgress?.last_updated}
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          Your Progress: {getProgressDisplay(userProgress)}
+                        </p>
+                        {userProgress?.notes && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            "{userProgress.notes}"
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {userProgress?.is_private && (
+                      <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                        Private
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Club reading statistics */}
+                {clubStats && (
+                  <div
+                    className="p-3 bg-bookconnect-terracotta/5 rounded-lg border border-bookconnect-terracotta/20 cursor-pointer hover:bg-bookconnect-terracotta/10 hover:border-bookconnect-terracotta/30 transition-colors"
+                    onClick={handleStatsClick}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleStatsClick();
+                      }
+                    }}
+                    aria-label="View detailed member progress"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-gray-900">Club Reading Progress</h4>
+                      <TrendingUp className="h-4 w-4 text-bookconnect-terracotta" />
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                      <div className="text-center p-2 sm:p-0">
+                        <div className="font-semibold text-bookconnect-terracotta text-lg sm:text-base">{clubStats.total_members}</div>
+                        <div className="text-gray-600 text-xs">Total Members</div>
+                      </div>
+                      <div className="text-center p-2 sm:p-0">
+                        <div className="font-semibold text-green-600 text-lg sm:text-base">{clubStats.finished_count}</div>
+                        <div className="text-gray-600 text-xs">Finished</div>
+                      </div>
+                      <div className="text-center p-2 sm:p-0">
+                        <div className="font-semibold text-blue-600 text-lg sm:text-base">{clubStats.reading_count}</div>
+                        <div className="text-gray-600 text-xs">Reading</div>
+                      </div>
+                      <div className="text-center p-2 sm:p-0">
+                        <div className="font-semibold text-bookconnect-terracotta text-lg sm:text-base">{clubStats.completion_percentage}%</div>
+                        <div className="text-gray-600 text-xs">Completion</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500 text-center">
+                      Click to view detailed member progress
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -148,6 +344,29 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({ currentBook }) 
             Club members can nominate books for the club to read next.
           </p>
         </div>
+      )}
+
+      {/* Progress Update Modal */}
+      {isMember && progressTrackingEnabled && (
+        <ProgressUpdateModal
+          isOpen={showProgressModal}
+          onClose={() => setShowProgressModal(false)}
+          clubId={clubId}
+          bookId={currentBook?.book_id || undefined}
+          currentProgress={userProgress}
+          onProgressUpdated={handleProgressUpdated}
+        />
+      )}
+
+      {/* Club Progress Details Modal */}
+      {isMember && progressTrackingEnabled && (
+        <ClubProgressDetailsModal
+          isOpen={showProgressDetailsModal}
+          onClose={() => setShowProgressDetailsModal(false)}
+          clubId={clubId}
+          bookId={currentBook?.book_id || undefined}
+          clubStats={clubStats}
+        />
       )}
     </>
   );

@@ -1,9 +1,63 @@
 import { supabase } from '../../supabase';
-import { isClubAdmin } from '../auth';
+import { getUserEntitlements } from '../../entitlements/cache';
+import { canManageClub } from '../../entitlements/permissions';
 
 /**
  * Book Club Current Book Management
  */
+
+/**
+ * Validate that only one current book exists per club
+ * @param clubId Club ID to validate
+ * @returns Promise<boolean> - true if validation passes
+ */
+async function validateSingleCurrentBook(clubId: string): Promise<boolean> {
+  try {
+    const { data, error, count } = await supabase
+      .from('current_books')
+      .select('club_id', { count: 'exact' })
+      .eq('club_id', clubId);
+
+    if (error) {
+      console.error('Error validating current book constraint:', error);
+      return false;
+    }
+
+    const bookCount = count || 0;
+    if (bookCount > 1) {
+      console.error(`❌ Data integrity violation: Club ${clubId} has ${bookCount} current books, expected 0 or 1`);
+
+      // Auto-fix by keeping only the most recent one
+      const { data: allBooks, error: fetchError } = await supabase
+        .from('current_books')
+        .select('*')
+        .eq('club_id', clubId)
+        .order('set_at', { ascending: false });
+
+      if (!fetchError && allBooks && allBooks.length > 1) {
+        const mostRecent = allBooks[0];
+        const toDelete = allBooks.slice(1);
+
+        console.log(`🔧 Auto-fixing: Keeping most recent book (${mostRecent.title}) and removing ${toDelete.length} duplicates`);
+
+        for (const book of toDelete) {
+          await supabase
+            .from('current_books')
+            .delete()
+            .eq('club_id', clubId)
+            .eq('set_at', book.set_at);
+        }
+      }
+
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Unexpected error validating current book constraint:', error);
+    return false;
+  }
+}
 
 export interface CurrentBook {
   club_id: string;
@@ -32,9 +86,28 @@ export interface CurrentBook {
  */
 export async function setCurrentBookFromNomination(userId: string, clubId: string, nominationId: string) {
   try {
-    // Check if user is an admin of the club
-    if (!(await isClubAdmin(userId, clubId))) {
-      throw new Error('You must be an admin of the club to set the current book');
+    // Get user entitlements and check club management permission
+    const entitlements = await getUserEntitlements(userId);
+
+    // Get club's store ID for contextual permission checking
+    const { data: club, error: clubError } = await supabase
+      .from('book_clubs')
+      .select('store_id')
+      .eq('id', clubId)
+      .single();
+
+    if (clubError) {
+      console.error('Error fetching club store ID:', clubError);
+      throw new Error('Failed to verify club permissions');
+    }
+
+    const canManage = canManageClub(entitlements, clubId, club.store_id);
+
+    if (!canManage) {
+      console.log('🚨 [setCurrentBookFromNomination] permission check failed for user:', userId);
+      console.log('📍 Club ID:', clubId);
+      console.log('🔑 User entitlements:', entitlements);
+      throw new Error('Unauthorized: Only club administrators can set the current book');
     }
 
     // Get the nomination details
@@ -50,10 +123,21 @@ export async function setCurrentBookFromNomination(userId: string, clubId: strin
       throw new Error('Failed to find nomination');
     }
 
-    // Update the current book
-    const { error } = await supabase
+    // Ensure only one current book per club by using explicit delete + insert transaction
+    const { error: deleteError } = await supabase
       .from('current_books')
-      .upsert([{
+      .delete()
+      .eq('club_id', clubId);
+
+    if (deleteError) {
+      console.error('Error removing existing current book:', deleteError);
+      throw new Error('Failed to remove existing current book');
+    }
+
+    // Insert the new current book
+    const { error: insertError } = await supabase
+      .from('current_books')
+      .insert([{
         club_id: clubId,
         book_id: nomination.book_id,
         nomination_id: nomination.id,
@@ -62,8 +146,8 @@ export async function setCurrentBookFromNomination(userId: string, clubId: strin
         set_at: new Date().toISOString()
       }]);
 
-    if (error) {
-      console.error('Error setting current book:', error);
+    if (insertError) {
+      console.error('Error setting current book:', insertError);
       throw new Error('Failed to set current book');
     }
 
@@ -77,6 +161,9 @@ export async function setCurrentBookFromNomination(userId: string, clubId: strin
       console.error('Error updating nomination status:', updateError);
       // Continue despite the error
     }
+
+    // Validate that only one current book exists for this club
+    await validateSingleCurrentBook(clubId);
 
     return getCurrentBook(clubId);
   } catch (error) {
@@ -96,11 +183,45 @@ export async function setCurrentBookFromNomination(userId: string, clubId: strin
  * @returns The updated current book
  */
 export async function setCurrentBook(userId: string, clubId: string, book: { title: string; author: string }) {
-  if (!(await isClubAdmin(userId, clubId))) throw new Error('Unauthorized');
+  // Get user entitlements and check club management permission
+  const entitlements = await getUserEntitlements(userId);
 
-  const { data, error } = await supabase
+  // Get club's store ID for contextual permission checking
+  const { data: club, error: clubError } = await supabase
+    .from('book_clubs')
+    .select('store_id')
+    .eq('id', clubId)
+    .single();
+
+  if (clubError) {
+    console.error('Error fetching club store ID:', clubError);
+    throw new Error('Failed to verify club permissions');
+  }
+
+  const canManage = canManageClub(entitlements, clubId, club.store_id);
+
+  if (!canManage) {
+    console.log('🚨 [setCurrentBook] permission check failed for user:', userId);
+    console.log('📍 Club ID:', clubId);
+    console.log('🔑 User entitlements:', entitlements);
+    throw new Error('Unauthorized: Only club administrators can set the current book');
+  }
+
+  // Ensure only one current book per club by using explicit delete + insert transaction
+  const { error: deleteError } = await supabase
     .from('current_books')
-    .upsert([{
+    .delete()
+    .eq('club_id', clubId);
+
+  if (deleteError) {
+    console.error('Error removing existing current book:', deleteError);
+    throw new Error('Failed to remove existing current book');
+  }
+
+  // Insert the new current book
+  const { data, error: insertError } = await supabase
+    .from('current_books')
+    .insert([{
       club_id: clubId,
       title: book.title,
       author: book.author,
@@ -109,7 +230,14 @@ export async function setCurrentBook(userId: string, clubId: string, book: { tit
     .select()
     .single();
 
-  if (error) throw error;
+  if (insertError) {
+    console.error('Error setting current book:', insertError);
+    throw new Error('Failed to set current book');
+  }
+
+  // Validate that only one current book exists for this club
+  await validateSingleCurrentBook(clubId);
+
   return data;
 }
 
@@ -122,6 +250,9 @@ export async function getCurrentBook(clubId: string): Promise<CurrentBook | null
   console.log('Getting current book for club:', clubId);
 
   try {
+    // First, validate and auto-fix any constraint violations
+    await validateSingleCurrentBook(clubId);
+
     // Get the current book with book details
     const { data, error } = await supabase
       .from('current_books')

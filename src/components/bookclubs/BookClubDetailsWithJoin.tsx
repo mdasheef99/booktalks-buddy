@@ -16,6 +16,7 @@ import DiscussionsSection from './sections/DiscussionsSection';
 import NominationsSection from './sections/NominationsSection';
 import JoinClubSection from './sections/JoinClubSection';
 import PendingMembershipSection from './sections/PendingMembershipSection';
+import EventsSection from './sections/EventsSection';
 
 interface BookClubDetailsWithJoinProps {}
 
@@ -93,7 +94,12 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
 
         {/* Current Book */}
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
-          <CurrentBookSection currentBook={currentBook} />
+          <CurrentBookSection
+            currentBook={currentBook}
+            clubId={clubId || ''}
+            isMember={isMember}
+            canManageClub={canManageClub}
+          />
         </div>
 
         {/* Book Nominations - Only show for members */}
@@ -107,9 +113,20 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
           </div>
         )}
 
+        {/* Club Events - Only show for members */}
+        {isMember && (
+          <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 transition-all duration-300 hover:shadow-lg">
+            <EventsSection
+              clubId={clubId || ''}
+              isMember={isMember}
+              isAdmin={isAdmin}
+            />
+          </div>
+        )}
+
         {/* Members */}
         <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
-          <MembersSection members={members} />
+          <MembersSection members={members} clubId={clubId || ''} />
         </div>
 
         {/* Discussion Topics - Only show for members */}
@@ -123,7 +140,10 @@ export const BookClubDetailsWithJoin: React.FC<BookClubDetailsWithJoinProps> = (
         {!isMember && !isPending && (
           <div className="bg-white rounded-xl shadow-md border border-bookconnect-brown/10 p-6 transition-all duration-300 hover:shadow-lg">
             <JoinClubSection
+              clubId={clubId || ''}
+              clubName={club.name || 'Book Club'}
               clubPrivacy={club.privacy || 'public'}
+              joinQuestionsEnabled={club.join_questions_enabled || false}
               actionInProgress={actionInProgress}
               handleJoinClub={handleJoinClub}
             />

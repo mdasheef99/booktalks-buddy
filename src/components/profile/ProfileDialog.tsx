@@ -19,8 +19,8 @@ interface ProfileDialogProps {
 const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
   const {
     // State
-    username,
-    setUsername,
+    username, // Read-only
+    displayName,
     favoriteAuthor,
     setFavoriteAuthor,
     favoriteGenre,
@@ -37,7 +37,8 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
     initialize,
     setupRealtimeSubscription,
     handleSaveProfile,
-    handleChatActionRequest
+    handleChatActionRequest,
+    handleDisplayNameUpdate
   } = useProfileData();
 
   useEffect(() => {
@@ -54,22 +55,13 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
 
   const handleSaveProfileAndRefresh = async () => {
     await handleSaveProfile();
-    // Force a refresh of both localStorage values
-    if (username) {
-      // Store the username in both localStorage keys for consistency
-      localStorage.setItem("anon_username", username);
-      localStorage.setItem("username", username);
 
-      // Create a custom event to notify other components about the username change
-      const usernameChangeEvent = new CustomEvent('usernameChanged', {
-        detail: { username }
-      });
-      window.dispatchEvent(usernameChangeEvent);
+    // Note: Username is no longer editable, so no need to update localStorage
+    // Only profile data (bio, favorite author/genre, etc.) is saved
 
-      toast("Username updated", {
-        description: "Your username has been updated throughout the app."
-      });
-    }
+    toast("Profile updated", {
+      description: "Your profile has been updated successfully."
+    });
 
     // Close the dialog after saving
     onClose();
@@ -92,7 +84,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
         <ProfileDialogHeader />
         <ProfileDialogContent
           username={username}
-          setUsername={setUsername}
+          displayName={displayName}
           favoriteAuthor={favoriteAuthor}
           setFavoriteAuthor={setFavoriteAuthor}
           favoriteGenre={favoriteGenre}
@@ -104,6 +96,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
           chatRequests={chatRequests}
           activeChatsCount={activeChatsCount}
           onChatAction={handleChatActionRequest}
+          onDisplayNameUpdate={handleDisplayNameUpdate}
         />
         <ProfileDialogFooter
           isLoading={isLoading}

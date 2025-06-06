@@ -1,9 +1,8 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Book, Users, MessageSquare, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { Book, Users, MessageSquare, Settings, ArrowLeft } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/lib/supabase';
@@ -24,19 +23,10 @@ export const BookClubDetails: React.FC<BookClubDetailsProps> = () => {
   const [topics, setTopics] = React.useState<DiscussionTopic[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [isAdmin, setIsAdmin] = React.useState(false);
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast.success("You've been successfully signed out");
-      navigate('/login');
-    } catch (error) {
-      console.error("Error signing out:", error);
-      toast.error("Failed to sign out");
-    }
-  };
+
 
   React.useEffect(() => {
     const fetchClubDetails = async () => {
@@ -189,21 +179,7 @@ export const BookClubDetails: React.FC<BookClubDetailsProps> = () => {
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Book Clubs
       </Button>
-      <div className="flex justify-center space-x-4 mb-4">
-        <Button onClick={() => navigate(`/book-club/${clubId}/members`)}>
-          Members Management
-        </Button>
-        <Button onClick={() => navigate(`/book-club/${clubId}/settings`)}>
-          Club Settings
-        </Button>
-        <Button
-          onClick={handleLogout}
-          variant="destructive"
-          className="bg-bookconnect-brown hover:bg-bookconnect-brown/80 text-white"
-        >
-          <LogOut className="h-4 w-4 mr-2" /> Logout
-        </Button>
-      </div>
+
     <div className="space-y-8">
       {/* Club Header */}
       <div className="bg-white shadow rounded-lg p-6">

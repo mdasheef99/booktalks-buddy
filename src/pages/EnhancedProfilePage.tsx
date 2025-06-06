@@ -5,16 +5,19 @@ import { useAuth } from '@/contexts/AuthContext';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Book, Clock, ArrowLeft } from 'lucide-react';
+import { Book, Clock, ArrowLeft, BookOpen } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUserClubMemberships } from '@/lib/api/profile';
 import ProfileForm from '@/components/profile/ProfileForm';
+
+
 
 // Import our new components
 import ProfileHeader from '@/components/profile/enhanced/ProfileHeader';
 import ProfilePreferences from '@/components/profile/enhanced/ProfilePreferences';
 import ProfileAvailability from '@/components/profile/enhanced/ProfileAvailability';
 import { UserMetadata, ClubMembership } from '@/components/profile/enhanced/types';
+import { getUserProfile, clearProfileCache } from '@/services/profileService';
 
 const EnhancedProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -38,13 +41,27 @@ const EnhancedProfilePage: React.FC = () => {
       try {
         setLoading(true);
 
-        // Get user data from Supabase Auth
-        const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
+        // Get profile data from database (includes avatar URLs)
+        const userProfile = await getUserProfile(user.id);
 
-        if (userError) throw userError;
+        // Combine database profile data with auth metadata from useAuth hook
+        const combinedMetadata: UserMetadata = {
+          // Database fields (primary source for avatar URLs)
+          display_name: userProfile.displayname,
+          username: userProfile.username,
+          avatar_url: userProfile.avatar_url,
+          avatar_thumbnail_url: userProfile.avatar_thumbnail_url,
+          avatar_medium_url: userProfile.avatar_medium_url,
+          avatar_full_url: userProfile.avatar_full_url,
+          bio: userProfile.bio,
+          // Auth metadata fields (fallback for preferences)
+          reading_frequency: user?.user_metadata?.reading_frequency,
+          favorite_genres: user?.user_metadata?.favorite_genres || [],
+          favorite_authors: user?.user_metadata?.favorite_authors || [],
+          preferred_meeting_times: user?.user_metadata?.preferred_meeting_times || []
+        };
 
-        // Set user metadata
-        setUserMetadata(userData?.user_metadata || {});
+        setUserMetadata(combinedMetadata);
 
         // Fetch club memberships
         try {
@@ -68,13 +85,30 @@ const EnhancedProfilePage: React.FC = () => {
   // Handle profile update
   const handleProfileUpdated = async () => {
     try {
-      // Refresh user data
-      const { data: { user: userData }, error: userError } = await supabase.auth.getUser();
+      // Clear profile cache to ensure fresh data
+      clearProfileCache();
 
-      if (userError) throw userError;
+      // Get fresh profile data from database
+      const userProfile = await getUserProfile(user.id);
 
-      // Update user metadata
-      setUserMetadata(userData?.user_metadata || {});
+      // Combine database profile data with auth metadata from useAuth hook
+      const combinedMetadata: UserMetadata = {
+        // Database fields (primary source for avatar URLs)
+        display_name: userProfile.displayname,
+        username: userProfile.username,
+        avatar_url: userProfile.avatar_url,
+        avatar_thumbnail_url: userProfile.avatar_thumbnail_url,
+        avatar_medium_url: userProfile.avatar_medium_url,
+        avatar_full_url: userProfile.avatar_full_url,
+        bio: userProfile.bio,
+        // Auth metadata fields (fallback for preferences)
+        reading_frequency: user?.user_metadata?.reading_frequency,
+        favorite_genres: user?.user_metadata?.favorite_genres || [],
+        favorite_authors: user?.user_metadata?.favorite_authors || [],
+        preferred_meeting_times: user?.user_metadata?.preferred_meeting_times || []
+      };
+
+      setUserMetadata(combinedMetadata);
 
       // Exit edit mode
       setEditMode(false);
@@ -157,7 +191,6 @@ const EnhancedProfilePage: React.FC = () => {
           />
 
           {/* Profile Content */}
-          {/* We could add a BookClubs tab here in the future */}
           <Tabs defaultValue="preferences" className="mt-6">
             <div className="flex justify-end mb-4">
               <TabsList className="bg-bookconnect-cream border border-bookconnect-brown/20">
@@ -168,6 +201,7 @@ const EnhancedProfilePage: React.FC = () => {
                   <Book className="h-4 w-4" />
                   Reading Preferences
                 </TabsTrigger>
+
                 <TabsTrigger
                   value="availability"
                   className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
@@ -182,6 +216,8 @@ const EnhancedProfilePage: React.FC = () => {
             <TabsContent value="preferences">
               <ProfilePreferences userMetadata={userMetadata} />
             </TabsContent>
+
+
 
             {/* Availability Tab */}
             <TabsContent value="availability">

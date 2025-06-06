@@ -64,9 +64,16 @@ export async function getStoreEvents(userId: string, storeId: string): Promise<E
 
   // Check if the user has permission to view store events
   const hasPermission = hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId) ||
-                         hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId);
+                         hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId) ||
+                         entitlements.includes('CAN_MANAGE_EVENTS') ||
+                         entitlements.includes('CAN_MANAGE_ALL_STORES');
 
   if (!hasPermission) {
+    console.log('🚨 Store events permission check failed for user:', userId);
+    console.log('📍 Store ID:', storeId);
+    console.log('🔑 User entitlements:', entitlements);
+    console.log('🔍 Looking for: STORE_OWNER_' + storeId + ' or STORE_MANAGER_' + storeId);
+    console.log('🔍 Or general permissions: CAN_MANAGE_EVENTS, CAN_MANAGE_ALL_STORES');
     throw new Error('Unauthorized: Only store owners and managers can view all store events');
   }
 
@@ -131,12 +138,19 @@ export async function toggleEventFeatured(
   const entitlements = await getUserEntitlements(userId);
 
   // Check if the user has permission to feature this event
-  const hasStorePermission = event.store_id ?
-    hasContextualEntitlement(entitlements, 'STORE_OWNER', event.store_id) ||
-    hasContextualEntitlement(entitlements, 'STORE_MANAGER', event.store_id) :
-    false;
+  let hasStorePermission = false;
+  if (event.store_id) {
+    hasStorePermission = hasContextualEntitlement(entitlements, 'STORE_OWNER', event.store_id) ||
+                        hasContextualEntitlement(entitlements, 'STORE_MANAGER', event.store_id) ||
+                        entitlements.includes('CAN_MANAGE_EVENTS') ||
+                        entitlements.includes('CAN_MANAGE_ALL_STORES');
+  }
 
   if (!hasStorePermission) {
+    console.log('🚨 Toggle featured permission check failed for user:', userId);
+    console.log('📍 Event ID:', eventId);
+    console.log('📍 Store ID:', event.store_id);
+    console.log('🔑 User entitlements:', entitlements);
     throw new Error('Unauthorized: Only store owners and managers can feature events');
   }
 

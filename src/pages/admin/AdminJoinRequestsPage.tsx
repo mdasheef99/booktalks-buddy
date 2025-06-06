@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLoadProfiles } from '@/contexts/UserProfileContext';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
-import { getPendingJoinRequests, approveJoinRequest, denyJoinRequest } from '@/lib/api';
+import { getPendingJoinRequests, approveJoinRequest, rejectJoinRequest } from '@/lib/api';
 
 // Import custom components
 import JoinRequestCard from '@/components/admin/JoinRequestCard';
@@ -91,13 +91,22 @@ const AdminJoinRequestsPage: React.FC = () => {
     setProcessingRequests(prev => ({ ...prev, [requestKey]: true }));
 
     try {
+      // Get the current user's ID for the admin parameter
+      const { data: { user } } = await supabase.auth.getUser();
+      const adminId = user?.id;
+
+      if (!adminId) {
+        toast.error('You must be logged in to perform this action');
+        return;
+      }
+
       if (approve) {
-        // Approve the request using the API function
-        const result = await approveJoinRequest(userId, clubId);
+        // Approve the request using the API function with all required parameters
+        const result = await approveJoinRequest(adminId, clubId, userId);
         toast.success(result.message);
       } else {
-        // Deny the request using the API function
-        const result = await denyJoinRequest(userId, clubId);
+        // Reject the request using the API function with all required parameters
+        const result = await rejectJoinRequest(adminId, clubId, userId);
         toast.success(result.message);
       }
 

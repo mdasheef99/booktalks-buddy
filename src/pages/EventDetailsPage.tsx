@@ -10,6 +10,7 @@ import { format, isPast } from 'date-fns';
 import RsvpButton from '@/components/events/RsvpButton';
 import ParticipantsList from '@/components/events/ParticipantsList';
 import { toast } from 'sonner';
+import { ReportButton } from '@/components/reporting/ReportButton';
 
 /**
  * Page for displaying event details and allowing users to RSVP
@@ -176,7 +177,19 @@ const EventDetailsPage: React.FC = () => {
           )}
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-serif font-bold mb-4">{event.title}</h1>
+        <div className="flex items-start justify-between mb-4">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold flex-1">{event.title}</h1>
+          <ReportButton
+            targetType="event"
+            targetId={event.id}
+            targetUserId={event.created_by}
+            targetTitle={event.title}
+            targetContent={event.description}
+            clubId={event.club_id}
+            variant="icon-only"
+            className="ml-4 flex-shrink-0"
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-2 space-y-6">

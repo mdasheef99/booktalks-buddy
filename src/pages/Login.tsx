@@ -19,7 +19,6 @@ const Login = () => {
 
   // Redirect if already logged in
   if (user) {
-    console.log("User already logged in, redirecting to /book-club", user);
     return <Navigate to="/book-club" />;
   }
 
@@ -32,11 +31,10 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting login with:", email);
       await signIn(email, password);
       // The redirect will be handled by the signIn function in AuthContext
     } catch (error: any) {
-      console.error("Error during login:", error);
+      // Error handling is done in AuthContext
     } finally {
       setIsLoading(false);
     }

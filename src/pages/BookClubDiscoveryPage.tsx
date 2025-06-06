@@ -141,6 +141,9 @@ const BookClubDiscoveryPage: React.FC = () => {
             renderActionButton={renderActionButton}
             onViewClub={handleViewClub}
             onPageChange={fetchClubs}
+            actionInProgress={actionInProgress}
+            onJoinClub={handleJoinClub}
+            onCancelRequest={handleCancelRequest}
           />
         </div>
       </div>
