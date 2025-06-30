@@ -41,7 +41,7 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({
   const [showProgressDetailsModal, setShowProgressDetailsModal] = useState(false);
   const [clubStats, setClubStats] = useState<any>(null);
 
-  // Real-time progress tracking
+  // ✅ FIXED: Real-time progress tracking with unique component ID
   const {
     userProgress,
     progressTrackingEnabled,
@@ -52,6 +52,7 @@ const CurrentBookSection: React.FC<CurrentBookSectionProps> = ({
     userId: user?.id || '',
     enabled: isMember && !!user?.id,
     showToasts: true,
+    componentId: 'current-book-section', // Unique identifier to prevent subscription conflicts
     onProgressUpdate: (progress) => {
       // Progress is automatically updated via the hook
     },

@@ -15,7 +15,9 @@ import {
   Image,
   MessageSquare,
   Quote,
-  TrendingUp
+  TrendingUp,
+  Package,
+  Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -203,6 +205,30 @@ const AdminLayout: React.FC = () => {
               >
                 <Quote className="h-4 w-4 mr-3" />
                 Quotes
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/book-listings"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Package className="h-4 w-4 mr-3" />
+                Book Listings
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/book-availability-requests"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Search className="h-4 w-4 mr-3" />
+                Book Requests
               </NavLink>
 
               <NavLink

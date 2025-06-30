@@ -1,7 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { toast } from 'sonner';
-import * as Sentry from '@sentry/react';
 import { supabase as supabaseClient } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 
@@ -25,7 +24,6 @@ export async function apiCall<T>(
     if (error) {
       console.error(error);
       toast.error(errorMessage);
-      Sentry.captureException(error);
       return null;
     }
     
@@ -33,7 +31,6 @@ export async function apiCall<T>(
   } catch (err) {
     console.error(err);
     toast.error(errorMessage);
-    Sentry.captureException(err);
     return null;
   }
 }

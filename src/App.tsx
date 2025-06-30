@@ -10,11 +10,13 @@ import { HelmetProvider } from "react-helmet-async";
 import Layout from "./components/Layout";
 import AdminLayout from "./components/layouts/AdminLayout";
 import Landing from "./pages/Landing";
+import Offers from "./pages/Offers";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Books from "./pages/Books";
+import BooksSection from "./pages/BooksSection";
 import BookDetail from "./pages/BookDetail";
 import ExploreBooks from "./pages/ExploreBooks";
 import BookDiscussion from "./pages/BookDiscussion";
@@ -27,6 +29,7 @@ import BookClubDiscussionsPage from "./pages/BookClubDiscussionsPage";
 import BookClubTopicDetailPage from "./pages/BookClubTopicDetailPage";
 import BookClubProfilePage from "./pages/BookClubProfilePage";
 import EnhancedProfilePage from "./pages/EnhancedProfilePage";
+import LegacyProfileRedirect from "./components/routing/LegacyProfileRedirect";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminClubManagementPage from "./pages/admin/AdminClubManagementPage";
 import AdminUserListPage from "./pages/admin/AdminUserListPage";
@@ -44,6 +47,8 @@ import CarouselManagement from "@/pages/admin/store/CarouselManagement";
 import BannerManagement from "@/pages/admin/store/BannerManagement";
 import { QuoteManagement } from "@/pages/admin/store/QuoteManagement";
 import { CommunityShowcaseManagement } from "@/pages/admin/store/CommunityShowcaseManagement";
+import BookListingsManagement from "@/pages/admin/store/BookListingsManagement";
+import BookAvailabilityRequestsManagement from "@/pages/admin/store/BookAvailabilityRequestsManagement";
 import ReportingSystemTest from "./components/testing/ReportingSystemTest";
 // Username validation debug tools removed - issues resolved
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
@@ -81,17 +86,20 @@ function App() {
             <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/offers" element={<Offers />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
+
+            {/* Legacy profile URL redirect (outside Layout to avoid auth guards) */}
+            <Route path="/profile/:userId" element={<LegacyProfileRedirect />} />
 
             {/* Main layout routes */}
             <Route element={<Layout />}>
               <Route path="/profile" element={<EnhancedProfilePage />} />
               <Route path="/user/:username" element={<BookClubProfilePage />} />
-              {/* Add a route that accepts user ID for profile links */}
-              <Route path="/profile/:userId" element={<BookClubProfilePage />} />
-              <Route path="/books" element={<Books />} />
+              <Route path="/books" element={<BooksSection />} />
+              <Route path="/books-old" element={<Books />} />
               <Route path="/books/:id" element={<BookDetail />} />
               <Route path="/book/:id" element={<BookDetail />} />
               <Route path="/events" element={<Events />} />
@@ -208,6 +216,8 @@ function App() {
                     <Route path="banners" element={<BannerManagement />} />
                     <Route path="community" element={<CommunityShowcaseManagement />} />
                     <Route path="quotes" element={<QuoteManagement />} />
+                    <Route path="book-listings" element={<BookListingsManagement />} />
+                    <Route path="book-availability-requests" element={<BookAvailabilityRequestsManagement />} />
                     <Route path="analytics" element={<LandingPageAnalytics />} />
                     <Route path="book-club-analytics" element={<BookClubAnalytics />} />
                   </Routes>

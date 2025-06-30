@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import * as Sentry from "@sentry/browser";
 import { apiFetch } from "../../lib/api";
 import { Book } from "../../types/books";
 import { useToast } from "../use-toast";
@@ -46,12 +45,7 @@ export function useSearchBooks(searchQuery: string, maxResults: number = 8) {
     staleTime: 1000 * 60 * 5, // 5 minutes
     meta: {
       onError: (error: Error) => {
-        Sentry.captureException(error, {
-          tags: {
-            hook: "useSearchBooks",
-          },
-          extra: { searchQuery },
-        });
+        console.error("Error searching books:", error, { searchQuery });
 
         toast({
           title: "Search Error",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Users } from 'lucide-react';
 import { clubMembersService } from '@/lib/services/clubMembersService';
+import { supabase } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface ClubMemberCountProps {
@@ -46,46 +47,96 @@ export const ClubMemberCount: React.FC<ClubMemberCountProps> = ({
   const currentSize = sizeClasses[size];
 
   useEffect(() => {
+    let isMounted = true;
+    let subscription: RealtimeChannel | null = null;
+
     const setupMemberCount = async () => {
-      if (!clubId) return;
+      if (!clubId || !isMounted) return;
 
       setLoading(true);
 
       try {
         if (realTimeUpdates) {
-          // Set up real-time subscription
-          const { count, subscription } = await clubMembersService.getMemberCountRealtime(clubId);
-          setMemberCount(count);
-          subscriptionRef.current = subscription;
+          // ✅ FIXED: Clean up any existing subscription first
+          if (subscriptionRef.current) {
+            subscriptionRef.current.unsubscribe();
+            subscriptionRef.current = null;
+          }
 
-          // Listen for count updates
-          subscription.on('postgres_changes', async () => {
-            const updatedCount = await clubMembersService.getMemberCountCached(clubId);
-            setMemberCount(updatedCount);
-          });
+          // ✅ FIXED: Create subscription with unique channel name and proper setup
+          subscription = supabase
+            .channel(`member_count_${clubId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
+            .on('postgres_changes', {
+              event: '*',
+              schema: 'public',
+              table: 'club_members',
+              filter: `club_id=eq.${clubId}`
+            }, async () => {
+              // Only update if component is still mounted
+              if (isMounted) {
+                try {
+                  const updatedCount = await clubMembersService.getMemberCountCached(clubId);
+                  setMemberCount(updatedCount);
+                } catch (error) {
+                  console.warn('Error updating member count:', error);
+                }
+              }
+            })
+            .subscribe();
+
+          // Store subscription reference
+          if (isMounted) {
+            subscriptionRef.current = subscription;
+          }
+
+          // Get initial count
+          const count = await clubMembersService.getMemberCountCached(clubId);
+          if (isMounted) {
+            setMemberCount(count);
+          }
         } else {
           // Get cached count only
           const count = await clubMembersService.getMemberCountCached(clubId);
-          setMemberCount(count);
+          if (isMounted) {
+            setMemberCount(count);
+          }
         }
       } catch (error) {
         console.error('Error setting up member count:', error);
-        // Keep initial count on error
+        // Keep initial count on error - don't break the UI
+        if (isMounted) {
+          setMemberCount(initialCount);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     setupMemberCount();
 
-    // Cleanup subscription on unmount
+    // ✅ FIXED: Enhanced cleanup function
     return () => {
+      isMounted = false;
+      if (subscription) {
+        try {
+          subscription.unsubscribe();
+        } catch (error) {
+          console.warn('Error unsubscribing from member count:', error);
+        }
+      }
       if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
+        try {
+          subscriptionRef.current.unsubscribe();
+        } catch (error) {
+          console.warn('Error unsubscribing from member count ref:', error);
+        } finally {
+          subscriptionRef.current = null;
+        }
       }
     };
-  }, [clubId, realTimeUpdates]);
+  }, [clubId, realTimeUpdates, initialCount]);
 
   // Format member count for display
   const formatCount = (count: number): string => {

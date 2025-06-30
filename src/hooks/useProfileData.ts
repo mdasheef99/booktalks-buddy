@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -62,9 +61,6 @@ export function useProfileData() {
       setActiveChatsCount(chatsCount);
     } catch (err) {
       console.error("Error loading profile data:", err);
-      Sentry.captureException(err, {
-        tags: { component: "ProfileDialog", action: "initializeProfile" }
-      });
     }
   };
 
@@ -119,10 +115,7 @@ export function useProfileData() {
       }
     } catch (err) {
       console.error("Error saving profile:", err);
-      Sentry.captureException(err, {
-        tags: { component: "ProfileDialog", action: "handleSaveProfile" }
-      });
-      
+
       toast({
         title: "Profile save failed!",
         description: "An unexpected error occurred.",
@@ -161,10 +154,6 @@ export function useProfileData() {
       }
     } catch (err) {
       console.error(`Error ${action}ing chat request:`, err);
-      Sentry.captureException(err, {
-        tags: { component: "ProfileDialog", action: `handleChatAction_${action}` },
-        extra: { chatId }
-      });
     }
   };
   

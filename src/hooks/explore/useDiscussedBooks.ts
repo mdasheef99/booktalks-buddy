@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import * as Sentry from "@sentry/browser";
 import { createClient } from "@supabase/supabase-js";
 import { Book } from "../../types/books";
 import { useToast } from "../use-toast";

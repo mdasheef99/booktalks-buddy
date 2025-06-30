@@ -11,11 +11,12 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Upload, Camera, User } from 'lucide-react';
+import { Upload, Camera, User, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageService, type UploadProgress } from '@/services/ProfileImageService';
+import { AvatarSyncManager, AvatarSyncError, type AvatarUploadProgress } from '@/lib/sync/AvatarSyncManager';
 import { getUserInitials } from '@/utils/avatarUtils';
 import { ProfileAvatar } from '@/components/ui/SmartAvatar';
 import type { UserProfile } from '@/services/profileService';
@@ -47,8 +48,11 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
 }) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<AvatarUploadProgress | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [currentError, setCurrentError] = useState<AvatarSyncError | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   
   // Get initials for avatar fallback using the utility function
   const getInitials = () => {
@@ -64,17 +68,19 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
     return namePart.substring(0, 2).toUpperCase();
   };
   
-  // Handle file upload with multi-tier processing
+  // Enhanced file upload with atomic operations and retry logic
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
     setUploading(true);
     setUploadProgress(null);
+    setUploadError(null);
+    setCurrentError(null);
 
     try {
-      // Use ProfileImageService for multi-tier upload
-      const avatarUrls = await ProfileImageService.uploadAvatar(
+      // Use enhanced AvatarSyncManager for atomic upload
+      const avatarUrls = await AvatarSyncManager.uploadAvatarAtomic(
         file,
         user.id,
         (progress) => {
@@ -96,13 +102,65 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
       }
 
       setDialogOpen(false);
-      toast.success('Avatar uploaded successfully with optimized sizes!');
+      toast.success('Avatar updated successfully!');
+      setRetryCount(0); // Reset retry count on success
+      setCurrentError(null); // Reset error state on success
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to upload avatar');
+
+      if (error instanceof AvatarSyncError) {
+        // Store the error object for retry logic
+        setCurrentError(error);
+
+        // Use the enhanced error information
+        const userMessage = AvatarSyncError.getAvatarErrorMessage(error.avatarErrorType);
+        const retryGuidance = error.getRetryGuidance();
+
+        // Store both the main message and retry guidance
+        setUploadError(`${userMessage}\n\n${retryGuidance}`);
+        toast.error(userMessage);
+      } else {
+        setCurrentError(null);
+        const genericMessage = 'Failed to upload avatar. Please try again.';
+        setUploadError(genericMessage);
+        toast.error(genericMessage);
+      }
     } finally {
       setUploading(false);
       setUploadProgress(null);
+    }
+  };
+
+  // Enhanced retry upload function
+  const handleRetryUpload = () => {
+    const maxRetries = currentError?.maxRetries || 3;
+
+    if (retryCount >= maxRetries) {
+      toast.error('Maximum retry attempts reached. Please try a different image.');
+      return;
+    }
+
+    setRetryCount(prev => prev + 1);
+    setUploadError(null);
+    setCurrentError(null);
+
+    // Add delay if specified by the error
+    const retryDelay = currentError?.retryDelay || 0;
+
+    if (retryDelay > 0) {
+      setTimeout(() => {
+        // Trigger file input click to retry
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.click();
+        }
+      }, retryDelay);
+    } else {
+      // Immediate retry
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
     }
   };
   
@@ -161,6 +219,41 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
                           </p>
                         </>
                       )}
+                    </div>
+                  ) : uploadError ? (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 space-y-3">
+                      <AlertCircle className="w-8 h-8 text-red-500" />
+                      <p className="text-sm text-red-600 text-center max-w-xs whitespace-pre-line">
+                        {uploadError}
+                      </p>
+                      {currentError?.retryable && retryCount < (currentError?.maxRetries || 3) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleRetryUpload}
+                          className="flex items-center gap-2"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          Retry Upload ({retryCount}/{currentError?.maxRetries || 3})
+                        </Button>
+                      )}
+                      {!currentError?.retryable && (
+                        <p className="text-xs text-gray-500 text-center">
+                          This error cannot be automatically retried. Please try a different image.
+                        </p>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setUploadError(null);
+                          setCurrentError(null);
+                          setRetryCount(0);
+                        }}
+                        className="text-gray-500"
+                      >
+                        Try Different Image
+                      </Button>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">

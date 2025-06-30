@@ -90,30 +90,28 @@ src/pages/admin/store/StoreManagementDashboard/
 
 ---
 
-### 4. `src/lib/api/messaging/utils.ts` - **517 lines**
-**Current Issues:**
-- Utility functions mixed with business logic
-- Multiple unrelated helper functions in one file
-- Difficult to locate specific functionality
-- Testing complexity due to mixed concerns
+### 4. ✅ `src/lib/api/messaging/utils.ts` - **COMPLETED**
+**Status:** Successfully refactored into modular structure
 
-**Refactoring Plan:**
+**Completed Structure:**
 ```
 src/lib/api/messaging/utils/
-├── message-formatting.ts      (120-150 lines)
-├── validation.ts             (100-130 lines)
-├── permissions.ts            (100-130 lines)
-├── date-time-helpers.ts      (80-100 lines)
-├── text-processing.ts        (80-100 lines)
-└── index.ts                  (export aggregator)
+├── store-context.ts          (75 lines) - Store context resolution
+├── user-lookup.ts           (176 lines) - User search and lookup
+├── conversation-helpers.ts   (120 lines) - Conversation utilities
+├── validation.ts            (150 lines) - Input validation
+├── message-formatting.ts    (140 lines) - Message formatting
+├── index.ts                 (87 lines) - Export aggregator
+└── __tests__/               - Comprehensive test suite
 ```
 
-**Specific Actions:**
-- Group related utilities by domain
-- Separate validation logic from formatting
-- Extract permission checking utilities
-- Create comprehensive test suites
-- Add TypeScript strict typing
+**Results:**
+- ✅ 100% backward compatibility maintained
+- ✅ Build verification successful
+- ✅ Comprehensive test coverage
+- ✅ 66% reduction in largest file size (518 → 176 lines)
+
+**Documentation:** See `docs/refactoring-summary-messaging-utils.md`
 
 ---
 
@@ -236,13 +234,13 @@ src/pages/BookNominationFormPage/
 
 ### **Phase 1 (Immediate - Next 2 weeks)**
 - ✅ ProfileForm.tsx refactoring (Task 2)
-- 🔴 messaging/data-retrieval.ts
-- 🔴 store/analytics.ts
+- ✅ messaging/data-retrieval.ts (COMPLETED)
+- ✅ store/analytics.ts (COMPLETED)
+- ✅ StoreManagementDashboard.tsx (COMPLETED)
+- ✅ messaging/utils.ts (COMPLETED)
 
 ### **Phase 2 (Short-term - Next month)**
-- 🔴 StoreManagementDashboard.tsx
-- 🔴 messaging/utils.ts
-- 🔴 clubEventsService.ts
+- 🔴 clubEventsService.ts (REMAINING HIGH PRIORITY)
 
 ### **Phase 3 (Medium-term - Next 2 months)**
 - 🟡 All medium priority files (400-499 lines)

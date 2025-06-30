@@ -36,3 +36,6 @@ export interface Category {
 }
 
 export type SortOption = 'relevance' | 'newest' | 'oldest';
+
+// Alias for backward compatibility and clarity
+export type BookType = Book;

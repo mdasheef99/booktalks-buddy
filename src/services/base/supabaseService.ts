@@ -2,7 +2,6 @@
 import { supabase } from '@/lib/supabase';
 import { v5 as uuidv5 } from 'uuid';
 import { toast } from 'sonner';
-import * as Sentry from '@sentry/react';
 
 // Map to store the relationship between UUIDs and original Google Books IDs
 const uuidToGoogleIdMap = new Map<string, string>();
@@ -61,7 +60,6 @@ export async function apiCall<T>(
     if (error) {
       console.error(error);
       toast.error(errorMessage);
-      Sentry.captureException(error);
       return null;
     }
 
@@ -69,7 +67,6 @@ export async function apiCall<T>(
   } catch (err) {
     console.error(err);
     toast.error(errorMessage);
-    Sentry.captureException(err);
     return null;
   }
 }

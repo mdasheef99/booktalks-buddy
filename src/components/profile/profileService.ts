@@ -1,5 +1,4 @@
 
-import * as Sentry from "@sentry/react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatRequest } from "./ChatRequestsList";
 
@@ -57,12 +56,6 @@ export const fetchChatRequests = async (): Promise<ChatRequest[]> => {
     return chatRequests;
   } catch (error) {
     console.error("Error fetching chat requests:", error);
-    Sentry.captureException(error, {
-      tags: {
-        component: "profileService",
-        action: "fetchChatRequests"
-      }
-    });
     return [];
   }
 };
@@ -138,12 +131,6 @@ export const saveProfile = async (
     return true;
   } catch (error) {
     console.error("Error saving profile:", error);
-    Sentry.captureException(error, {
-      tags: {
-        component: "profileService",
-        action: "saveProfile"
-      }
-    });
     return false;
   }
 };
@@ -190,12 +177,6 @@ export const loadProfileData = async (): Promise<{
     };
   } catch (error) {
     console.error("Error loading profile:", error);
-    Sentry.captureException(error, {
-      tags: {
-        component: "profileService",
-        action: "loadProfileData"
-      }
-    });
     return null;
   }
 };

@@ -8,11 +8,14 @@ import { GenreDialog } from "@/components/dialogs/GenreDialog";
 import { LoginDialog } from "@/components/dialogs/LoginDialog";
 
 // Import the new component sections
+import LandingHeader from "@/components/landing/header/LandingHeader";
 import CarouselSection from "@/components/landing/CarouselSection";
 import HeroSection from "@/components/landing/HeroSection";
 import PromotionalBannersSection from "@/components/landing/PromotionalBannersSection";
 import EventsSection from "@/components/landing/events";
 import BookClubsSection from "@/components/landing/BookClubsSection";
+import BookListingSection from "@/components/landing/BookListingSection";
+import BookAvailabilityRequestSection from "@/components/landing/BookAvailabilityRequestSection";
 import QuoteSection from "@/components/landing/QuoteSection";
 import { CommunityShowcaseSection } from "@/components/landing/CommunityShowcaseSection";
 import FooterSection from "@/components/landing/FooterSection";
@@ -54,6 +57,10 @@ const Landing = () => {
 
   const handleEventsClick = () => {
     navigate("/events");
+  };
+
+  const handleOffersClick = () => {
+    navigate("/offers");
   };
 
   // Show loading state while storeId is being fetched
@@ -112,6 +119,14 @@ const Landing = () => {
         />
       </Helmet>
 
+      {/* Landing Page Header */}
+      <LandingHeader
+        onAnonymousChatClick={handleOpenUsernameDialog}
+        onBookClubsClick={handleBookClubsClick}
+        onEventsClick={handleEventsClick}
+        onOffersClick={handleOffersClick}
+      />
+
       {/* Carousel Section - Featured Books */}
       <CarouselSection storeId={storeId} />
 
@@ -129,6 +144,12 @@ const Landing = () => {
         handleBookClubClick={handleBookClubClick}
         handleBookClubsClick={handleBookClubsClick}
       />
+
+      {/* Book Listing Section */}
+      <BookListingSection storeId={storeId} />
+
+      {/* Book Availability Request Section */}
+      <BookAvailabilityRequestSection storeId={storeId} />
 
       {/* Community Showcase Section */}
       <CommunityShowcaseSection storeId={storeId} />

@@ -336,8 +336,24 @@ export class ProfileImageService {
       throw new Error(`Failed to update profile: ${error.message}`);
     }
 
-    // Clear profile cache to ensure fresh data is loaded
-    clearProfileCache();
+    // Enhanced cache invalidation with sync integration
+    try {
+      const { ProfileCacheManager, CacheInvalidationReason } = await import('@/lib/sync/ProfileCacheManager');
+      await ProfileCacheManager.invalidateUserProfile(userId, CacheInvalidationReason.AVATAR_UPLOAD);
+    } catch (cacheError) {
+      console.warn('Enhanced cache invalidation failed, falling back to basic cache clear:', cacheError);
+      clearProfileCache();
+    }
+
+    // Validate sync after avatar upload (non-blocking)
+    try {
+      const { validateAndReportSync } = await import('@/lib/sync/ProfileSyncValidator');
+      validateAndReportSync(userId).catch(error => {
+        console.warn('Post-avatar-upload sync validation failed:', error);
+      });
+    } catch (error) {
+      console.warn('Could not perform sync validation after avatar upload:', error);
+    }
 
     // Debug: Log the generated URLs
     console.log('Generated avatar URLs:', avatarUrls);
@@ -352,7 +368,7 @@ export class ProfileImageService {
   }
 
   /**
-   * Complete avatar upload workflow
+   * Complete avatar upload workflow with enhanced error handling
    */
   public static async uploadAvatar(
     file: File,
@@ -362,15 +378,31 @@ export class ProfileImageService {
     try {
       // Process image into multiple sizes
       const processedImages = await this.processImage(file, onProgress);
-      
+
       // Upload all sizes to storage
       const uploadedImages = await this.uploadImages(processedImages, userId, onProgress);
-      
+
       // Update user profile
       const avatarUrls = await this.updateUserProfile(userId, uploadedImages, onProgress);
-      
+
       return avatarUrls;
     } catch (error) {
+      // Enhanced error handling with specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('File too large')) {
+          throw new Error('Image file is too large. Please choose a file under 10MB.');
+        }
+        if (error.message.includes('Invalid file type')) {
+          throw new Error('Please select a valid image file (JPG, PNG, or WebP).');
+        }
+        if (error.message.includes('Failed to upload')) {
+          throw new Error('Failed to upload image. Please check your connection and try again.');
+        }
+        if (error.message.includes('Failed to update profile')) {
+          throw new Error('Image uploaded but failed to update profile. Please refresh and try again.');
+        }
+      }
+
       throw new Error(`Avatar upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

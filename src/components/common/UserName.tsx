@@ -107,7 +107,7 @@ const UserName: React.FC<UserNameProps> = ({
     // Use username for profile links (more stable than ID)
     return (
       <Link
-        to={`/profile/${profile.username}`}
+        to={`/user/${profile.username}`}
         className="hover:underline text-bookconnect-brown"
         title={`View ${profile.displayname || profile.username}'s profile`}
       >

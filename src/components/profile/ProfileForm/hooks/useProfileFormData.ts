@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { safeSupabaseQuery } from '@/lib/database/SafeQuery';
 
 export interface ProfileFormData {
   username: string;
@@ -88,11 +89,17 @@ export function useProfileFormData(): UseProfileFormDataReturn {
         setIsLoading(true);
         
         // First, try to load from the users table (primary source)
-        const { data: userRecord, error: userError } = await supabase
+        const userQuery = supabase
           .from('users')
           .select('username, displayname, bio, favorite_author, favorite_genre, avatar_url, avatar_thumbnail_url, avatar_medium_url, avatar_full_url')
           .eq('id', user.id)
           .single();
+
+        const { data: userRecord, error: userError } = await safeSupabaseQuery(
+          userQuery,
+          null,
+          'user_profile_load'
+        );
 
         if (!userError && userRecord) {
           // Load from database
@@ -147,7 +154,19 @@ export function useProfileFormData(): UseProfileFormDataReturn {
         }
       } catch (error) {
         console.error('Error loading profile:', error);
-        toast.error('Failed to load profile data');
+
+        // Enhanced profile loading error handling
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        if (errorMessage.includes('JWT') || errorMessage.includes('session') || errorMessage.includes('unauthorized')) {
+          toast.error('Your session has expired. Please sign in again to view your profile.');
+        } else if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('NetworkError')) {
+          toast.error('Connection issue. Please check your internet connection.');
+        } else if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+          toast.error('Request timed out. Please refresh the page and try again.');
+        } else {
+          toast.error('Failed to load profile data. Please refresh the page.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -256,7 +275,7 @@ export function useProfileFormData(): UseProfileFormDataReturn {
     }
 
     try {
-      // Update user metadata (username is read-only, not included in updates)
+      // Update auth metadata with reading preferences
       const { error: authError } = await supabase.auth.updateUser({
         data: {
           display_name: formData.displayName,
@@ -270,10 +289,24 @@ export function useProfileFormData(): UseProfileFormDataReturn {
         }
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Error updating auth metadata:', authError);
+
+        // Enhanced auth error handling
+        if (authError.message?.includes('JWT') || authError.message?.includes('session')) {
+          toast.error('Your session has expired. Please sign in again to continue.');
+        } else if (authError.message?.includes('network') || authError.message?.includes('fetch')) {
+          toast.error('Connection issue. Please check your internet and try again.');
+        } else if (authError.message?.includes('rate limit')) {
+          toast.error('Too many requests. Please wait a moment and try again.');
+        } else {
+          toast.error('Failed to update profile preferences. Please try again.');
+        }
+        return false;
+      }
 
       // Update users table with profile data including avatar URLs
-      const { error: dbError } = await supabase
+      const updateQuery = supabase
         .from('users')
         .update({
           displayname: formData.displayName,
@@ -287,13 +320,51 @@ export function useProfileFormData(): UseProfileFormDataReturn {
         })
         .eq('id', user.id);
 
-      if (dbError) throw dbError;
+      const { error: dbError } = await safeSupabaseQuery(
+        updateQuery,
+        null,
+        'user_profile_update'
+      );
+
+      if (dbError) {
+        console.error('Error updating database:', dbError);
+
+        // Enhanced database error handling (dbError is now a string from safeSupabaseQuery)
+        if (dbError.includes('PGRST301')) {
+          toast.error('Profile updated but may take a moment to appear. Please refresh if needed.');
+        } else if (dbError.includes('23505') || dbError.includes('already taken')) {
+          toast.error('This username or email is already taken. Please choose a different one.');
+        } else if (dbError.includes('42501') || dbError.includes('permission')) {
+          toast.error('You don\'t have permission to update this profile.');
+        } else if (dbError.includes('network') || dbError.includes('connection')) {
+          toast.error('Connection issue. Please check your internet and try again.');
+        } else if (dbError.includes('timeout')) {
+          toast.error('Request timed out. Please try again.');
+        } else {
+          toast.error('Failed to update profile. Please try again.');
+        }
+        return false;
+      }
 
       toast.success('Profile updated successfully');
       return true;
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+
+      // Enhanced general error handling
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      if (errorMessage.includes('JWT') || errorMessage.includes('session') || errorMessage.includes('unauthorized')) {
+        toast.error('Your session has expired. Please sign in again to continue.');
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('NetworkError')) {
+        toast.error('Connection issue. Please check your internet and try again.');
+      } else if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+        toast.error('Request timed out. Please check your connection and try again.');
+      } else if (errorMessage.includes('rate limit')) {
+        toast.error('Too many requests. Please wait a moment and try again.');
+      } else {
+        toast.error('Failed to update profile. Please try again.');
+      }
       return false;
     }
   };

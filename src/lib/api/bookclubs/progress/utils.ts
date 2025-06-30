@@ -70,7 +70,7 @@ export function formatProgressStatus(status: 'not_started' | 'reading' | 'finish
 
 /**
  * Get current book progress for a user in a club
- * 
+ *
  * @param requestingUserId - ID of user making the request
  * @param targetUserId - ID of user whose progress to fetch
  * @param clubId - Club ID
@@ -82,15 +82,66 @@ export async function getCurrentBookProgress(
   clubId: string
 ): Promise<ReadingProgress | null> {
   try {
-    // Get current book for the club
+    // ✅ FIXED: Get current book for the club with fallback fields and proper NULL handling
     const { data: currentBook } = await supabase
       .from('current_books')
-      .select('book_id')
+      .select('book_id, title, author')  // Include fallback fields for legacy records
       .eq('club_id', clubId)
-      .single();
+      .maybeSingle();  // Changed from .single() to handle NULL/empty results gracefully
 
-    if (!currentBook?.book_id) {
-      return null; // No current book set
+    // ✅ FIXED: Handle case where no current book is set
+    if (!currentBook) {
+      return null; // No current book set for this club
+    }
+
+    let bookId = currentBook.book_id;
+
+    // ✅ FIXED: Handle legacy records without book_id (auto-migration)
+    if (!bookId && currentBook.title && currentBook.author) {
+      try {
+        // Check if book already exists to avoid duplicates
+        const { data: existingBook } = await supabase
+          .from('books')
+          .select('id')
+          .eq('title', currentBook.title)
+          .eq('author', currentBook.author)
+          .maybeSingle();
+
+        if (existingBook) {
+          bookId = existingBook.id;
+        } else {
+          // Create new book record for legacy data
+          const { data: newBook } = await supabase
+            .from('books')
+            .insert({
+              title: currentBook.title,
+              author: currentBook.author,
+              genre: 'Unknown'  // Default genre for legacy records
+            })
+            .select('id')
+            .single();
+
+          if (newBook) {
+            bookId = newBook.id;
+          }
+        }
+
+        // Update current_books with the book_id (one-time migration)
+        if (bookId) {
+          await supabase
+            .from('current_books')
+            .update({ book_id: bookId })
+            .eq('club_id', clubId);
+        }
+      } catch (migrationError) {
+        console.warn('Auto-migration failed for legacy current_books record:', migrationError);
+        // Continue without book_id - don't break the flow
+      }
+    }
+
+    // ✅ FIXED: Final validation - return null if still no valid book_id
+    if (!bookId) {
+      return null; // No valid book_id available
     }
 
     // Import getUserReadingProgress to avoid circular dependency

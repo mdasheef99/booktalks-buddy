@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import * as Sentry from "@sentry/react";
 
 import { useToast } from "@/hooks/use-toast";
 import { fetchBooksByQuery, fetchTrendingBooks } from "@/services/googleBooksService";
@@ -67,13 +66,7 @@ export function useExploreBooks() {
     enabled: searchQuery.length > 0,
     meta: {
       onError: (error: Error) => {
-        Sentry.captureException(error, {
-          tags: {
-            component: "ExploreBooks",
-            action: "searchBooks"
-          },
-          extra: { searchQuery }
-        });
+        console.error("Error searching books:", error, { searchQuery });
 
         toast({
           title: "Search Error",
@@ -93,13 +86,7 @@ export function useExploreBooks() {
     queryFn: () => fetchTrendingBooks(primaryGenre, 5),
     meta: {
       onError: (error: Error) => {
-        Sentry.captureException(error, {
-          tags: {
-            component: "ExploreBooks",
-            action: "fetchTrendingBooks"
-          },
-          extra: { genre: primaryGenre, allGenres: genres }
-        });
+        console.error("Error fetching trending books:", error, { genre: primaryGenre, allGenres: genres });
 
         toast({
           title: "Couldn't load trending books",
@@ -123,12 +110,7 @@ export function useExploreBooks() {
     refetchOnMount: true,
     meta: {
       onError: (error: Error) => {
-        Sentry.captureException(error, {
-          tags: {
-            component: "ExploreBooks",
-            action: "fetchDiscussedBooks"
-          }
-        });
+        console.error("Error fetching discussed books:", error);
 
         toast({
           title: "Couldn't load discussed books",

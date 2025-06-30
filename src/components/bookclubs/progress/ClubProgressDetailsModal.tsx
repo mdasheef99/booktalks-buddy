@@ -78,7 +78,7 @@ const ClubProgressDetailsModal: React.FC<ClubProgressDetailsModalProps> = ({
   const [memberProgress, setMemberProgress] = useState<MemberProgressSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Real-time progress tracking for the modal
+  // ✅ FIXED: Real-time progress tracking for the modal with unique component ID
   const {
     memberProgress: realtimeMemberProgress,
     loading: realtimeLoading
@@ -87,6 +87,7 @@ const ClubProgressDetailsModal: React.FC<ClubProgressDetailsModalProps> = ({
     userId: user?.id || '',
     enabled: isOpen && !!user?.id,
     showToasts: false, // Don't show toasts in modal
+    componentId: 'progress-details-modal', // Unique identifier to prevent subscription conflicts
     onMemberProgressUpdate: (progress) => {
       // Filter out private progress and update state
       const publicProgress = progress.filter(p => !p.is_private);

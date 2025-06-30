@@ -18,7 +18,7 @@ interface MembersSectionProps {
 const MembersSection: React.FC<MembersSectionProps> = ({ members, clubId }) => {
   const { user } = useAuth();
 
-  // Real-time progress tracking
+  // ✅ FIXED: Real-time progress tracking with unique component ID
   const {
     memberProgress,
     progressTrackingEnabled,
@@ -28,6 +28,7 @@ const MembersSection: React.FC<MembersSectionProps> = ({ members, clubId }) => {
     userId: user?.id || '',
     enabled: !!user?.id,
     showToasts: false, // Don't show toasts in members section to avoid spam
+    componentId: 'members-section', // Unique identifier to prevent subscription conflicts
     onMemberProgressUpdate: (progress) => {
       // Progress is automatically updated via the hook
     }

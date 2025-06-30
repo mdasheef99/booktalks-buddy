@@ -63,41 +63,136 @@ const BookClubProfileSettings: React.FC<BookClubProfileSettingsProps> = ({
     setFavoriteAuthors(favoriteAuthors.filter(a => a !== author));
   };
 
-  // Handle form submission
+  // Enhanced form submission with atomic operations and error recovery
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
+    // Import sync utilities
+    const { ProfileSyncError, SyncErrorType, attemptErrorRecovery } = await import('@/lib/sync/ProfileSyncError');
+    const { ProfileCacheManager, CacheInvalidationReason } = await import('@/lib/sync/ProfileCacheManager');
+    const { validateAndReportSync } = await import('@/lib/sync/ProfileSyncValidator');
+
+    let authUpdateSucceeded = false;
+    let dbUpdateSucceeded = false;
+
     try {
-      // First, update the auth metadata
-      const { error: authError } = await supabase.auth.updateUser({
-        data: {
+      // Step 1: Update the auth metadata
+      try {
+        const { error: authError } = await supabase.auth.updateUser({
+          data: {
+            bio,
+            favorite_genres: favoriteGenres,
+            favorite_authors: favoriteAuthors
+          }
+        });
+
+        if (authError) {
+          throw ProfileSyncError.fromAuthError(authError, {
+            userId: profile.id,
+            operation: 'bookclub_profile_auth_update'
+          });
+        }
+
+        authUpdateSucceeded = true;
+        console.log('Auth metadata updated successfully');
+      } catch (error) {
+        if (error instanceof ProfileSyncError) {
+          error.logError();
+          const recovered = await attemptErrorRecovery(error);
+          if (!recovered) {
+            toast.error(error.userMessage);
+            setSaving(false);
+            return;
+          }
+          authUpdateSucceeded = true;
+        } else {
+          throw error;
+        }
+      }
+
+      // Step 2: Update the users table (username is read-only, not updated)
+      try {
+        const updatedProfile = await updateBookClubProfile(profile.id, {
           bio,
           favorite_genres: favoriteGenres,
           favorite_authors: favoriteAuthors
-        }
-      });
+        });
 
-      if (authError) {
-        throw authError;
+        if (!updatedProfile) {
+          throw new ProfileSyncError(
+            SyncErrorType.DATABASE_UPDATE_FAILED,
+            'Failed to update book club profile',
+            { userId: profile.id, operation: 'bookclub_profile_db_update' },
+            true
+          );
+        }
+
+        dbUpdateSucceeded = true;
+        console.log('Database profile updated successfully');
+      } catch (error) {
+        if (error instanceof ProfileSyncError) {
+          error.logError();
+          const recovered = await attemptErrorRecovery(error);
+          if (!recovered) {
+            // If database update fails but auth succeeded, we have partial failure
+            if (authUpdateSucceeded) {
+              toast.error('Profile preferences saved, but some changes may not be visible to others. Please try again.');
+            } else {
+              toast.error(error.userMessage);
+            }
+            setSaving(false);
+            return;
+          }
+          dbUpdateSucceeded = true;
+        } else {
+          throw error;
+        }
       }
 
-      // Then, update the users table (username is read-only, not updated)
-      const updatedProfile = await updateBookClubProfile(profile.id, {
-        bio,
-        favorite_genres: favoriteGenres,
-        favorite_authors: favoriteAuthors
-      });
+      // Step 3: Invalidate cache after successful updates
+      try {
+        await ProfileCacheManager.invalidateUserProfile(profile.id, CacheInvalidationReason.PROFILE_UPDATE);
+      } catch (cacheError) {
+        console.warn('Cache invalidation failed, but profile update succeeded:', cacheError);
+        // Don't fail the operation due to cache issues
+      }
 
-      // Also sync the data to the users table for other users to see
-      await syncUserProfileToDatabase(profile.id);
+      // Step 4: Validate sync (non-blocking)
+      validateAndReportSync(profile.id).catch(error => {
+        console.warn('Post-update sync validation failed:', error);
+      });
 
       toast.success('Profile updated successfully');
       // Pass the updated profile back to the parent
       onProfileUpdated();
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+
+      // Handle unexpected errors
+      const syncError = new ProfileSyncError(
+        SyncErrorType.PARTIAL_SYNC_FAILURE,
+        'Unexpected error during profile update',
+        { userId: profile.id, operation: 'bookclub_profile_save', originalError: error as Error },
+        true
+      );
+      syncError.logError();
+
+      // Attempt recovery
+      const recovered = await attemptErrorRecovery(syncError);
+      if (recovered) {
+        toast.success('Profile updated successfully (after recovery)');
+        onProfileUpdated();
+      } else {
+        // Provide specific error message based on what succeeded
+        if (authUpdateSucceeded && !dbUpdateSucceeded) {
+          toast.error('Profile preferences saved, but some changes may not be visible to others. Please try again.');
+        } else if (!authUpdateSucceeded && dbUpdateSucceeded) {
+          toast.error('Profile information saved, but preferences may not be updated. Please try again.');
+        } else {
+          toast.error('Failed to update profile. Please try again.');
+        }
+      }
     } finally {
       setSaving(false);
     }

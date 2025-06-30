@@ -1,5 +1,4 @@
 import { toast } from 'sonner';
-import * as Sentry from '@sentry/react';
 
 /**
  * Standard error handler for chat operations
@@ -16,12 +15,6 @@ export function handleChatError(
 ) {
   // Log to console
   console.error(`Error during ${operation}:`, error);
-
-  // Report to Sentry with context
-  Sentry.captureException(error, {
-    tags: { component: "ChatService", operation },
-    extra: context
-  });
 
   // Show user-friendly toast notification
   const defaultMessage = `Couldn't ${operation.toLowerCase()}. Please try again.`;
@@ -48,12 +41,6 @@ export function handleClubError(
 ) {
   // Log to console
   console.error(`Error during ${operation}:`, error);
-
-  // Report to Sentry with context
-  Sentry.captureException(error, {
-    tags: { component: "ClubManagement", operation },
-    extra: context
-  });
 
   // Determine appropriate error message based on error type
   let message = customMessage;

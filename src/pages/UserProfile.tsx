@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Book, MessageCircle, User, BookOpen, Award } from "lucide-react";
-import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
 import { ReportButton } from "@/components/reporting/ReportButton";
 
@@ -37,10 +36,6 @@ const UserProfile = () => {
 
         if (error) {
           console.error("Error fetching user data:", error);
-          Sentry.captureException(error, {
-            tags: { component: "UserProfile" },
-            extra: { username }
-          });
           return;
         }
 
@@ -51,7 +46,6 @@ const UserProfile = () => {
         setIsCurrentUser(currentUsername === data.username);
       } catch (err) {
         console.error("Error in user profile:", err);
-        Sentry.captureException(err);
       } finally {
         setIsLoading(false);
       }
@@ -106,7 +100,6 @@ const UserProfile = () => {
       });
     } catch (err) {
       console.error("Error starting chat:", err);
-      Sentry.captureException(err);
       toast("Error", {
         description: "Unable to start chat. Please try again later."
       });

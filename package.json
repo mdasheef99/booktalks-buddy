@@ -10,7 +10,21 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "update-types": "npx supabase gen types typescript --project-id qsldppxjmrplbmukqorj > src/lib/database.types.ts && npx supabase gen types typescript --project-id qsldppxjmrplbmukqorj > src/integrations/supabase/types.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "playwright test --config=playwright-mcp.config.ts",
+    "test:e2e:headed": "playwright test --config=playwright-mcp.config.ts --headed",
+    "test:e2e:auth": "playwright test --config=playwright-mcp.config.ts tests/e2e/auth --headed",
+    "test:e2e:clubs": "playwright test --config=playwright-mcp.config.ts tests/e2e/book-clubs --headed",
+    "test:e2e:profile": "playwright test --config=playwright-mcp.config.ts tests/e2e/profile --headed",
+    "test:e2e:books": "playwright test --config=playwright-mcp.config.ts tests/e2e/books --headed",
+    "test:e2e:events": "playwright test --config=playwright-mcp.config.ts tests/e2e/events --headed",
+    "test:e2e:admin": "playwright test --config=playwright-mcp.config.ts tests/e2e/admin --headed",
+    "test:e2e:mobile": "playwright test --config=playwright-mcp.config.ts tests/e2e/mobile --headed",
+    "test:e2e:accessibility": "playwright test --config=playwright-mcp.config.ts tests/e2e/accessibility --headed",
+    "test:e2e:workflows": "playwright test --config=playwright-mcp.config.ts tests/e2e/workflows --headed",
+    "test:e2e:debug": "playwright test --config=playwright-mcp.config.ts --debug",
+    "test:e2e:report": "playwright show-report mcp-report",
+    "test:e2e:install": "playwright install"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -74,6 +88,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@playwright/test": "^1.53.1",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

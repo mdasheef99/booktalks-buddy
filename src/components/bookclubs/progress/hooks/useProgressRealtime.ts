@@ -18,6 +18,8 @@ interface UseProgressRealtimeOptions {
   onMemberProgressUpdate?: (memberProgress: MemberProgressSummary[]) => void;
   onStatsUpdate?: (stats: ClubProgressStats) => void;
   onFeatureToggle?: (enabled: boolean) => void;
+  /** Optional unique identifier for the component using this hook to prevent channel conflicts */
+  componentId?: string;
 }
 
 interface UseProgressRealtimeReturn {
@@ -42,7 +44,8 @@ export const useProgressRealtime = ({
   onProgressUpdate,
   onMemberProgressUpdate,
   onStatsUpdate,
-  onFeatureToggle
+  onFeatureToggle,
+  componentId = 'default'
 }: UseProgressRealtimeOptions): UseProgressRealtimeReturn => {
   // State management
   const [userProgress, setUserProgress] = useState<ReadingProgress | null>(null);
@@ -195,9 +198,10 @@ export const useProgressRealtime = ({
       subscriptionRef.current.unsubscribe();
     }
 
-    // Create new subscription
+    // ✅ FIXED: Create new subscription with unique channel name to prevent conflicts
+    const uniqueChannelName = `club_progress_${clubId}_${componentId}_${Date.now()}`;
     const subscription = supabase
-      .channel(`club_progress_${clubId}`)
+      .channel(uniqueChannelName)
       .on(
         'postgres_changes',
         {
@@ -220,15 +224,15 @@ export const useProgressRealtime = ({
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          console.log(`Subscribed to progress updates for club ${clubId}`);
+          console.log(`Subscribed to progress updates for club ${clubId} (${componentId})`);
         } else if (status === 'CHANNEL_ERROR') {
-          console.error(`Channel error for club progress ${clubId}`);
+          console.error(`Channel error for club progress ${clubId} (${componentId})`);
           setError(new Error('Real-time connection error'));
           if (showToasts) {
             toast.error('Lost connection to real-time updates');
           }
         } else if (status === 'TIMED_OUT') {
-          console.error(`Subscription timed out for club progress ${clubId}`);
+          console.error(`Subscription timed out for club progress ${clubId} (${componentId})`);
           setError(new Error('Real-time connection timed out'));
           if (showToasts) {
             toast.error('Real-time connection timed out');
