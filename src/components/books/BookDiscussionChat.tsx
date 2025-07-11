@@ -4,6 +4,7 @@ import { ChatMessage } from "@/services/chatService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MessageItem from "./chat/MessageItem";
+import MessageItemErrorBoundary from "./chat/MessageItemErrorBoundary";
 import ScrollButtons from "./chat/ScrollButtons";
 import { useScrollHandlers } from "@/hooks/use-scroll-handlers";
 
@@ -176,21 +177,25 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
               const originalMessage = findOriginalMessage(message.reply_to_id);
 
               return (
-                <MessageItem
+                <MessageItemErrorBoundary
                   key={`${message.id}-${message.timestamp}`}
-                  message={message}
-                  isCurrentUser={isCurrentUser}
-                  currentUsername={currentUsername}
-                  originalMessage={originalMessage}
-                  onReplyToMessage={onReplyToMessage}
-                  onScrollToMessage={scrollToMessage}
-                  isMobile={isMobile}
-                  setRef={el => {
-                    if (el) {
-                      messageRefs.current[message.id] = el;
-                    }
-                  }}
-                />
+                  messageId={message.id}
+                >
+                  <MessageItem
+                    message={message}
+                    isCurrentUser={isCurrentUser}
+                    currentUsername={currentUsername}
+                    originalMessage={originalMessage}
+                    onReplyToMessage={onReplyToMessage}
+                    onScrollToMessage={scrollToMessage}
+                    isMobile={isMobile}
+                    setRef={el => {
+                      if (el) {
+                        messageRefs.current[message.id] = el;
+                      }
+                    }}
+                  />
+                </MessageItemErrorBoundary>
               );
             })}
           </div>

@@ -7,6 +7,8 @@ export interface LandingHeaderProps {
   onBookClubsClick: () => void;
   onEventsClick: () => void;
   onOffersClick: () => void;
+  onListBookClick: () => void;
+  onRequestBookClick: () => void;
 }
 
 export interface NavigationItemProps {
@@ -31,4 +33,17 @@ export interface MobileMenuProps {
   onBookClubsClick: () => void;
   onEventsClick: () => void;
   onOffersClick: () => void;
+  onListBookClick: () => void;
+  onRequestBookClick: () => void;
+}
+
+export interface HamburgerDropdownProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAnonymousChatClick: () => void;
+  onBookClubsClick: () => void;
+  onEventsClick: () => void;
+  onOffersClick: () => void;
+  onListBookClick: () => void;
+  onRequestBookClick: () => void;
 }

@@ -193,8 +193,11 @@ export function subscribeToEventNotifications(
   userId: string,
   callback: (notification: EventNotification) => void
 ) {
+  // Create unique channel name to prevent conflicts when multiple components subscribe
+  const uniqueChannelName = `event-notifications-${userId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   return supabase
-    .channel(`event-notifications-${userId}`)
+    .channel(uniqueChannelName)
     .on(
       'postgres_changes',
       {

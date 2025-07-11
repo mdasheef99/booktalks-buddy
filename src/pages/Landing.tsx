@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Helmet } from "react-helmet-async";
@@ -29,6 +29,10 @@ const Landing = () => {
   const [genreDialogOpen, setGenreDialogOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [currentUsername, setCurrentUsername] = useState("");
+
+  // Refs for scroll-to-section functionality
+  const bookListingSectionRef = useRef<HTMLDivElement>(null);
+  const bookRequestSectionRef = useRef<HTMLDivElement>(null);
 
   const handleUsernameComplete = (username: string) => {
     setCurrentUsername(username);
@@ -61,6 +65,20 @@ const Landing = () => {
 
   const handleOffersClick = () => {
     navigate("/offers");
+  };
+
+  const handleListBookClick = () => {
+    bookListingSectionRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
+  const handleRequestBookClick = () => {
+    bookRequestSectionRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   };
 
   // Show loading state while storeId is being fetched
@@ -125,6 +143,8 @@ const Landing = () => {
         onBookClubsClick={handleBookClubsClick}
         onEventsClick={handleEventsClick}
         onOffersClick={handleOffersClick}
+        onListBookClick={handleListBookClick}
+        onRequestBookClick={handleRequestBookClick}
       />
 
       {/* Carousel Section - Featured Books */}
@@ -146,10 +166,14 @@ const Landing = () => {
       />
 
       {/* Book Listing Section */}
-      <BookListingSection storeId={storeId} />
+      <div ref={bookListingSectionRef}>
+        <BookListingSection storeId={storeId} />
+      </div>
 
       {/* Book Availability Request Section */}
-      <BookAvailabilityRequestSection storeId={storeId} />
+      <div ref={bookRequestSectionRef}>
+        <BookAvailabilityRequestSection storeId={storeId} />
+      </div>
 
       {/* Community Showcase Section */}
       <CommunityShowcaseSection storeId={storeId} />

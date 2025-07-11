@@ -9,6 +9,88 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      book_availability_requests: {
+        Row: {
+          id: string
+          store_id: string
+          customer_name: string
+          customer_email: string
+          customer_phone: string
+          book_title: string
+          book_author: string
+          description: string | null
+          status: "pending" | "responded" | "resolved"
+          store_owner_notes: string | null
+          responded_by: string | null
+          responded_at: string | null
+          user_id: string | null
+          google_books_id: string | null
+          request_source: "anonymous" | "authenticated_user"
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          store_id: string
+          customer_name: string
+          customer_email: string
+          customer_phone: string
+          book_title: string
+          book_author: string
+          description?: string | null
+          status?: "pending" | "responded" | "resolved"
+          store_owner_notes?: string | null
+          responded_by?: string | null
+          responded_at?: string | null
+          user_id?: string | null
+          google_books_id?: string | null
+          request_source?: "anonymous" | "authenticated_user"
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          store_id?: string
+          customer_name?: string
+          customer_email?: string
+          customer_phone?: string
+          book_title?: string
+          book_author?: string
+          description?: string | null
+          status?: "pending" | "responded" | "resolved"
+          store_owner_notes?: string | null
+          responded_by?: string | null
+          responded_at?: string | null
+          user_id?: string | null
+          google_books_id?: string | null
+          request_source?: "anonymous" | "authenticated_user"
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_availability_requests_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_availability_requests_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_availability_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       book_clubs: {
         Row: {
           access_tier_required: string | null
@@ -2203,7 +2285,6 @@ export type Database = {
       }
       users: {
         Row: {
-          account_tier: string
           allow_chats: boolean | null
           allow_direct_messages: boolean | null
           avatar_url: string | null
@@ -2218,7 +2299,6 @@ export type Database = {
           username: string
         }
         Insert: {
-          account_tier?: string
           allow_chats?: boolean | null
           allow_direct_messages?: boolean | null
           avatar_url?: string | null
@@ -2233,7 +2313,6 @@ export type Database = {
           username: string
         }
         Update: {
-          account_tier?: string
           allow_chats?: boolean | null
           allow_direct_messages?: boolean | null
           avatar_url?: string | null
@@ -2404,10 +2483,7 @@ export type Database = {
           expires_at: string
         }[]
       }
-      has_account_tier: {
-        Args: { required_tier: string }
-        Returns: boolean
-      }
+
       has_active_subscription: {
         Args: { user_id: string }
         Returns: boolean

@@ -20,13 +20,13 @@ export async function apiCall<T>(
 ): Promise<T | null> {
   try {
     const { data, error } = await promise;
-    
+
     if (error) {
       console.error(error);
       toast.error(errorMessage);
       return null;
     }
-    
+
     return data;
   } catch (err) {
     console.error(err);

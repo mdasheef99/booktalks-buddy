@@ -4,6 +4,27 @@
  * This module contains all entitlement constants and role hierarchy definitions.
  */
 
+// =========================
+// Feature Flag Integration
+// =========================
+
+/**
+ * Feature flags that control entitlements behavior
+ */
+export const ENTITLEMENT_FEATURE_FLAGS = {
+  /** Enable subscription validation in entitlements calculation */
+  SUBSCRIPTION_VALIDATION: 'subscription_validation_fix',
+
+  /** Enable subscription-aware cache invalidation */
+  SUBSCRIPTION_CACHE: 'subscription_cache_invalidation',
+
+  /** Enable role-based subscription enforcement for user roles */
+  ROLE_BASED_ENFORCEMENT: 'role_based_subscription_enforcement',
+
+  /** Enable subscription monitoring in entitlements */
+  SUBSCRIPTION_MONITORING: 'subscription_monitoring',
+} as const;
+
 /**
  * Basic entitlements that all authenticated users have (MEMBER tier)
  */

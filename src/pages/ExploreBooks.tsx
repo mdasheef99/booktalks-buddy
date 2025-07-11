@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/react";
 
 import BookConnectHeader from "@/components/BookConnectHeader";
 import BookSearchForm from "@/components/books/BookSearchForm";
-import { ProfileDialog } from "@/components/profile";
+import { SimpleProfileDialog } from "@/components/anonymous-chat/SimpleProfileDialog";
 
 // New components
 import NewSearchResults from "@/components/explore/SearchResults";
@@ -128,8 +128,8 @@ const ExploreBooks: React.FC = () => {
           setOpen: setShowProfileDialog,
         }}
       />
-      {/* Render the ProfileDialog component */}
-      <ProfileDialog
+      {/* Render the SimpleProfileDialog component for anonymous chat */}
+      <SimpleProfileDialog
         open={showProfileDialog}
         onClose={() => setShowProfileDialog(false)}
       />

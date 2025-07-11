@@ -124,7 +124,6 @@ describe('Profile Messaging Integration', () => {
           <BookClubProfileHeader
             profile={mockProfile}
             isCurrentUser={false}
-            onEditProfile={vi.fn()}
             onProfileUpdated={vi.fn()}
           />
         </createWrapper>
@@ -140,7 +139,6 @@ describe('Profile Messaging Integration', () => {
           <BookClubProfileHeader
             profile={mockProfile}
             isCurrentUser={true}
-            onEditProfile={vi.fn()}
             onProfileUpdated={vi.fn()}
           />
         </createWrapper>
@@ -150,20 +148,19 @@ describe('Profile Messaging Integration', () => {
       expect(screen.queryByTestId('message-icon')).not.toBeInTheDocument();
     });
 
-    it('shows Edit Profile button for current user', () => {
+    it('does not show Edit Profile button for current user (clean separation)', () => {
       render(
         <createWrapper>
           <BookClubProfileHeader
             profile={mockProfile}
             isCurrentUser={true}
-            onEditProfile={vi.fn()}
             onProfileUpdated={vi.fn()}
           />
         </createWrapper>
       );
 
-      expect(screen.getByText('Edit Profile')).toBeInTheDocument();
-      expect(screen.getByTestId('edit-icon')).toBeInTheDocument();
+      // Edit Profile button should not appear in BookClubProfileHeader anymore
+      expect(screen.queryByText('Edit Profile')).not.toBeInTheDocument();
     });
 
     it('calls messaging hook with correct username for other users', () => {
@@ -218,7 +215,6 @@ describe('Profile Messaging Integration', () => {
           <BookClubProfileHeader
             profile={mockProfile}
             isCurrentUser={false}
-            onEditProfile={vi.fn()}
             onProfileUpdated={vi.fn()}
           />
         </createWrapper>
@@ -330,7 +326,6 @@ describe('Profile Messaging Integration', () => {
           <BookClubProfileHeader
             profile={mockProfile}
             isCurrentUser={false}
-            onEditProfile={vi.fn()}
             onProfileUpdated={vi.fn()}
           />
         </createWrapper>
@@ -388,7 +383,6 @@ describe('Profile Messaging Integration', () => {
           <BookClubProfileHeader
             profile={profileWithoutUsername}
             isCurrentUser={false}
-            onEditProfile={vi.fn()}
             onProfileUpdated={vi.fn()}
           />
         </createWrapper>

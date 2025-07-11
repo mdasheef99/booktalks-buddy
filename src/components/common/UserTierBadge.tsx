@@ -26,8 +26,8 @@ const UserTierBadge: React.FC<UserTierBadgeProps> = ({
   showTooltip = true,
   showFreeTier = false,
 }) => {
-  // Default to 'free' if tier is not provided
-  const userTier = tier || 'free';
+  // Normalize tier to lowercase for consistent handling
+  const userTier = tier ? tier.toLowerCase() : 'free';
 
   // Define badge properties based on tier
   let badgeProps: {

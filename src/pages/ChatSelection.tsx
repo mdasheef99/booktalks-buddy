@@ -61,8 +61,8 @@ const ChatSelection = () => {
     
     console.log("Chat selection complete, username:", username, "genre:", genre);
     
-    // Navigate to books filtered by genre
-    navigate(`/books?genre=${encodeURIComponent(genre)}`);
+    // Navigate to explore books for anonymous chat
+    navigate(`/explore-books?genre=${encodeURIComponent(genre)}`);
   };
 
   return (

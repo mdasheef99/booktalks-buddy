@@ -186,7 +186,7 @@ const UserNameDebugTest: React.FC = () => {
               </div>
               <div className="flex-1">
                 <div className="text-sm text-gray-600">
-                  Raw DB: {user.username} | {user.displayname || 'NO DISPLAY NAME'} | {user.account_tier}
+                  Raw DB: {user.username} | {user.displayname || 'NO DISPLAY NAME'} | {user.membership_tier}
                 </div>
                 <div className="font-medium">
                   UserName component:
@@ -213,7 +213,7 @@ const UserNameDebugTest: React.FC = () => {
               </div>
               <div className="flex-1">
                 <div className="text-sm text-gray-600">
-                  Raw data: {user.username} | {user.account_tier} | {user.role}
+                  Raw data: {user.username} | {user.membership_tier} | {user.role}
                 </div>
                 <div className="font-medium">
                   UserName component:

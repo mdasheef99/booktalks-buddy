@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { getUserProfile, UserProfile } from '@/services/profileService';
 import UserTierBadge from '@/components/common/UserTierBadge';
 import { formatUserIdentity } from '@/utils/usernameValidation';
+import { useAuth } from '@/contexts/AuthContext';
+import { convertTierForUI, shouldShowTierBadge } from '@/lib/utils/tierUtils';
 
 interface UserNameProps {
   userId: string;
@@ -25,6 +27,7 @@ const UserName: React.FC<UserNameProps> = ({
 }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -97,14 +100,18 @@ const UserName: React.FC<UserNameProps> = ({
       </span>
 
       {/* Tier badge */}
-      {showTierBadge && profile?.account_tier && profile.account_tier !== 'free' && (
-        <UserTierBadge tier={profile.account_tier} size="sm" />
+      {showTierBadge && shouldShowTierBadge(profile?.membership_tier) && (
+        <UserTierBadge tier={convertTierForUI(profile?.membership_tier) || 'member'} size="sm" />
       )}
     </span>
   );
 
-  if (linkToProfile && profile?.username) {
+  // Check if this is the current user's own profile
+  const isCurrentUser = user?.id === userId;
+
+  if (linkToProfile && profile?.username && !isCurrentUser) {
     // Use username for profile links (more stable than ID)
+    // Only make it clickable if it's NOT the current user
     return (
       <Link
         to={`/user/${profile.username}`}

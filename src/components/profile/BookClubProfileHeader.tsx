@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookClubProfile, uploadProfileAvatar } from '@/lib/api/profile';
-import { Edit, Upload, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { Upload, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMessagingButton } from '@/components/messaging/hooks/useMessaging';
 import { ProfileAvatarLarge } from '@/components/ui/SmartAvatar';
@@ -12,14 +12,12 @@ import { hasAvatar } from '@/utils/avatarUtils';
 interface BookClubProfileHeaderProps {
   profile: BookClubProfile;
   isCurrentUser: boolean;
-  onEditProfile: () => void;
   onProfileUpdated: () => void;
 }
 
 const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
   profile,
   isCurrentUser,
-  onEditProfile,
   onProfileUpdated
 }) => {
   const [uploading, setUploading] = useState(false);
@@ -97,19 +95,6 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
       <div className="h-32 bg-gradient-to-r from-bookconnect-cream to-amber-100 relative">
         {/* Position buttons in top right - desktop only */}
         <div className="absolute top-4 right-4 hidden sm:flex gap-2">
-          {/* Edit Profile button - only for current user */}
-          {isCurrentUser && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white hover:bg-bookconnect-cream border-bookconnect-brown/30 text-bookconnect-brown hover:text-bookconnect-brown shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 font-medium"
-              onClick={onEditProfile}
-            >
-              <Edit className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:rotate-12" />
-              Edit Profile
-            </Button>
-          )}
-
           {/* Message User button - only for other users */}
           {!isCurrentUser && (
             <Button
@@ -203,19 +188,6 @@ const BookClubProfileHeader: React.FC<BookClubProfileHeaderProps> = ({
 
             {/* Action buttons positioned for mobile - mobile only */}
             <div className="flex gap-2 w-full sm:hidden">
-              {/* Edit Profile button - only for current user */}
-              {isCurrentUser && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 bg-white hover:bg-bookconnect-cream border-bookconnect-brown/30 text-bookconnect-brown hover:text-bookconnect-brown shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 font-medium"
-                  onClick={onEditProfile}
-                >
-                  <Edit className="h-4 w-4 mr-2 transition-transform duration-200 group-hover:rotate-12" />
-                  Edit Profile
-                </Button>
-              )}
-
               {/* Message button - only for other users */}
               {!isCurrentUser && (
                 <Button

@@ -11,6 +11,7 @@ import React, { ReactElement, createContext } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { renderHook, RenderHookOptions } from '@testing-library/react-hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
 import { Event } from '@/lib/api/bookclubs/events/types';
 
 // Create a mock AuthContext since we can't import it directly
@@ -49,6 +50,25 @@ export const MockAuthContext = createContext<AuthContextType>({
   refreshEntitlements: async () => {},
   hasEntitlement: () => false,
   hasContextualEntitlement: () => false,
+  // Subscription state (Phase 4B.1.1)
+  subscriptionStatus: null,
+  subscriptionLoading: false,
+  refreshSubscriptionStatus: async () => {},
+  hasValidSubscription: () => false,
+  getSubscriptionTier: () => 'MEMBER',
+  hasRequiredTier: () => false,
+  // Enhanced subscription helpers (Phase 4B.1.2)
+  canAccessFeature: () => false,
+  getSubscriptionStatusWithContext: () => ({
+    tier: 'MEMBER',
+    hasActiveSubscription: false,
+    isValid: false,
+    needsUpgrade: false,
+    canUpgrade: true,
+    context: 'Mock context'
+  }),
+  // Coordinated data refresh (Phase 4B.1.2)
+  refreshUserData: async () => {},
 });
 
 // Define types for the wrapper props
@@ -93,11 +113,13 @@ export const AllProviders: React.FC<AllProvidersProps> = ({
   };
 
   return (
-    <MockAuthContext.Provider value={authContextValue}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    </MockAuthContext.Provider>
+    <BrowserRouter>
+      <MockAuthContext.Provider value={authContextValue}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </MockAuthContext.Provider>
+    </BrowserRouter>
   );
 };
 

@@ -35,6 +35,12 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   // Check if message is deleted
   const isDeleted = !!message.deleted_at;
 
+  // Add error handling for anonymous chat
+  if (!message || !message.id) {
+    console.warn('MessageActions: Invalid message data', message);
+    return null;
+  }
+
   const handleReply = () => {
     onReplyToMessage(message);
     setDropdownOpen(false);

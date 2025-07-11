@@ -15,6 +15,7 @@ const cacheInvalidationListeners: CacheInvalidationListener[] = [];
 export enum CacheInvalidationReason {
   PROFILE_UPDATE = 'PROFILE_UPDATE',
   AVATAR_UPLOAD = 'AVATAR_UPLOAD',
+  AVATAR_ROLLBACK = 'AVATAR_ROLLBACK',
   SYNC_RECOVERY = 'SYNC_RECOVERY',
   MANUAL_REFRESH = 'MANUAL_REFRESH',
   ERROR_RECOVERY = 'ERROR_RECOVERY',

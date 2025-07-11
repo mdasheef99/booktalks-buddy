@@ -43,6 +43,14 @@ const createSupabaseMock = () => {
       on: vi.fn().mockReturnThis(),
       subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
     }),
+    rpc: vi.fn().mockImplementation((functionName, params) => {
+      // Mock feature flag calls to return enabled for subscription_validation_fix
+      if (functionName === 'is_feature_enabled' && params?.p_flag_key === 'subscription_validation_fix') {
+        return Promise.resolve({ data: true, error: null });
+      }
+      // Default to false for other feature flags
+      return Promise.resolve({ data: false, error: null });
+    }),
   }
 
   // Setup method chaining
@@ -64,6 +72,9 @@ const createSupabaseMock = () => {
   mock.match.mockReturnValue(mock)
   mock.or.mockReturnValue(mock)
   mock.and.mockReturnValue(mock)
+
+  // Special handling for single() - should return a resolved promise with data structure
+  mock.single.mockResolvedValue({ data: null, error: null })
 
   return mock
 }

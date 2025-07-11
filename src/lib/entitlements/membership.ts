@@ -5,8 +5,8 @@
  */
 
 import { supabase } from '../supabase';
-import { 
-  MEMBER_ENTITLEMENTS, 
+import {
+  MEMBER_ENTITLEMENTS,
   BASIC_ENTITLEMENTS,
   PRIVILEGED_ENTITLEMENTS,
   PRIVILEGED_PLUS_ENTITLEMENTS,
@@ -14,9 +14,20 @@ import {
   CLUB_MODERATOR_ENTITLEMENTS,
   STORE_MANAGER_ENTITLEMENTS,
   STORE_OWNER_ENTITLEMENTS,
-  PLATFORM_OWNER_ENTITLEMENTS
+  PLATFORM_OWNER_ENTITLEMENTS,
+  ENTITLEMENT_FEATURE_FLAGS
 } from './constants';
 import { hasEntitlement } from './permissions';
+import { isFeatureEnabled } from '../feature-flags';
+import {
+  hasActiveSubscription,
+  getSubscriptionStatus
+} from '../api/subscriptions';
+import {
+  makeSubscriptionValidationDecision,
+  logRoleClassificationDecision,
+  type SubscriptionValidationDecision
+} from './roleClassification';
 
 /**
  * Calculate all entitlements for a user
@@ -54,8 +65,53 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
 
     if (userError) throw userError;
 
-    // Use membership_tier column
-    const membershipTier = user?.membership_tier || 'MEMBER';
+    // 3. Check if subscription validation feature flag is enabled
+    const subscriptionValidationEnabled = await isFeatureEnabled(
+      ENTITLEMENT_FEATURE_FLAGS.SUBSCRIPTION_VALIDATION,
+      { userId }
+    );
+
+    let membershipTier: string;
+
+    if (subscriptionValidationEnabled.enabled) {
+      // SECURITY FIX: Use subscription-validated tier instead of cached database tier
+      console.log(`[Security] Subscription validation enabled for user ${userId}`);
+
+      try {
+        // Get validated subscription status
+        const subscriptionStatus = await getSubscriptionStatus(userId, { useCache: true });
+
+        // Use subscription-validated tier
+        membershipTier = subscriptionStatus.currentTier;
+
+        // Log security validation
+        console.log(`[Security] User ${userId} tier validation:`, {
+          databaseTier: user?.membership_tier || 'MEMBER',
+          subscriptionTier: membershipTier,
+          hasActiveSubscription: subscriptionStatus.hasActiveSubscription,
+          isValid: subscriptionStatus.isValid,
+          validationSource: subscriptionStatus.validationSource
+        });
+
+        // Security warning if database and subscription tiers don't match
+        if (user?.membership_tier && user.membership_tier !== membershipTier) {
+          console.warn(`[Security] Tier mismatch detected for user ${userId}:`, {
+            databaseTier: user.membership_tier,
+            validatedTier: membershipTier,
+            subscriptionValid: subscriptionStatus.isValid
+          });
+        }
+
+      } catch (subscriptionError) {
+        // Fail secure: Use MEMBER tier if subscription validation fails
+        console.error(`[Security] Subscription validation failed for user ${userId}:`, subscriptionError);
+        membershipTier = 'MEMBER';
+      }
+    } else {
+      // Legacy behavior: Use cached database tier (VULNERABLE - Original Line 58 issue, now Line 108)
+      membershipTier = user?.membership_tier || 'MEMBER';
+      console.log(`[Legacy] Using database tier for user ${userId}: ${membershipTier}`);
+    }
 
     // Add tier-based entitlements
     if (membershipTier === 'PRIVILEGED' || membershipTier === 'PRIVILEGED_PLUS') {
@@ -66,7 +122,53 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
       entitlements.push(...PRIVILEGED_PLUS_ENTITLEMENTS);
     }
 
-    // 3. Check store administrator roles
+    // 4. Role-Based Subscription Enforcement (Phase 3.2)
+    // IMPORTANT: Check exemptions FIRST before processing any roles
+    let roleValidationDecision: SubscriptionValidationDecision | null = null;
+    let roleEnforcementEnabled = false;
+    let isExemptFromValidation = false;
+
+    try {
+      // Check if role-based subscription enforcement is enabled
+      const roleEnforcementFlag = await isFeatureEnabled(
+        'role_based_subscription_enforcement',
+        { userId }
+      );
+      roleEnforcementEnabled = roleEnforcementFlag.enabled;
+
+      if (roleEnforcementEnabled) {
+        console.log(`[Role Enforcement] Role-based subscription enforcement enabled for user ${userId}`);
+
+        // Get role-based subscription validation decision FIRST
+        roleValidationDecision = await makeSubscriptionValidationDecision(userId);
+
+        // Determine if user is exempt from validation (store owners, platform owners, etc.)
+        isExemptFromValidation = !roleValidationDecision.shouldValidate;
+
+        // Log the decision for monitoring
+        logRoleClassificationDecision(userId, roleValidationDecision, 'calculateUserEntitlements');
+
+        console.log(`[Role Enforcement] Validation decision for user ${userId}:`, {
+          shouldValidate: roleValidationDecision.shouldValidate,
+          isExempt: isExemptFromValidation,
+          reason: roleValidationDecision.reason,
+          exemptRoles: roleValidationDecision.exemptRoles.length,
+          enforcedRoles: roleValidationDecision.enforcedRoles.length
+        });
+      } else {
+        console.log(`[Role Enforcement] Role-based subscription enforcement disabled for user ${userId}`);
+        // If enforcement is disabled, treat all users as exempt
+        isExemptFromValidation = true;
+      }
+    } catch (error) {
+      console.error(`[Role Enforcement] Error checking role enforcement for user ${userId}:`, error);
+      // Fail secure: disable enforcement on error and treat as exempt
+      roleEnforcementEnabled = false;
+      roleValidationDecision = null;
+      isExemptFromValidation = true;
+    }
+
+    // 5. Check store administrator roles
     try {
       const { data: storeRoles, error: storeError } = await supabase
         .from('store_administrators')
@@ -92,7 +194,7 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
       console.warn('Could not check store administrator roles:', error);
     }
 
-    // 4. Check club leadership
+    // 6. Check club leadership (with subscription enforcement)
     try {
       const { data: ledClubs, error: ledClubsError } = await supabase
         .from('book_clubs')
@@ -103,14 +205,34 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
 
       for (const club of ledClubs || []) {
         entitlements.push(`CLUB_LEAD_${club.id}`);
-        entitlements.push(...CLUB_LEAD_ENTITLEMENTS);
+
+        // Apply role-based subscription enforcement for club leadership
+        // Use the pre-calculated exemption status to ensure store owners bypass validation
+        if (roleEnforcementEnabled && !isExemptFromValidation) {
+          // User is subject to subscription validation for club leadership role
+          const hasActiveSubscriptionForRole = await hasActiveSubscription(userId);
+
+          if (hasActiveSubscriptionForRole) {
+            console.log(`[Role Enforcement] User ${userId} has active subscription - granting club leadership entitlements`);
+            entitlements.push(...CLUB_LEAD_ENTITLEMENTS);
+          } else {
+            console.log(`[Role Enforcement] User ${userId} lacks active subscription - denying club leadership entitlements`);
+            // Note: Club-specific entitlement (CLUB_LEAD_${club.id}) is still granted for basic club access
+            // but premium leadership entitlements are denied
+          }
+        } else {
+          // Role enforcement disabled OR user is exempt (store owners, platform owners, etc.) - grant all entitlements
+          const exemptionReason = isExemptFromValidation ? 'administrative exemption' : 'enforcement disabled';
+          console.log(`[Role Enforcement] Granting club leadership entitlements without validation for user ${userId} (${exemptionReason})`);
+          entitlements.push(...CLUB_LEAD_ENTITLEMENTS);
+        }
       }
     } catch (error) {
       // Silently handle the case where book_clubs table doesn't exist or has no lead_user_id column
       console.warn('Could not check club leadership roles:', error);
     }
 
-    // 5. Check club moderator roles
+    // 7. Check club moderator roles (with subscription enforcement)
     try {
       const { data: moderatedClubs, error: moderatedClubsError } = await supabase
         .from('club_moderators')
@@ -121,7 +243,27 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
 
       for (const club of moderatedClubs || []) {
         entitlements.push(`CLUB_MODERATOR_${club.club_id}`);
-        entitlements.push(...CLUB_MODERATOR_ENTITLEMENTS);
+
+        // Apply role-based subscription enforcement for club moderation
+        // Use the pre-calculated exemption status to ensure store owners bypass validation
+        if (roleEnforcementEnabled && !isExemptFromValidation) {
+          // User is subject to subscription validation for club moderator role
+          const hasActiveSubscriptionForRole = await hasActiveSubscription(userId);
+
+          if (hasActiveSubscriptionForRole) {
+            console.log(`[Role Enforcement] User ${userId} has active subscription - granting club moderator entitlements`);
+            entitlements.push(...CLUB_MODERATOR_ENTITLEMENTS);
+          } else {
+            console.log(`[Role Enforcement] User ${userId} lacks active subscription - denying club moderator entitlements`);
+            // Note: Club-specific entitlement (CLUB_MODERATOR_${club.club_id}) is still granted for basic club access
+            // but premium moderation entitlements are denied
+          }
+        } else {
+          // Role enforcement disabled OR user is exempt (store owners, platform owners, etc.) - grant all entitlements
+          const exemptionReason = isExemptFromValidation ? 'administrative exemption' : 'enforcement disabled';
+          console.log(`[Role Enforcement] Granting club moderator entitlements without validation for user ${userId} (${exemptionReason})`);
+          entitlements.push(...CLUB_MODERATOR_ENTITLEMENTS);
+        }
       }
     } catch (error) {
       // Silently handle the case where club_moderators table doesn't exist

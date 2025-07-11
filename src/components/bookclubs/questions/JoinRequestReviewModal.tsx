@@ -40,6 +40,11 @@ export default function JoinRequestReviewModal({
   const [isRejecting, setIsRejecting] = useState(false);
   const isMobile = useIsMobile();
 
+  // Early return if joinRequest is null/undefined or missing answers
+  if (!joinRequest || !joinRequest.answers || !Array.isArray(joinRequest.answers)) {
+    return null;
+  }
+
   const handleApprove = async () => {
     setIsApproving(true);
     try {

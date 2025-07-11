@@ -33,6 +33,15 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
   const [userListOpen, setUserListOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
+  // Add error handling for anonymous chat
+  if (!messageId || !currentUsername) {
+    console.warn('MessageReactionList: Missing required props', { messageId, currentUsername });
+    return null;
+  }
+
+  // Ensure reactions is always an array
+  const safeReactions = Array.isArray(reactions) ? reactions : [];
+
   const handleAddReaction = async (emoji: string, event?: React.MouseEvent) => {
     // This function now only handles adding/removing reactions
     // If event is provided and it's a special click, show user list instead
@@ -116,10 +125,10 @@ const MessageReactionList: React.FC<MessageReactionListProps> = ({
     }
   };
 
-  console.log("Processing reactions in MessageReactionList:", reactions);
+  console.log("Processing reactions in MessageReactionList:", safeReactions);
 
   // Group reactions by emoji
-  const groupedReactions = reactions.reduce((acc, reaction) => {
+  const groupedReactions = safeReactions.reduce((acc, reaction) => {
     // Skip reactions without emoji
     if (!reaction.reaction) return acc;
 

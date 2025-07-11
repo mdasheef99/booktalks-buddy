@@ -32,19 +32,34 @@ const MessageItem: React.FC<MessageItemProps> = ({
   useEffect(() => {
     setReactions(message.reactions || []);
 
-    // Set up a subscription to reaction changes for this message
-    const subscription = subscribeToReactions(message.id, () => {
-      // When reactions change, fetch the latest reactions
-      console.log("Reaction change detected via subscription, updating...");
-      handleReactionsUpdated(message.id);
-    });
+    // Add error handling for subscription setup
+    let subscription: any = null;
 
-    // Fetch reactions immediately to ensure we have the latest data
-    handleReactionsUpdated(message.id);
+    try {
+      // Set up a subscription to reaction changes for this message
+      subscription = subscribeToReactions(message.id, () => {
+        // When reactions change, fetch the latest reactions
+        console.log("Reaction change detected via subscription, updating...");
+        handleReactionsUpdated(message.id);
+      });
+
+      // Fetch reactions immediately to ensure we have the latest data
+      handleReactionsUpdated(message.id);
+    } catch (error) {
+      console.warn("Failed to set up reaction subscription for message:", message.id, error);
+      // Still fetch reactions even if subscription fails
+      handleReactionsUpdated(message.id);
+    }
 
     // Clean up subscription when component unmounts or message changes
     return () => {
-      subscription.unsubscribe();
+      if (subscription && typeof subscription.unsubscribe === 'function') {
+        try {
+          subscription.unsubscribe();
+        } catch (error) {
+          console.warn("Error unsubscribing from reactions:", error);
+        }
+      }
     };
   }, [message.id]);
 

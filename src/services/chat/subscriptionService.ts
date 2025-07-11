@@ -9,6 +9,9 @@ type PresencePayload = {
 };
 
 // ========== Subscription Functions ==========
+// Track active subscriptions to prevent duplicates
+const activeSubscriptions = new Map<string, any>();
+
 export function subscribeToChat(
   bookId: string,
   callback: (message: ChatMessage) => void
@@ -19,10 +22,20 @@ export function subscribeToChat(
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(originalId);
 
-  console.log("Subscribing to chat for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId);
+  // Create unique channel name to avoid conflicts with presence
+  const channelName = `chat_messages:${originalId}`;
 
-  return supabase
-    .channel(`chat:${bookId}`)
+  console.log("Subscribing to chat for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId, "channel:", channelName);
+
+  // Check if subscription already exists
+  if (activeSubscriptions.has(channelName)) {
+    console.log("Subscription already exists for channel:", channelName);
+    const existingSubscription = activeSubscriptions.get(channelName);
+    return existingSubscription;
+  }
+
+  const channel = supabase
+    .channel(channelName)
     .on(
       'postgres_changes',
       {
@@ -50,8 +63,20 @@ export function subscribeToChat(
       }
     )
     .subscribe((status) => {
-      console.log("Subscription status:", status);
+      console.log("Chat subscription status:", status);
     });
+
+  // Store the subscription
+  activeSubscriptions.set(channelName, {
+    unsubscribe: () => {
+      console.log("Unsubscribing from chat channel:", channelName);
+      activeSubscriptions.delete(channelName);
+      channel.unsubscribe();
+      supabase.removeChannel(channel);
+    }
+  });
+
+  return activeSubscriptions.get(channelName);
 }
 
 export function subscribeToReactions(
@@ -84,6 +109,9 @@ export function subscribeToReactions(
     });
 }
 
+// Track active presence subscriptions to prevent duplicates
+const activePresenceSubscriptions = new Map<string, any>();
+
 // Track presence in a book discussion
 export function trackPresence(
   bookId: string,
@@ -93,8 +121,20 @@ export function trackPresence(
   // Ensure we're using the original Google Books ID
   const originalId = isUuid(bookId) ? getBookDiscussionId(bookId) : bookId;
 
+  // Create unique channel name for presence
+  const channelName = `presence:${originalId}`;
+
+  console.log("Setting up presence tracking for channel:", channelName, "user:", username);
+
+  // Check if presence subscription already exists
+  if (activePresenceSubscriptions.has(channelName)) {
+    console.log("Presence subscription already exists for channel:", channelName);
+    const existingSubscription = activePresenceSubscriptions.get(channelName);
+    return existingSubscription;
+  }
+
   // Create a presence channel for this book discussion
-  const channel = supabase.channel(`presence:${originalId}`);
+  const channel = supabase.channel(channelName);
 
   // Set up presence handlers
   channel
@@ -137,12 +177,16 @@ export function trackPresence(
     }
   });
 
-  // Return a function to leave the channel
-  return {
+  // Store and return the subscription
+  const subscription = {
     unsubscribe: async () => {
-      console.log('Unsubscribing from presence channel');
+      console.log('Unsubscribing from presence channel:', channelName);
+      activePresenceSubscriptions.delete(channelName);
       await channel.untrack();
       supabase.removeChannel(channel);
     }
   };
+
+  activePresenceSubscriptions.set(channelName, subscription);
+  return subscription;
 }

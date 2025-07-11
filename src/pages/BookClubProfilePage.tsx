@@ -4,11 +4,12 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import BookClubProfileHeader from '@/components/profile/BookClubProfileHeader';
 import BookClubMemberships from '@/components/profile/BookClubMemberships';
-import BookClubProfileSettings from '@/components/profile/BookClubProfileSettings';
+import ProfileReadingListSection from '@/components/profile/ProfileReadingListSection';
+import ProfileCollectionsSection from '@/components/profile/ProfileCollectionsSection';
 import { BookClubProfile, ClubMembership, getBookClubProfile, getUserClubMemberships } from '@/lib/api/profile';
 import { supabase } from '@/lib/supabase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users } from 'lucide-react';
+import { Users, BookOpen, FolderOpen } from 'lucide-react';
 
 
 import { BackButton } from '@/components/ui/BackButton';
@@ -21,9 +22,8 @@ const BookClubProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<BookClubProfile | null>(null);
   const [memberships, setMemberships] = useState<ClubMembership[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
 
-  // Determine if this is the current user's profile with proper logic
+  // Determine if this is the current user's profile for viewing permissions only
   const isCurrentUser = useMemo(() => {
     if (!user) return false;
 
@@ -241,11 +241,8 @@ const BookClubProfilePage: React.FC = () => {
     if (!user) return;
 
     try {
-      // Since we're using a simplified profile approach, we'll just exit edit mode
-      // In a real implementation, we would fetch the updated profile data here
-
-      // Exit edit mode
-      setEditMode(false);
+      // Refresh profile data after updates
+      // This function is kept for potential future use but no longer handles edit mode
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error refreshing profile data:', error);
@@ -328,38 +325,50 @@ const BookClubProfilePage: React.FC = () => {
           <BookClubProfileHeader
             profile={profile}
             isCurrentUser={isCurrentUser}
-            onEditProfile={() => setEditMode(true)}
             onProfileUpdated={handleProfileUpdated}
           />
 
-          {/* Profile Content */}
-          {editMode ? (
-            <BookClubProfileSettings
-              profile={profile}
-              onCancel={() => setEditMode(false)}
-              onProfileUpdated={handleProfileUpdated}
-            />
-          ) : (
-            <Tabs defaultValue="clubs" className="mt-6">
-              <TabsList className="mb-4">
-                <TabsTrigger value="clubs" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Book Clubs
-                </TabsTrigger>
+          {/* Profile Content - View Only */}
+          <Tabs defaultValue="clubs" className="mt-6">
+            <TabsList className="mb-4">
+              <TabsTrigger value="clubs" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Book Clubs
+              </TabsTrigger>
+              <TabsTrigger value="reading" className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Reading List
+              </TabsTrigger>
+              <TabsTrigger value="collections" className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                Collections
+              </TabsTrigger>
+            </TabsList>
 
-              </TabsList>
+            <TabsContent value="clubs">
+              <BookClubMemberships
+                memberships={memberships}
+                loading={loading}
+                isCurrentUser={isCurrentUser}
+              />
+            </TabsContent>
 
-              <TabsContent value="clubs">
-                <BookClubMemberships
-                  memberships={memberships}
-                  loading={loading}
-                  isCurrentUser={isCurrentUser}
-                />
-              </TabsContent>
+            <TabsContent value="reading">
+              <ProfileReadingListSection
+                userId={profile.id}
+                username={profile.username}
+                isCurrentUser={isCurrentUser}
+              />
+            </TabsContent>
 
-
-            </Tabs>
-          )}
+            <TabsContent value="collections">
+              <ProfileCollectionsSection
+                userId={profile.id}
+                username={profile.username}
+                isCurrentUser={isCurrentUser}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

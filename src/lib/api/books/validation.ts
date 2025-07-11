@@ -197,6 +197,37 @@ export function validateCollectionId(collectionId: string): ValidationResult {
 }
 
 /**
+ * Validate store ID (UUID)
+ */
+export function validateStoreId(storeId: string): ValidationResult {
+  if (!storeId || typeof storeId !== 'string') {
+    return {
+      valid: false,
+      error: 'Store ID is required',
+      details: { provided: typeof storeId }
+    };
+  }
+
+  const trimmed = storeId.trim();
+  if (trimmed.length === 0) {
+    return {
+      valid: false,
+      error: 'Store ID cannot be empty'
+    };
+  }
+
+  if (!UUID_REGEX.test(trimmed)) {
+    return {
+      valid: false,
+      error: 'Invalid store ID format',
+      details: { format: 'Expected UUID format' }
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
  * Validate reading status enum
  */
 export function validateReadingStatus(status: string): ValidationResult {

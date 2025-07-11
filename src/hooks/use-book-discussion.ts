@@ -141,9 +141,17 @@ export function useBookDiscussion(id: string, title: string, author: string, use
 
     console.log("Setting up real-time subscription for book:", id);
     let subscription: { unsubscribe: () => void } | null = null;
+    let isSubscriptionActive = false;
 
     const setupSubscription = () => {
+      // Prevent multiple subscriptions
+      if (isSubscriptionActive) {
+        console.log("Subscription already active, skipping setup");
+        return;
+      }
+
       try {
+        console.log("Creating new chat subscription for book:", id);
         subscription = subscribeToChat(id, (newMessage) => {
           console.log("Received new message in component:", newMessage);
 
@@ -165,12 +173,20 @@ export function useBookDiscussion(id: string, title: string, author: string, use
             setReconnectAttempts(0);
           }
         });
+
+        isSubscriptionActive = true;
+        console.log("Chat subscription created successfully");
       } catch (error) {
         console.error("Error setting up chat subscription:", error);
         setConnectionError(true);
+        isSubscriptionActive = false;
 
         // Try to reconnect after a delay
-        setTimeout(setupSubscription, 5000);
+        setTimeout(() => {
+          if (!isSubscriptionActive) {
+            setupSubscription();
+          }
+        }, 5000);
       }
     };
 
@@ -179,19 +195,8 @@ export function useBookDiscussion(id: string, title: string, author: string, use
 
     // Set up a heartbeat to check the subscription is still active
     const heartbeatInterval = setInterval(() => {
-      if (connectionError && isOnline) {
+      if (connectionError && isOnline && !isSubscriptionActive) {
         console.log("Connection appears to be restored, attempting to resubscribe");
-
-        // Clean up existing subscription if any
-        if (subscription) {
-          try {
-            subscription.unsubscribe();
-          } catch (e) {
-            console.error("Error unsubscribing:", e);
-          }
-        }
-
-        // Set up a new subscription
         setupSubscription();
       }
     }, 10000); // Check every 10 seconds
@@ -199,15 +204,19 @@ export function useBookDiscussion(id: string, title: string, author: string, use
     return () => {
       console.log("Unsubscribing from chat");
       clearInterval(heartbeatInterval);
+      isSubscriptionActive = false;
+
       if (subscription) {
         try {
+          console.log("Cleaning up chat subscription");
           subscription.unsubscribe();
+          subscription = null;
         } catch (e) {
           console.error("Error during unsubscribe:", e);
         }
       }
     };
-  }, [id, connectionError, isOnline]);
+  }, [id]); // Remove connectionError and isOnline from dependencies to prevent re-subscriptions
 
   // Track presence of users in the chat
   useEffect(() => {
@@ -215,9 +224,17 @@ export function useBookDiscussion(id: string, title: string, author: string, use
 
     console.log("Setting up presence tracking for book:", id);
     let presenceTracker: { unsubscribe: () => void } | null = null;
+    let isPresenceActive = false;
 
     const setupPresence = () => {
+      // Prevent multiple presence trackers
+      if (isPresenceActive) {
+        console.log("Presence tracking already active, skipping setup");
+        return;
+      }
+
       try {
+        console.log("Creating new presence tracker for book:", id, "user:", username);
         presenceTracker = trackPresence(id, username, (onlineUsers) => {
           console.log("Online users updated:", onlineUsers);
           setOnlineUsers(onlineUsers);
@@ -227,11 +244,19 @@ export function useBookDiscussion(id: string, title: string, author: string, use
             setConnectionError(false);
           }
         });
+
+        isPresenceActive = true;
+        console.log("Presence tracking created successfully");
       } catch (error) {
         console.error("Error setting up presence tracking:", error);
+        isPresenceActive = false;
 
         // Try to reconnect after a delay
-        setTimeout(setupPresence, 5000);
+        setTimeout(() => {
+          if (!isPresenceActive) {
+            setupPresence();
+          }
+        }, 5000);
       }
     };
 
@@ -240,19 +265,8 @@ export function useBookDiscussion(id: string, title: string, author: string, use
 
     // Set up a heartbeat to check the presence tracking is still active
     const heartbeatInterval = setInterval(() => {
-      if (connectionError && isOnline) {
+      if (connectionError && isOnline && !isPresenceActive) {
         console.log("Connection appears to be restored, attempting to reconnect presence");
-
-        // Clean up existing tracker if any
-        if (presenceTracker) {
-          try {
-            presenceTracker.unsubscribe();
-          } catch (e) {
-            console.error("Error unsubscribing from presence:", e);
-          }
-        }
-
-        // Set up a new tracker
         setupPresence();
       }
     }, 15000); // Check every 15 seconds
@@ -260,15 +274,19 @@ export function useBookDiscussion(id: string, title: string, author: string, use
     return () => {
       console.log("Unsubscribing from presence tracking");
       clearInterval(heartbeatInterval);
+      isPresenceActive = false;
+
       if (presenceTracker) {
         try {
+          console.log("Cleaning up presence tracker");
           presenceTracker.unsubscribe();
+          presenceTracker = null;
         } catch (e) {
           console.error("Error during presence unsubscribe:", e);
         }
       }
     };
-  }, [id, username, connectionError, isOnline]);
+  }, [id, username]); // Remove connectionError and isOnline from dependencies
 
 
 
@@ -356,6 +374,30 @@ export function useBookDiscussion(id: string, title: string, author: string, use
         throw new Error("Failed to send message - empty result");
       } else {
         console.log("Message sent successfully:", result);
+
+        // Immediately add the message to local state for instant display
+        // The real-time subscription will handle updates/duplicates
+        const newMessage: ChatMessage = {
+          id: result.id,
+          message: message,
+          username: username,
+          timestamp: result.timestamp || new Date().toISOString(),
+          book_id: result.book_id,
+          reply_to_id: replyToId || null,
+          reactions: [],
+          deleted_at: null
+        };
+
+        setMessages((prevMessages) => {
+          // Check if message already exists (in case real-time was faster)
+          if (prevMessages.some(msg => msg.id === newMessage.id)) {
+            return prevMessages;
+          }
+          // Add the new message
+          return [...prevMessages, newMessage];
+        });
+
+        console.log("Message added to local state immediately");
       }
     } catch (error) {
       console.error("Error sending message:", error);

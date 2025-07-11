@@ -125,13 +125,18 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
     setFilteredEvents(filtered);
   }, [events, filter, sort, userClubs]);
 
-  // Initial fetch
+  // Initial fetch when filter or userClubs change
   useEffect(() => {
     fetchEvents();
+  }, [filter, userClubs.length]);
 
-    // Set up real-time subscription
+  // Set up real-time subscription (only once)
+  useEffect(() => {
+    // Create unique channel name to prevent conflicts
+    const uniqueChannelName = `events_changes_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const subscription = supabase
-      .channel('events_changes')
+      .channel(uniqueChannelName)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -145,7 +150,7 @@ export function useEvents(initialFilter: EventFilter = 'all', initialSort: Event
     return () => {
       subscription.unsubscribe();
     };
-  }, [filter, userClubs.length]);
+  }, []); // Empty dependency array - only run once
 
   return {
     events: filteredEvents,

@@ -27,6 +27,13 @@ export const MessageReaction = ({ messageId, currentUsername, onReactionsUpdated
   if (isDeleted) {
     return null;
   }
+
+  // Add error handling for anonymous chat
+  if (!messageId || !currentUsername) {
+    console.warn('MessageReaction: Missing required props', { messageId, currentUsername });
+    return null;
+  }
+
   const [reactions, setReactions] = useState<ReactionData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);

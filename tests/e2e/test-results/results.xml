@@ -1,0 +1,422 @@
+<testsuites id="" name="" tests="11" failures="11" skipped="0" errors="0" time="32.88368">
+<testsuite name="backward-compatibility.spec.ts" timestamp="2025-07-01T00:15:14.802Z" hostname="chromium" tests="11" failures="11" skipped="0" time="64.795" errors="0">
+<testcase name="Backward Compatibility Verification › Original Import Paths › should access Books Section through original path" classname="backward-compatibility.spec.ts" time="7.467">
+<failure message="backward-compatibility.spec.ts:28:5 should access Books Section through original path" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:28:5 › Backward Compatibility Verification › Original Import Paths › should access Books Section through original path 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-28e9d-ction-through-original-path-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-28e9d-ction-through-original-path-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-28e9d-ction-through-original-path-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-28e9d-ction-through-original-path-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Original Import Paths › should maintain all Books Section functionality" classname="backward-compatibility.spec.ts" time="8.928">
+<failure message="backward-compatibility.spec.ts:44:5 should maintain all Books Section functionality" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:44:5 › Backward Compatibility Verification › Original Import Paths › should maintain all Books Section functionality 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-87252-Books-Section-functionality-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-87252-Books-Section-functionality-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-87252-Books-Section-functionality-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-87252-Books-Section-functionality-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Service Function Availability › should access personal books service functions" classname="backward-compatibility.spec.ts" time="7.946">
+<failure message="backward-compatibility.spec.ts:63:5 should access personal books service functions" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:63:5 › Backward Compatibility Verification › Service Function Availability › should access personal books service functions 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-9bec4-nal-books-service-functions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-9bec4-nal-books-service-functions-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-9bec4-nal-books-service-functions-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-9bec4-nal-books-service-functions-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Service Function Availability › should access store requests service functions" classname="backward-compatibility.spec.ts" time="8.193">
+<failure message="backward-compatibility.spec.ts:77:5 should access store requests service functions" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:77:5 › Backward Compatibility Verification › Service Function Availability › should access store requests service functions 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-7d83c--requests-service-functions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-7d83c--requests-service-functions-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-7d83c--requests-service-functions-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-7d83c--requests-service-functions-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Service Function Availability › should maintain error handling and user feedback" classname="backward-compatibility.spec.ts" time="4.568">
+<failure message="backward-compatibility.spec.ts:92:5 should maintain error handling and user feedback" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:92:5 › Backward Compatibility Verification › Service Function Availability › should maintain error handling and user feedback 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-14731--handling-and-user-feedback-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-14731--handling-and-user-feedback-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-14731--handling-and-user-feedback-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-14731--handling-and-user-feedback-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Data Flow and State Management › should maintain state across tab switches" classname="backward-compatibility.spec.ts" time="4.617">
+<failure message="backward-compatibility.spec.ts:110:5 should maintain state across tab switches" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:110:5 › Backward Compatibility Verification › Data Flow and State Management › should maintain state across tab switches 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-c121c-n-state-across-tab-switches-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-c121c-n-state-across-tab-switches-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-c121c-n-state-across-tab-switches-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-c121c-n-state-across-tab-switches-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Data Flow and State Management › should handle loading states correctly" classname="backward-compatibility.spec.ts" time="4.539">
+<failure message="backward-compatibility.spec.ts:126:5 should handle loading states correctly" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:126:5 › Backward Compatibility Verification › Data Flow and State Management › should handle loading states correctly 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-556b2-le-loading-states-correctly-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-556b2-le-loading-states-correctly-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-556b2-le-loading-states-correctly-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-556b2-le-loading-states-correctly-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Component Integration › should integrate with existing navigation" classname="backward-compatibility.spec.ts" time="3.86">
+<failure message="backward-compatibility.spec.ts:141:5 should integrate with existing navigation" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:141:5 › Backward Compatibility Verification › Component Integration › should integrate with existing navigation 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-486cb-te-with-existing-navigation-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-486cb-te-with-existing-navigation-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-486cb-te-with-existing-navigation-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-486cb-te-with-existing-navigation-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › Component Integration › should maintain responsive design" classname="backward-compatibility.spec.ts" time="5.174">
+<failure message="backward-compatibility.spec.ts:159:5 should maintain responsive design" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:159:5 › Backward Compatibility Verification › Component Integration › should maintain responsive design 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-0bcd8--maintain-responsive-design-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-0bcd8--maintain-responsive-design-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-0bcd8--maintain-responsive-design-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-0bcd8--maintain-responsive-design-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › API Integration › should maintain Google Books API integration" classname="backward-compatibility.spec.ts" time="5.172">
+<failure message="backward-compatibility.spec.ts:181:5 should maintain Google Books API integration" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:181:5 › Backward Compatibility Verification › API Integration › should maintain Google Books API integration 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-b5c2a-oogle-Books-API-integration-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-b5c2a-oogle-Books-API-integration-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-b5c2a-oogle-Books-API-integration-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-b5c2a-oogle-Books-API-integration-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Backward Compatibility Verification › API Integration › should handle API errors gracefully" classname="backward-compatibility.spec.ts" time="4.331">
+<failure message="backward-compatibility.spec.ts:197:5 should handle API errors gracefully" type="FAILURE">
+<![CDATA[  [chromium] › backward-compatibility.spec.ts:197:5 › Backward Compatibility Verification › API Integration › should handle API errors gracefully 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+       at ..\page-objects\Authentication.page.ts:49
+
+      47 |    */
+      48 |   async goto() {
+    > 49 |     await this.page.goto('/login');
+         |                     ^
+      50 |     await this.page.waitForLoadState('networkidle');
+      51 |   }
+      52 |
+        at AuthenticationPage.goto (C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\page-objects\Authentication.page.ts:49:21)
+        at C:\Users\acer\Downloads\bookbuddy\booktalks-buddy\tests\e2e\tests\backward-compatibility.spec.ts:21:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-95631-andle-API-errors-gracefully-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\backward-compatibility-Bac-95631-andle-API-errors-gracefully-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-95631-andle-API-errors-gracefully-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|..\..\..\test-results\backward-compatibility-Bac-95631-andle-API-errors-gracefully-chromium\video.webm]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

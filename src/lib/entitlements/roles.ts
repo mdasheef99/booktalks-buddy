@@ -104,15 +104,13 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
     // 5. Get membership tier as a role
     const { data: user } = await supabase
       .from('users')
-      .select('membership_tier, account_tier')
+      .select('membership_tier')
       .eq('id', userId)
       .single();
 
     if (user) {
-      const membershipTier = user.membership_tier ||
-        (user.account_tier === 'free' ? 'MEMBER' :
-         user.account_tier === 'privileged' ? 'PRIVILEGED' :
-         user.account_tier === 'privileged_plus' ? 'PRIVILEGED_PLUS' : 'MEMBER');
+      // Use membership_tier directly, defaulting to 'MEMBER' if null
+      const membershipTier = user.membership_tier || 'MEMBER';
 
       roles.push({
         role: membershipTier,

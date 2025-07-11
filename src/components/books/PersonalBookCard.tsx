@@ -24,7 +24,8 @@ import {
   Trash2,
   Edit,
   Store,
-  FolderPlus
+  FolderPlus,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PersonalBook, ReadingListItem } from '@/services/books';
@@ -36,9 +37,10 @@ interface PersonalBookCardProps {
   readingListItem?: ReadingListItem;
   onStatusChange?: (bookId: string, status: 'want_to_read' | 'currently_reading' | 'completed') => void;
   onRate?: (bookId: string, rating: number) => void;
+  onEditReview?: (book: PersonalBook) => void;
   onTogglePrivacy?: (bookId: string, isPublic: boolean) => void;
   onRemove?: (bookId: string) => void;
-  onAddToCollection?: (bookId: string) => void;
+  onAddToCollection?: (book: PersonalBook) => void;
   onRequestFromStore?: (book: PersonalBook) => void;
   className?: string;
 }
@@ -48,6 +50,7 @@ const PersonalBookCard: React.FC<PersonalBookCardProps> = ({
   readingListItem,
   onStatusChange,
   onRate,
+  onEditReview,
   onTogglePrivacy,
   onRemove,
   onAddToCollection,
@@ -80,9 +83,15 @@ const PersonalBookCard: React.FC<PersonalBookCardProps> = ({
     }
   };
 
+  const handleEditReview = () => {
+    if (onEditReview) {
+      onEditReview(book);
+    }
+  };
+
   const handleAddToCollection = () => {
     if (onAddToCollection) {
-      onAddToCollection(book.id);
+      onAddToCollection(book);
     }
   };
 
@@ -196,6 +205,14 @@ const PersonalBookCard: React.FC<PersonalBookCardProps> = ({
                   </DropdownMenuItem>
                 )}
 
+                {/* Review Edit */}
+                {readingListItem && onEditReview && (
+                  <DropdownMenuItem onClick={handleEditReview}>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    {readingListItem.review_text ? 'Edit Review' : 'Add Review'}
+                  </DropdownMenuItem>
+                )}
+
                 {/* Privacy Toggle */}
                 {readingListItem && onTogglePrivacy && (
                   <>
@@ -251,10 +268,34 @@ const PersonalBookCard: React.FC<PersonalBookCardProps> = ({
 
             {/* Review Preview */}
             {readingListItem.review_text && (
-              <div className="mt-2">
+              <div
+                className="mt-2 cursor-pointer hover:bg-bookconnect-cream/20 rounded p-1 -m-1 transition-colors"
+                onClick={onEditReview ? handleEditReview : undefined}
+                title={onEditReview ? "Click to edit review" : undefined}
+              >
                 <p className="text-xs text-bookconnect-brown/70 line-clamp-2">
                   "{readingListItem.review_text}"
                 </p>
+                {onEditReview && (
+                  <p className="text-xs text-bookconnect-brown/50 mt-1">
+                    Click to edit
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Add Review Button */}
+            {!readingListItem.review_text && onEditReview && (
+              <div className="mt-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleEditReview}
+                  className="h-6 px-2 text-xs text-bookconnect-brown/70 hover:text-bookconnect-brown"
+                >
+                  <MessageSquare className="h-3 w-3 mr-1" />
+                  Add Review
+                </Button>
               </div>
             )}
           </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import LandingLogo from "./LandingLogo";
 import LandingNavigation from "./LandingNavigation";
 import MobileMenu from "./MobileMenu";
+import HamburgerDropdown from "./HamburgerDropdown";
 import { LandingHeaderProps } from "./types";
 
 /**
@@ -14,9 +15,12 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({
   onAnonymousChatClick,
   onBookClubsClick,
   onEventsClick,
-  onOffersClick
+  onOffersClick,
+  onListBookClick,
+  onRequestBookClick
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isHamburgerDropdownOpen, setIsHamburgerDropdownOpen] = useState(false);
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -24,6 +28,14 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({
 
   const handleMobileMenuClose = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleHamburgerDropdownToggle = () => {
+    setIsHamburgerDropdownOpen(!isHamburgerDropdownOpen);
+  };
+
+  const handleHamburgerDropdownClose = () => {
+    setIsHamburgerDropdownOpen(false);
   };
 
   return (
@@ -34,7 +46,7 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({
             {/* Logo */}
             <LandingLogo />
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - Hidden, moved to hamburger dropdown */}
             <LandingNavigation
               onAnonymousChatClick={onAnonymousChatClick}
               onBookClubsClick={onBookClubsClick}
@@ -42,17 +54,46 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({
               onOffersClick={onOffersClick}
             />
 
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleMobileMenuToggle}
-              className="md:hidden text-bookconnect-brown/80 hover:text-bookconnect-terracotta hover:bg-bookconnect-brown/5"
-              aria-label="Open navigation menu"
-              aria-expanded={isMobileMenuOpen}
-            >
-              <Menu className="w-6 h-6" />
-            </Button>
+            {/* Right side buttons container */}
+            <div className="flex items-center gap-2">
+              {/* Hamburger Dropdown Button - Always visible */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleHamburgerDropdownToggle}
+                  className="text-bookconnect-brown/80 hover:text-bookconnect-terracotta hover:bg-bookconnect-brown/5 transition-colors duration-200"
+                  aria-label="Open navigation dropdown"
+                  aria-expanded={isHamburgerDropdownOpen}
+                >
+                  <Menu className="w-6 h-6" />
+                </Button>
+
+                {/* Hamburger Dropdown */}
+                <HamburgerDropdown
+                  isOpen={isHamburgerDropdownOpen}
+                  onClose={handleHamburgerDropdownClose}
+                  onAnonymousChatClick={onAnonymousChatClick}
+                  onBookClubsClick={onBookClubsClick}
+                  onEventsClick={onEventsClick}
+                  onOffersClick={onOffersClick}
+                  onListBookClick={onListBookClick}
+                  onRequestBookClick={onRequestBookClick}
+                />
+              </div>
+
+              {/* Mobile Menu Button - Only visible on mobile */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleMobileMenuToggle}
+                className="md:hidden text-bookconnect-brown/80 hover:text-bookconnect-terracotta hover:bg-bookconnect-brown/5"
+                aria-label="Open mobile navigation menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <Menu className="w-6 h-6" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -65,6 +106,8 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({
         onBookClubsClick={onBookClubsClick}
         onEventsClick={onEventsClick}
         onOffersClick={onOffersClick}
+        onListBookClick={onListBookClick}
+        onRequestBookClick={onRequestBookClick}
       />
     </>
   );

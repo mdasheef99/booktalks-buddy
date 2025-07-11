@@ -5,10 +5,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Book, Clock, ArrowLeft, BookOpen } from 'lucide-react';
+import { Book, Clock, ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getUserClubMemberships } from '@/lib/api/profile';
-import ProfileForm from '@/components/profile/ProfileForm';
+import ProfileForm from '@/components/profile/ProfileForm/ProfileForm';
 
 
 
@@ -16,6 +16,7 @@ import ProfileForm from '@/components/profile/ProfileForm';
 import ProfileHeader from '@/components/profile/enhanced/ProfileHeader';
 import ProfilePreferences from '@/components/profile/enhanced/ProfilePreferences';
 import ProfileAvailability from '@/components/profile/enhanced/ProfileAvailability';
+import ProfileSubscriptionDisplay from '@/components/profile/enhanced/ProfileSubscriptionDisplay';
 import { UserMetadata, ClubMembership } from '@/components/profile/enhanced/types';
 import { getUserProfile, clearProfileCache } from '@/services/profileService';
 
@@ -209,6 +210,14 @@ const EnhancedProfilePage: React.FC = () => {
                   <Clock className="h-4 w-4" />
                   Availability
                 </TabsTrigger>
+
+                <TabsTrigger
+                  value="subscription"
+                  className="flex items-center gap-2 data-[state=active]:bg-bookconnect-brown data-[state=active]:text-white"
+                >
+                  <Crown className="h-4 w-4" />
+                  Subscription & Membership
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -222,6 +231,11 @@ const EnhancedProfilePage: React.FC = () => {
             {/* Availability Tab */}
             <TabsContent value="availability">
               <ProfileAvailability userMetadata={userMetadata} />
+            </TabsContent>
+
+            {/* Subscription & Membership Tab */}
+            <TabsContent value="subscription">
+              <ProfileSubscriptionDisplay />
             </TabsContent>
           </Tabs>
         </div>

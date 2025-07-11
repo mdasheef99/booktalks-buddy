@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { X, MessageCircle, Users, Calendar, Tag } from "lucide-react";
+import { X, MessageCircle, Users, Calendar, Tag, BookOpen, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NavigationItem from "./NavigationItem";
 import { MobileMenuProps } from "./types";
@@ -14,7 +14,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   onAnonymousChatClick,
   onBookClubsClick,
   onEventsClick,
-  onOffersClick
+  onOffersClick,
+  onListBookClick,
+  onRequestBookClick
 }) => {
   // Handle escape key to close menu
   useEffect(() => {
@@ -101,6 +103,23 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             label="Offers"
             onClick={() => handleItemClick(onOffersClick)}
             icon={<Tag className="w-5 h-5" />}
+            className="w-full justify-start text-lg py-4 hover:bg-bookconnect-brown/5"
+          />
+
+          {/* Divider */}
+          <div className="border-t border-bookconnect-brown/10 my-4"></div>
+
+          {/* Book-related actions */}
+          <NavigationItem
+            label="List a Book"
+            onClick={() => handleItemClick(onListBookClick)}
+            icon={<BookOpen className="w-5 h-5" />}
+            className="w-full justify-start text-lg py-4 hover:bg-bookconnect-brown/5"
+          />
+          <NavigationItem
+            label="Request a Book"
+            onClick={() => handleItemClick(onRequestBookClick)}
+            icon={<Search className="w-5 h-5" />}
             className="w-full justify-start text-lg py-4 hover:bg-bookconnect-brown/5"
           />
         </nav>
