@@ -9,6 +9,8 @@ import { ReportButton } from '@/components/reporting/ReportButton';
 import { useAuth } from '@/contexts/AuthContext';
 import ClubPhotoDisplay from '../photos/ClubPhotoDisplay';
 import ClubMemberCount from '../ClubMemberCount';
+import { showSubscriptionExpiredToast } from '@/components/alerts/AlertToast';
+import { hasContextualEntitlement } from '@/lib/entitlements';
 
 type BookClub = Database['public']['Tables']['book_clubs']['Row'];
 
@@ -34,7 +36,7 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
   memberCount = 0
 }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, entitlements, subscriptionStatus } = useAuth();
 
   // Get the store ID for the club dynamically
   const [storeId, setStoreId] = React.useState<string>('');
@@ -67,6 +69,24 @@ const ClubHeader: React.FC<ClubHeaderProps> = ({
   const { result: canManage } = useCanManageClub(clubId, storeId);
 
   const handleManageClub = () => {
+    // Check if user has club leadership but lacks management entitlement (subscription expired)
+    if (entitlements && clubId) {
+      const hasClubLead = hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId);
+      const hasManageEntitlement = entitlements.includes('CAN_MANAGE_CLUB');
+
+      if (hasClubLead && !hasManageEntitlement) {
+        // User is a club leader but subscription expired - show specific toast
+        showSubscriptionExpiredToast(
+          subscriptionStatus?.currentTier || 'PRIVILEGED',
+          () => {
+            console.log('Contact store clicked for club management access');
+            // TODO: Add contact store functionality
+          }
+        );
+        return; // Don't navigate
+      }
+    }
+
     navigate(`/book-club/${clubId}/manage`);
   };
 

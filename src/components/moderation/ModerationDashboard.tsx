@@ -3,19 +3,21 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  AlertTriangle, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+  XCircle,
   ArrowUp,
   Filter,
-  RefreshCw
+  RefreshCw,
+  Users
 } from 'lucide-react';
 import { getReports, getReportStats } from '@/services/reportingService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import UserName from '@/components/common/UserName';
+import { UserManagementTab } from './UserManagementTab';
 import type { 
   Report, 
   ReportStats, 
@@ -193,7 +195,7 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
       {/* Reports List */}
       <Card className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="pending">
               Pending ({stats?.pending_reports || 0})
             </TabsTrigger>
@@ -206,7 +208,15 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
             <TabsTrigger value="resolved">
               Resolved
             </TabsTrigger>
+            <TabsTrigger value="user_management">
+              <Users className="h-4 w-4 mr-1" />
+              User Management
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="user_management" className="mt-6">
+            <UserManagementTab storeId={storeId} />
+          </TabsContent>
 
           <TabsContent value={activeTab} className="mt-6">
             {filteredReports.length === 0 ? (

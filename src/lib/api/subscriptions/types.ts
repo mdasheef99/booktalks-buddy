@@ -18,24 +18,36 @@
 export interface SubscriptionStatus {
   /** Whether the user has an active, non-expired subscription */
   hasActiveSubscription: boolean;
-  
+
   /** Current membership tier based on subscription validation */
   currentTier: 'MEMBER' | 'PRIVILEGED' | 'PRIVILEGED_PLUS';
-  
+
   /** ISO string of when the subscription expires, null if no active subscription */
   subscriptionExpiry: string | null;
-  
+
   /** Whether the subscription status is valid (active and not expired) */
   isValid: boolean;
-  
+
   /** ISO string of when this status was last validated */
   lastValidated: string;
-  
+
   /** Source of the validation data */
-  validationSource: 'database' | 'cache' | 'fallback';
-  
+  validationSource: 'database' | 'cache' | 'fallback' | 'consolidated_query';
+
   /** Optional warning messages about subscription status */
   warnings?: string[];
+
+  /**
+   * Indicates if user had a premium subscription that expired
+   * Used by alert system to identify users who need expiration notifications
+   */
+  hadPremiumSubscription?: boolean;
+
+  /**
+   * The tier of the most recent subscription (even if expired)
+   * Used for showing "Expired PRIVILEGED_PLUS" instead of just "MEMBER"
+   */
+  mostRecentSubscriptionTier?: 'MEMBER' | 'PRIVILEGED' | 'PRIVILEGED_PLUS';
 }
 
 /**

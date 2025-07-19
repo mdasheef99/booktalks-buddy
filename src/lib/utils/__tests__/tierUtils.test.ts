@@ -14,6 +14,7 @@ import {
   shouldShowTierBadge,
   getTierDisplayName,
   isValidTier,
+  convertTierForSubscription,
 } from '../tierUtils';
 
 describe('tierUtils', () => {
@@ -108,10 +109,23 @@ describe('tierUtils', () => {
     });
   });
 
+  describe('convertTierForSubscription', () => {
+    it('should convert database tiers to subscription format', () => {
+      expect(convertTierForSubscription('PRIVILEGED')).toBe('privileged');
+      expect(convertTierForSubscription('PRIVILEGED_PLUS')).toBe('privileged_plus');
+    });
+
+    it('should fallback to privileged for unknown tiers', () => {
+      expect(convertTierForSubscription('MEMBER')).toBe('privileged');
+      expect(convertTierForSubscription('UNKNOWN')).toBe('privileged');
+      expect(convertTierForSubscription('')).toBe('privileged');
+    });
+  });
+
   describe('Integration Tests', () => {
     it('should handle round-trip conversions correctly', () => {
       const databaseTiers = ['MEMBER', 'PRIVILEGED', 'PRIVILEGED_PLUS'];
-      
+
       databaseTiers.forEach(dbTier => {
         const uiTier = convertTierForUI(dbTier);
         const backToDb = convertTierForDatabase(uiTier);
@@ -123,6 +137,12 @@ describe('tierUtils', () => {
       // Test that our conversions work with the UserTierBadge component
       expect(convertTierForUI('PRIVILEGED')).toBe('privileged'); // Expected by UserTierBadge
       expect(convertTierForUI('PRIVILEGED_PLUS')).toBe('privileged_plus'); // Expected by UserTierBadge
+    });
+
+    it('should work with subscription table constraints', () => {
+      // Test that our conversions work with the subscription table constraints
+      expect(convertTierForSubscription('PRIVILEGED')).toBe('privileged'); // Expected by user_subscriptions table
+      expect(convertTierForSubscription('PRIVILEGED_PLUS')).toBe('privileged_plus'); // Expected by user_subscriptions table
     });
   });
 });

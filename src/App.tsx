@@ -5,6 +5,7 @@ import GlobalAdminRouteGuard from "./components/routeguards/GlobalAdminRouteGuar
 import { StoreOwnerRouteGuard } from "./components/routeguards/StoreOwnerRouteGuard";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
+import { AlertProvider } from "./contexts/AlertContext";
 import { UserProfileProvider } from "./contexts/UserProfileContext";
 import { HelmetProvider } from "react-helmet-async";
 import Layout from "./components/Layout";
@@ -39,6 +40,8 @@ import AdminEventsPage from "./pages/admin/AdminEventsPage";
 import CreateEventPage from "./pages/admin/CreateEventPage";
 import EditEventPage from "./pages/admin/EditEventPage";
 import ModerationPage from "./pages/admin/ModerationPage";
+import SubscriptionManagementPage from "./pages/admin/SubscriptionManagementPage";
+import EntitlementsDebug from "./pages/debug/EntitlementsDebug";
 import { StoreManagementDashboard } from "@/pages/admin/store/StoreManagementDashboard";
 import { HeroCustomization } from "@/pages/admin/store/HeroCustomization";
 import { LandingPageAnalytics } from "@/pages/admin/store/LandingPageAnalytics";
@@ -50,6 +53,10 @@ import { CommunityShowcaseManagement } from "@/pages/admin/store/CommunityShowca
 import BookListingsManagement from "@/pages/admin/store/BookListingsManagement";
 import BookAvailabilityRequestsManagement from "@/pages/admin/store/BookAvailabilityRequestsManagement";
 import ReportingSystemTest from "./components/testing/ReportingSystemTest";
+import { AlertSystemTest } from "./components/testing/AlertSystemTest";
+import { SubscriptionDebugger } from "./components/testing/SubscriptionDebugger";
+import { SubscriptionAlertTest } from "./components/testing/SubscriptionAlertTest";
+import ToastTest from "./components/testing/ToastTest";
 // Username validation debug tools removed - issues resolved
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
@@ -82,7 +89,8 @@ function App() {
       <HelmetProvider>
         <BrowserRouter>
           <AuthProvider>
-            <UserProfileProvider>
+            <AlertProvider>
+              <UserProfileProvider>
             <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
@@ -105,6 +113,12 @@ function App() {
               <Route path="/events" element={<Events />} />
               <Route path="/events/:eventId" element={<EventDetailsPage />} />
               <Route path="/search" element={<Search />} />
+
+              {/* Testing Routes */}
+              <Route path="/test/alerts" element={<AlertSystemTest />} />
+              <Route path="/test/subscription-debug" element={<SubscriptionDebugger />} />
+              <Route path="/test/subscription-alerts" element={<SubscriptionAlertTest />} />
+              <Route path="/test/toasts" element={<ToastTest />} />
 
               {/* Direct Messaging Routes */}
               <Route path="/messages" element={
@@ -183,6 +197,9 @@ function App() {
               } />
             </Route>
 
+            {/* Debug routes */}
+            <Route path="/debug/entitlements" element={<EntitlementsDebug />} />
+
             {/* Legacy admin dashboard (to be deprecated) */}
             <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
 
@@ -204,6 +221,13 @@ function App() {
               <Route path="moderation" element={<ModerationPage />} />
               <Route path="test-reporting" element={<ReportingSystemTest />} />
               {/* Username debug route removed - validation issues resolved */}
+
+              {/* Subscription Management Route - Store Owner Only */}
+              <Route path="subscriptions" element={
+                <StoreOwnerRouteGuard>
+                  <SubscriptionManagementPage />
+                </StoreOwnerRouteGuard>
+              } />
 
               {/* Store Management Routes - Store Owner Only */}
               <Route path="store-management/*" element={
@@ -229,7 +253,8 @@ function App() {
             <Route path="*" element={<NotFound />} />
             </Routes>
             </UserProfileProvider>
-          </AuthProvider>
+          </AlertProvider>
+        </AuthProvider>
           <Toaster />
         </BrowserRouter>
       </HelmetProvider>

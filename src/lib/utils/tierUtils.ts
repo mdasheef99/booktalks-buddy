@@ -99,7 +99,22 @@ export function getTierDisplayName(tier: string | null | undefined): string {
  */
 export function isValidTier(tier: string | null | undefined): boolean {
   if (!tier) return false;
-  
+
   const normalizedTier = tier.toUpperCase().trim();
   return ['MEMBER', 'PRIVILEGED', 'PRIVILEGED_PLUS'].includes(normalizedTier);
+}
+
+/**
+ * Converts database tier format (uppercase) to subscription tier format (lowercase)
+ * Used for subscription table operations that expect lowercase tier values
+ */
+export function convertTierForSubscription(databaseTier: string): string {
+  switch (databaseTier) {
+    case 'PRIVILEGED':
+      return 'privileged';
+    case 'PRIVILEGED_PLUS':
+      return 'privileged_plus';
+    default:
+      return 'privileged'; // fallback for any paid tier
+  }
 }

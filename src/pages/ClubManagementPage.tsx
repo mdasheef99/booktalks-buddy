@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings, Users, Shield, MessageSquare, Book, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,8 @@ import { useAnalyticsAccess } from '@/hooks/useClubManagement';
 import AnalyticsDashboard from '@/components/clubManagement/analytics/AnalyticsDashboard';
 import ModeratorPermissionsPanel from '@/components/clubManagement/moderators/ModeratorPermissionsPanel';
 import EventsSection from '@/components/clubManagement/events/EventsSection';
+import { showSubscriptionExpiredToast } from '@/components/alerts/AlertToast';
+import { hasContextualEntitlement } from '@/lib/entitlements';
 
 // Import existing management panels
 import ClubSettingsPanel from '@/components/bookclubs/management/ClubSettingsPanel';
@@ -30,7 +32,7 @@ interface ClubManagementPageProps {}
 const ClubManagementPage: React.FC<ClubManagementPageProps> = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, entitlements, subscriptionStatus } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [clubName, setClubName] = useState<string>('');
   const [loadingClubName, setLoadingClubName] = useState(true);
@@ -76,7 +78,35 @@ const ClubManagementPage: React.FC<ClubManagementPageProps> = () => {
   );
 
   // Get analytics access for current user
-  const { hasAccess: hasAnalyticsAccess, loading: analyticsAccessLoading } = useAnalyticsAccess(clubId || '');
+  const { hasAccess: hasAnalyticsAccess } = useAnalyticsAccess(clubId || '');
+
+  // MOVED: Check if the user can manage this club - handle subscription expiry
+  // This useEffect must be at the top level to avoid React Hooks violations
+  useEffect(() => {
+    if (!canManage && user && entitlements && clubId) {
+      // Check if user has club leadership but lacks management entitlement (subscription expired)
+      const hasClubLead = hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId);
+      const hasManageEntitlement = entitlements.includes('CAN_MANAGE_CLUB');
+
+      if (hasClubLead && !hasManageEntitlement) {
+        // User is a club leader but subscription expired - show specific toast
+        showSubscriptionExpiredToast(
+          subscriptionStatus?.currentTier || 'PRIVILEGED',
+          () => {
+            console.log('Contact store clicked for club management access');
+            // TODO: Add contact store functionality
+          }
+        );
+      }
+
+      // Navigate to unauthorized after showing toast
+      const timer = setTimeout(() => {
+        navigate('/unauthorized');
+      }, 1000); // Give time for toast to appear
+
+      return () => clearTimeout(timer);
+    }
+  }, [canManage, user, entitlements, clubId, subscriptionStatus, navigate]);
 
   const isLoading = authLoading || loadingPermissions || fetchingStoreId || loadingClubName;
 
@@ -110,10 +140,8 @@ const ClubManagementPage: React.FC<ClubManagementPageProps> = () => {
     return null;
   }
 
-  // Check if the user can manage this club
   if (!canManage) {
-    navigate('/unauthorized');
-    return null;
+    return null; // Will redirect after useEffect
   }
 
   const handleBackToClub = () => {

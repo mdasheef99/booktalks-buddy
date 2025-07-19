@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, UserMinus, Search } from 'lucide-react';
+import { ArrowLeft, UserMinus, Search, Crown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase';
 import UserAvatar from '@/components/common/UserAvatar';
 import UserName from '@/components/common/UserName';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
+import { transferClubOwnership } from '@/lib/api/admin/accountManagement';
 
 interface ClubMember {
   user_id: string;
@@ -30,6 +31,9 @@ const BookClubMembers: React.FC = () => {
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [removingMember, setRemovingMember] = useState(false);
   const [storeId, setStoreId] = useState<string>('');
+  const [currentLeadId, setCurrentLeadId] = useState<string>('');
+  const [confirmTransfer, setConfirmTransfer] = useState<string | null>(null);
+  const [transferringLeadership, setTransferringLeadership] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -39,31 +43,34 @@ const BookClubMembers: React.FC = () => {
   // Load profiles for all members
   useLoadProfiles(members, (member) => member.user_id);
 
-  // Fetch store ID for the club
+  // Fetch store ID and current lead for the club
   useEffect(() => {
-    const fetchStoreId = async () => {
+    const fetchClubData = async () => {
       if (!clubId) return;
 
       try {
         const { data: club, error } = await supabase
           .from('book_clubs')
-          .select('store_id')
+          .select('store_id, lead_user_id')
           .eq('id', clubId)
           .single();
 
         if (error) {
-          console.error('Error fetching club store ID:', error);
+          console.error('Error fetching club data:', error);
           setStoreId('');
+          setCurrentLeadId('');
         } else {
           setStoreId(club.store_id || '');
+          setCurrentLeadId(club.lead_user_id || '');
         }
       } catch (error) {
-        console.error('Error fetching club store ID:', error);
+        console.error('Error fetching club data:', error);
         setStoreId('');
+        setCurrentLeadId('');
       }
     };
 
-    fetchStoreId();
+    fetchClubData();
   }, [clubId]);
 
   useEffect(() => {
@@ -143,6 +150,41 @@ const BookClubMembers: React.FC = () => {
     setConfirmRemove(memberId);
   };
 
+  const handleTransferLeadership = async (newLeadId: string) => {
+    if (!clubId || !currentLeadId) return;
+
+    try {
+      setTransferringLeadership(true);
+
+      // Transfer club ownership using the admin API
+      const result = await transferClubOwnership(clubId, currentLeadId, newLeadId);
+
+      if (result.success) {
+        // Update local state
+        setCurrentLeadId(newLeadId);
+        toast.success('Club leadership transferred successfully');
+
+        // Refresh members list to reflect any role changes
+        const memberData = await getClubMembers(clubId);
+        setMembers(memberData);
+        setFilteredMembers(memberData);
+      } else {
+        toast.error('Failed to transfer club leadership');
+      }
+
+      setConfirmTransfer(null);
+    } catch (error) {
+      console.error('Error transferring leadership:', error);
+      toast.error('Failed to transfer club leadership');
+    } finally {
+      setTransferringLeadership(false);
+    }
+  };
+
+  const openTransferConfirmation = (memberId: string) => {
+    setConfirmTransfer(memberId);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -198,14 +240,36 @@ const BookClubMembers: React.FC = () => {
                   </div>
                 </div>
                 {isClubAdmin && member.user_id !== user?.id && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => openRemoveConfirmation(member.user_id)}
-                  >
-                    <UserMinus className="h-4 w-4 mr-2" />
-                    Remove
-                  </Button>
+                  <div className="flex gap-2">
+                    {/* Make Club Lead Button - only show if not current lead */}
+                    {member.user_id !== currentLeadId && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openTransferConfirmation(member.user_id)}
+                        className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                      >
+                        <Crown className="h-4 w-4 mr-2" />
+                        Make Club Lead
+                      </Button>
+                    )}
+                    {/* Current Lead Badge */}
+                    {member.user_id === currentLeadId && (
+                      <div className="flex items-center px-3 py-1 bg-amber-100 text-amber-800 rounded-md text-sm font-medium">
+                        <Crown className="h-4 w-4 mr-1" />
+                        Club Lead
+                      </div>
+                    )}
+                    {/* Remove Button */}
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => openRemoveConfirmation(member.user_id)}
+                    >
+                      <UserMinus className="h-4 w-4 mr-2" />
+                      Remove
+                    </Button>
+                  </div>
                 )}
               </div>
             </Card>
@@ -215,7 +279,7 @@ const BookClubMembers: React.FC = () => {
         )}
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* Remove Member Confirmation Dialog */}
       {confirmRemove && (
         <ConfirmationDialog
           isOpen={!!confirmRemove}
@@ -226,6 +290,20 @@ const BookClubMembers: React.FC = () => {
           confirmText="Remove"
           variant="destructive"
           isLoading={removingMember}
+        />
+      )}
+
+      {/* Transfer Leadership Confirmation Dialog */}
+      {confirmTransfer && (
+        <ConfirmationDialog
+          isOpen={!!confirmTransfer}
+          onClose={() => setConfirmTransfer(null)}
+          onConfirm={() => handleTransferLeadership(confirmTransfer)}
+          title="Transfer Club Leadership"
+          description="Are you sure you want to make this member the new club leader? The current leader will become a regular member."
+          confirmText="Transfer Leadership"
+          variant="default"
+          isLoading={transferringLeadership}
         />
       )}
     </div>

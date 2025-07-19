@@ -2,6 +2,7 @@ import { supabase } from '../../supabase';
 import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
 import { canManageClub } from '@/lib/entitlements/permissions';
+import { convertTierForSubscription } from '@/lib/utils/tierUtils';
 
 /**
  * Admin Management Functions
@@ -151,12 +152,16 @@ export async function updateUserTier(
 
     // If upgrading to a paid tier, create a subscription and payment record
     if (tier !== 'MEMBER' && subscriptionType) {
+      // Convert tier to lowercase format for database constraint
+      const subscriptionTier = convertTierForSubscription(tier);
+      console.log(`📝 Converting tier for subscription: ${tier} → ${subscriptionTier}`);
+
       // Use the helper function to create subscription and payment in one transaction
       const { data: subscriptionId, error: subscriptionError } = await supabase
         .rpc('create_subscription_with_payment', {
           p_user_id: userId,
           p_store_id: storeId,
-          p_tier: tier,
+          p_tier: subscriptionTier,
           p_subscription_type: subscriptionType,
           p_recorded_by: adminId,
           p_amount: amount,

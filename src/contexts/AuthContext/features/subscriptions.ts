@@ -48,6 +48,9 @@ export async function refreshSubscriptionStatus(
       console.log(`[AuthContext] Subscription status updated:`, {
         hasActiveSubscription: validationResult.status.hasActiveSubscription,
         currentTier: validationResult.status.currentTier,
+        hadPremiumSubscription: validationResult.status.hadPremiumSubscription,
+        mostRecentSubscriptionTier: validationResult.status.mostRecentSubscriptionTier,
+        subscriptionExpiry: validationResult.status.subscriptionExpiry,
         validationSource: validationResult.status.validationSource
       });
     } else {

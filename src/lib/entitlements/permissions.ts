@@ -50,7 +50,11 @@ export function canManageClub(
 ): boolean {
   return (
     hasEntitlement(entitlements, 'CAN_MANAGE_ALL_CLUBS') ||
-    hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId) ||
+    // Check for both contextual club leadership AND the manage club entitlement
+    // This ensures subscription enforcement works - expired users get CLUB_LEAD_${clubId}
+    // but not CAN_MANAGE_CLUB, so they can't access management features
+    (hasContextualEntitlement(entitlements, 'CLUB_LEAD', clubId) &&
+     hasEntitlement(entitlements, 'CAN_MANAGE_CLUB')) ||
     hasContextualEntitlement(entitlements, 'STORE_OWNER', storeId) ||
     hasContextualEntitlement(entitlements, 'STORE_MANAGER', storeId) ||
     entitlements.includes('CAN_MANAGE_STORE_SETTINGS') ||

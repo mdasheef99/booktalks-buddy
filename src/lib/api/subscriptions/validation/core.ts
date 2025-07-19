@@ -90,8 +90,8 @@ async function performConsolidatedValidation(userId: string): Promise<Validation
     console.log(`[Consolidated Validation] Starting optimized validation for user ${userId}`);
     const startTime = Date.now();
 
-    // Single optimized query combining all validation logic
-    const { data: validationResult, error: validationError } = await supabase
+    // First check for active subscriptions
+    const { data: activeSubscription, error: activeError } = await supabase
       .from('user_subscriptions')
       .select(`
         user_id,
@@ -108,25 +108,55 @@ async function performConsolidatedValidation(userId: string): Promise<Validation
       .limit(1)
       .maybeSingle();
 
-    if (validationError) {
-      console.error('[Consolidated Validation] Query failed:', validationError);
+    if (activeError) {
+      console.error('[Consolidated Validation] Active subscription query failed:', activeError);
       return {
         success: false,
         error: createValidationError(
           VALIDATION_ERROR_CODES.CONSOLIDATED_VALIDATION_FAILED,
-          `Consolidated validation query failed: ${validationError.message}`,
-          { userId, supabaseError: validationError },
+          `Active subscription query failed: ${activeError.message}`,
+          { userId, supabaseError: activeError },
           'high'
         ),
         queryCount: 1,
       };
     }
 
+    let validationResult = activeSubscription;
+    let queryCount = 1;
+
+    // If no active subscription, check for most recent subscription (including expired)
+    if (!activeSubscription) {
+      const { data: recentSubscription, error: recentError } = await supabase
+        .from('user_subscriptions')
+        .select(`
+          user_id,
+          tier,
+          is_active,
+          end_date,
+          subscription_type,
+          users!inner(membership_tier)
+        `)
+        .eq('user_id', userId)
+        .order('end_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      queryCount = 2;
+
+      if (recentError) {
+        console.error('[Consolidated Validation] Recent subscription query failed:', recentError);
+        // Continue with null result - will fall back to membership_tier
+      } else {
+        validationResult = recentSubscription;
+      }
+    }
+
     const queryTime = Date.now() - startTime;
     console.log(`[Consolidated Validation] Query completed in ${queryTime}ms`);
 
     // Process validation result
-    const hasActiveSubscription = !!validationResult;
+    const hasActiveSubscription = !!activeSubscription;
     const subscriptionTier = validationResult?.tier || null;
     const subscriptionExpiry = validationResult?.end_date || null;
     const userMembershipTier = validationResult?.users?.membership_tier || 'MEMBER';
@@ -134,7 +164,17 @@ async function performConsolidatedValidation(userId: string): Promise<Validation
     // Map subscription tier to standard format
     const currentTier = subscriptionTier ?
       (subscriptionTier === 'privileged_plus' ? 'PRIVILEGED_PLUS' :
-       subscriptionTier === 'privileged' ? 'PRIVILEGED' : 'MEMBER') : 'MEMBER';
+       subscriptionTier === 'privileged' ? 'PRIVILEGED' : 'MEMBER') : userMembershipTier;
+
+    // Determine if user had a premium subscription
+    const hadPremiumSubscription = validationResult &&
+      validationResult.tier &&
+      validationResult.tier !== 'member' &&
+      !hasActiveSubscription;
+
+    const mostRecentSubscriptionTier = validationResult?.tier ?
+      (validationResult.tier === 'privileged_plus' ? 'PRIVILEGED_PLUS' :
+       validationResult.tier === 'privileged' ? 'PRIVILEGED' : 'MEMBER') : 'MEMBER';
 
     // Create consolidated validation result
     const consolidatedResult = {
@@ -145,12 +185,17 @@ async function performConsolidatedValidation(userId: string): Promise<Validation
       lastValidated: new Date().toISOString(),
       validationSource: 'consolidated_query' as const,
       queryTime,
-      userMembershipTier
+      userMembershipTier,
+      hadPremiumSubscription,
+      mostRecentSubscriptionTier: mostRecentSubscriptionTier as 'MEMBER' | 'PRIVILEGED' | 'PRIVILEGED_PLUS'
     };
 
     console.log(`[Consolidated Validation] Result for user ${userId}:`, {
       hasActiveSubscription,
       currentTier,
+      hadPremiumSubscription,
+      mostRecentSubscriptionTier,
+      subscriptionExpiry,
       queryTime: `${queryTime}ms`,
       improvement: 'Single query vs 3 separate queries'
     });
@@ -158,7 +203,7 @@ async function performConsolidatedValidation(userId: string): Promise<Validation
     return {
       success: true,
       data: consolidatedResult,
-      queryCount: 1,
+      queryCount,
     };
 
   } catch (error) {

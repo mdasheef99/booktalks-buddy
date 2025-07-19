@@ -133,7 +133,9 @@ export function SubscriptionStatus({
           
           {statusContext.expiryDate && (
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Expires</span>
+              <span className="text-sm font-medium">
+                {new Date(statusContext.expiryDate) < new Date() ? 'Expired' : 'Expires'}
+              </span>
               <span className="text-xs text-muted-foreground">
                 {new Date(statusContext.expiryDate).toLocaleDateString()}
               </span>

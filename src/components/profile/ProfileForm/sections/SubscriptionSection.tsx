@@ -185,16 +185,20 @@ export default function SubscriptionSection({ className = '' }: SubscriptionSect
               {statusContext.expiryDate && (
                 <>
                   <div>
-                    <span className="font-medium">Expires</span>
+                    <span className="font-medium">
+                      {new Date(statusContext.expiryDate) < new Date() ? 'Expired' : 'Expires'}
+                    </span>
                     <div className="mt-1 text-muted-foreground">
                       {new Date(statusContext.expiryDate).toLocaleDateString()}
                     </div>
                   </div>
-                  
+
                   <div>
-                    <span className="font-medium">Days Remaining</span>
+                    <span className="font-medium">
+                      {new Date(statusContext.expiryDate) < new Date() ? 'Days Since Expiry' : 'Days Remaining'}
+                    </span>
                     <div className="mt-1 text-muted-foreground">
-                      {Math.max(0, Math.ceil((new Date(statusContext.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
+                      {Math.abs(Math.ceil((new Date(statusContext.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
                     </div>
                   </div>
                 </>

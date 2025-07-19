@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   BookOpen,
   Users,
-  UserPlus,
   LogOut,
   ArrowLeft,
   BarChart,
@@ -17,7 +16,8 @@ import {
   Quote,
   TrendingUp,
   Package,
-  Search
+  Search,
+  CreditCard
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -93,18 +93,6 @@ const AdminLayout: React.FC = () => {
           </NavLink>
 
           <NavLink
-            to="/admin/requests"
-            className={({ isActive }) =>
-              `flex items-center p-3 rounded-lg ${isActive
-                ? 'bg-white/20 text-white'
-                : 'text-white/70 hover:bg-white/10'}`
-            }
-          >
-            <UserPlus className="h-5 w-5 mr-3" />
-            Join Requests
-          </NavLink>
-
-          <NavLink
             to="/admin/moderation"
             className={({ isActive }) =>
               `flex items-center p-3 rounded-lg ${isActive
@@ -146,6 +134,18 @@ const AdminLayout: React.FC = () => {
                   </p>
                 )}
               </div>
+
+              <NavLink
+                to="/admin/subscriptions"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <CreditCard className="h-5 w-5 mr-3" />
+                Subscription Management
+              </NavLink>
 
               <NavLink
                 to="/admin/store-management"

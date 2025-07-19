@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { getUserEntitlements, invalidateUserEntitlements } from '@/lib/entitlements/cache';
 import { canManageUserTiers } from '@/lib/entitlements';
+import { convertTierForSubscription } from '@/lib/utils/tierUtils';
 
 /**
  * API functions for managing user tiers
@@ -38,7 +39,7 @@ export async function getUserTier(userId: string) {
  * Update a user's tier
  * @param currentUserId - ID of the user making the change
  * @param userId - ID of the user to update
- * @param tier - New tier ('free', 'privileged', or 'privileged_plus')
+ * @param tier - New tier ('MEMBER', 'PRIVILEGED', or 'PRIVILEGED_PLUS')
  * @param storeId - ID of the store context
  * @param subscriptionType - Type of subscription ('monthly' or 'annual')
  * @param paymentReference - Optional reference for the payment
@@ -56,9 +57,10 @@ export async function updateUserTier(
   amount?: number,
   notes?: string
 ) {
-  // Validate the tier
-  if (!['free', 'privileged', 'privileged_plus'].includes(tier)) {
-    throw new Error('Invalid tier. Must be one of: free, privileged, privileged_plus');
+  // Validate the tier - use consistent uppercase format
+  const validTiers = ['MEMBER', 'PRIVILEGED', 'PRIVILEGED_PLUS'];
+  if (!validTiers.includes(tier)) {
+    throw new Error(`Invalid tier: ${tier}. Must be one of: ${validTiers.join(', ')}`);
   }
 
   // Check if the current user has permission to manage user tiers
@@ -121,12 +123,16 @@ export async function updateUserTier(
     if (tier !== 'MEMBER' && subscriptionType) {
       console.log('💳 Creating subscription and payment record...');
 
+      // Convert tier to lowercase format for database constraint
+      const subscriptionTier = convertTierForSubscription(tier);
+      console.log(`📝 Converting tier for subscription: ${tier} → ${subscriptionTier}`);
+
       // Use the helper function to create subscription and payment in one transaction
       const { data: subscriptionId, error: subscriptionError } = await supabase
         .rpc('create_subscription_with_payment', {
           p_user_id: userId,
           p_store_id: storeId,
-          p_tier: tier,
+          p_tier: subscriptionTier,
           p_subscription_type: subscriptionType,
           p_recorded_by: currentUserId,
           p_amount: amount,

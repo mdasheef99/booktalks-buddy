@@ -7,10 +7,14 @@ import { Search, Mail, UserPlus, ArrowLeft, ChevronDown, ChevronUp } from 'lucid
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { UserTierManager } from '@/components/admin/UserTierManager';
+import { UserAccountManager } from '@/components/admin/UserAccountManager';
 import UserTierBadge from '@/components/common/UserTierBadge';
 import { UserSubscriptionInfo } from '@/components/admin/UserSubscriptionInfo';
+import { UserSubscriptionStatus } from '@/components/admin/UserSubscriptionStatus';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useStoreOwnerAccess } from '@/hooks/useStoreOwnerAccess';
+import { calculateSubscriptionStatus, requiresAttention } from '@/lib/utils/subscriptionUtils';
+import { getUserAccountStatus, type AccountStatus } from '@/lib/api/admin/accountManagement';
 
 interface User {
   id: string;
@@ -19,6 +23,16 @@ interface User {
   favorite_genre: string | null;
   favorite_author: string | null;
   membership_tier: string;
+  account_status?: string | null;
+  status_changed_at?: string | null;
+  deleted_at?: string | null;
+}
+
+interface SubscriptionStats {
+  totalPaidUsers: number;
+  expiredUsers: number;
+  expiringSoonUsers: number;
+  activeUsers: number;
 }
 
 const AdminUserListPage: React.FC = () => {
@@ -28,6 +42,13 @@ const AdminUserListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
   const [showInviteForm, setShowInviteForm] = useState(false);
+  const [userAccountStatuses, setUserAccountStatuses] = useState<Record<string, AccountStatus>>({});
+  const [subscriptionStats, setSubscriptionStats] = useState<SubscriptionStats>({
+    totalPaidUsers: 0,
+    expiredUsers: 0,
+    expiringSoonUsers: 0,
+    activeUsers: 0
+  });
   const navigate = useNavigate();
 
   // Use proper store owner access hook
@@ -49,18 +70,108 @@ const AdminUserListPage: React.FC = () => {
     console.log('  storeAccessError:', storeAccessError);
   }, [isStoreOwner, storeId, storeName, storeAccessLoading, storeAccessError]);
 
+  // Calculate subscription statistics
+  const calculateSubscriptionStats = async (userList: User[]): Promise<SubscriptionStats> => {
+    const stats: SubscriptionStats = {
+      totalPaidUsers: 0,
+      expiredUsers: 0,
+      expiringSoonUsers: 0,
+      activeUsers: 0
+    };
+
+    // Get subscription data for all paid users
+    const paidUsers = userList.filter(user => user.membership_tier !== 'MEMBER');
+    stats.totalPaidUsers = paidUsers.length;
+
+    if (paidUsers.length === 0) {
+      return stats;
+    }
+
+    try {
+      // Fetch subscription data for all paid users
+      const { data: subscriptions, error } = await supabase
+        .from('user_subscriptions')
+        .select('user_id, end_date, is_active')
+        .in('user_id', paidUsers.map(user => user.id))
+        .eq('is_active', true);
+
+      if (error) {
+        console.error('Error fetching subscription stats:', error);
+        return stats;
+      }
+
+      // Calculate stats for each user
+      paidUsers.forEach(user => {
+        const subscription = subscriptions?.find(sub => sub.user_id === user.id);
+        const status = calculateSubscriptionStatus(subscription?.end_date || null, user.membership_tier);
+
+        switch (status.status) {
+          case 'expired':
+            stats.expiredUsers++;
+            break;
+          case 'expiring_soon':
+            stats.expiringSoonUsers++;
+            break;
+          case 'active':
+            stats.activeUsers++;
+            break;
+        }
+      });
+    } catch (error) {
+      console.error('Error calculating subscription stats:', error);
+    }
+
+    return stats;
+  };
+
+  // Load account statuses for users
+  const loadAccountStatuses = async (userList: User[]) => {
+    try {
+      const statuses: Record<string, AccountStatus> = {};
+
+      // Load account status for each user
+      for (const user of userList) {
+        try {
+          const status = await getUserAccountStatus(user.id);
+          statuses[user.id] = status;
+        } catch (error) {
+          console.error(`Error loading account status for user ${user.id}:`, error);
+          // Fallback to user data from database
+          statuses[user.id] = {
+            account_status: user.account_status as any || 'active',
+            status_changed_at: user.status_changed_at,
+            deleted_at: user.deleted_at
+          };
+        }
+      }
+
+      setUserAccountStatuses(statuses);
+    } catch (error) {
+      console.error('Error loading account statuses:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fetch users with their membership tiers
+        // Fetch users with their membership tiers and account status
         const { data, error } = await supabase
           .from('users')
-          .select('id, username, email, favorite_genre, favorite_author, membership_tier')
+          .select('id, username, email, favorite_genre, favorite_author, membership_tier, account_status, status_changed_at, deleted_at')
           .order('username');
 
         if (error) throw error;
-        setUsers(data || []);
-        setFilteredUsers(data || []);
+
+        const userList = data || [];
+        setUsers(userList);
+        setFilteredUsers(userList);
+
+        // Calculate subscription statistics
+        const stats = await calculateSubscriptionStats(userList);
+        setSubscriptionStats(stats);
+
+        // Load account statuses for all users
+        await loadAccountStatuses(userList);
       } catch (error) {
         console.error('Error fetching users:', error);
         toast.error('Failed to load users');
@@ -164,6 +275,40 @@ const AdminUserListPage: React.FC = () => {
             Store Owner access required for tier management features
           </p>
         )}
+
+        {/* Subscription Statistics Summary */}
+        {users.length > 0 && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">User & Subscription Overview</h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-bookconnect-sage">{users.length}</div>
+                <div className="text-xs text-gray-600">Total Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-bookconnect-brown">{subscriptionStats.totalPaidUsers}</div>
+                <div className="text-xs text-gray-600">Paid Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{subscriptionStats.activeUsers}</div>
+                <div className="text-xs text-gray-600">Active</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-amber-600">{subscriptionStats.expiringSoonUsers}</div>
+                <div className="text-xs text-gray-600">Expiring Soon</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">{subscriptionStats.expiredUsers}</div>
+                <div className="text-xs text-gray-600">Expired</div>
+              </div>
+            </div>
+            {(subscriptionStats.expiredUsers > 0 || subscriptionStats.expiringSoonUsers > 0) && (
+              <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
+                <strong>Action Required:</strong> {subscriptionStats.expiredUsers + subscriptionStats.expiringSoonUsers} users need subscription attention
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
@@ -220,9 +365,20 @@ const AdminUserListPage: React.FC = () => {
             <Card key={user.id}>
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-lg font-semibold">{user.username || 'No username'}</h3>
                     <p className="text-muted-foreground">{user.email || 'No email'}</p>
+
+                    {/* Subscription Status - prominently displayed for paid tiers */}
+                    {user.membership_tier && user.membership_tier !== 'MEMBER' && (
+                      <div className="mt-3">
+                        <UserSubscriptionStatus
+                          userId={user.id}
+                          membershipTier={user.membership_tier}
+                        />
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap gap-2 mt-2">
                       {user.favorite_genre && (
                         <span className="text-xs bg-bookconnect-sage/20 text-bookconnect-sage px-2 py-1 rounded-full">
@@ -238,15 +394,33 @@ const AdminUserListPage: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col gap-4">
-                    {(() => {
-                      // Debug logging for conditional rendering
-                      console.log('🎨 Conditional Rendering Debug for user:', user.id);
-                      console.log('  isStoreOwner:', isStoreOwner);
-                      console.log('  storeId:', storeId);
-                      console.log('  condition (isStoreOwner && storeId):', isStoreOwner && storeId);
+                    {/* Account Management */}
+                    <UserAccountManager
+                      userId={user.id}
+                      currentStatus={userAccountStatuses[user.id] || { account_status: user.account_status as any || 'active' }}
+                      username={user.username || undefined}
+                      storeId={storeId}
+                      onStatusChange={(newStatus) => {
+                        // Update the account status cache
+                        setUserAccountStatuses(prev => ({
+                          ...prev,
+                          [user.id]: newStatus
+                        }));
 
+                        // Update the user list with new status
+                        const updateUser = (u: User) =>
+                          u.id === user.id
+                            ? { ...u, account_status: newStatus.account_status, status_changed_at: newStatus.status_changed_at }
+                            : u;
+
+                        setUsers(users.map(updateUser));
+                        setFilteredUsers(filteredUsers.map(updateUser));
+                      }}
+                    />
+
+                    {/* Tier Management */}
+                    {(() => {
                       if (isStoreOwner && storeId) {
-                        console.log('  ✅ Rendering UserTierManager');
                         return (
                           <UserTierManager
                             userId={user.id}
