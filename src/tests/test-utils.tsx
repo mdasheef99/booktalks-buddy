@@ -9,7 +9,7 @@
  */
 import React, { ReactElement, createContext } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { renderHook, RenderHookOptions } from '@testing-library/react-hooks';
+import { renderHook, RenderHookOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { Event } from '@/lib/api/bookclubs/events/types';

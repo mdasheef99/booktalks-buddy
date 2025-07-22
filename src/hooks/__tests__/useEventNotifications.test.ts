@@ -9,7 +9,7 @@
  * - Refreshing notification count
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import { waitFor, act } from '@testing-library/react';
 
 // Import the hook directly

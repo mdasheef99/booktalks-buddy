@@ -213,7 +213,7 @@ describe('BookListingsManagement Refactoring Tests', () => {
         '@/pages/admin/store/BookListingsManagement/hooks/useBookListings'
       );
 
-      const { renderHook } = await import('@testing-library/react-hooks');
+      const { renderHook } = await import('@testing-library/react');
 
       const { result, waitForNextUpdate } = renderHook(() =>
         useBookListings({
@@ -240,7 +240,7 @@ describe('BookListingsManagement Refactoring Tests', () => {
         '@/pages/admin/store/BookListingsManagement/hooks/useListingActions'
       );
 
-      const { renderHook } = await import('@testing-library/react-hooks');
+      const { renderHook } = await import('@testing-library/react');
 
       const mockOnSuccess = vi.fn();
       const { result } = renderHook(() =>
@@ -494,7 +494,7 @@ describe('BookListingsManagement Refactoring Tests', () => {
         '@/pages/admin/store/BookListingsManagement/hooks/useListingActions'
       );
 
-      const { renderHook } = await import('@testing-library/react-hooks');
+      const { renderHook } = await import('@testing-library/react');
 
       // Mock update failure
       mockBookListingService.updateBookListingStatus.mockRejectedValue(
