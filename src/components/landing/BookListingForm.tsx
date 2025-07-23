@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,16 +6,26 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BookOpen, Upload, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { EnhancedInput, EnhancedTextarea } from '@/components/ui/enhanced-input';
+import { BookOpen, Upload, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BookListingService } from '@/lib/services/bookListingService';
-import { 
-  BookListingFormData, 
-  BookListingFormErrors, 
+import {
+  BookListingFormData,
+  BookListingFormErrors,
   BOOK_CONDITIONS,
   VALIDATION_RULES,
   IMAGE_UPLOAD_CONFIG
 } from '@/types/bookListings';
+import {
+  debounce,
+  SubmissionThrottle,
+  validateNameField,
+  validateEmail,
+  validatePhoneNumber,
+  validateBookTitle,
+  validateOptionalText
+} from '@/lib/utils/formValidation';
 
 interface BookListingFormProps {
   storeId: string;
@@ -50,6 +60,48 @@ export const BookListingForm: React.FC<BookListingFormProps> = ({
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [fieldTouched, setFieldTouched] = useState<Record<string, boolean>>({});
+  const [submissionThrottle] = useState(() => new SubmissionThrottle(5));
+
+  // Debounced validation for real-time feedback
+  const debouncedValidateField = useCallback(
+    debounce((field: keyof BookListingFormData, value: any) => {
+      if (fieldTouched[field]) {
+        const fieldErrors = validateSingleField(field, value);
+        setErrors(prev => ({ ...prev, [field]: fieldErrors }));
+      }
+    }, 300),
+    [fieldTouched]
+  );
+
+  // Enhanced field validation
+  const validateSingleField = (field: keyof BookListingFormData, value: any): string | undefined => {
+    switch (field) {
+      case 'customer_name':
+        const nameValidation = validateNameField(value, 'Customer name');
+        return nameValidation.isValid ? undefined : nameValidation.error;
+      case 'customer_email':
+        const emailValidation = validateEmail(value);
+        return emailValidation.isValid ? undefined : emailValidation.error;
+      case 'customer_phone':
+        const phoneValidation = validatePhoneNumber(value);
+        return phoneValidation.isValid ? undefined : phoneValidation.error;
+      case 'book_title':
+        const titleValidation = validateBookTitle(value);
+        return titleValidation.isValid ? undefined : titleValidation.error;
+      case 'book_author':
+        const authorValidation = validateNameField(value, 'Author name');
+        return authorValidation.isValid ? undefined : authorValidation.error;
+      case 'book_description':
+        if (value) {
+          const descValidation = validateOptionalText(value, VALIDATION_RULES.book_description.maxLength, 'Description');
+          return descValidation.isValid ? undefined : descValidation.error;
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
 
   // Form field update handler
   const updateField = <K extends keyof BookListingFormData>(
@@ -57,11 +109,22 @@ export const BookListingForm: React.FC<BookListingFormProps> = ({
     value: BookListingFormData[K]
   ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
+
+    // Trigger debounced validation
+    debouncedValidateField(field, value);
+  };
+
+  const handleFieldBlur = (field: keyof BookListingFormData) => {
+    setFieldTouched(prev => ({ ...prev, [field]: true }));
+
+    // Validate immediately on blur
+    const fieldError = validateSingleField(field, formData[field]);
+    setErrors(prev => ({ ...prev, [field]: fieldError }));
   };
 
   // Image handling
@@ -166,13 +229,21 @@ export const BookListingForm: React.FC<BookListingFormProps> = ({
   // Form submission
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
+    // Check rate limiting
+    if (!submissionThrottle.canSubmit()) {
+      const remainingSeconds = submissionThrottle.getRemainingCooldown();
+      toast.error(`Please wait ${remainingSeconds} seconds before submitting again`);
+      return;
+    }
+
     if (!validateForm()) {
       toast.error('Please fix the errors below');
       return;
     }
 
     setIsSubmitting(true);
+    submissionThrottle.recordSubmission();
 
     try {
       const submission = {
@@ -263,65 +334,45 @@ export const BookListingForm: React.FC<BookListingFormProps> = ({
             <h3 className="text-lg font-semibold text-bookconnect-brown">Your Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="customer_name">
-                  Full Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="customer_name"
-                  value={formData.customer_name}
-                  onChange={(e) => updateField('customer_name', e.target.value)}
-                  placeholder="Enter your full name"
-                  className={errors.customer_name ? 'border-red-500' : ''}
-                />
-                {errors.customer_name && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.customer_name}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="customer_email">
-                  Email Address <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="customer_email"
-                  type="email"
-                  value={formData.customer_email}
-                  onChange={(e) => updateField('customer_email', e.target.value)}
-                  placeholder="Enter your email"
-                  className={errors.customer_email ? 'border-red-500' : ''}
-                />
-                {errors.customer_email && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.customer_email}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="customer_phone">
-                Phone Number <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="customer_phone"
-                type="tel"
-                value={formData.customer_phone}
-                onChange={(e) => updateField('customer_phone', e.target.value)}
-                placeholder="Enter your phone number"
-                className={errors.customer_phone ? 'border-red-500' : ''}
+              <EnhancedInput
+                id="customer_name"
+                label="Full Name"
+                value={formData.customer_name}
+                onChange={(value) => updateField('customer_name', value)}
+                onBlur={() => handleFieldBlur('customer_name')}
+                error={errors.customer_name}
+                maxLength={VALIDATION_RULES.customer_name.maxLength}
+                showCharacterCount={false}
+                required={true}
+                placeholder="Enter your full name"
               />
-              {errors.customer_phone && (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.customer_phone}
-                </p>
-              )}
+
+              <EnhancedInput
+                id="customer_email"
+                label="Email Address"
+                value={formData.customer_email}
+                onChange={(value) => updateField('customer_email', value)}
+                onBlur={() => handleFieldBlur('customer_email')}
+                error={errors.customer_email}
+                maxLength={VALIDATION_RULES.customer_email.maxLength}
+                showCharacterCount={false}
+                required={true}
+                type="email"
+                placeholder="Enter your email"
+              />
             </div>
+
+            <EnhancedInput
+              id="customer_phone"
+              label="Phone Number"
+              value={formData.customer_phone}
+              onChange={(value) => updateField('customer_phone', value)}
+              onBlur={() => handleFieldBlur('customer_phone')}
+              error={errors.customer_phone}
+              required={true}
+              type="tel"
+              placeholder="Enter your phone number"
+            />
           </div>
 
           {/* Book Information */}
@@ -329,43 +380,31 @@ export const BookListingForm: React.FC<BookListingFormProps> = ({
             <h3 className="text-lg font-semibold text-bookconnect-brown">Book Details</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="book_title">
-                  Book Title <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="book_title"
-                  value={formData.book_title}
-                  onChange={(e) => updateField('book_title', e.target.value)}
-                  placeholder="Enter the book title"
-                  className={errors.book_title ? 'border-red-500' : ''}
-                />
-                {errors.book_title && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.book_title}
-                  </p>
-                )}
-              </div>
+              <EnhancedInput
+                id="book_title"
+                label="Book Title"
+                value={formData.book_title}
+                onChange={(value) => updateField('book_title', value)}
+                onBlur={() => handleFieldBlur('book_title')}
+                error={errors.book_title}
+                maxLength={VALIDATION_RULES.book_title.maxLength}
+                showCharacterCount={true}
+                required={true}
+                placeholder="Enter the book title"
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="book_author">
-                  Author <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="book_author"
-                  value={formData.book_author}
-                  onChange={(e) => updateField('book_author', e.target.value)}
-                  placeholder="Enter the author's name"
-                  className={errors.book_author ? 'border-red-500' : ''}
-                />
-                {errors.book_author && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.book_author}
-                  </p>
-                )}
-              </div>
+              <EnhancedInput
+                id="book_author"
+                label="Author"
+                value={formData.book_author}
+                onChange={(value) => updateField('book_author', value)}
+                onBlur={() => handleFieldBlur('book_author')}
+                error={errors.book_author}
+                maxLength={VALIDATION_RULES.book_author.maxLength}
+                showCharacterCount={true}
+                required={true}
+                placeholder="Enter the author's name"
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -429,20 +468,18 @@ export const BookListingForm: React.FC<BookListingFormProps> = ({
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="book_description">Description (Optional)</Label>
-              <Textarea
-                id="book_description"
-                value={formData.book_description}
-                onChange={(e) => updateField('book_description', e.target.value)}
-                placeholder="Any additional details about the book's condition, edition, etc."
-                rows={3}
-                maxLength={1000}
-              />
-              <p className="text-xs text-gray-500">
-                {formData.book_description?.length || 0}/1000 characters
-              </p>
-            </div>
+            <EnhancedTextarea
+              id="book_description"
+              label="Description (Optional)"
+              value={formData.book_description}
+              onChange={(value) => updateField('book_description', value)}
+              onBlur={() => handleFieldBlur('book_description')}
+              error={errors.book_description}
+              maxLength={VALIDATION_RULES.book_description.maxLength}
+              showCharacterCount={true}
+              placeholder="Any additional details about the book's condition, edition, etc."
+              rows={3}
+            />
           </div>
 
           {/* Image Upload */}

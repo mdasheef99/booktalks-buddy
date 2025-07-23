@@ -1,40 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { EnhancedInput, EnhancedTextarea } from '@/components/ui/enhanced-input';
 import { Search, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-  BookAvailabilityRequestFormData, 
-  BookAvailabilityRequestFormErrors, 
+import {
+  BookAvailabilityRequestFormData,
+  BookAvailabilityRequestFormErrors,
   validateBookAvailabilityRequestForm,
-  DEFAULT_FORM_DATA
+  DEFAULT_FORM_DATA,
+  VALIDATION_RULES
 } from '@/types/bookAvailabilityRequests';
+import {
+  debounce,
+  getCharacterCount,
+  SubmissionThrottle,
+  validateNameField,
+  validateEmail,
+  validatePhoneNumber,
+  validateBookTitle,
+  validateOptionalText
+} from '@/lib/utils/formValidation';
 
 interface BookAvailabilityRequestFormProps {
   storeId: string;
   onSuccess?: () => void;
 }
 
-export const BookAvailabilityRequestForm: React.FC<BookAvailabilityRequestFormProps> = ({ 
-  storeId, 
-  onSuccess 
+export const BookAvailabilityRequestForm: React.FC<BookAvailabilityRequestFormProps> = ({
+  storeId,
+  onSuccess
 }) => {
   const [formData, setFormData] = useState<BookAvailabilityRequestFormData>(DEFAULT_FORM_DATA);
   const [errors, setErrors] = useState<BookAvailabilityRequestFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [fieldTouched, setFieldTouched] = useState<Record<string, boolean>>({});
+  const [submissionThrottle] = useState(() => new SubmissionThrottle(5));
+
+  // Enhanced field validation
+  const validateSingleField = (field: keyof BookAvailabilityRequestFormData, value: string): string | undefined => {
+    switch (field) {
+      case 'customer_name':
+        const nameValidation = validateNameField(value, 'Customer name');
+        return nameValidation.isValid ? undefined : nameValidation.error;
+      case 'customer_email':
+        const emailValidation = validateEmail(value);
+        return emailValidation.isValid ? undefined : emailValidation.error;
+      case 'customer_phone':
+        const phoneValidation = validatePhoneNumber(value);
+        return phoneValidation.isValid ? undefined : phoneValidation.error;
+      case 'book_title':
+        const titleValidation = validateBookTitle(value);
+        return titleValidation.isValid ? undefined : titleValidation.error;
+      case 'book_author':
+        const authorValidation = validateNameField(value, 'Author name');
+        return authorValidation.isValid ? undefined : authorValidation.error;
+      case 'description':
+        if (value) {
+          const descValidation = validateOptionalText(value, VALIDATION_RULES.description.maxLength, 'Description');
+          return descValidation.isValid ? undefined : descValidation.error;
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  // Debounced validation for real-time feedback
+  const debouncedValidateField = useCallback(
+    debounce((field: keyof BookAvailabilityRequestFormData, value: string) => {
+      if (fieldTouched[field]) {
+        const fieldError = validateSingleField(field, value);
+        setErrors(prev => ({ ...prev, [field]: fieldError }));
+      }
+    }, 300),
+    [fieldTouched]
+  );
 
   const handleInputChange = (field: keyof BookAvailabilityRequestFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
+
+    // Trigger debounced validation
+    debouncedValidateField(field, value);
+  };
+
+  const handleFieldBlur = (field: keyof BookAvailabilityRequestFormData) => {
+    setFieldTouched(prev => ({ ...prev, [field]: true }));
+
+    // Validate immediately on blur
+    const fieldError = validateSingleField(field, formData[field] || '');
+    setErrors(prev => ({ ...prev, [field]: fieldError }));
   };
 
   const validateForm = (): boolean => {
@@ -45,13 +107,21 @@ export const BookAvailabilityRequestForm: React.FC<BookAvailabilityRequestFormPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Check rate limiting
+    if (!submissionThrottle.canSubmit()) {
+      const remainingSeconds = submissionThrottle.getRemainingCooldown();
+      toast.error(`Please wait ${remainingSeconds} seconds before submitting again`);
+      return;
+    }
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
     }
 
     setIsSubmitting(true);
+    submissionThrottle.recordSubmission();
     
     try {
       const response = await fetch('/api/book-availability-requests', {
@@ -135,66 +205,44 @@ export const BookAvailabilityRequestForm: React.FC<BookAvailabilityRequestFormPr
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="customer_name" className="text-bookconnect-brown font-medium">
-                  Full Name *
-                </Label>
-                <Input
-                  id="customer_name"
-                  type="text"
-                  value={formData.customer_name}
-                  onChange={(e) => handleInputChange('customer_name', e.target.value)}
-                  className={errors.customer_name ? 'border-red-500' : ''}
-                  placeholder="Enter your full name"
-                />
-                {errors.customer_name && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.customer_name}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="customer_phone" className="text-bookconnect-brown font-medium">
-                  Phone Number *
-                </Label>
-                <Input
-                  id="customer_phone"
-                  type="tel"
-                  value={formData.customer_phone}
-                  onChange={(e) => handleInputChange('customer_phone', e.target.value)}
-                  className={errors.customer_phone ? 'border-red-500' : ''}
-                  placeholder="Enter your phone number"
-                />
-                {errors.customer_phone && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.customer_phone}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="customer_email" className="text-bookconnect-brown font-medium">
-                Email Address *
-              </Label>
-              <Input
-                id="customer_email"
-                type="email"
-                value={formData.customer_email}
-                onChange={(e) => handleInputChange('customer_email', e.target.value)}
-                className={errors.customer_email ? 'border-red-500' : ''}
-                placeholder="Enter your email address"
+              <EnhancedInput
+                id="customer_name"
+                label="Full Name"
+                value={formData.customer_name}
+                onChange={(value) => handleInputChange('customer_name', value)}
+                onBlur={() => handleFieldBlur('customer_name')}
+                error={errors.customer_name}
+                maxLength={VALIDATION_RULES.customer_name.maxLength}
+                showCharacterCount={true}
+                required={true}
+                placeholder="Enter your full name"
               />
-              {errors.customer_email && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.customer_email}
-                </p>
-              )}
+
+              <EnhancedInput
+                id="customer_phone"
+                label="Phone Number"
+                value={formData.customer_phone}
+                onChange={(value) => handleInputChange('customer_phone', value)}
+                onBlur={() => handleFieldBlur('customer_phone')}
+                error={errors.customer_phone}
+                required={true}
+                type="tel"
+              />
             </div>
+
+            <EnhancedInput
+              id="customer_email"
+              label="Email Address"
+              value={formData.customer_email}
+              onChange={(value) => handleInputChange('customer_email', value)}
+              onBlur={() => handleFieldBlur('customer_email')}
+              error={errors.customer_email}
+              maxLength={VALIDATION_RULES.customer_email.maxLength}
+              showCharacterCount={true}
+              required={true}
+              type="email"
+              placeholder="Enter your email address"
+            />
           </div>
 
           {/* Book Information Section */}
@@ -203,68 +251,44 @@ export const BookAvailabilityRequestForm: React.FC<BookAvailabilityRequestFormPr
               Book Information
             </h3>
             
-            <div>
-              <Label htmlFor="book_title" className="text-bookconnect-brown font-medium">
-                Book Title *
-              </Label>
-              <Input
-                id="book_title"
-                type="text"
-                value={formData.book_title}
-                onChange={(e) => handleInputChange('book_title', e.target.value)}
-                className={errors.book_title ? 'border-red-500' : ''}
-                placeholder="Enter the book title"
-              />
-              {errors.book_title && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.book_title}
-                </p>
-              )}
-            </div>
+            <EnhancedInput
+              id="book_title"
+              label="Book Title"
+              value={formData.book_title}
+              onChange={(value) => handleInputChange('book_title', value)}
+              onBlur={() => handleFieldBlur('book_title')}
+              error={errors.book_title}
+              maxLength={VALIDATION_RULES.book_title.maxLength}
+              showCharacterCount={true}
+              required={true}
+              placeholder="Enter the book title"
+            />
 
-            <div>
-              <Label htmlFor="book_author" className="text-bookconnect-brown font-medium">
-                Author Name *
-              </Label>
-              <Input
-                id="book_author"
-                type="text"
-                value={formData.book_author}
-                onChange={(e) => handleInputChange('book_author', e.target.value)}
-                className={errors.book_author ? 'border-red-500' : ''}
-                placeholder="Enter the author's name"
-              />
-              {errors.book_author && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.book_author}
-                </p>
-              )}
-            </div>
+            <EnhancedInput
+              id="book_author"
+              label="Author Name"
+              value={formData.book_author}
+              onChange={(value) => handleInputChange('book_author', value)}
+              onBlur={() => handleFieldBlur('book_author')}
+              error={errors.book_author}
+              maxLength={VALIDATION_RULES.book_author.maxLength}
+              showCharacterCount={true}
+              required={true}
+              placeholder="Enter the author's name"
+            />
 
-            <div>
-              <Label htmlFor="description" className="text-bookconnect-brown font-medium">
-                Additional Details (Optional)
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description || ''}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                className={errors.description ? 'border-red-500' : ''}
-                placeholder="Any additional details about the book you're looking for (edition, publisher, year, etc.)"
-                rows={3}
-              />
-              <p className="text-sm text-bookconnect-brown/60 mt-1">
-                Include details like specific edition, publisher, publication year, or any other relevant information
-              </p>
-              {errors.description && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.description}
-                </p>
-              )}
-            </div>
+            <EnhancedTextarea
+              id="description"
+              label="Additional Details (Optional)"
+              value={formData.description || ''}
+              onChange={(value) => handleInputChange('description', value)}
+              onBlur={() => handleFieldBlur('description')}
+              error={errors.description}
+              maxLength={VALIDATION_RULES.description.maxLength}
+              showCharacterCount={true}
+              placeholder="Include details like specific edition, publisher, publication year, or any other relevant information"
+              rows={3}
+            />
           </div>
 
           {/* Submit Button */}

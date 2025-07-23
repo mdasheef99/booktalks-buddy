@@ -87,28 +87,28 @@ export const BOOK_LISTING_STATUSES: { value: BookListingStatus; label: string; c
 export const VALIDATION_RULES = {
   customer_name: {
     required: true,
-    maxLength: 100,
-    minLength: 2
+    maxLength: 50,
+    minLength: 6
   },
   customer_email: {
     required: true,
-    maxLength: 255,
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    maxLength: 254,
+    pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
   },
   customer_phone: {
     required: true,
-    maxLength: 20,
-    pattern: /^[\+]?[1-9][\d]{0,15}$/
+    exactLength: 10,
+    pattern: /^\d{10}$/
   },
   book_title: {
     required: true,
-    maxLength: 200,
-    minLength: 1
+    maxLength: 100,
+    minLength: 6
   },
   book_author: {
     required: true,
-    maxLength: 100,
-    minLength: 1
+    maxLength: 50,
+    minLength: 6
   },
   book_isbn: {
     required: false,

@@ -59,28 +59,28 @@ export interface BookAvailabilityRequestFormErrors {
 export const VALIDATION_RULES = {
   customer_name: {
     required: true,
-    minLength: 2,
-    maxLength: 100,
+    minLength: 6,
+    maxLength: 50,
   },
   customer_email: {
     required: true,
-    maxLength: 255,
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    maxLength: 254,
+    pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
   },
   customer_phone: {
     required: true,
-    maxLength: 20,
-    pattern: /^[\+]?[1-9][\d]{0,15}$/,
+    exactLength: 10,
+    pattern: /^\d{10}$/,
   },
   book_title: {
     required: true,
-    minLength: 1,
-    maxLength: 200,
+    minLength: 6,
+    maxLength: 100,
   },
   book_author: {
     required: true,
-    minLength: 1,
-    maxLength: 100,
+    minLength: 6,
+    maxLength: 50,
   },
   description: {
     required: false,
@@ -101,54 +101,64 @@ export const validateBookAvailabilityRequestForm = (
 ): BookAvailabilityRequestFormErrors => {
   const errors: BookAvailabilityRequestFormErrors = {};
 
+  // Note: Import validation utilities at the top of the file instead
+  // For now, we'll use basic validation until we can properly import the utilities
+
   // Customer Name Validation
   if (!data.customer_name?.trim()) {
     errors.customer_name = 'Customer name is required';
   } else if (data.customer_name.trim().length < VALIDATION_RULES.customer_name.minLength) {
     errors.customer_name = `Customer name must be at least ${VALIDATION_RULES.customer_name.minLength} characters`;
   } else if (data.customer_name.trim().length > VALIDATION_RULES.customer_name.maxLength) {
-    errors.customer_name = `Customer name must be less than ${VALIDATION_RULES.customer_name.maxLength} characters`;
+    errors.customer_name = `Customer name must be ${VALIDATION_RULES.customer_name.maxLength} characters or less`;
+  } else if (!/^[a-zA-Z\s\-']+$/.test(data.customer_name.trim())) {
+    errors.customer_name = 'Customer name can only contain letters, spaces, hyphens, and apostrophes';
   }
 
   // Customer Email Validation
   if (!data.customer_email?.trim()) {
     errors.customer_email = 'Email address is required';
+  } else if (data.customer_email.trim().length > VALIDATION_RULES.customer_email.maxLength) {
+    errors.customer_email = `Email must be ${VALIDATION_RULES.customer_email.maxLength} characters or less`;
   } else if (!VALIDATION_RULES.customer_email.pattern.test(data.customer_email.trim())) {
     errors.customer_email = 'Please enter a valid email address';
-  } else if (data.customer_email.trim().length > VALIDATION_RULES.customer_email.maxLength) {
-    errors.customer_email = `Email must be less than ${VALIDATION_RULES.customer_email.maxLength} characters`;
   }
 
   // Customer Phone Validation
   if (!data.customer_phone?.trim()) {
     errors.customer_phone = 'Phone number is required';
-  } else if (!VALIDATION_RULES.customer_phone.pattern.test(data.customer_phone.trim())) {
-    errors.customer_phone = 'Please enter a valid phone number';
-  } else if (data.customer_phone.trim().length > VALIDATION_RULES.customer_phone.maxLength) {
-    errors.customer_phone = `Phone number must be less than ${VALIDATION_RULES.customer_phone.maxLength} characters`;
+  } else {
+    const digitsOnly = data.customer_phone.replace(/\D/g, '');
+    if (digitsOnly.length !== VALIDATION_RULES.customer_phone.exactLength) {
+      errors.customer_phone = 'Phone number must be exactly 10 digits';
+    }
   }
 
   // Book Title Validation
   if (!data.book_title?.trim()) {
     errors.book_title = 'Book title is required';
   } else if (data.book_title.trim().length < VALIDATION_RULES.book_title.minLength) {
-    errors.book_title = 'Book title cannot be empty';
+    errors.book_title = `Book title must be at least ${VALIDATION_RULES.book_title.minLength} characters`;
   } else if (data.book_title.trim().length > VALIDATION_RULES.book_title.maxLength) {
-    errors.book_title = `Book title must be less than ${VALIDATION_RULES.book_title.maxLength} characters`;
+    errors.book_title = `Book title must be ${VALIDATION_RULES.book_title.maxLength} characters or less`;
+  } else if (!/^[a-zA-Z0-9\s\.,!?:;\-']+$/.test(data.book_title.trim())) {
+    errors.book_title = 'Book title contains invalid characters';
   }
 
   // Book Author Validation
   if (!data.book_author?.trim()) {
-    errors.book_author = 'Book author is required';
+    errors.book_author = 'Author name is required';
   } else if (data.book_author.trim().length < VALIDATION_RULES.book_author.minLength) {
-    errors.book_author = 'Book author cannot be empty';
+    errors.book_author = `Author name must be at least ${VALIDATION_RULES.book_author.minLength} characters`;
   } else if (data.book_author.trim().length > VALIDATION_RULES.book_author.maxLength) {
-    errors.book_author = `Book author must be less than ${VALIDATION_RULES.book_author.maxLength} characters`;
+    errors.book_author = `Author name must be ${VALIDATION_RULES.book_author.maxLength} characters or less`;
+  } else if (!/^[a-zA-Z\s\-']+$/.test(data.book_author.trim())) {
+    errors.book_author = 'Author name can only contain letters, spaces, hyphens, and apostrophes';
   }
 
   // Description Validation (Optional)
   if (data.description && data.description.trim().length > VALIDATION_RULES.description.maxLength) {
-    errors.description = `Description must be less than ${VALIDATION_RULES.description.maxLength} characters`;
+    errors.description = `Description must be ${VALIDATION_RULES.description.maxLength} characters or less`;
   }
 
   return errors;
