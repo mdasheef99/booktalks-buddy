@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="41.324068">
+<testsuite name="store-manager-moderation.spec.ts" timestamp="2025-07-24T19:00:24.494Z" hostname="chromium" tests="1" failures="0" skipped="0" time="8.246" errors="0">
+<testcase name="Store Manager Moderation Interface › Authentication &amp; Access Control › should redirect unauthorized users" classname="store-manager-moderation.spec.ts" time="8.246">
+<system-out>
+<![CDATA[🚀 Setting up Store Manager Moderation test
+🔐 Logging in as Store Manager: kafka@bookconnect.com
+✅ Store Manager login successful
+🚫 Testing unauthorized access protection
+🚪 Logging out current user
+✅ Logout successful
+📍 Final URL after redirect attempt: http://localhost:5173/login
+✅ Unauthorized access properly blocked
+🧹 Cleaning up Store Manager Moderation test
+🧹 Cleaning up test state
+🚪 Logging out current user
+✅ Logout via URL navigation
+✅ Test state cleaned up
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
