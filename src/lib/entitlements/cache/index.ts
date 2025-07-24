@@ -32,6 +32,37 @@ import {
   clearMemoryCache
 } from './enhanced';
 
+// =========================
+// Circuit Breaker for Infinite Loop Prevention
+// =========================
+
+// 🚨 CRITICAL SAFEGUARD: Prevent infinite recursion in getUserEntitlements
+const entitlementCalculationInProgress = new Set<string>();
+const pendingEntitlementPromises = new Map<string, Promise<string[]>>();
+
+function preventInfiniteEntitlementLoop(userId: string): { canProceed: boolean; cleanup: () => void } {
+  const key = `entitlements-${userId}`;
+
+  if (entitlementCalculationInProgress.has(key)) {
+    console.warn(`🚨 CIRCUIT BREAKER: Entitlement calculation already in progress for user ${userId}`);
+    return { canProceed: false, cleanup: () => {} };
+  }
+
+  entitlementCalculationInProgress.add(key);
+  console.log(`[Circuit Breaker] Started entitlement calculation for user ${userId}`);
+
+  const cleanup = () => {
+    entitlementCalculationInProgress.delete(key);
+    pendingEntitlementPromises.delete(key);
+    console.log(`[Circuit Breaker] Completed entitlement calculation for user ${userId}`);
+  };
+
+  // Auto-cleanup after 5 seconds to prevent permanent blocks (reduced since we have promise deduplication)
+  setTimeout(cleanup, 5000);
+
+  return { canProceed: true, cleanup };
+}
+
 // Re-export core functionality
 export * from './core';
 export * from './enhanced';
@@ -52,80 +83,110 @@ export async function getUserEntitlements(
     return [];
   }
 
-  // Try to load from memory cache first (fastest)
-  if (!forceRefresh) {
-    const memoryCache = loadFromMemoryCache(userId);
-    if (memoryCache && isCacheValid(memoryCache, userId)) {
-      cacheStats.hits++;
-      logDebug('Memory cache hit', { userId, stats: cacheStats });
-      return memoryCache.entitlements;
-    }
+  // 🚨 CRITICAL SAFEGUARD: Check if calculation already in progress
+  const key = `entitlements-${userId}`;
 
-    // Try to load from sessionStorage
-    const storageCache = loadFromStorage(userId);
-    if (isCacheValid(storageCache, userId)) {
-      // Promote to memory cache
-      if (storageCache) {
-        saveToMemoryCache(userId, storageCache);
-      }
-      cacheStats.hits++;
-      logDebug('Storage cache hit', { userId, stats: cacheStats });
-      return storageCache.entitlements;
-    }
-
-    cacheStats.misses++;
-    logDebug('Cache miss or expired', { userId, stats: cacheStats });
-  } else {
-    logDebug('Force refresh requested', { userId });
+  // If there's already a pending promise for this user, return it instead of starting a new calculation
+  if (pendingEntitlementPromises.has(key)) {
+    console.log(`[Deduplication] Returning existing promise for user ${userId}`);
+    return pendingEntitlementPromises.get(key)!;
   }
 
-  // Calculate fresh entitlements and roles
-  try {
-    const startTime = Date.now();
+  // Circuit breaker to prevent infinite recursion
+  const { canProceed, cleanup } = preventInfiniteEntitlementLoop(userId);
+  if (!canProceed) {
+    console.warn(`[Circuit Breaker] Returning empty entitlements for user ${userId} due to infinite loop prevention`);
+    return [];
+  }
 
-    // Always calculate entitlements
-    const entitlements = await calculateUserEntitlements(userId);
-
-    // Try to get roles, but don't fail if it doesn't work
-    let roles: UserRole[] = [];
-    let permissions: any[] = [];
-
+  // 🚨 PERFORMANCE FIX: Create and store the promise to prevent duplicate calculations
+  const calculationPromise = (async (): Promise<string[]> => {
     try {
-      roles = await getUserRoles(userId);
-      permissions = createPermissionsArray(entitlements, roles);
-    } catch (roleError) {
-      console.warn('Could not fetch user roles, using basic cache structure:', roleError);
-      // Create basic permissions from entitlements only
-      permissions = entitlements.map((entitlement: string) => ({
-        name: entitlement,
-        inherited: false,
-        source: 'direct'
-      }));
+      // Try to load from memory cache first (fastest)
+      if (!forceRefresh) {
+        const memoryCache = loadFromMemoryCache(userId);
+        if (memoryCache && isCacheValid(memoryCache, userId)) {
+          cacheStats.hits++;
+          logDebug('Memory cache hit', { userId, stats: cacheStats });
+          cleanup();
+          return memoryCache.entitlements;
+        }
+
+        // Try to load from sessionStorage
+        const storageCache = loadFromStorage(userId);
+        if (isCacheValid(storageCache, userId)) {
+          // Promote to memory cache
+          if (storageCache) {
+            saveToMemoryCache(userId, storageCache);
+          }
+          cacheStats.hits++;
+          logDebug('Storage cache hit', { userId, stats: cacheStats });
+          cleanup();
+          return storageCache.entitlements;
+        }
+
+        cacheStats.misses++;
+        logDebug('Cache miss or expired', { userId, stats: cacheStats });
+      } else {
+        logDebug('Force refresh requested', { userId });
+      }
+
+      // Calculate fresh entitlements and roles
+      const startTime = Date.now();
+
+      // Always calculate entitlements
+      const entitlements = await calculateUserEntitlements(userId);
+
+      // Try to get roles, but don't fail if it doesn't work
+      let roles: UserRole[] = [];
+      let permissions: any[] = [];
+
+      try {
+        roles = await getUserRoles(userId);
+        permissions = createPermissionsArray(entitlements, roles);
+      } catch (roleError) {
+        console.warn('Could not fetch user roles, using basic cache structure:', roleError);
+        // Create basic permissions from entitlements only
+        permissions = entitlements.map((entitlement: string) => ({
+          name: entitlement,
+          inherited: false,
+          source: 'direct'
+        }));
+      }
+
+      const computationTime = Date.now() - startTime;
+
+      // Create new cache entry
+      const cacheEntry: EntitlementsCache = {
+        entitlements,
+        roles,
+        permissions,
+        version: CACHE_CONFIG.VERSION,
+        timestamp: Date.now(),
+        userId,
+        computationTime
+      };
+
+      // Save to both memory and storage
+      saveToMemoryCache(userId, cacheEntry);
+      saveToStorage(userId, cacheEntry);
+
+      // 🚨 CRITICAL SAFEGUARD: Clean up circuit breaker
+      cleanup();
+      return entitlements;
+    } catch (error) {
+      console.error('Error calculating user entitlements:', error);
+      cacheStats.errors++;
+      // 🚨 CRITICAL SAFEGUARD: Clean up circuit breaker on error
+      cleanup();
+      throw error;
     }
+  })();
 
-    const computationTime = Date.now() - startTime;
+  // Store the promise to prevent duplicate calculations
+  pendingEntitlementPromises.set(key, calculationPromise);
 
-    // Create new cache entry
-    const cacheEntry: EntitlementsCache = {
-      entitlements,
-      roles,
-      permissions,
-      version: CACHE_CONFIG.VERSION,
-      timestamp: Date.now(),
-      userId,
-      computationTime
-    };
-
-    // Save to both memory and storage
-    saveToMemoryCache(userId, cacheEntry);
-    saveToStorage(userId, cacheEntry);
-
-    return entitlements;
-  } catch (error) {
-    console.error('Error calculating user entitlements:', error);
-    cacheStats.errors++;
-    throw error;
-  }
+  return calculationPromise;
 }
 
 /**
@@ -160,11 +221,58 @@ export async function getEnhancedUserEntitlements(
     }
   }
 
-  // Force refresh by calling getUserEntitlements which will populate the cache
-  await getUserEntitlements(userId, forceRefresh);
+  // 🚨 CRITICAL FIX: Calculate entitlements directly instead of recursive call
+  // This prevents the infinite loop: getEnhancedUserEntitlements() → getUserEntitlements() → getEnhancedUserEntitlements()
 
-  // Return the newly cached data
-  return loadFromMemoryCache(userId) || loadFromStorage(userId);
+  try {
+    console.log(`[Cache] Force refresh - calculating entitlements directly for user ${userId}`);
+    const startTime = Date.now();
+
+    // Calculate fresh entitlements directly (same logic as getUserEntitlements but without recursion)
+    const entitlements = await calculateUserEntitlements(userId);
+
+    // Try to get roles, but don't fail if it doesn't work
+    let roles: UserRole[] = [];
+    let permissions: any[] = [];
+
+    try {
+      roles = await getUserRoles(userId);
+      permissions = createPermissionsArray(entitlements, roles);
+    } catch (roleError) {
+      console.warn('Could not fetch user roles during cache refresh, using basic structure:', roleError);
+      // Create basic permissions from entitlements only
+      permissions = entitlements.map((entitlement: string) => ({
+        name: entitlement,
+        inherited: false,
+        source: 'direct'
+      }));
+    }
+
+    const computationTime = Date.now() - startTime;
+
+    // Create new cache entry
+    const cacheEntry: EntitlementsCache = {
+      entitlements,
+      roles,
+      permissions,
+      version: CACHE_CONFIG.VERSION,
+      timestamp: Date.now(),
+      userId,
+      computationTime
+    };
+
+    // Save to both memory and storage
+    saveToMemoryCache(userId, cacheEntry);
+    saveToStorage(userId, cacheEntry);
+
+    console.log(`[Cache] Direct calculation completed in ${computationTime}ms for user ${userId}`);
+    return cacheEntry;
+
+  } catch (error) {
+    console.error('Error in direct entitlements calculation:', error);
+    // Return null to indicate cache refresh failed
+    return null;
+  }
 }
 
 // Note: All functions and types are already re-exported via export * above

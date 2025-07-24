@@ -13,11 +13,12 @@ import type { User } from '@supabase/supabase-js';
 import type { SubscriptionStatus } from '@/lib/api/subscriptions/types';
 
 /**
- * Refresh both subscription and entitlements data in parallel
- * 
+ * Refresh subscription, entitlements, and account status data in parallel
+ *
  * @param user - Current user
  * @param refreshSubscriptionStatus - Subscription refresh function
  * @param refreshEntitlements - Entitlements refresh function
+ * @param refreshAccountStatus - Account status refresh function
  * @param subscriptionStatus - Current subscription status (for consistency check)
  * @param entitlements - Current entitlements (for consistency check)
  * @returns Promise<void>
@@ -26,6 +27,7 @@ export async function refreshUserData(
   user: User | null,
   refreshSubscriptionStatus: () => Promise<void>,
   refreshEntitlements: () => Promise<void>,
+  refreshAccountStatus: () => Promise<void>,
   subscriptionStatus: SubscriptionStatus | null,
   entitlements: string[]
 ): Promise<void> {
@@ -33,16 +35,18 @@ export async function refreshUserData(
 
   console.log(`[AuthContext] Refreshing coordinated user data for ${user.id}`);
 
-  // Refresh subscription and entitlements in parallel for better performance
+  // Refresh subscription, entitlements, and account status in parallel for better performance
   const results = await Promise.allSettled([
     refreshSubscriptionStatus(),
-    refreshEntitlements()
+    refreshEntitlements(),
+    refreshAccountStatus()
   ]);
 
   // Log any failures
   results.forEach((result, index) => {
     if (result.status === 'rejected') {
-      const source = index === 0 ? 'subscription' : 'entitlements';
+      const sources = ['subscription', 'entitlements', 'account status'];
+      const source = sources[index] || 'unknown';
       console.error(`[AuthContext] Failed to refresh ${source}:`, result.reason);
     }
   });

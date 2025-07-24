@@ -263,6 +263,54 @@ export async function deleteBookClub(userId: string, clubId: string) {
     // Continue with deletion even if this fails
   }
 
+  // Delete associated events
+  console.log('Deleting associated events...');
+  try {
+    await supabase
+      .from('events')
+      .delete()
+      .eq('club_id', clubId);
+  } catch (error) {
+    console.error('Error deleting events:', error);
+    // Continue with deletion even if this fails
+  }
+
+  // Delete book nominations (these should have CASCADE but let's be explicit)
+  console.log('Deleting book nominations...');
+  try {
+    await supabase
+      .from('book_nominations')
+      .delete()
+      .eq('club_id', clubId);
+  } catch (error) {
+    console.error('Error deleting book nominations:', error);
+    // Continue with deletion even if this fails
+  }
+
+  // Delete club moderators (these should have CASCADE but let's be explicit)
+  console.log('Deleting club moderators...');
+  try {
+    await supabase
+      .from('club_moderators')
+      .delete()
+      .eq('club_id', clubId);
+  } catch (error) {
+    console.error('Error deleting club moderators:', error);
+    // Continue with deletion even if this fails
+  }
+
+  // Delete club meetings and related data (these should have CASCADE but let's be explicit)
+  console.log('Deleting club meetings...');
+  try {
+    await supabase
+      .from('club_meetings')
+      .delete()
+      .eq('club_id', clubId);
+  } catch (error) {
+    console.error('Error deleting club meetings:', error);
+    // Continue with deletion even if this fails
+  }
+
   // Finally delete the club
   console.log('Deleting the book club...');
   const { error } = await supabase

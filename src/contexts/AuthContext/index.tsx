@@ -12,6 +12,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User, Session } from '@supabase/supabase-js';
 import type { SubscriptionStatus } from '@/lib/api/subscriptions/types';
+import type { AccountStatus } from '@/lib/api/admin/accountManagement';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 // Import types
 import type { AuthContextType } from './types';
@@ -19,18 +22,28 @@ import type { AuthContextType } from './types';
 // Import core functionality
 import { signIn as coreSignIn, signUp as coreSignUp, signOut as coreSignOut } from './core/authentication';
 import { initializeSession } from './core/sessionManagement';
+import { useSuspensionModal } from '@/contexts/SuspensionModalContext';
 
 // Import feature modules
 import { fetchClubRoles, isAdmin, isMember } from './features/clubRoles';
 import { refreshEntitlements, loadInitialEntitlements, checkEntitlement, checkContextualEntitlement } from './features/entitlements';
-import { 
-  refreshSubscriptionStatus, 
-  hasValidSubscription, 
-  getSubscriptionTier, 
+import {
+  refreshSubscriptionStatus,
+  hasValidSubscription,
+  getSubscriptionTier,
   hasRequiredTier,
   canAccessFeature,
   getSubscriptionStatusWithContext
 } from './features/subscriptions';
+import {
+  loadAccountStatus,
+  refreshAccountStatus,
+  isAccountSuspended,
+  isAccountDeleted,
+  isAccountActive,
+  getAccountStatusMessage,
+  validateAccountStatus
+} from './features/accountStatus';
 
 // Import utilities
 import { refreshUserData } from './utils/coordinatedRefresh';
@@ -58,9 +71,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus | null>(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
 
+  // Account status state
+  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(null);
+  const [accountStatusLoading, setAccountStatusLoading] = useState(false);
+
   // Navigation and user tracking
   const navigate = useNavigate();
   const [lastKnownUserId, setLastKnownUserId] = useState<string | null>(null);
+
+  // Suspension modal
+  const { showModal: showSuspensionModal } = useSuspensionModal();
 
   // Authentication functions
   const signIn = async (email: string, password: string) => {
@@ -126,12 +146,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return getSubscriptionStatusWithContext(subscriptionStatus);
   };
 
+  // Account status functions
+  const handleRefreshAccountStatus = async () => {
+    await refreshAccountStatus(user, setAccountStatus, setAccountStatusLoading);
+  };
+
+  const handleIsAccountSuspended = () => {
+    return isAccountSuspended(accountStatus);
+  };
+
+  const handleIsAccountDeleted = () => {
+    return isAccountDeleted(accountStatus);
+  };
+
+  const handleIsAccountActive = () => {
+    return isAccountActive(accountStatus);
+  };
+
+  const handleGetAccountStatusMessage = () => {
+    return getAccountStatusMessage(accountStatus);
+  };
+
   // Coordinated refresh
   const handleRefreshUserData = async () => {
     await refreshUserData(
       user,
       handleRefreshSubscriptionStatus,
       handleRefreshEntitlements,
+      handleRefreshAccountStatus,
       subscriptionStatus,
       entitlements
     );
@@ -148,11 +190,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSubscriptionLoading,
       lastKnownUserId,
       setLastKnownUserId,
-      navigate
+      navigate,
+      accountStatus,
+      signOut,
+      showSuspensionModal
     );
 
     return cleanup;
-  }, [navigate, lastKnownUserId]);
+  }, [navigate, lastKnownUserId, accountStatus]);
 
   // Load club roles when user changes
   useEffect(() => {
@@ -182,6 +227,114 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSubscriptionLoading(false);
     }
   }, [user?.id]);
+
+  // Load account status when user changes
+  useEffect(() => {
+    if (user?.id) {
+      loadAccountStatus(user, setAccountStatus, setAccountStatusLoading).catch(error => {
+        console.error('[AuthContext] Failed to load account status on user change:', error);
+      });
+    } else {
+      setAccountStatus(null);
+      setAccountStatusLoading(false);
+    }
+  }, [user?.id]);
+
+  // Real-time account status subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
+    console.log(`[AuthContext] Setting up real-time account status subscription for user ${user.id}`);
+
+    const subscription = supabase
+      .channel('account-status-changes')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'users',
+        filter: `id=eq.${user.id}`
+      }, (payload) => {
+        console.log('[AuthContext] Account status change detected:', payload);
+
+        // Extract account status from the updated row
+        const newAccountStatus: AccountStatus = {
+          account_status: payload.new.account_status,
+          status_changed_by: payload.new.status_changed_by,
+          status_changed_at: payload.new.status_changed_at,
+          deleted_at: payload.new.deleted_at,
+          deleted_by: payload.new.deleted_by
+        };
+
+        setAccountStatus(newAccountStatus);
+
+        // Check if user should be logged out immediately
+        const statusValidation = validateAccountStatus(newAccountStatus);
+        if (statusValidation.shouldLogout) {
+          console.log('[AuthContext] Real-time status change requires logout', {
+            currentPath: window.location.pathname,
+            accountStatus: newAccountStatus?.account_status
+          });
+
+          // Don't logout if user is already on the suspended page
+          if (window.location.pathname !== '/suspended') {
+            toast.error(statusValidation.message);
+            // Let the SuspensionRouteGuard handle the redirect instead of doing it here
+            signOut().catch(error => {
+              console.error('[AuthContext] Error during real-time forced logout:', error);
+            });
+          }
+        }
+      })
+      .subscribe();
+
+    return () => {
+      console.log(`[AuthContext] Cleaning up account status subscription for user ${user.id}`);
+      subscription.unsubscribe();
+    };
+  }, [user?.id, navigate]);
+
+  // Periodic account status checking (every 5 minutes)
+  useEffect(() => {
+    if (!user?.id) return;
+
+    console.log(`[AuthContext] Setting up periodic account status checking for user ${user.id}`);
+
+    const checkAccountStatus = async () => {
+      try {
+        await handleRefreshAccountStatus();
+
+        // Check if status requires logout
+        if (accountStatus) {
+          const statusValidation = validateAccountStatus(accountStatus);
+          if (statusValidation.shouldLogout) {
+            console.log('[AuthContext] Periodic check detected suspended/deleted account', {
+              currentPath: window.location.pathname,
+              accountStatus: accountStatus?.account_status
+            });
+
+            // Don't logout if user is already on the suspended page
+            if (window.location.pathname !== '/suspended') {
+              toast.error(statusValidation.message);
+              // Let the SuspensionRouteGuard handle the redirect instead of doing it here
+              await signOut();
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[AuthContext] Error during periodic account status check:', error);
+        // Don't logout on error - graceful degradation
+      }
+    };
+
+    // Check immediately, then every 5 minutes
+    checkAccountStatus();
+    const interval = setInterval(checkAccountStatus, 5 * 60 * 1000); // 5 minutes
+
+    return () => {
+      console.log(`[AuthContext] Cleaning up periodic account status checking for user ${user.id}`);
+      clearInterval(interval);
+    };
+  }, [user?.id, navigate]); // 🚨 CRITICAL FIX: Removed accountStatus to prevent infinite dependency loop
 
   // Context value
   const value: AuthContextType = {
@@ -217,6 +370,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Enhanced subscription helpers
     canAccessFeature: handleCanAccessFeature,
     getSubscriptionStatusWithContext: handleGetSubscriptionStatusWithContext,
+
+    // Account status management
+    accountStatus,
+    accountStatusLoading,
+    isAccountSuspended: handleIsAccountSuspended,
+    isAccountDeleted: handleIsAccountDeleted,
+    isAccountActive: handleIsAccountActive,
+    refreshAccountStatus: handleRefreshAccountStatus,
+    getAccountStatusMessage: handleGetAccountStatusMessage,
 
     // Coordinated data refresh
     refreshUserData: handleRefreshUserData

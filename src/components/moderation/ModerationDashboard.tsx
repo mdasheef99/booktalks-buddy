@@ -18,12 +18,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import UserName from '@/components/common/UserName';
 import { UserManagementTab } from './UserManagementTab';
-import type { 
-  Report, 
-  ReportStats, 
-  ReportFilters, 
+import { ReportActionDialog } from './ReportActionDialog';
+import type {
+  Report,
+  ReportStats,
+  ReportFilters,
   ReportSeverity,
-  ReportStatus 
+  ReportStatus
 } from '@/types/reporting';
 
 interface ModerationDashboardProps {
@@ -54,6 +55,7 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
   const [stats, setStats] = useState<ReportStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -279,7 +281,10 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
                           View Details
                         </Button>
                         {report.status === 'pending' && (
-                          <Button size="sm">
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedReport(report)}
+                          >
                             Take Action
                           </Button>
                         )}
@@ -292,6 +297,17 @@ export const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
           </TabsContent>
         </Tabs>
       </Card>
+
+      {/* Report Action Dialog */}
+      <ReportActionDialog
+        report={selectedReport}
+        open={!!selectedReport}
+        onOpenChange={(open) => !open && setSelectedReport(null)}
+        onActionComplete={() => {
+          setSelectedReport(null);
+          loadData(); // Refresh the reports list
+        }}
+      />
     </div>
   );
 };

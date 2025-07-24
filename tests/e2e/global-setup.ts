@@ -1,9 +1,11 @@
 import { chromium, FullConfig } from '@playwright/test';
+import { TEST_CONFIG } from './helpers/store-manager-helpers';
 
 /**
  * Global Setup for BookTalks Buddy E2E Tests
- * 
+ *
  * Handles authentication and test data preparation
+ * Includes Store Manager Interface specific setup
  */
 async function globalSetup(config: FullConfig) {
   console.log('🚀 Starting global setup for BookTalks Buddy E2E tests...');
@@ -26,7 +28,10 @@ async function globalSetup(config: FullConfig) {
     
     // Setup test user authentication if needed
     await setupTestAuthentication(page);
-    
+
+    // Setup Store Manager specific tests
+    await setupStoreManagerTests(page);
+
     // Prepare test data
     await prepareTestData(page);
     
@@ -78,18 +83,87 @@ async function setupTestAuthentication(page: any) {
 }
 
 /**
+ * Setup Store Manager specific tests
+ */
+async function setupStoreManagerTests(page: any) {
+  try {
+    console.log('🏪 Setting up Store Manager Interface tests...');
+
+    // Verify Store Manager routes are protected
+    await page.goto(`${TEST_CONFIG.baseUrl}/store-manager/dashboard`);
+    const currentUrl = page.url();
+
+    if (currentUrl.includes('/login')) {
+      console.log('✅ Store Manager routes are properly protected');
+    } else {
+      console.log('⚠️ Store Manager route protection needs verification');
+    }
+
+    // Test Store Manager account accessibility
+    console.log('🔍 Testing Store Manager account...');
+    await page.goto(`${TEST_CONFIG.baseUrl}/login`);
+
+    // Fill Store Manager credentials
+    await page.fill('input[type="email"]', TEST_CONFIG.storeManager.email);
+    await page.fill('input[type="password"]', TEST_CONFIG.storeManager.password);
+    await page.click('button[type="submit"]');
+
+    // Wait for response
+    await page.waitForTimeout(3000);
+
+    const loginResult = page.url();
+    if (loginResult.includes('/dashboard') || loginResult.includes('/profile')) {
+      console.log('✅ Store Manager account accessible');
+
+      // Test Store Manager interface access
+      await page.goto(`${TEST_CONFIG.baseUrl}/store-manager/dashboard`);
+      await page.waitForTimeout(2000);
+
+      const storeManagerUrl = page.url();
+      if (storeManagerUrl.includes('/store-manager')) {
+        console.log('✅ Store Manager interface accessible');
+      } else {
+        console.log('⚠️ Store Manager interface access needs verification');
+      }
+
+      // Logout for clean state
+      const logoutButton = page.locator('button:has-text("Logout"), button:has-text("Sign Out")').first();
+      if (await logoutButton.isVisible()) {
+        await logoutButton.click();
+        await page.waitForTimeout(2000);
+      }
+    } else {
+      console.log('⚠️ Store Manager account login needs verification');
+    }
+
+    // Create screenshots directory
+    const fs = require('fs');
+    const path = require('path');
+    const screenshotsDir = path.join(__dirname, 'screenshots');
+    if (!fs.existsSync(screenshotsDir)) {
+      fs.mkdirSync(screenshotsDir, { recursive: true });
+      console.log('✅ Screenshots directory created');
+    }
+
+    console.log('✅ Store Manager setup completed');
+  } catch (error) {
+    console.log('⚠️ Store Manager setup encountered issues:', error.message);
+  }
+}
+
+/**
  * Prepare test data
  */
 async function prepareTestData(page: any) {
   try {
     console.log('📊 Preparing test data...');
-    
+
     // Clear any existing test data if needed
     // This could involve API calls to clean up test user data
-    
+
     // Create any necessary test data
     // This could involve seeding the database with test books, collections, etc.
-    
+
     console.log('✅ Test data preparation completed');
   } catch (error) {
     console.log('⚠️ Test data preparation skipped:', error.message);

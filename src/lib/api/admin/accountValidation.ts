@@ -78,7 +78,6 @@ export async function validateStoreContext(
       .from('store_administrators')
       .select('store_id, role')
       .eq('user_id', adminId)
-      .eq('is_active', true)
       .single();
 
     if (adminError && adminError.code !== 'PGRST116') {
@@ -217,13 +216,16 @@ async function validateClubOwnership(userId: string): Promise<ValidationResult> 
     const { data: ownedClubs, error } = await supabase
       .from('book_clubs')
       .select('id, name')
-      .eq('lead_user_id', userId)
-      .eq('is_active', true);
+      .eq('lead_user_id', userId);
 
     if (error) throw error;
 
     if (ownedClubs && ownedClubs.length > 0) {
-      errors.push(`User owns ${ownedClubs.length} active club(s). Transfer ownership first.`);
+      const clubNames = ownedClubs.map(club => `"${club.name}"`).join(', ');
+      errors.push(
+        `Cannot delete account while owning ${ownedClubs.length} club(s): ${clubNames}. ` +
+        `Transfer ownership to another member or contact your store owner for assistance.`
+      );
     }
 
     return { isValid: errors.length === 0, errors };
@@ -249,7 +251,6 @@ async function validateClubSuspension(
       .select('id, expires_at')
       .eq('user_id', userId)
       .eq('club_id', clubId)
-      .eq('is_active', true)
       .single();
 
     if (error && error.code !== 'PGRST116') {
@@ -264,17 +265,15 @@ async function validateClubSuspension(
       }
     }
 
-    // Check if club exists and is active
+    // Check if club exists
     const { data: club, error: clubError } = await supabase
       .from('book_clubs')
-      .select('id, name, is_active')
+      .select('id, name')
       .eq('id', clubId)
       .single();
 
     if (clubError || !club) {
       errors.push('Club not found');
-    } else if (!club.is_active) {
-      errors.push('Cannot suspend from inactive club');
     }
 
     return { isValid: errors.length === 0, errors };
@@ -354,7 +353,6 @@ export async function validateDataCleanupSafety(userId: string): Promise<Validat
         .from('club_members')
         .select('id')
         .eq('user_id', userId)
-        .eq('is_active', true)
     ]);
 
     const [subscriptions, recentPayments, clubMemberships] = checks;

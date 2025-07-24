@@ -17,15 +17,15 @@ import type { SubscriptionStatus } from '@/lib/api/subscriptions/types';
 
 /**
  * Sign in with email and password
- * 
+ *
  * @param email - User email
  * @param password - User password
  * @param setLoading - Loading state setter
  * @returns Promise<void>
  */
 export async function signIn(
-  email: string, 
-  password: string, 
+  email: string,
+  password: string,
   setLoading: (loading: boolean) => void
 ): Promise<void> {
   setLoading(true);
@@ -116,7 +116,7 @@ export async function signOut(
   navigate: (path: string) => void
 ): Promise<void> {
   setLoading(true);
-  
+
   try {
     // Invalidate caches if user exists
     if (user?.id) {

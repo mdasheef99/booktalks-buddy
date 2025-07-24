@@ -33,6 +33,8 @@ const GlobalAdminRouteGuard: React.FC<Props> = ({ children }) => {
                                     canManageUserTiers ||
                                     canManageAllClubs;
 
+        // Debug logging removed for production
+
         setIsGlobalAdmin(hasAdminEntitlements);
       } catch (error) {
         console.error('Error checking admin status:', error);

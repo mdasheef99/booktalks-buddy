@@ -4,10 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Settings, Users, MessageSquare, ArrowLeft, Search, Filter, X } from 'lucide-react';
+import { Plus, Settings, Users, MessageSquare, ArrowLeft, Search, Filter, X, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHasEntitlement } from '@/lib/entitlements/hooks';
+import { useStoreManagerAccess } from '@/hooks/store-manager/useStoreManagerAccess';
+import { deleteBookClub } from '@/lib/api';
+import DestructiveActionDialog from '@/components/common/DestructiveActionDialog';
 
 interface BookClub {
   id: string;
@@ -15,6 +19,7 @@ interface BookClub {
   description: string | null;
   privacy: string | null;
   created_at: string;
+  store_id: string;
 }
 
 const AdminClubManagementPage: React.FC = () => {
@@ -22,18 +27,48 @@ const AdminClubManagementPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [privacyFilter, setPrivacyFilter] = useState<string>('all');
+  const [clubToDelete, setClubToDelete] = useState<BookClub | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { result: canManageAllClubs, loading: entitlementsLoading } = useHasEntitlement('CAN_MANAGE_ALL_CLUBS');
+  const { isStoreManager, storeId, loading: storeAccessLoading } = useStoreManagerAccess();
 
   useEffect(() => {
     const fetchAllClubs = async () => {
+      // Wait for all loading states to complete
+      if (entitlementsLoading || storeAccessLoading) return;
+
+      // Check if user has any club management permissions
+      const hasClubAccess = canManageAllClubs || isStoreManager;
+      if (!hasClubAccess) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const { data, error } = await supabase
+        console.log('🏪 Fetching clubs for admin management', {
+          canManageAllClubs,
+          isStoreManager,
+          storeId
+        });
+
+        let query = supabase
           .from('book_clubs')
           .select('*')
           .order('created_at', { ascending: false });
 
+        // If user is a Store Manager (but not platform admin), filter by their store
+        if (isStoreManager && !canManageAllClubs && storeId) {
+          query = query.eq('store_id', storeId);
+          console.log('🏪 Filtering clubs by store:', storeId);
+        }
+
+        const { data, error } = await query;
+
         if (error) throw error;
+
+        console.log('✅ Fetched clubs:', data?.length || 0);
         setClubs(data || []);
       } catch (error) {
         console.error('Error fetching clubs:', error);
@@ -44,7 +79,7 @@ const AdminClubManagementPage: React.FC = () => {
     };
 
     fetchAllClubs();
-  }, []);
+  }, [canManageAllClubs, entitlementsLoading, isStoreManager, storeId, storeAccessLoading]);
 
   // Filter and search clubs
   const filteredClubs = useMemo(() => {
@@ -89,7 +124,40 @@ const AdminClubManagementPage: React.FC = () => {
     navigate(`/book-club/${clubId}`);
   };
 
-  if (loading) {
+  const handleDeleteClub = (club: BookClub) => {
+    setClubToDelete(club);
+  };
+
+  const confirmDeleteClub = async () => {
+    if (!clubToDelete || !user) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteBookClub(user.id, clubToDelete.id);
+      toast.success('Book club deleted successfully');
+
+      // Remove the deleted club from the list
+      setClubs(clubs.filter(club => club.id !== clubToDelete.id));
+      setClubToDelete(null);
+    } catch (error) {
+      console.error('Error deleting club:', error);
+      toast.error('Failed to delete club');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDeleteClub = () => {
+    setClubToDelete(null);
+  };
+
+  // Helper function to determine if a club can be deleted by the current admin user
+  const canDeleteClub = (club: BookClub): boolean => {
+    // Admin users with club management permissions can delete clubs
+    return canManageAllClubs;
+  };
+
+  if (loading || entitlementsLoading || storeAccessLoading) {
     return (
       <div className="animate-pulse space-y-4">
         <div className="h-8 w-64 bg-gray-300 rounded"></div>
@@ -98,6 +166,25 @@ const AdminClubManagementPage: React.FC = () => {
           <div className="h-32 bg-gray-300 rounded"></div>
           <div className="h-32 bg-gray-300 rounded"></div>
         </div>
+      </div>
+    );
+  }
+
+  // Show access denied if user doesn't have any club management permissions
+  const hasClubAccess = canManageAllClubs || isStoreManager;
+  if (!hasClubAccess) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
+        <p className="text-gray-600">You must have club management permissions to access this page.</p>
+        <Button
+          variant="outline"
+          onClick={() => navigate('/admin/dashboard')}
+          className="mt-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
       </div>
     );
   }
@@ -113,7 +200,9 @@ const AdminClubManagementPage: React.FC = () => {
         Back to Dashboard
       </Button>
 
-      <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">Book Club Management</h1>
+      <h1 className="text-3xl font-serif text-bookconnect-brown mb-8">
+        {isStoreManager && !canManageAllClubs ? 'Store Club Management' : 'Book Club Management'}
+      </h1>
 
       <Button
         onClick={handleCreateClub}
@@ -227,6 +316,17 @@ const AdminClubManagementPage: React.FC = () => {
                       <Settings className="h-4 w-4 mr-1" />
                       Settings
                     </Button>
+                    {canDeleteClub(club) && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteClub(club)}
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -265,6 +365,26 @@ const AdminClubManagementPage: React.FC = () => {
           </Card>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DestructiveActionDialog
+        isOpen={!!clubToDelete}
+        onClose={cancelDeleteClub}
+        onConfirm={confirmDeleteClub}
+        title="Delete Book Club"
+        description={`Are you sure you want to delete "${clubToDelete?.name}"? This will permanently remove the club and all associated data including members, discussions, and events.`}
+        confirmText="Delete Club"
+        cancelText="Cancel"
+        severity="high"
+        isLoading={isDeleting}
+        affectedItems={[
+          'All club members will be removed',
+          'All discussions and posts will be deleted',
+          'All club events will be cancelled',
+          'This action cannot be undone'
+        ]}
+        affectedItemsLabel="What will be deleted:"
+      />
     </div>
   );
 };

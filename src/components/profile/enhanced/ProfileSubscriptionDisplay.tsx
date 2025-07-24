@@ -36,6 +36,7 @@ import { useAlerts } from '@/hooks/useAlerts';
 import { SubscriptionAlertBanner } from '@/components/alerts/SubscriptionAlertBanner';
 import { deleteUser } from '@/lib/api/admin/accountManagement';
 import { validateAccountAction } from '@/lib/api/admin/accountValidation';
+import { createSelfDeletionRequest, checkUserClubOwnership } from '@/lib/api/admin/selfDeletionRequests';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -82,6 +83,25 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
 
     setIsDeleting(true);
     try {
+      // Check if user owns any clubs
+      const clubCheck = await checkUserClubOwnership(user.id);
+
+      if (clubCheck.ownsClubs) {
+        // User owns clubs - create deletion request instead
+        const result = await createSelfDeletionRequest(user.id, deleteReason);
+
+        if (result.success) {
+          toast.success(result.message);
+          setShowDeleteDialog(false);
+          setDeletePassword('');
+          setDeleteReason('');
+        } else {
+          toast.error(result.message);
+        }
+        return;
+      }
+
+      // User owns no clubs - proceed with immediate deletion
       // Validate the deletion action
       const validation = await validateAccountAction({
         adminId: user.id,
@@ -95,7 +115,7 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
         return;
       }
 
-      // Execute self-deletion (soft delete by default)
+      // Execute immediate deletion (soft delete by default)
       await deleteUser(user.id, user.id, {
         reason: deleteReason || 'User requested account deletion',
         type: 'soft',
@@ -127,9 +147,9 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
     setShowDeleteDialog(true);
   };
 
-  // Validate deletion form
+  // Validate deletion form (only password required)
   const isDeleteFormValid = () => {
-    return deletePassword.length >= 6 && deleteReason.length >= 10;
+    return deletePassword.length >= 6;
   };
 
 
@@ -478,6 +498,8 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
           <DialogDescription>
             This will permanently delete your account and all associated data.
             This action cannot be undone. Your account will be soft-deleted and retained for 30 days.
+            <br /><br />
+            <strong>Note:</strong> If you own book clubs, account deletion will take up to 3 business days to allow for club leadership transfer.
           </DialogDescription>
         </DialogHeader>
 

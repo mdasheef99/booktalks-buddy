@@ -323,10 +323,16 @@ export async function deleteUser(
   options: DeletionOptions
 ): Promise<void> {
   try {
-    // Validate admin permissions
-    if (adminId === userId && adminId !== userId) {
-      // Allow self-deletion but log it differently
+    // Validate admin permissions and identify deletion type
+    if (adminId === userId) {
+      // Self-deletion case
       console.log(`Self-deletion initiated by user ${userId}`);
+    } else {
+      // Admin-initiated deletion case
+      console.log(`Admin deletion initiated by ${adminId} for user ${userId}`);
+
+      // TODO: Add admin permission validation here if needed
+      // For now, we trust that the calling code has validated permissions
     }
 
     // Check for club ownership before deletion
@@ -338,7 +344,15 @@ export async function deleteUser(
     if (clubError) throw clubError;
 
     if (ownedClubs && ownedClubs.length > 0) {
-      throw new Error(`User owns ${ownedClubs.length} club(s). Transfer ownership first.`);
+      const clubNames = ownedClubs.map(club => `"${club.name}"`).join(', ');
+
+      throw new Error(
+        `Cannot delete account while owning ${ownedClubs.length} club(s): ${clubNames}. ` +
+        `Please either:\n` +
+        `• Transfer ownership to another member\n` +
+        `• Contact your store owner for assistance\n` +
+        `• Use the club management interface to assign new leaders`
+      );
     }
 
     if (options.type === 'soft') {
@@ -622,13 +636,12 @@ async function findLongestServingAdmin(clubId: string): Promise<{ user_id: strin
  */
 async function dissolveClub(clubId: string, reason: string): Promise<void> {
   try {
-    // Mark club as inactive/dissolved
+    // Mark club as dissolved (using description field since no is_active column exists)
     const { error: clubError } = await supabase
       .from('book_clubs')
       .update({
-        is_active: false,
-        dissolution_reason: reason,
-        dissolved_at: new Date().toISOString()
+        description: `[DISSOLVED] ${reason}`,
+        updated_at: new Date().toISOString()
       })
       .eq('id', clubId);
 

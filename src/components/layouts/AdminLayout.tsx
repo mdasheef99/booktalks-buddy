@@ -17,7 +17,8 @@ import {
   TrendingUp,
   Package,
   Search,
-  CreditCard
+  CreditCard,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -90,6 +91,18 @@ const AdminLayout: React.FC = () => {
           >
             <Users className="h-5 w-5 mr-3" />
             Users
+          </NavLink>
+
+          <NavLink
+            to="/admin/delete-requests"
+            className={({ isActive }) =>
+              `flex items-center p-3 rounded-lg ${isActive
+                ? 'bg-white/20 text-white'
+                : 'text-white/70 hover:bg-white/10'}`
+            }
+          >
+            <Trash2 className="h-5 w-5 mr-3" />
+            Delete Requests
           </NavLink>
 
           <NavLink
@@ -253,6 +266,18 @@ const AdminLayout: React.FC = () => {
               >
                 <BookOpen className="h-4 w-4 mr-3" />
                 Book Club Analytics
+              </NavLink>
+
+              <NavLink
+                to="/admin/store-management/managers"
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-lg ml-4 ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:bg-white/10'}`
+                }
+              >
+                <Users className="h-4 w-4 mr-3" />
+                Store Managers
               </NavLink>
             </>
           )}

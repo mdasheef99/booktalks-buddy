@@ -29,7 +29,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       await signIn(email, password);
       // The redirect will be handled by the signIn function in AuthContext

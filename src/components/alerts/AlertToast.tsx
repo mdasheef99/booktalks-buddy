@@ -301,6 +301,47 @@ export function showGracePeriodWarningToast(
 }
 
 /**
+ * Show club ownership blocking account deletion toast
+ */
+export function showClubOwnershipBlockingToast(
+  clubCount: number,
+  clubNames: string[],
+  onShowTransferOptions?: () => void
+) {
+  const clubList = clubNames.length > 3
+    ? `${clubNames.slice(0, 3).join(', ')} and ${clubNames.length - 3} more`
+    : clubNames.join(', ');
+
+  return toast.error(
+    <div className="flex items-start gap-3">
+      <AlertTriangle className="h-5 w-5 mt-0.5 text-red-500" />
+      <div>
+        <div className="font-medium text-sm mb-1">
+          Cannot Delete Account
+        </div>
+        <div className="text-sm text-gray-600 mb-2">
+          You own {clubCount} book club{clubCount > 1 ? 's' : ''} that must be transferred first.
+        </div>
+        <div className="text-xs text-gray-500 mb-2">
+          Clubs: {clubList}
+        </div>
+        <div className="text-xs text-gray-600">
+          Please transfer ownership to another member or contact your store owner for assistance.
+        </div>
+      </div>
+    </div>,
+    {
+      duration: 0, // Persistent until dismissed
+      action: onShowTransferOptions ? {
+        label: 'Transfer Clubs',
+        onClick: onShowTransferOptions
+      } : undefined,
+      className: 'border-red-200 bg-red-50'
+    }
+  );
+}
+
+/**
  * Show success toast for resolved alerts
  */
 export function showAlertResolvedToast(alertTitle: string) {

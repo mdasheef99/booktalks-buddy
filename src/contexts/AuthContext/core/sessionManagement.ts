@@ -12,6 +12,8 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import type { Session, User } from '@supabase/supabase-js';
 import type { SubscriptionStatus } from '@/lib/api/subscriptions/types';
+import type { AccountStatus } from '@/lib/api/admin/accountManagement';
+import { validateAccountStatus } from '../features/accountStatus';
 
 /**
  * Initialize session and set up auth state change listener
@@ -36,7 +38,10 @@ export function initializeSession(
   setSubscriptionLoading: (loading: boolean) => void,
   lastKnownUserId: string | null,
   setLastKnownUserId: (id: string | null) => void,
-  navigate: (path: string) => void
+  navigate: (path: string) => void,
+  accountStatus?: AccountStatus | null,
+  signOut?: () => Promise<void>,
+  showSuspensionModal?: () => void
 ): () => void {
   // Track if this is the initial session fetch
   let isInitialMount = true;
@@ -79,6 +84,21 @@ export function initializeSession(
           // Update the last known user ID without navigation
           // This handles user changes without tab switching
           setLastKnownUserId(session.user.id);
+        }
+
+        // Check account status for suspended/deleted users
+        if (accountStatus && showSuspensionModal) {
+          const statusValidation = validateAccountStatus(accountStatus);
+          if (statusValidation.shouldLogout) {
+            console.log('[SessionManagement] Account suspended/deleted, showing modal', {
+              currentPath: window.location.pathname,
+              accountStatus: accountStatus?.account_status
+            });
+
+            // Show suspension modal instead of logging out
+            showSuspensionModal();
+            return;
+          }
         }
       } else {
         // User signed out

@@ -472,16 +472,18 @@ function SuspensionForm({ form, onChange }: SuspensionFormProps) {
           onValueChange={(value) => onChange({ ...form, duration_hours: value })}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select duration (leave empty for permanent)" />
+            <SelectValue placeholder="Select suspension duration" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="permanent">Permanent</SelectItem>
+            <SelectItem value="permanent">Permanent Suspension</SelectItem>
             <SelectItem value="1">1 hour</SelectItem>
             <SelectItem value="6">6 hours</SelectItem>
             <SelectItem value="24">1 day</SelectItem>
             <SelectItem value="72">3 days</SelectItem>
             <SelectItem value="168">1 week</SelectItem>
             <SelectItem value="720">1 month</SelectItem>
+            <SelectItem value="4320">6 months</SelectItem>
+            <SelectItem value="8760">1 year</SelectItem>
           </SelectContent>
         </Select>
       </div>

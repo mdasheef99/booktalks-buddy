@@ -3,13 +3,17 @@ import AdminRouteGuard from "./components/routeguards/AdminRouteGuard";
 import MemberRouteGuard from "./components/routeguards/MemberRouteGuard";
 import GlobalAdminRouteGuard from "./components/routeguards/GlobalAdminRouteGuard";
 import { StoreOwnerRouteGuard } from "./components/routeguards/StoreOwnerRouteGuard";
+import { StoreManagerRouteGuard } from "./components/routeguards/StoreManagerRouteGuard";
+
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AlertProvider } from "./contexts/AlertContext";
 import { UserProfileProvider } from "./contexts/UserProfileContext";
+import { SuspensionModalProvider } from "./contexts/SuspensionModalContext";
 import { HelmetProvider } from "react-helmet-async";
 import Layout from "./components/Layout";
 import AdminLayout from "./components/layouts/AdminLayout";
+import StoreManagerLayout from "./components/layouts/StoreManagerLayout";
 import Landing from "./pages/Landing";
 import Offers from "./pages/Offers";
 import Profile from "./pages/Profile";
@@ -37,10 +41,21 @@ import AdminUserListPage from "./pages/admin/AdminUserListPage";
 import AdminJoinRequestsPage from "./pages/admin/AdminJoinRequestsPage";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminEventsPage from "./pages/admin/AdminEventsPage";
+
+// Store Manager Pages
+import StoreManagerDashboardPage from "./pages/store-manager/StoreManagerDashboardPage";
+import StoreManagerAnalyticsPage from "./pages/store-manager/StoreManagerAnalyticsPage";
+import StoreManagerUsersPage from "./pages/store-manager/StoreManagerUsersPage";
+import StoreManagerClubsPage from "./pages/store-manager/StoreManagerClubsPage";
+import StoreManagerModerationPage from "./pages/store-manager/StoreManagerModerationPage";
+import StoreManagerEventsPage from "./pages/store-manager/StoreManagerEventsPage";
+import StoreManagerCreateEventPage from "./pages/store-manager/StoreManagerCreateEventPage";
+import StoreManagerEditEventPage from "./pages/store-manager/StoreManagerEditEventPage";
 import CreateEventPage from "./pages/admin/CreateEventPage";
 import EditEventPage from "./pages/admin/EditEventPage";
 import ModerationPage from "./pages/admin/ModerationPage";
 import SubscriptionManagementPage from "./pages/admin/SubscriptionManagementPage";
+import SelfDeletionRequests from "./components/admin/SelfDeletionRequests";
 import EntitlementsDebug from "./pages/debug/EntitlementsDebug";
 import { StoreManagementDashboard } from "@/pages/admin/store/StoreManagementDashboard";
 import { HeroCustomization } from "@/pages/admin/store/HeroCustomization";
@@ -52,6 +67,7 @@ import { QuoteManagement } from "@/pages/admin/store/QuoteManagement";
 import { CommunityShowcaseManagement } from "@/pages/admin/store/CommunityShowcaseManagement";
 import BookListingsManagement from "@/pages/admin/store/BookListingsManagement";
 import BookAvailabilityRequestsManagement from "@/pages/admin/store/BookAvailabilityRequestsManagement";
+import StoreManagersManagement from "@/pages/admin/store/StoreManagersManagement";
 import ReportingSystemTest from "./components/testing/ReportingSystemTest";
 import { AlertSystemTest } from "./components/testing/AlertSystemTest";
 import { SubscriptionDebugger } from "./components/testing/SubscriptionDebugger";
@@ -74,6 +90,8 @@ import BookListingPage from "./pages/BookListingPage";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";
+import { SuspensionModal } from "./components/modals/SuspensionModal";
+
 
 // Direct Messaging Components
 import { ConversationListPage } from "./components/messaging/pages/ConversationListPage";
@@ -90,9 +108,10 @@ function App() {
     <>
       <HelmetProvider>
         <BrowserRouter>
-          <AuthProvider>
-            <AlertProvider>
-              <UserProfileProvider>
+          <SuspensionModalProvider>
+            <AuthProvider>
+              <AlertProvider>
+                <UserProfileProvider>
             <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
@@ -100,6 +119,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
+
 
             {/* Legacy profile URL redirect (outside Layout to avoid auth guards) */}
             <Route path="/profile/:userId" element={<LegacyProfileRedirect />} />
@@ -219,6 +239,7 @@ function App() {
               <Route path="clubs" element={<AdminClubManagementPage />} />
               <Route path="users" element={<AdminUserListPage />} />
               <Route path="requests" element={<AdminJoinRequestsPage />} />
+              <Route path="delete-requests" element={<SelfDeletionRequests />} />
               <Route path="events" element={<AdminEventsPage />} />
               <Route path="events/create" element={<CreateEventPage />} />
               <Route path="events/edit/:eventId" element={<EditEventPage />} />
@@ -248,17 +269,40 @@ function App() {
                     <Route path="book-availability-requests" element={<BookAvailabilityRequestsManagement />} />
                     <Route path="analytics" element={<LandingPageAnalytics />} />
                     <Route path="book-club-analytics" element={<BookClubAnalytics />} />
+                    <Route path="managers" element={<StoreManagersManagement />} />
                   </Routes>
                 </StoreOwnerRouteGuard>
               } />
             </Route>
 
+            {/* Store Manager Routes with Store Manager Guard */}
+            <Route path="/store-manager" element={
+              <StoreManagerRouteGuard>
+                <StoreManagerLayout />
+              </StoreManagerRouteGuard>
+            }>
+              <Route index element={<Navigate to="/store-manager/dashboard" replace />} />
+              <Route path="dashboard" element={<StoreManagerDashboardPage />} />
+              <Route path="analytics" element={<StoreManagerAnalyticsPage />} />
+              <Route path="users" element={<StoreManagerUsersPage />} />
+              <Route path="clubs" element={<StoreManagerClubsPage />} />
+              <Route path="moderation" element={<StoreManagerModerationPage />} />
+              <Route path="events" element={<StoreManagerEventsPage />} />
+              <Route path="events/create" element={<StoreManagerCreateEventPage />} />
+              <Route path="events/edit/:eventId" element={<StoreManagerEditEventPage />} />
+            </Route>
+
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
             </Routes>
-            </UserProfileProvider>
-          </AlertProvider>
-        </AuthProvider>
+
+            {/* Global Suspension Modal */}
+            <SuspensionModal />
+
+                </UserProfileProvider>
+              </AlertProvider>
+            </AuthProvider>
+          </SuspensionModalProvider>
           <Toaster />
         </BrowserRouter>
       </HelmetProvider>

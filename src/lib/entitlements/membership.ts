@@ -29,6 +29,48 @@ import {
   type SubscriptionValidationDecision
 } from './roleClassification';
 
+// =========================
+// Subscription Validation Caching
+// =========================
+
+// 🚨 PERFORMANCE FIX: Cache subscription status to prevent repeated DB queries
+const subscriptionCache = new Map<string, { hasActive: boolean; timestamp: number }>();
+const SUBSCRIPTION_CACHE_DURATION = 60000; // 1 minute cache
+
+async function getCachedSubscriptionStatus(userId: string): Promise<boolean> {
+  const cached = subscriptionCache.get(userId);
+
+  // Return cached result if still valid
+  if (cached && Date.now() - cached.timestamp < SUBSCRIPTION_CACHE_DURATION) {
+    console.log(`[Subscription Cache] Cache hit for user ${userId}`);
+    return cached.hasActive;
+  }
+
+  // Cache miss or expired - fetch from database
+  console.log(`[Subscription Cache] Cache miss for user ${userId}, fetching from database`);
+  try {
+    // 🚨 PERFORMANCE FIX: Add timeout to prevent hanging queries
+    const timeoutPromise = new Promise<boolean>((_, reject) => {
+      setTimeout(() => reject(new Error('Subscription query timeout')), 5000); // 5 second timeout
+    });
+
+    const subscriptionPromise = hasActiveSubscription(userId);
+    const hasActive = await Promise.race([subscriptionPromise, timeoutPromise]);
+
+    // Cache the result
+    subscriptionCache.set(userId, {
+      hasActive,
+      timestamp: Date.now()
+    });
+
+    console.log(`[Subscription Cache] Successfully cached result for user ${userId}: ${hasActive}`);
+    return hasActive;
+  } catch (error) {
+    console.error(`[Subscription Cache] Error fetching subscription status for user ${userId}:`, error);
+    return false; // Fail secure
+  }
+}
+
 /**
  * Calculate all entitlements for a user
  *
@@ -210,7 +252,8 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
         // Use the pre-calculated exemption status to ensure store owners bypass validation
         if (roleEnforcementEnabled && !isExemptFromValidation) {
           // User is subject to subscription validation for club leadership role
-          const hasActiveSubscriptionForRole = await hasActiveSubscription(userId);
+          // 🚨 PERFORMANCE FIX: Use cached subscription status to prevent repeated DB queries
+          const hasActiveSubscriptionForRole = await getCachedSubscriptionStatus(userId);
 
           if (hasActiveSubscriptionForRole) {
             console.log(`[Role Enforcement] User ${userId} has active subscription - granting club leadership entitlements`);
@@ -248,7 +291,8 @@ export async function calculateUserEntitlements(userId: string): Promise<string[
         // Use the pre-calculated exemption status to ensure store owners bypass validation
         if (roleEnforcementEnabled && !isExemptFromValidation) {
           // User is subject to subscription validation for club moderator role
-          const hasActiveSubscriptionForRole = await hasActiveSubscription(userId);
+          // 🚨 PERFORMANCE FIX: Use cached subscription status to prevent repeated DB queries
+          const hasActiveSubscriptionForRole = await getCachedSubscriptionStatus(userId);
 
           if (hasActiveSubscriptionForRole) {
             console.log(`[Role Enforcement] User ${userId} has active subscription - granting club moderator entitlements`);

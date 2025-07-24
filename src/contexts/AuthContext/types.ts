@@ -10,6 +10,7 @@
 
 import type { User, Session } from '@supabase/supabase-js';
 import type { SubscriptionStatus } from '@/lib/api/subscriptions/types';
+import type { AccountStatus } from '@/lib/api/admin/accountManagement';
 
 /**
  * Complete authentication context type definition
@@ -56,6 +57,15 @@ export interface AuthContextType {
     expiryDate?: string | null;
     lastValidated?: string;
   };
+
+  // Account status management (Suspension Enforcement System)
+  accountStatus: AccountStatus | null;
+  accountStatusLoading: boolean;
+  isAccountSuspended: () => boolean;
+  isAccountDeleted: () => boolean;
+  isAccountActive: () => boolean;
+  refreshAccountStatus: () => Promise<void>;
+  getAccountStatusMessage: () => string;
 
   // Coordinated data refresh (Phase 4B.1.2)
   refreshUserData: () => Promise<void>;
