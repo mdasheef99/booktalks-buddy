@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BookListingForm } from './BookListingForm';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BookOpen, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import { useSectionAnimation } from '@/hooks/useScrollAnimation';
@@ -10,38 +10,15 @@ interface BookListingSectionProps {
 }
 
 export const BookListingSection: React.FC<BookListingSectionProps> = ({ storeId }) => {
-  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
   const { elementRef: headerRef, animationClass: headerAnimation } = useSectionAnimation('fade-up');
   const { elementRef: contentRef, animationClass: contentAnimation } = useSectionAnimation('fade-scale');
 
-  const handleFormSuccess = () => {
-    setShowForm(false);
-    // Scroll to top of section
-    headerRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleListBooksClick = () => {
+    navigate('/book-listing');
   };
 
-  if (showForm) {
-    return (
-      <section className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-cream to-bookconnect-parchment">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 text-center">
-            <Button
-              variant="outline"
-              onClick={() => setShowForm(false)}
-              className="mb-4 border-bookconnect-brown text-bookconnect-brown hover:bg-bookconnect-brown hover:text-white"
-            >
-              ← Back to Information
-            </Button>
-          </div>
-          
-          <BookListingForm
-            storeId={storeId}
-            onSuccess={handleFormSuccess}
-          />
-        </div>
-      </section>
-    );
-  }
+
 
   return (
     <section className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-cream to-bookconnect-parchment relative overflow-hidden">
@@ -146,7 +123,7 @@ export const BookListingSection: React.FC<BookListingSectionProps> = ({ storeId 
         {/* Call to Action */}
         <div className="text-center">
           <Button
-            onClick={() => setShowForm(true)}
+            onClick={handleListBooksClick}
             size="lg"
             className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
