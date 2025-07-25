@@ -54,18 +54,14 @@ export function useDiscussionData({
       try {
         setLoading(true);
         setConnectionError(false);
-        console.log("Loading chat history for book:", id, "with username:", username);
-
-        // Use the updated getBookChat function with pagination support
         const result = await getBookChat(id, { limit: 30 });
-        console.log("Got chat history:", result);
 
         setMessages(result.messages);
         setHasMoreMessages(result.hasMore);
 
         // Set the oldest message timestamp for pagination
         if (result.messages.length > 0) {
-          setOldestMessageTimestamp(result.messages[0].timestamp);
+          setOldestMessageTimestamp(result.messages[0].created_at);
         } else {
           setOldestMessageTimestamp(null);
         }
@@ -110,13 +106,9 @@ export function useDiscussionData({
     const MAX_RECONNECT_ATTEMPTS = 5;
     const RECONNECT_INTERVAL = 5000; // 5 seconds
 
-    // Don't try to reconnect if we've exceeded the maximum attempts
     if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-      console.log(`Maximum reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached`);
       return;
     }
-
-    console.log(`Attempting to reconnect (attempt ${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})...`);
 
     const reconnectTimer = setTimeout(async () => {
       try {
@@ -124,15 +116,13 @@ export function useDiscussionData({
         const isConnected = await checkConnection();
 
         if (isConnected) {
-          // If we're online, try to reload chat history
-          console.log("Connection restored, reloading chat history");
           const result = await getBookChat(id, { limit: 30 });
           setMessages(result.messages);
           setHasMoreMessages(result.hasMore);
 
           // Update oldest message timestamp
           if (result.messages.length > 0) {
-            setOldestMessageTimestamp(result.messages[0].timestamp);
+            setOldestMessageTimestamp(result.messages[0].created_at);
           } else {
             setOldestMessageTimestamp(null);
           }
@@ -165,7 +155,6 @@ export function useDiscussionData({
 
     try {
       setIsLoadingOlderMessages(true);
-      console.log("Loading older messages before timestamp:", oldestMessageTimestamp);
 
       const result = await getBookChat(id, {
         limit: 20,
@@ -177,7 +166,7 @@ export function useDiscussionData({
         setMessages((prevMessages: any) => [...result.messages, ...prevMessages]);
 
         // Update the oldest message timestamp
-        setOldestMessageTimestamp(result.messages[0].timestamp);
+        setOldestMessageTimestamp(result.messages[0].created_at);
       }
 
       // Update whether there are more messages to load

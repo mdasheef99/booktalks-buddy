@@ -27,25 +27,25 @@ export function useDiscussionRealtime({
 }: UseDiscussionRealtimeProps) {
   const { isOnline } = useConnectionStatus();
 
-  // Subscribe to real-time chat updates
+  // Subscribe to real-time chat updates - StrictMode Safe
   useEffect(() => {
     if (!id) return;
 
-    console.log("Setting up real-time subscription for book:", id);
+
     let subscription: { unsubscribe: () => void } | null = null;
     let isSubscriptionActive = false;
+    let isMounted = true; // Track if component is still mounted
 
     const setupSubscription = () => {
-      // Prevent multiple subscriptions
-      if (isSubscriptionActive) {
-        console.log("Subscription already active, skipping setup");
+      if (isSubscriptionActive || !isMounted) {
         return;
       }
 
       try {
-        console.log("Creating new chat subscription for book:", id);
         subscription = subscribeToChat(id, (newMessage) => {
-          console.log("Received new message in component:", newMessage);
+          if (!isMounted) {
+            return;
+          }
 
           // Handle both new messages and updates to existing messages (deletions)
           setMessages((prevMessages) => {
@@ -67,40 +67,43 @@ export function useDiscussionRealtime({
         });
 
         isSubscriptionActive = true;
-        console.log("Chat subscription created successfully");
       } catch (error) {
         console.error("Error setting up chat subscription:", error);
-        setConnectionError(true);
+        if (isMounted) {
+          setConnectionError(true);
+        }
         isSubscriptionActive = false;
 
-        // Try to reconnect after a delay
+
         setTimeout(() => {
-          if (!isSubscriptionActive) {
+          if (!isSubscriptionActive && isMounted) {
             setupSubscription();
           }
         }, 5000);
       }
     };
 
-    // Initial setup
-    setupSubscription();
 
-    // Set up a heartbeat to check the subscription is still active
-    const heartbeatInterval = setInterval(() => {
-      if (connectionError && isOnline && !isSubscriptionActive) {
-        console.log("Connection appears to be restored, attempting to resubscribe");
+    const setupTimer = setTimeout(() => {
+      if (isMounted) {
         setupSubscription();
       }
-    }, 10000); // Check every 10 seconds
+    }, 100);
+
+    const heartbeatInterval = setInterval(() => {
+      if (connectionError && isOnline && !isSubscriptionActive && isMounted) {
+        setupSubscription();
+      }
+    }, 10000);
 
     return () => {
-      console.log("Unsubscribing from chat");
+      isMounted = false;
+      clearTimeout(setupTimer);
       clearInterval(heartbeatInterval);
       isSubscriptionActive = false;
 
       if (subscription) {
         try {
-          console.log("Cleaning up chat subscription");
           subscription.unsubscribe();
           subscription = null;
         } catch (e) {
@@ -108,27 +111,23 @@ export function useDiscussionRealtime({
         }
       }
     };
-  }, [id]); // Remove connectionError and isOnline from dependencies to prevent re-subscriptions
+  }, [id]);
 
   // Track presence of users in the chat
   useEffect(() => {
     if (!id || !username) return;
 
-    console.log("Setting up presence tracking for book:", id);
+
     let presenceTracker: { unsubscribe: () => void } | null = null;
     let isPresenceActive = false;
 
     const setupPresence = () => {
-      // Prevent multiple presence trackers
       if (isPresenceActive) {
-        console.log("Presence tracking already active, skipping setup");
         return;
       }
 
       try {
-        console.log("Creating new presence tracker for book:", id, "user:", username);
         presenceTracker = trackPresence(id, username, (onlineUsers) => {
-          console.log("Online users updated:", onlineUsers);
           setOnlineUsers(onlineUsers);
 
           // If we're receiving presence updates, we're connected
@@ -138,12 +137,11 @@ export function useDiscussionRealtime({
         });
 
         isPresenceActive = true;
-        console.log("Presence tracking created successfully");
       } catch (error) {
         console.error("Error setting up presence tracking:", error);
         isPresenceActive = false;
 
-        // Try to reconnect after a delay
+
         setTimeout(() => {
           if (!isPresenceActive) {
             setupPresence();
@@ -152,25 +150,21 @@ export function useDiscussionRealtime({
       }
     };
 
-    // Initial setup
+
     setupPresence();
 
-    // Set up a heartbeat to check the presence tracking is still active
     const heartbeatInterval = setInterval(() => {
       if (connectionError && isOnline && !isPresenceActive) {
-        console.log("Connection appears to be restored, attempting to reconnect presence");
         setupPresence();
       }
-    }, 15000); // Check every 15 seconds
+    }, 15000);
 
     return () => {
-      console.log("Unsubscribing from presence tracking");
       clearInterval(heartbeatInterval);
       isPresenceActive = false;
 
       if (presenceTracker) {
         try {
-          console.log("Cleaning up presence tracker");
           presenceTracker.unsubscribe();
           presenceTracker = null;
         } catch (e) {
@@ -178,7 +172,7 @@ export function useDiscussionRealtime({
         }
       }
     };
-  }, [id, username]); // Remove connectionError and isOnline from dependencies
+  }, [id, username]);
 
   return {};
 }

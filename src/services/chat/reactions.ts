@@ -4,12 +4,6 @@ import { supabase } from '../base/supabaseService';
 // ========== Reaction Functions ==========
 export async function getMessageReactions(messageId: string): Promise<Array<{reaction: string, count: number, userReacted: boolean, username: string, users: string[]}>> {
   try {
-    console.log("Fetching reactions for message:", messageId);
-
-    // Add a cache-busting parameter to ensure we get fresh data
-    const timestamp = new Date().getTime();
-
-    // Use a direct query to ensure we get the latest data
     const { data, error } = await supabase
       .from('message_reactions')
       .select('reaction, username, created_at')
@@ -22,13 +16,8 @@ export async function getMessageReactions(messageId: string): Promise<Array<{rea
     }
 
     if (!data || data.length === 0) {
-      console.log("No reactions found for message:", messageId);
       return [];
     }
-
-    console.log(`Found ${data.length} reactions at ${timestamp}:`, data);
-
-    console.log("Raw reaction data:", data);
 
     // Group reactions and count them, ensuring each user is only counted once per emoji
     const reactionGroups: Record<string, {count: number, users: string[]}> = {};
@@ -63,9 +52,7 @@ export async function getMessageReactions(messageId: string): Promise<Array<{rea
         .map((item: { reaction: string }) => item.reaction)
     )];
 
-    console.log("Current user reactions:", userReactions);
 
-    // Format the response
     const formattedReactions = Object.keys(reactionGroups).map(reaction => {
       const users = reactionGroups[reaction].users;
       return {
@@ -77,12 +64,6 @@ export async function getMessageReactions(messageId: string): Promise<Array<{rea
       };
     });
 
-    console.log("Formatted reactions:", formattedReactions);
-
-    // Log the count for each reaction
-    formattedReactions.forEach(r => {
-      console.log(`Reaction ${r.reaction} has ${r.count} reactions and ${r.users.length} users`);
-    });
     return formattedReactions;
   } catch (error) {
     console.error("Failed to get message reactions:", error);
@@ -96,9 +77,6 @@ export async function addReaction(
   reaction: string
 ): Promise<boolean> {
   try {
-    console.log("Adding/toggling reaction:", reaction, "for message:", messageId, "by user:", username);
-
-    // Step 1: Check if this exact reaction exists (for toggling)
     const { data: existingReactions, error: checkError } = await supabase
       .from('message_reactions')
       .select('id')
@@ -111,11 +89,7 @@ export async function addReaction(
       return false;
     }
 
-    // If user has this reaction, remove it (toggle off)
     if (existingReactions && existingReactions.length > 0) {
-      console.log("User already has this reaction, removing it (toggle off)");
-
-      // Try to delete the reaction
       const { error: deleteError } = await supabase
         .from('message_reactions')
         .delete()
@@ -126,7 +100,6 @@ export async function addReaction(
         return false;
       }
 
-      console.log("Reaction removed successfully");
       return true;
     }
 
@@ -139,12 +112,9 @@ export async function addReaction(
 
     if (userReactionsError) {
       console.error("Error checking user reactions:", userReactionsError);
-      // Continue anyway, as the insert might still work
     }
 
-    // If user has other reactions, delete them (one reaction per user)
     if (userReactions && userReactions.length > 0) {
-      console.log(`User has ${userReactions.length} existing reactions, removing them`);
 
       for (const existingReaction of userReactions) {
         const { error: deleteError } = await supabase
@@ -154,15 +124,11 @@ export async function addReaction(
 
         if (deleteError) {
           console.error(`Error removing reaction ${existingReaction.id}:`, deleteError);
-          // Continue with other deletions
         }
       }
     }
 
-    // Step 3: Add the new reaction with a retry mechanism
-    console.log("Adding new reaction:", reaction);
 
-    // Try up to 3 times to insert the reaction
     let insertSuccess = false;
     let attempts = 0;
     let lastError = null;
@@ -177,28 +143,21 @@ export async function addReaction(
             message_id: messageId,
             username,
             reaction,
-            created_at: new Date().toISOString() // Add timestamp to ensure it's fresh
+            created_at: new Date().toISOString()
           }]);
 
         if (!insertError) {
           insertSuccess = true;
-          console.log(`Reaction added successfully on attempt ${attempts}`);
         } else {
           lastError = insertError;
-          console.warn(`Insert attempt ${attempts} failed:`, insertError);
 
-          // If it's a unique constraint violation, we can stop trying
           if (insertError.code === '23505') {
-            console.warn("Unique constraint violation - user already has a reaction");
             break;
           }
-
-          // Wait a bit before retrying
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       } catch (e) {
         lastError = e;
-        console.error(`Exception on insert attempt ${attempts}:`, e);
         await new Promise(resolve => setTimeout(resolve, 300));
       }
     }
@@ -208,7 +167,6 @@ export async function addReaction(
       return false;
     }
 
-    console.log("Reaction operation completed successfully");
     return true;
   } catch (error) {
     console.error("Failed to add/toggle reaction:", error);

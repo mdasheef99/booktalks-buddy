@@ -27,8 +27,7 @@ export async function getBookChat(
   // Convert Google Books ID to UUID format for Supabase
   const dbBookId = generateBookUuid(originalId);
 
-  console.log("Fetching chat for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId,
-    "with options:", { limit, beforeTimestamp });
+
 
   try {
     // Start building the query
@@ -39,12 +38,12 @@ export async function getBookChat(
 
     // Add timestamp filter for pagination if provided
     if (beforeTimestamp) {
-      query = query.lt('timestamp', beforeTimestamp);
+      query = query.lt('created_at', beforeTimestamp);
     }
 
-    // Add ordering and limit
+    // Add ordering and limit - USE created_at for consistent ordering
     query = query
-      .order('timestamp', { ascending: false }) // Descending for pagination (newest first)
+      .order('created_at', { ascending: false }) // Descending for pagination (newest first)
       .limit(limit + 1); // Fetch one extra to determine if there are more messages
 
     // Execute the query
@@ -64,7 +63,7 @@ export async function getBookChat(
     // Reverse the messages to maintain ascending order (oldest first)
     messages.reverse();
 
-    console.log("Retrieved messages:", messages.length, "hasMore:", hasMore);
+
 
     // Load reactions for each message
     const messagesWithReactions = await Promise.all(messages.map(async (message) => {
@@ -123,7 +122,7 @@ export async function sendChatMessage(
     // Now passing coverUrl to ensure it gets stored
     const dbBookId = await ensureBookExists(originalId, title || 'Unknown Book', author || 'Unknown Author', coverUrl);
 
-    console.log("Sending message for bookId:", bookId, "original ID:", originalId, "converted to UUID:", dbBookId);
+
 
     const timestamp = new Date().toISOString();
 
@@ -137,7 +136,7 @@ export async function sendChatMessage(
       // Status is tracked client-side only, not in the database
     };
 
-    console.log("Inserting message:", newMessage);
+
 
     const { data, error } = await supabase
       .from('chat_messages')
@@ -167,7 +166,7 @@ export async function sendChatMessage(
       throw error;
     }
 
-    console.log("Message sent successfully, response:", data);
+
     return data;
   } catch (error) {
     // Don't handle the error here, just rethrow it
