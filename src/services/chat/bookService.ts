@@ -30,6 +30,7 @@ export async function ensureBookExists(googleBooksId: string, title: string, aut
       .insert([
         {
           id: dbBookId,
+          google_books_id: originalId, // FIX: Store the Google Books ID
           title: title || 'Unknown Book',
           author: author || 'Unknown Author',
           genre: 'Uncategorized', // Required field

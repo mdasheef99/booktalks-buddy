@@ -1,22 +1,505 @@
-<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="41.324068">
-<testsuite name="store-manager-moderation.spec.ts" timestamp="2025-07-24T19:00:24.494Z" hostname="chromium" tests="1" failures="0" skipped="0" time="8.246" errors="0">
-<testcase name="Store Manager Moderation Interface › Authentication &amp; Access Control › should redirect unauthorized users" classname="store-manager-moderation.spec.ts" time="8.246">
+<testsuites id="" name="" tests="15" failures="15" skipped="0" errors="0" time="103.88654">
+<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="chromium" tests="3" failures="3" skipped="0" time="53.965" errors="0">
+<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="19.547">
+<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
+<![CDATA[  [chromium] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      12 |     // Setup User 1
+      13 |     await page1.goto('/chat-selection');
+    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
+         |                 ^
+      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
+      16 |     await page1.click('[data-testid="start-chat-button"]');
+      17 |     
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\error-context.md
+]]>
+</failure>
 <system-out>
-<![CDATA[🚀 Setting up Store Manager Moderation test
-🔐 Logging in as Store Manager: kafka@bookconnect.com
-✅ Store Manager login successful
-🚫 Testing unauthorized access protection
-🚪 Logging out current user
-✅ Logout successful
-📍 Final URL after redirect attempt: http://localhost:5173/login
-✅ Unauthorized access properly blocked
-🧹 Cleaning up Store Manager Moderation test
-🧹 Cleaning up test state
-🚪 Logging out current user
-✅ Logout via URL navigation
-✅ Test state cleaned up
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\error-context.md]]
 ]]>
 </system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="14.99">
+<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
+<![CDATA[  [chromium] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="19.428">
+<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
+<![CDATA[  [chromium] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="firefox" tests="3" failures="3" skipped="0" time="115.005" errors="0">
+<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="30.511">
+<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
+<![CDATA[  [firefox] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      12 |     // Setup User 1
+      13 |     await page1.goto('/chat-selection');
+    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
+         |                 ^
+      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
+      16 |     await page1.click('[data-testid="start-chat-button"]');
+      17 |     
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="60.007">
+<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
+<![CDATA[  [firefox] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
+
+    Test timeout of 60000ms exceeded.
+
+    Error: browserContext.newPage: Test ended.
+
+      60 |     const context2 = await browser.newContext();
+      61 |     
+    > 62 |     const page1 = await context1.newPage();
+         |                                  ^
+      63 |     const page2 = await context2.newPage();
+      64 |
+      65 |     // Setup both users in same book discussion
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:62:34
+]]>
+</failure>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="24.487">
+<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
+<![CDATA[  [firefox] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="webkit" tests="3" failures="3" skipped="0" time="46.51" errors="0">
+<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="19.643">
+<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
+<![CDATA[  [webkit] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      12 |     // Setup User 1
+      13 |     await page1.goto('/chat-selection');
+    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
+         |                 ^
+      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
+      16 |     await page1.click('[data-testid="start-chat-button"]');
+      17 |     
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="13.819">
+<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
+<![CDATA[  [webkit] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="13.048">
+<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
+<![CDATA[  [webkit] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="Mobile Chrome" tests="3" failures="3" skipped="0" time="39.993" errors="0">
+<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="13.864">
+<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      12 |     // Setup User 1
+      13 |     await page1.goto('/chat-selection');
+    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
+         |                 ^
+      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
+      16 |     await page1.click('[data-testid="start-chat-button"]');
+      17 |     
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="13.49">
+<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-2.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="12.639">
+<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
+
+    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\test-failed-1.png]]
+
+[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="Mobile Safari" tests="3" failures="3" skipped="0" time="16.487" errors="0">
+<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="7.143">
+<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
+<![CDATA[  [Mobile Safari] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
+
+    Error: page.fill: Target page, context or browser has been closed
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      12 |     // Setup User 1
+      13 |     await page1.goto('/chat-selection');
+    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
+         |                 ^
+      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
+      16 |     await page1.click('[data-testid="start-chat-button"]');
+      17 |     
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
+]]>
+</failure>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="7.585">
+<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
+<![CDATA[  [Mobile Safari] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
+
+    Error: page.fill: Target page, context or browser has been closed
+    Call log:
+      - waiting for locator('[data-testid="username-input"]')
+
+
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+      144 |   await page.goto('/chat-selection');
+    > 145 |   await page.fill('[data-testid="username-input"]', username);
+          |              ^
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+      148 |   await page.goto(`/book-discussion/${bookId}`);
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
+]]>
+</failure>
+</testcase>
+<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="1.759">
+<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
+<![CDATA[  [Mobile Safari] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
+
+    Error: page.goto: Target page, context or browser has been closed
+    Call log:
+      - navigating to "http://localhost:5173/chat-selection", waiting until "load"
+
+
+      142 | // Helper function to setup user in chat
+      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
+    > 144 |   await page.goto('/chat-selection');
+          |              ^
+      145 |   await page.fill('[data-testid="username-input"]', username);
+      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
+      147 |   await page.click('[data-testid="start-chat-button"]');
+        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:144:14)
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:11
+]]>
+</failure>
 </testcase>
 </testsuite>
 </testsuites>

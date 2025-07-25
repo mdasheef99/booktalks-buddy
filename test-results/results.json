@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 1
+      "actualWorkers": 4
     },
     "preserveOutput": "always",
     "reporter": [
@@ -43,7 +43,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "chromium",
         "name": "chromium",
@@ -52,14 +52,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "C:/Users/LEGION/Desktop/Asheef/Bookconnect/booktalks-buddy/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "firefox",
         "name": "firefox",
@@ -68,14 +68,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "C:/Users/LEGION/Desktop/Asheef/Bookconnect/booktalks-buddy/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "webkit",
         "name": "webkit",
@@ -84,14 +84,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "C:/Users/LEGION/Desktop/Asheef/Bookconnect/booktalks-buddy/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
@@ -100,14 +100,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "C:/Users/LEGION/Desktop/Asheef/Bookconnect/booktalks-buddy/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
@@ -116,14 +116,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "C:/Users/LEGION/Desktop/Asheef/Bookconnect/booktalks-buddy/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "store-manager-chrome",
         "name": "store-manager-chrome",
@@ -132,7 +132,7 @@
         "testMatch": [
           "**/store-manager-*.spec.ts"
         ],
-        "timeout": 30000
+        "timeout": 60000
       }
     ],
     "shard": null,
@@ -149,100 +149,1035 @@
   },
   "suites": [
     {
-      "title": "store-manager-moderation.spec.ts",
-      "file": "store-manager-moderation.spec.ts",
+      "title": "race-condition-fix.spec.ts",
+      "file": "race-condition-fix.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Store Manager Moderation Interface",
-          "file": "store-manager-moderation.spec.ts",
-          "line": 135,
+          "title": "Race Condition Fix - Real-time Chat",
+          "file": "race-condition-fix.spec.ts",
+          "line": 3,
           "column": 6,
-          "specs": [],
-          "suites": [
+          "specs": [
             {
-              "title": "Authentication & Access Control",
-              "file": "store-manager-moderation.spec.ts",
-              "line": 146,
-              "column": 8,
-              "specs": [
+              "title": "should handle presence tracking without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
                 {
-                  "title": "should redirect unauthorized users",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "timeout": 30000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "chromium",
-                      "projectName": "chromium",
-                      "results": [
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 19547,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 17,
+                          "line": 14
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
+                      },
+                      "errors": [
                         {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 8246,
-                          "errors": [],
-                          "stdout": [
-                            {
-                              "text": "🚀 Setting up Store Manager Moderation test\n"
-                            },
-                            {
-                              "text": "🔐 Logging in as Store Manager: kafka@bookconnect.com\n"
-                            },
-                            {
-                              "text": "✅ Store Manager login successful\n"
-                            },
-                            {
-                              "text": "🚫 Testing unauthorized access protection\n"
-                            },
-                            {
-                              "text": "🚪 Logging out current user\n"
-                            },
-                            {
-                              "text": "✅ Logout successful\n"
-                            },
-                            {
-                              "text": "📍 Final URL after redirect attempt: http://localhost:5173/login\n"
-                            },
-                            {
-                              "text": "✅ Unauthorized access properly blocked\n"
-                            },
-                            {
-                              "text": "🧹 Cleaning up Store Manager Moderation test\n"
-                            },
-                            {
-                              "text": "🧹 Cleaning up test state\n"
-                            },
-                            {
-                              "text": "🚪 Logging out current user\n"
-                            },
-                            {
-                              "text": "✅ Logout via URL navigation\n"
-                            },
-                            {
-                              "text": "✅ Test state cleaned up\n"
-                            }
-                          ],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2025-07-24T19:00:25.779Z",
-                          "annotations": [],
-                          "attachments": []
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 17,
+                            "line": 14
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
                         }
                       ],
-                      "status": "expected"
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:27.238Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\\test-failed-2.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 17,
+                        "line": 14
+                      }
                     }
                   ],
-                  "id": "a2a53cb88c2e8dfccb91-6f9d6bc446f7a2de9b65",
-                  "file": "store-manager-moderation.spec.ts",
-                  "line": 176,
-                  "column": 5
+                  "status": "unexpected"
                 }
-              ]
+              ],
+              "id": "36a175575be443fd8800-710e188e524416dcd890",
+              "file": "race-condition-fix.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should synchronize messages without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 14990,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:27.264Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\\test-failed-2.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-9b3379700fb1fa8ebbab",
+              "file": "race-condition-fix.spec.ts",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "should handle subscription cleanup without memory leaks",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 19428,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:27.252Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-f505b6856e92b0c0148b",
+              "file": "race-condition-fix.spec.ts",
+              "line": 110,
+              "column": 3
+            },
+            {
+              "title": "should handle presence tracking without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 30511,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 17,
+                          "line": 14
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 17,
+                            "line": 14
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:27.251Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\\test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\\test-failed-2.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 17,
+                        "line": 14
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-1b92426970936fcb69b9",
+              "file": "race-condition-fix.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should synchronize messages without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 1,
+                      "status": "timedOut",
+                      "duration": 60007,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 34,
+                            "line": 62
+                          },
+                          "message": "Error: browserContext.newPage: Test ended.\n\n\u001b[0m \u001b[90m 60 |\u001b[39m     \u001b[36mconst\u001b[39m context2 \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m browser\u001b[33m.\u001b[39mnewContext()\u001b[33m;\u001b[39m\n \u001b[90m 61 |\u001b[39m     \n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 62 |\u001b[39m     \u001b[36mconst\u001b[39m page1 \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m context1\u001b[33m.\u001b[39mnewPage()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 63 |\u001b[39m     \u001b[36mconst\u001b[39m page2 \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m context2\u001b[33m.\u001b[39mnewPage()\u001b[33m;\u001b[39m\n \u001b[90m 64 |\u001b[39m\n \u001b[90m 65 |\u001b[39m     \u001b[90m// Setup both users in same book discussion\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:62:34\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:46.839Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-8af85dbbb342a503ed5e",
+              "file": "race-condition-fix.spec.ts",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "should handle subscription cleanup without memory leaks",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 24487,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:50.785Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-0c5f64a308378bc9cd76",
+              "file": "race-condition-fix.spec.ts",
+              "line": 110,
+              "column": 3
+            },
+            {
+              "title": "should handle presence tracking without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 19643,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 17,
+                          "line": 14
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 17,
+                            "line": 14
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:11:51.072Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\\test-failed-2.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 17,
+                        "line": 14
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-13cbbcf02ade6077c58b",
+              "file": "race-condition-fix.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should synchronize messages without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 13819,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:05.114Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\\test-failed-2.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-96f390997e44b5f9d9e5",
+              "file": "race-condition-fix.spec.ts",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "should handle subscription cleanup without memory leaks",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 13048,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:13.263Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-4f34504435e94bf02bc0",
+              "file": "race-condition-fix.spec.ts",
+              "line": 110,
+              "column": 3
+            },
+            {
+              "title": "should handle presence tracking without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 13864,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 17,
+                          "line": 14
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 17,
+                            "line": 14
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:18.061Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\\test-failed-2.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 17,
+                        "line": 14
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-b7e6698d704f9a71af75",
+              "file": "race-condition-fix.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should synchronize messages without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 13490,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:21.288Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\\test-failed-2.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-d7769bf4866cc939799e",
+              "file": "race-condition-fix.spec.ts",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "should handle subscription cleanup without memory leaks",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12639,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:27.474Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-72a509dfd2faf3afcb46",
+              "file": "race-condition-fix.spec.ts",
+              "line": 110,
+              "column": 3
+            },
+            {
+              "title": "should handle presence tracking without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 7143,
+                      "error": {
+                        "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 17,
+                          "line": 14
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 17,
+                            "line": 14
+                          },
+                          "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:33.470Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 17,
+                        "line": 14
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-a26bd08bb329a2b3afa7",
+              "file": "race-condition-fix.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "should synchronize messages without race conditions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 7585,
+                      "error": {
+                        "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
+                        "stack": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 145
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 145
+                          },
+                          "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:36.952Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 145
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-ca27a62eeb69d1b970c1",
+              "file": "race-condition-fix.spec.ts",
+              "line": 58,
+              "column": 3
+            },
+            {
+              "title": "should handle subscription cleanup without memory leaks",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1759,
+                      "error": {
+                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/chat-selection\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/chat-selection\", waiting until \"load\"\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:144:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:11",
+                        "location": {
+                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                          "column": 14,
+                          "line": 144
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 142 |\u001b[39m \u001b[90m// Helper function to setup user in chat\u001b[39m\n \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                            "column": 14,
+                            "line": 144
+                          },
+                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/chat-selection\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 142 |\u001b[39m \u001b[90m// Helper function to setup user in chat\u001b[39m\n \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:144:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:11\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-07-25T07:12:41.768Z",
+                      "annotations": [],
+                      "attachments": [],
+                      "errorLocation": {
+                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
+                        "column": 14,
+                        "line": 144
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "36a175575be443fd8800-c6c4fc815549b2bd457a",
+              "file": "race-condition-fix.spec.ts",
+              "line": 110,
+              "column": 3
             }
           ]
         }
@@ -251,11 +1186,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-07-24T18:59:55.435Z",
-    "duration": 41324.068,
-    "expected": 1,
+    "startTime": "2025-07-25T07:11:07.986Z",
+    "duration": 103886.54,
+    "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 15,
     "flaky": 0
   }
 }

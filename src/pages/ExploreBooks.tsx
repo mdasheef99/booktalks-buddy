@@ -16,7 +16,7 @@ import NewExploreContainer from "@/components/explore/ExploreContainer";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchBooks } from "@/hooks/explore/useSearchBooks";
 import { useTrendingBooks } from "@/hooks/explore/useTrendingBooks";
-import { useDiscussedBooks } from "@/hooks/explore/useDiscussedBooks";
+import { usePaginatedDiscussedBooks } from "@/hooks/explore/usePaginatedDiscussedBooks";
 import { generateLiteraryUsername } from "@/utils/usernameGenerator";
 import { Book } from "@/types/books";
 
@@ -111,12 +111,7 @@ const ExploreBooks: React.FC = () => {
     isError: isTrendingError,
   } = useTrendingBooks(primaryGenre);
 
-  const {
-    data: discussedBooks,
-    isLoading: isDiscussedLoading,
-    isError: isDiscussedError,
-    refetch: refetchDiscussedBooks,
-  } = useDiscussedBooks();
+  const discussedBooksState = usePaginatedDiscussedBooks(6, 12); // 6 books per page, 12 hours filter
 
   const isNewExploreEnabled = import.meta.env.VITE_NEW_EXPLORE_ENABLED === 'true';
 
@@ -163,16 +158,20 @@ const ExploreBooks: React.FC = () => {
           />
 
           <NewDiscussedBooksSection
-            books={discussedBooks || []}
-            isLoading={isDiscussedLoading}
-            isError={isDiscussedError}
+            books={discussedBooksState.books}
+            isLoading={discussedBooksState.isLoading}
+            isError={discussedBooksState.isError}
+            hasMore={discussedBooksState.hasMore}
+            isLoadingMore={discussedBooksState.isLoadingMore}
+            totalCount={discussedBooksState.totalCount}
             onJoinDiscussion={(book: Book) =>
               handleJoinDiscussion(book.id, book.title, book.author, book.imageUrl || "")
             }
             onRefresh={() => {
               setLastDiscussionTime(Date.now());
-              refetchDiscussedBooks();
+              discussedBooksState.refresh();
             }}
+            onLoadMore={discussedBooksState.loadMore}
           />
         </NewExploreContainer>
     </div>

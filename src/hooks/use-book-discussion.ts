@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ChatMessage, subscribeToChat, getBookChat, sendChatMessage, trackPresence } from "@/services/chatService";
 import * as Sentry from "@sentry/react";
 import { toast } from "sonner";
@@ -135,158 +135,173 @@ export function useBookDiscussion(id: string, title: string, author: string, use
     return () => clearTimeout(reconnectTimer);
   }, [connectionError, id, reconnectAttempts, checkConnection]); // Re-run when username changes
 
-  // Subscribe to real-time chat updates
-  useEffect(() => {
-    if (!id) return;
+  // StrictMode-safe subscription management
+  const subscriptionsRef = useRef<{
+    chatSubscription: { unsubscribe: () => void } | null;
+    presenceTracker: { unsubscribe: () => void } | null;
+    isChatActive: boolean;
+    isPresenceActive: boolean;
+    chatHeartbeat: NodeJS.Timeout | null;
+    presenceHeartbeat: NodeJS.Timeout | null;
+  }>({
+    chatSubscription: null,
+    presenceTracker: null,
+    isChatActive: false,
+    isPresenceActive: false,
+    chatHeartbeat: null,
+    presenceHeartbeat: null,
+  });
 
-    console.log("Setting up real-time subscription for book:", id);
-    let subscription: { unsubscribe: () => void } | null = null;
-    let isSubscriptionActive = false;
-
-    const setupSubscription = () => {
-      // Prevent multiple subscriptions
-      if (isSubscriptionActive) {
-        console.log("Subscription already active, skipping setup");
-        return;
-      }
-
-      try {
-        console.log("Creating new chat subscription for book:", id);
-        subscription = subscribeToChat(id, (newMessage) => {
-          console.log("Received new message in component:", newMessage);
-
-          // Handle both new messages and updates to existing messages (deletions)
-          setMessages((prevMessages) => {
-            // Check if this is an update to an existing message
-            if (prevMessages.some(msg => msg.id === newMessage.id)) {
-              return prevMessages.map(msg =>
-                msg.id === newMessage.id ? newMessage : msg
-              );
-            }
-            // Otherwise it's a new message
-            return [...prevMessages, newMessage];
-          });
-
-          // If we receive a message, we're definitely connected
-          if (connectionError) {
-            setConnectionError(false);
-            setReconnectAttempts(0);
-          }
-        });
-
-        isSubscriptionActive = true;
-        console.log("Chat subscription created successfully");
-      } catch (error) {
-        console.error("Error setting up chat subscription:", error);
-        setConnectionError(true);
-        isSubscriptionActive = false;
-
-        // Try to reconnect after a delay
-        setTimeout(() => {
-          if (!isSubscriptionActive) {
-            setupSubscription();
-          }
-        }, 5000);
-      }
-    };
-
-    // Initial setup
-    setupSubscription();
-
-    // Set up a heartbeat to check the subscription is still active
-    const heartbeatInterval = setInterval(() => {
-      if (connectionError && isOnline && !isSubscriptionActive) {
-        console.log("Connection appears to be restored, attempting to resubscribe");
-        setupSubscription();
-      }
-    }, 10000); // Check every 10 seconds
-
-    return () => {
-      console.log("Unsubscribing from chat");
-      clearInterval(heartbeatInterval);
-      isSubscriptionActive = false;
-
-      if (subscription) {
-        try {
-          console.log("Cleaning up chat subscription");
-          subscription.unsubscribe();
-          subscription = null;
-        } catch (e) {
-          console.error("Error during unsubscribe:", e);
-        }
-      }
-    };
-  }, [id]); // Remove connectionError and isOnline from dependencies to prevent re-subscriptions
-
-  // Track presence of users in the chat
+  // Unified real-time subscriptions (chat + presence) - StrictMode Safe
   useEffect(() => {
     if (!id || !username) return;
 
-    console.log("Setting up presence tracking for book:", id);
-    let presenceTracker: { unsubscribe: () => void } | null = null;
-    let isPresenceActive = false;
+    console.log("[Hook] Setting up unified real-time subscriptions for book:", id, "user:", username);
 
-    const setupPresence = () => {
-      // Prevent multiple presence trackers
-      if (isPresenceActive) {
-        console.log("Presence tracking already active, skipping setup");
-        return;
+    // Prevent duplicate subscriptions in StrictMode
+    if (subscriptionsRef.current.isChatActive || subscriptionsRef.current.isPresenceActive) {
+      console.log("[Hook] Subscriptions already active, skipping setup");
+      return;
+    }
+
+    const setupUnifiedSubscriptions = async () => {
+      const subs = subscriptionsRef.current;
+
+      // Setup chat subscription
+      if (!subs.isChatActive) {
+        try {
+          console.log("[Hook] Creating new chat subscription for book:", id);
+          subs.chatSubscription = subscribeToChat(id, (newMessage) => {
+            console.log("[Hook] Received new message in component:", newMessage);
+
+            // Handle both new messages and updates to existing messages (deletions)
+            setMessages((prevMessages) => {
+              // Check if this is an update to an existing message
+              if (prevMessages.some(msg => msg.id === newMessage.id)) {
+                return prevMessages.map(msg =>
+                  msg.id === newMessage.id ? newMessage : msg
+                );
+              }
+              // Otherwise it's a new message
+              return [...prevMessages, newMessage];
+            });
+
+            // If we receive a message, we're definitely connected
+            if (connectionError) {
+              setConnectionError(false);
+              setReconnectAttempts(0);
+            }
+          });
+
+          subs.isChatActive = true;
+          console.log("[Hook] Chat subscription created successfully");
+
+          // Set up chat heartbeat
+          subs.chatHeartbeat = setInterval(() => {
+            if (connectionError && isOnline && !subs.isChatActive) {
+              console.log("[Hook] Connection appears to be restored, attempting to resubscribe to chat");
+              setupUnifiedSubscriptions();
+            }
+          }, 10000);
+
+        } catch (error) {
+          console.error("[Hook] Error setting up chat subscription:", error);
+          setConnectionError(true);
+          subs.isChatActive = false;
+
+          // Try to reconnect after a delay
+          setTimeout(() => {
+            if (!subs.isChatActive) {
+              setupUnifiedSubscriptions();
+            }
+          }, 5000);
+        }
       }
 
-      try {
-        console.log("Creating new presence tracker for book:", id, "user:", username);
-        presenceTracker = trackPresence(id, username, (onlineUsers) => {
-          console.log("Online users updated:", onlineUsers);
-          setOnlineUsers(onlineUsers);
+      // Setup presence tracking
+      if (!subs.isPresenceActive) {
+        try {
+          console.log("[Hook] Creating new presence tracker for book:", id, "user:", username);
+          subs.presenceTracker = trackPresence(id, username, (onlineUsers) => {
+            console.log("[Hook] Online users updated:", onlineUsers);
+            setOnlineUsers(onlineUsers);
 
-          // If we're receiving presence updates, we're connected
-          if (connectionError) {
-            setConnectionError(false);
-          }
-        });
+            // If we're receiving presence updates, we're connected
+            if (connectionError) {
+              setConnectionError(false);
+            }
+          });
 
-        isPresenceActive = true;
-        console.log("Presence tracking created successfully");
-      } catch (error) {
-        console.error("Error setting up presence tracking:", error);
-        isPresenceActive = false;
+          subs.isPresenceActive = true;
+          console.log("[Hook] Presence tracking created successfully");
 
-        // Try to reconnect after a delay
-        setTimeout(() => {
-          if (!isPresenceActive) {
-            setupPresence();
-          }
-        }, 5000);
+          // Set up presence heartbeat
+          subs.presenceHeartbeat = setInterval(() => {
+            if (connectionError && isOnline && !subs.isPresenceActive) {
+              console.log("[Hook] Connection appears to be restored, attempting to reconnect presence");
+              setupUnifiedSubscriptions();
+            }
+          }, 15000);
+
+        } catch (error) {
+          console.error("[Hook] Error setting up presence tracking:", error);
+          subs.isPresenceActive = false;
+
+          // Try to reconnect after a delay
+          setTimeout(() => {
+            if (!subs.isPresenceActive) {
+              setupUnifiedSubscriptions();
+            }
+          }, 5000);
+        }
       }
     };
 
     // Initial setup
-    setupPresence();
+    setupUnifiedSubscriptions();
 
-    // Set up a heartbeat to check the presence tracking is still active
-    const heartbeatInterval = setInterval(() => {
-      if (connectionError && isOnline && !isPresenceActive) {
-        console.log("Connection appears to be restored, attempting to reconnect presence");
-        setupPresence();
-      }
-    }, 15000); // Check every 15 seconds
-
+    // StrictMode-safe cleanup function
     return () => {
-      console.log("Unsubscribing from presence tracking");
-      clearInterval(heartbeatInterval);
-      isPresenceActive = false;
+      const subs = subscriptionsRef.current;
+      console.log("[Hook] Cleaning up unified subscriptions for book:", id, "user:", username);
 
-      if (presenceTracker) {
+      // Clear heartbeat intervals
+      if (subs.chatHeartbeat) {
+        clearInterval(subs.chatHeartbeat);
+        subs.chatHeartbeat = null;
+      }
+      if (subs.presenceHeartbeat) {
+        clearInterval(subs.presenceHeartbeat);
+        subs.presenceHeartbeat = null;
+      }
+
+      // Mark as inactive
+      subs.isChatActive = false;
+      subs.isPresenceActive = false;
+
+      // Cleanup chat subscription
+      if (subs.chatSubscription) {
         try {
-          console.log("Cleaning up presence tracker");
-          presenceTracker.unsubscribe();
-          presenceTracker = null;
+          console.log("[Hook] Cleaning up chat subscription");
+          subs.chatSubscription.unsubscribe();
+          subs.chatSubscription = null;
         } catch (e) {
-          console.error("Error during presence unsubscribe:", e);
+          console.error("[Hook] Error during chat unsubscribe:", e);
+        }
+      }
+
+      // Cleanup presence tracker
+      if (subs.presenceTracker) {
+        try {
+          console.log("[Hook] Cleaning up presence tracker");
+          subs.presenceTracker.unsubscribe();
+          subs.presenceTracker = null;
+        } catch (e) {
+          console.error("[Hook] Error during presence unsubscribe:", e);
         }
       }
     };
-  }, [id, username]); // Remove connectionError and isOnline from dependencies
+  }, [id, username]); // Unified dependencies - FIXES RACE CONDITION
 
 
 
