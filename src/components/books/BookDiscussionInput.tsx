@@ -103,9 +103,14 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
         )}
 
         {sendError && (
-          <div className="mx-2 mb-1 p-1 bg-red-50 text-red-600 text-xs rounded border border-red-200 flex items-center">
+          <div
+            id="send-error"
+            className="mx-2 mb-1 p-1 bg-red-50 text-red-600 text-xs rounded border border-red-200 flex items-center"
+            role="alert"
+            aria-live="polite"
+          >
             <div className="mr-1 flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="12"></line>
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -139,8 +144,10 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
             }}
             placeholder={replyTo ? "Type your reply..." : "Share your thoughts..."}
             disabled={isSubmitting}
-            className={`flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7 ${sendError ? 'border-red-300' : ''}`}
+            className={`flex-1 p-1 bg-transparent border-none focus:outline-none font-serif text-bookconnect-brown text-sm h-7 focus-visible ${sendError ? 'border-red-300' : ''}`}
             ref={inputRef}
+            aria-label={replyTo ? `Reply to ${replyTo.username}` : "Type your message"}
+            aria-describedby={sendError ? "send-error" : undefined}
           />
 
           <Tooltip>
@@ -148,7 +155,8 @@ const BookDiscussionInput: React.FC<BookDiscussionInputProps> = ({
               <Button
                 type="submit"
                 disabled={!message.trim() || isSubmitting}
-                className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0"
+                className="bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90 text-white h-7 w-7 p-0 focus-visible"
+                aria-label={replyTo ? "Send reply" : "Send message"}
               >
                 {isSubmitting ? (
                   <div className="h-3 w-3 border-t-transparent border-solid animate-spin rounded-full border-white border"></div>
