@@ -29,7 +29,8 @@ import {
   Info,
   Trash2,
   AlertTriangle,
-  Shield
+  Shield,
+  Receipt
 } from 'lucide-react';
 import { useUserSubscriptionAlerts } from '@/contexts/AlertContext';
 import { useAlerts } from '@/hooks/useAlerts';
@@ -39,6 +40,9 @@ import { validateAccountAction } from '@/lib/api/admin/accountValidation';
 import { createSelfDeletionRequest, checkUserClubOwnership } from '@/lib/api/admin/selfDeletionRequests';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { CompactPaymentHistory } from '@/components/user/CompactPaymentHistory';
+import { PaymentHistoryModal } from '@/components/user/PaymentHistoryModal';
+
 
 interface ProfileSubscriptionDisplayProps {
   className?: string;
@@ -62,6 +66,9 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteReason, setDeleteReason] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Payment history state
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
 
   // Debug logging
   console.log('🔍 ProfileSubscriptionDisplay Debug:', {
@@ -454,6 +461,35 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
           </div>
         </div>
 
+        {/* Payment History Section */}
+        <div className="mt-6">
+          <Separator className="mb-4" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-bookconnect-brown" />
+              <h3 className="text-lg font-semibold text-bookconnect-brown">Payment History</h3>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPaymentHistory(true)}
+              className="flex items-center gap-2"
+            >
+              <Receipt className="h-4 w-4" />
+              View All Payments
+            </Button>
+          </div>
+
+          <CompactPaymentHistory
+            maxItems={3}
+            title="Recent Payments"
+            showViewAllButton={false}
+            className="mb-6"
+          />
+
+
+        </div>
+
         {/* Account Management Section */}
         <div className="mt-6">
           <Separator className="mb-4" />
@@ -565,6 +601,13 @@ export default function ProfileSubscriptionDisplay({ className = '' }: ProfileSu
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Payment History Modal */}
+    <PaymentHistoryModal
+      isOpen={showPaymentHistory}
+      onClose={() => setShowPaymentHistory(false)}
+      title="Payment History"
+    />
     </div>
   );
 }
