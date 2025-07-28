@@ -6,6 +6,7 @@ import { Helmet } from "react-helmet-async";
 import { UsernameDialog } from "@/components/dialogs/UsernameDialog";
 import { GenreDialog } from "@/components/dialogs/GenreDialog";
 import { LoginDialog } from "@/components/dialogs/LoginDialog";
+import { HeroSkeleton } from "@/components/ui/enhanced-skeleton";
 
 // Import the new component sections
 import LandingHeader from "@/components/landing/header/LandingHeader";
@@ -84,12 +85,13 @@ const Landing = () => {
   // Show loading state while storeId is being fetched
   if (storeIdLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-bookconnect-sage/10 to-bookconnect-cream/20">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-bookconnect-sage/10 to-bookconnect-cream/20">
+        <div className="text-center pt-20 pb-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bookconnect-terracotta mx-auto mb-4"></div>
           <h2 className="text-xl font-serif text-bookconnect-brown mb-2">Loading BookTalks Buddy</h2>
           <p className="text-bookconnect-brown/70">Preparing your reading experience...</p>
         </div>
+        <HeroSkeleton />
       </div>
     );
   }

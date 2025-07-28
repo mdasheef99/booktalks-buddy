@@ -2,6 +2,7 @@ import React from "react";
 import { Book } from "@/types/books";
 import BookCard from "@/components/books/BookCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchResultSkeleton } from "@/components/ui/enhanced-skeleton";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
 
@@ -28,11 +29,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       </h2>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, idx) => (
-            <Skeleton key={idx} className="h-64 rounded-lg" />
-          ))}
-        </div>
+        <SearchResultSkeleton />
       ) : isError ? (
         <ErrorState message="We couldn't find what you're looking for. Try a different search?" />
       ) : !searchResults || searchResults.length === 0 ? (

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import TrendingBookCard from "@/components/books/TrendingBookCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BookCardSkeleton } from "@/components/ui/enhanced-skeleton";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
@@ -94,7 +95,7 @@ const DiscussedBooksSection: React.FC<DiscussedBooksSectionProps> = ({
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, idx) => (
-            <Skeleton key={idx} className="h-64 rounded-lg" />
+            <BookCardSkeleton key={idx} />
           ))}
         </div>
       ) : isError ? (

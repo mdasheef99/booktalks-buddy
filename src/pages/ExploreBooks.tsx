@@ -117,6 +117,7 @@ const ExploreBooks: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bookconnect-cream">
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <BookConnectHeader
         externalProfileDialog={{
           isOpen: showProfileDialog,
@@ -135,7 +136,8 @@ const ExploreBooks: React.FC = () => {
             <BookSearchForm onSearch={handleSearch} isSearching={isSearching} />
           </div>
 
-          <NewSearchResults
+          <main id="main-content">
+            <NewSearchResults
             searchQuery={searchQuery}
             searchResults={searchResults || []}
             isSearchError={isSearchError}
@@ -173,6 +175,7 @@ const ExploreBooks: React.FC = () => {
             }}
             onLoadMore={discussedBooksState.loadMore}
           />
+          </main>
         </NewExploreContainer>
     </div>
   );

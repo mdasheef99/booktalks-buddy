@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback, memo } from "react";
 import { ChatMessage } from "@/services/chatService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ChatMessageSkeleton } from "@/components/ui/enhanced-skeleton";
 import MessageItem from "./chat/MessageItem";
 import MessageItemErrorBoundary from "./chat/MessageItemErrorBoundary";
 import ScrollButtons from "./chat/ScrollButtons";
@@ -133,10 +134,17 @@ const BookDiscussionChat: React.FC<BookDiscussionChatProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-bookconnect-terracotta mx-auto mb-3"></div>
-          <p className="text-bookconnect-brown/80 font-serif">Loading conversation...</p>
+      <div className="flex flex-col h-full p-4 space-y-4">
+        <div className="text-center mb-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bookconnect-terracotta mx-auto mb-2"></div>
+          <p className="text-bookconnect-brown/80 font-serif text-sm">Loading conversation...</p>
+        </div>
+        {/* Show skeleton messages while loading */}
+        <div className="space-y-4 flex-1">
+          <ChatMessageSkeleton isCurrentUser={false} />
+          <ChatMessageSkeleton isCurrentUser={true} />
+          <ChatMessageSkeleton isCurrentUser={false} />
+          <ChatMessageSkeleton isCurrentUser={true} />
         </div>
       </div>
     );

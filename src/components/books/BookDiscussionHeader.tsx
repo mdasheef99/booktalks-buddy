@@ -36,7 +36,8 @@ const BookDiscussionHeader: React.FC<BookDiscussionHeaderProps> = ({
             variant="ghost"
             size="sm"
             onClick={onBack}
-            className="mr-1 text-white hover:bg-bookconnect-brown/20 h-7 w-7 p-0"
+            className="mr-1 text-white hover:bg-bookconnect-brown/20 h-7 w-7 p-0 focus-visible"
+            aria-label="Go back to explore books"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

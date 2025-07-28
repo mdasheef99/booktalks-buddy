@@ -4,38 +4,43 @@
  * Displays subscription information and management options within the profile form
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Crown, 
-  Star, 
-  User, 
-  Calendar, 
-  RefreshCw, 
-  Settings, 
+import {
+  Crown,
+  Star,
+  User,
+  Calendar,
+  RefreshCw,
+  Settings,
   CreditCard,
   Gift,
-  TrendingUp
+  TrendingUp,
+  Receipt,
+  ExternalLink
 } from 'lucide-react';
 import { SubscriptionStatus } from '@/components/subscription/SubscriptionStatus';
 import { FeatureAvailabilityIndicator } from '@/components/subscription/FeatureAvailabilityIndicator';
+import { CompactPaymentHistory, PaymentSummaryCard } from '@/components/user/CompactPaymentHistory';
+import { PaymentHistoryModal } from '@/components/user/PaymentHistoryModal';
 
 interface SubscriptionSectionProps {
   className?: string;
 }
 
 export default function SubscriptionSection({ className = '' }: SubscriptionSectionProps) {
-  const { 
-    subscriptionStatus, 
-    subscriptionLoading, 
+  const {
+    subscriptionStatus,
+    subscriptionLoading,
     getSubscriptionStatusWithContext,
-    refreshUserData 
+    refreshUserData
   } = useAuth();
 
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
   const statusContext = getSubscriptionStatusWithContext();
 
   // Get tier-specific benefits
@@ -103,13 +108,13 @@ export default function SubscriptionSection({ className = '' }: SubscriptionSect
               <span>Refresh Status</span>
             </Button>
             
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center space-x-2"
-              onClick={() => console.log('Navigate to billing')}
+              onClick={() => setShowPaymentHistory(true)}
             >
-              <CreditCard className="h-4 w-4" />
-              <span>Billing Settings</span>
+              <Receipt className="h-4 w-4" />
+              <span>Payment History</span>
             </Button>
             
             {statusContext.needsUpgrade && (
@@ -285,6 +290,22 @@ export default function SubscriptionSection({ className = '' }: SubscriptionSect
           </CardContent>
         </Card>
       )}
+
+      {/* Payment History Section */}
+      <CompactPaymentHistory
+        className="mt-6"
+        maxItems={3}
+        title="Recent Payments"
+        showViewAllButton={true}
+        onViewAll={() => setShowPaymentHistory(true)}
+      />
+
+      {/* Payment History Modal */}
+      <PaymentHistoryModal
+        isOpen={showPaymentHistory}
+        onClose={() => setShowPaymentHistory(false)}
+        title="Payment History"
+      />
     </div>
   );
 }

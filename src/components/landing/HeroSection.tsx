@@ -19,7 +19,7 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
     <div
       className="relative min-h-[65vh] flex items-center justify-center text-center px-4 py-24 md:py-36 overflow-hidden bg-cover bg-center"
       style={{
-        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')"
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')"
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -44,13 +44,13 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
           Welcome to BookConnect
         </span>
 
-        <h1 className="font-serif text-4xl md:text-5xl lg:text-7xl text-white font-bold mb-6 leading-tight tracking-tight">
+        <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white font-bold mb-6 leading-tight tracking-tight" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
           Connect Through <span className="relative">Books
             <span className="absolute bottom-1 left-0 w-full h-2 bg-bookconnect-terracotta/40"></span>
           </span>
         </h1>
 
-        <p className="text-base md:text-lg lg:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base md:text-lg lg:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
           Join our community of book lovers and connect anonymously through your shared passion for reading
         </p>
 
@@ -86,7 +86,7 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
         )}
 
         {/* Chat Button Section */}
-        {heroCustomization?.chatButton.enabled && (
+        {heroCustomization?.chatButton.enabled ? (
           <div className={cn(
             "flex flex-col sm:flex-row gap-4 items-center",
             CHAT_BUTTON_CONFIGS.positions[heroCustomization.chatButton.position as keyof typeof CHAT_BUTTON_CONFIGS.positions]?.className || "justify-center"
@@ -97,11 +97,23 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
               className={cn(
                 "text-white rounded-md button-hover-lift focus-ring-enhanced group",
                 CHAT_BUTTON_CONFIGS.sizes[heroCustomization.chatButton.size as keyof typeof CHAT_BUTTON_CONFIGS.sizes]?.className || "px-8 py-7 text-xl",
-                CHAT_BUTTON_CONFIGS.colorSchemes[heroCustomization.chatButton.colorScheme as keyof typeof CHAT_BUTTON_CONFIGS.colorSchemes]?.className || "bg-bookconnect-terracotta hover:bg-bookconnect-terracotta/90"
+                CHAT_BUTTON_CONFIGS.colorSchemes[heroCustomization.chatButton.colorScheme as keyof typeof CHAT_BUTTON_CONFIGS.colorSchemes]?.className || "enhanced-chat-button"
               )}
             >
               <BookOpen className="mr-2 icon-transition" />
               {heroCustomization.chatButton.text}
+              <ArrowRight className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 icon-transition" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <Button
+              onClick={handleStartChatting}
+              size="lg"
+              className="enhanced-chat-button text-white px-8 py-7 text-xl rounded-md button-hover-lift focus-ring-enhanced group"
+            >
+              <BookOpen className="mr-2 icon-transition" />
+              Start Chatting Anonymously
               <ArrowRight className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 icon-transition" />
             </Button>
           </div>
