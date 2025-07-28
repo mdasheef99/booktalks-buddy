@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { updateUserTier } from '@/lib/api/users/tier';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 type UserTierManagerProps = {
   userId: string;
@@ -78,7 +79,6 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
   };
 
   const openConfirmDialog = () => {
-    if (tier === convertToNewTier(currentTier)) return;
     setIsDialogOpen(true);
   };
 
@@ -87,7 +87,6 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
   };
 
   const updateTier = async () => {
-    if (tier === convertToNewTier(currentTier)) return;
     if (!user) {
       toast.error('You must be logged in to update user tiers');
       return;
@@ -174,7 +173,7 @@ export function UserTierManager({ userId, currentTier, storeId, onTierUpdated }:
             variant="outline"
             size="sm"
             onClick={openConfirmDialog}
-            disabled={isUpdating || tier === convertToNewTier(currentTier)}
+            disabled={isUpdating}
           >
             {isUpdating ? 'Updating...' : 'Update'}
           </Button>
