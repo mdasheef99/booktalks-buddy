@@ -9,7 +9,8 @@ import ProfileCollectionsSection from '@/components/profile/ProfileCollectionsSe
 import { BookClubProfile, ClubMembership, getBookClubProfile, getUserClubMemberships } from '@/lib/api/profile';
 import { supabase } from '@/lib/supabase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, BookOpen, FolderOpen } from 'lucide-react';
+import { Users, BookOpen, FolderOpen, Receipt } from 'lucide-react';
+import { CompactPaymentHistory } from '@/components/user/CompactPaymentHistory';
 
 
 import { BackButton } from '@/components/ui/BackButton';
@@ -343,6 +344,12 @@ const BookClubProfilePage: React.FC = () => {
                 <FolderOpen className="h-4 w-4" />
                 Collections
               </TabsTrigger>
+              {isCurrentUser && (
+                <TabsTrigger value="payments" className="flex items-center gap-2">
+                  <Receipt className="h-4 w-4" />
+                  Payment History
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="clubs">
@@ -368,6 +375,17 @@ const BookClubProfilePage: React.FC = () => {
                 isCurrentUser={isCurrentUser}
               />
             </TabsContent>
+
+            {isCurrentUser && (
+              <TabsContent value="payments">
+                <CompactPaymentHistory
+                  className="max-w-4xl"
+                  maxItems={20}
+                  title="Payment History"
+                  showViewAllButton={false}
+                />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </div>
