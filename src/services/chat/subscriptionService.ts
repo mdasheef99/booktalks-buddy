@@ -289,32 +289,51 @@ export function trackPresence(
   const isNewChannel = allCallbacks.size === 1;
 
   if (isNewChannel) {
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const onlineUsers: string[] = [];
+    // Helper function to extract and update online users
+    const updateOnlineUsers = (eventType: string = 'sync') => {
+      const state = channel.presenceState();
+      const onlineUsers: string[] = [];
 
-        Object.values(state).forEach((presences: any) => {
-          presences.forEach((presence: any) => {
-            if (presence.username) {
-              onlineUsers.push(presence.username);
-            }
-          });
-        });
+      console.log(`[Presence] ${eventType} event - presence state:`, state);
 
-        const currentCallbacks = channelManager.getChannelCallbacks(channelName, 'PRESENCE');
-        currentCallbacks.forEach(cb => {
-          try {
-            cb(onlineUsers);
-          } catch (error) {
-            console.error("[Presence] Error in presence callback:", error);
+      Object.values(state).forEach((presences: any) => {
+        presences.forEach((presence: any) => {
+          if (presence.username) {
+            onlineUsers.push(presence.username);
           }
         });
+      });
+
+      // Remove duplicates (in case of multiple presence entries for same user)
+      const uniqueUsers = [...new Set(onlineUsers)];
+      console.log(`[Presence] ${eventType} event - extracted users:`, uniqueUsers);
+
+      const currentCallbacks = channelManager.getChannelCallbacks(channelName, 'PRESENCE');
+      currentCallbacks.forEach(cb => {
+        try {
+          cb(uniqueUsers);
+        } catch (error) {
+          console.error("[Presence] Error in presence callback:", error);
+        }
+      });
+    };
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        updateOnlineUsers('sync');
       })
-      .on('presence', { event: 'join' }, () => {})
-      .on('presence', { event: 'leave' }, () => {});
+      .on('presence', { event: 'join' }, (payload: any) => {
+        console.log('[Presence] User joined:', payload);
+        updateOnlineUsers('join');
+      })
+      .on('presence', { event: 'leave' }, (payload: any) => {
+        console.log('[Presence] User left:', payload);
+        updateOnlineUsers('leave');
+      });
 
     channel.subscribe(async (status: string) => {
+      console.log(`[Presence] Channel subscription status: ${status} for user: ${username}`);
+
       if (status === 'SUBSCRIBED') {
         channelManager.updateSubscriptionState(subscriptionId, 'SUBSCRIBED');
         const userStatus = {
@@ -324,10 +343,30 @@ export function trackPresence(
 
         try {
           await channel.track(userStatus);
+          console.log(`[Presence] Successfully tracking user: ${username}`);
+
+          // Validate presence after a short delay
+          setTimeout(() => {
+            const state = channel.presenceState();
+            const hasCurrentUser = Object.values(state).some((presences: any) =>
+              presences.some((p: any) => p.username === username)
+            );
+
+            if (!hasCurrentUser) {
+              console.warn(`[Presence] User ${username} not found in presence state, retrying...`);
+              channel.track(userStatus).catch((retryError: any) => {
+                console.error('[Presence] Retry tracking failed:', retryError);
+              });
+            } else {
+              console.log(`[Presence] User ${username} confirmed in presence state`);
+            }
+          }, 2000);
+
         } catch (error) {
           console.error('[Presence] Error tracking user presence:', error);
         }
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.error(`[Presence] Channel error/timeout: ${status} for user: ${username}`);
         channelManager.updateSubscriptionState(subscriptionId, 'ERROR');
       }
     });
