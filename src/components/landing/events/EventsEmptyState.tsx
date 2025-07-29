@@ -16,7 +16,7 @@ const EventsEmptyState = ({ onViewAllClick }: EventsEmptyStateProps) => {
 
         <div className="text-center py-12">
           <p className="text-bookconnect-brown/80 mb-4">
-            No events are currently scheduled. Check back soon for upcoming events!
+            Stay tuned for future events
           </p>
           <Button
             onClick={onViewAllClick}

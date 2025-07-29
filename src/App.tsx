@@ -73,6 +73,7 @@ import { AlertSystemTest } from "./components/testing/AlertSystemTest";
 import { SubscriptionDebugger } from "./components/testing/SubscriptionDebugger";
 import { SubscriptionAlertTest } from "./components/testing/SubscriptionAlertTest";
 import ToastTest from "./components/testing/ToastTest";
+import RoleAccessDeniedTest from "./components/testing/RoleAccessDeniedTest";
 // Username validation debug tools removed - issues resolved
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
@@ -143,6 +144,7 @@ function App() {
               <Route path="/test/subscription-debug" element={<SubscriptionDebugger />} />
               <Route path="/test/subscription-alerts" element={<SubscriptionAlertTest />} />
               <Route path="/test/toasts" element={<ToastTest />} />
+              <Route path="/test/role-access-denied" element={<RoleAccessDeniedTest />} />
 
               {/* Direct Messaging Routes */}
               <Route path="/messages" element={

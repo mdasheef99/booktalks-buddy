@@ -1,0 +1,229 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - link "BookConnect":
+    - /url: /
+  - button "Open navigation dropdown":
+    - img
+- img
+- text: Featured Books
+- heading "Discover Our Favorites" [level=2]
+- paragraph: Handpicked selections from our collection, curated just for you
+- region:
+  - group:
+    - img "Cover of Black Swan"
+    - heading "Black Swan" [level=3]
+    - paragraph: by Nassim taleb
+  - group:
+    - img "Cover of Antifragile"
+    - heading "Antifragile" [level=3]
+    - paragraph: by Nassim taleb
+  - group:
+    - img "Cover of Black Swan"
+    - heading "Black Swan" [level=3]
+    - paragraph: by Nassim taleb
+  - button "Previous slide":
+    - img
+    - text: Previous slide
+  - button "Next slide":
+    - img
+    - text: Next slide
+  - button "Go to slide 1"
+  - button "Go to slide 2"
+  - button "Go to slide 3"
+  - button "Go to slide 4"
+  - button "Go to slide 5"
+  - button "Go to slide 6"
+- img
+- img
+- img
+- img
+- text: Welcome to BookConnect
+- heading "Connect Through Books" [level=1]
+- paragraph: Join our community of book lovers and connect anonymously through your shared passion for reading
+- img
+- blockquote: "\"all power is within you\""
+- text: — Manikant
+- button "Start Chatting Anonymously":
+  - img
+  - text: Start Chatting Anonymously
+  - img
+- img
+- heading "Click Me! Surprise" [level=3]
+- paragraph: Jello
+- button "Open":
+  - text: Open
+  - img
+- heading "Events" [level=2]
+- paragraph: Join literary events, author meet-ups, and book festivals happening in your community
+- paragraph: Stay tuned for future events
+- button "View All Events"
+- heading "Book Clubs" [level=2]
+- paragraph: Connect with fellow readers, discover your next favorite book, and engage in meaningful discussions that bring stories to life
+- heading "Discover Your Next Great Read" [level=3]
+- paragraph: Join passionate readers in meaningful discussions, discover personalized book recommendations, and build lasting friendships through the power of literature.
+- img
+- heading "Curated Reading Lists" [level=4]
+- paragraph: Explore carefully selected books across all genres, from timeless classics to contemporary bestsellers.
+- img
+- heading "Vibrant Communities" [level=4]
+- paragraph: Connect with like-minded readers, share insights, and participate in engaging discussions.
+- img
+- heading "Flexible Scheduling" [level=4]
+- paragraph: Join clubs that fit your schedule with weekly, bi-weekly, or monthly meeting options.
+- button "Browse Book Clubs":
+  - text: Browse Book Clubs
+  - img
+- paragraph: Find your perfect reading community today
+- heading "Science Fiction Club" [level=4]
+- paragraph: Explore futuristic worlds and technological wonders with fellow sci-fi enthusiasts. Join weekly discussions and discover award-winning authors.
+- button "Learn More"
+- heading "Mystery Readers" [level=4]
+- paragraph: Unravel puzzles and solve crimes alongside detectives from the greatest mystery novels. Perfect for fans of Agatha Christie and modern thrillers.
+- button "Learn More"
+- heading "Contemporary Fiction" [level=4]
+- paragraph: Discuss modern literary works and their reflections on today's society and culture. Explore diverse voices and contemporary storytelling.
+- button "Learn More"
+- img
+- text: Sell Your Books
+- heading "Turn Your Books Into Cash" [level=2]
+- paragraph: Have books you no longer need? We're always looking for quality second-hand books to add to our collection. Submit your books for review and we'll contact you directly.
+- img
+- heading "Easy Submission" [level=3]
+- paragraph: Simply fill out our form with your book details and upload photos. The process takes just a few minutes.
+- img
+- heading "Quick Review" [level=3]
+- paragraph: Our team reviews submissions promptly and contacts you directly with our decision and next steps.
+- img
+- heading "Fair Prices" [level=3]
+- paragraph: We offer competitive prices for quality books and handle all the details once we accept your submission.
+- heading "What We're Looking For" [level=3]
+- heading "✓ We Accept" [level=4]
+- list:
+  - listitem: • Fiction and non-fiction books
+  - listitem: • Textbooks and academic books
+  - listitem: • Children's and young adult books
+  - listitem: • Collectible and rare books
+  - listitem: • Books in good to excellent condition
+- heading "✗ We Don't Accept" [level=4]
+- list:
+  - listitem: • Books with significant damage
+  - listitem: • Outdated textbooks (older than 5 years)
+  - listitem: • Books with missing pages
+  - listitem: • Heavily marked or highlighted books
+  - listitem: • Magazines and periodicals
+- button "List Your Books Now":
+  - img
+  - text: List Your Books Now
+- paragraph: No account required • Free to submit • Direct contact from store owner
+- heading "Looking for a Specific Book?" [level=2]
+- paragraph: Can't find the book you're looking for? Submit a book availability request and our store owner will contact you directly if they have it or can source it for you.
+- img
+- heading "Easy Request" [level=3]
+- paragraph: Simply fill out our form with the book details you're looking for. Takes just a few minutes to submit your request.
+- img
+- heading "Direct Contact" [level=3]
+- paragraph: Store owner will contact you directly via phone or email if they have the book or can source it for you.
+- img
+- heading "Free Service" [level=3]
+- paragraph: This is a complimentary service. No fees for submitting requests or getting information about book availability.
+- heading "How It Works" [level=3]
+- text: "1"
+- heading "Submit Request" [level=4]
+- paragraph: Fill out the form with book details
+- text: "2"
+- heading "Store Review" [level=4]
+- paragraph: Owner checks inventory and sources
+- text: "3"
+- heading "Direct Contact" [level=4]
+- paragraph: Owner contacts you with availability
+- text: "4"
+- heading "Get Your Book" [level=4]
+- paragraph: Arrange purchase or pickup
+- heading "What to Include in Your Request" [level=3]
+- heading "Required Information:" [level=4]
+- list:
+  - listitem:
+    - img
+    - text: Your contact information (name, email, phone)
+  - listitem:
+    - img
+    - text: Book title and author name
+- heading "Helpful Details (Optional):" [level=4]
+- list:
+  - listitem:
+    - img
+    - text: Specific edition or publication year
+  - listitem:
+    - img
+    - text: Publisher information
+  - listitem:
+    - img
+    - text: Any other identifying details
+- button "Request Book Availability":
+  - img
+  - text: Request Book Availability
+- paragraph: No account required • Free service • Direct contact from store owner
+- img
+- heading "Our Community" [level=2]
+- paragraph: Join thousands of passionate readers who share recommendations, celebrate literary discoveries, and build lasting friendships through the power of books.
+- img
+- heading "Featured Members" [level=3]
+- text: S
+- heading "sufiyanpopper" [level=4]
+- paragraph: "@Sufiyan"
+- img
+- text: Helpful Contributor
+- paragraph: has provided with the most reviews
+- img
+- text: Since April 2025 Member K
+- heading "kant" [level=4]
+- img
+- text: Helpful Contributor
+- paragraph: Always steps forward
+- img
+- text: Since April 2025 Privileged
+- img
+- paragraph: "\"Smart people are not smart in that there is a difference in the degree but with the framework with which they think.\""
+- text: — Freeman Dyson
+- contentinfo:
+  - img
+  - text: BookConnect
+  - paragraph: Connecting book lovers through meaningful conversations and literary exploration since 2023.
+  - link:
+    - /url: "#"
+  - link:
+    - /url: "#"
+  - link:
+    - /url: "#"
+  - heading "Quick Links" [level=3]
+  - list:
+    - listitem:
+      - link "Home":
+        - /url: "#"
+    - listitem:
+      - link "About Us":
+        - /url: "#"
+    - listitem:
+      - link "Events":
+        - /url: "#"
+    - listitem:
+      - link "Book Clubs":
+        - /url: "#"
+    - listitem:
+      - link "Blog":
+        - /url: "#"
+  - heading "Newsletter" [level=3]
+  - paragraph: Stay updated with the latest literary events and book recommendations.
+  - textbox "Your email address"
+  - button "Subscribe"
+  - paragraph: © 2025 BookConnect. All rights reserved.
+  - link "Privacy Policy":
+    - /url: "#"
+  - link "Terms of Service":
+    - /url: "#"
+  - link "Contact":
+    - /url: "#"
+- region "Notifications alt+T"
+```
