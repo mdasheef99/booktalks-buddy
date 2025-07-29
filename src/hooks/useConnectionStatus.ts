@@ -54,7 +54,7 @@ export function useConnectionStatus() {
         setStatus('reconnecting');
         
         // Make a lightweight request to verify connection
-        const response = await fetch('/api/ping', { 
+        const response = await fetch('/', {
           method: 'HEAD',
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache' }
