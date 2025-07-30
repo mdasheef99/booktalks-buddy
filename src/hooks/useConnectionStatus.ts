@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 type ConnectionStatus = 'online' | 'offline' | 'reconnecting';
 
@@ -49,21 +50,22 @@ export function useConnectionStatus() {
   // Function to manually check connection and attempt reconnection
   const checkConnection = useCallback(async () => {
     if (navigator.onLine) {
-      // Browser thinks we're online, but let's verify with a network request
+      // Browser thinks we're online, but let's verify with a database connection
       try {
         setStatus('reconnecting');
-        
-        // Make a lightweight request to verify connection
-        const response = await fetch('/', {
-          method: 'HEAD',
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache' }
-        });
-        
-        if (response.ok) {
+
+        // ✅ UPDATED: Use direct Supabase query instead of fetch request
+        // Make a lightweight database query to verify connection
+        const { data, error } = await supabase
+          .from('users')
+          .select('count')
+          .limit(1);
+
+        if (!error) {
           handleOnline();
           return true;
         } else {
+          console.warn('Database connection check failed:', error);
           setStatus('offline');
           return false;
         }

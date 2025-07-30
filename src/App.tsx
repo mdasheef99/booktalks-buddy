@@ -88,6 +88,7 @@ import BookNominationsPage from "./pages/BookNominationsPage";
 import BookNominationFormPage from "./pages/BookNominationFormPage";
 import BookRequestPage from "./pages/BookRequestPage";
 import BookListingPage from "./pages/BookListingPage";
+import BannerDetail from "./pages/BannerDetail";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";
@@ -138,6 +139,9 @@ function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/book-request" element={<BookRequestPage />} />
               <Route path="/book-listing" element={<BookListingPage />} />
+
+              {/* Banner Detail Route */}
+              <Route path="/banner/:bannerId" element={<BannerDetail />} />
 
               {/* Testing Routes */}
               <Route path="/test/alerts" element={<AlertSystemTest />} />

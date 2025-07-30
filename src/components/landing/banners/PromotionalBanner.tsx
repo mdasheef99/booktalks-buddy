@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ExternalLink, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BannerTrackingAPI, SessionManager, DeviceDetector } from '@/lib/api/store/analytics/bannerTracking';
 
 interface BannerItem {
   id: string;
@@ -29,6 +30,8 @@ interface PromotionalBannerProps {
   index: number;
   onBannerClick?: (bannerId: string) => void;
   className?: string;
+  storeId?: string; // Added for analytics tracking
+  totalBannersVisible?: number; // Added for context tracking
 }
 
 const animationClasses = {
@@ -47,8 +50,22 @@ export const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   banner,
   index,
   onBannerClick,
-  className
+  className,
+  storeId,
+  totalBannersVisible
 }) => {
+  // Refs and state for analytics tracking
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [viewStartTime, setViewStartTime] = useState<number | null>(null);
+  const [hasBeenTracked, setHasBeenTracked] = useState(false);
+  const [scrollBehavior, setScrollBehavior] = useState({
+    scrollDirection: 'none' as 'up' | 'down' | 'none',
+    scrollSpeed: 0,
+    lastScrollY: 0,
+    scrollEvents: 0
+  });
+
   const animationClass = banner.animation_type ? animationClasses[banner.animation_type] : '';
   const hasClickAction = banner.cta_url || onBannerClick;
 
@@ -74,16 +91,171 @@ export const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
     return baseStyle;
   };
 
-  const handleBannerClick = () => {
+  const handleBannerClick = (event?: React.MouseEvent) => {
+    // Capture click position if event is available
+    let clickPosition: { x: number; y: number } | undefined;
+    if (event && bannerRef.current) {
+      const rect = bannerRef.current.getBoundingClientRect();
+      clickPosition = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    }
+
+    // Track click with position data if storeId is available
+    if (storeId && clickPosition) {
+      const sessionId = SessionManager.getSessionId();
+      BannerTrackingAPI.trackBannerClick(
+        storeId,
+        banner.id,
+        sessionId,
+        {
+          bannerPosition: index + 1,
+          totalBannersVisible: totalBannersVisible || 1,
+          bannerTitle: banner.title,
+          bannerType: banner.content_type,
+          clickPosition,
+          deviceType: DeviceDetector.getDeviceType(),
+          clickSource: 'banner_component',
+          timestamp: new Date().toISOString()
+        }
+      );
+    }
+
     if (onBannerClick) {
       onBannerClick(banner.id);
     }
   };
 
+  // Intersection Observer for banner view tracking
+  useEffect(() => {
+    if (!storeId || !bannerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasBeenTracked) {
+            // Banner became visible
+            setIsVisible(true);
+            setViewStartTime(Date.now());
+            setHasBeenTracked(true);
+
+            // Track banner view
+            const sessionId = SessionManager.getSessionId();
+            BannerTrackingAPI.trackBannerView(
+              storeId,
+              banner.id,
+              sessionId,
+              {
+                bannerPosition: index + 1,
+                totalBannersVisible: totalBannersVisible || 1,
+                bannerTitle: banner.title,
+                bannerType: banner.content_type,
+                deviceType: DeviceDetector.getDeviceType(),
+                viewportHeight: window.innerHeight,
+                viewportWidth: window.innerWidth,
+                scrollPosition: window.scrollY
+              }
+            );
+          } else if (!entry.isIntersecting && isVisible && viewStartTime) {
+            // Banner became invisible - track view duration
+            const viewDuration = Date.now() - viewStartTime;
+            setIsVisible(false);
+
+            // Track view duration if it was visible for more than 1 second
+            if (viewDuration > 1000) {
+              const sessionId = SessionManager.getSessionId();
+              BannerTrackingAPI.trackBannerView(
+                storeId,
+                banner.id,
+                sessionId,
+                {
+                  bannerPosition: index + 1,
+                  totalBannersVisible: totalBannersVisible || 1,
+                  bannerTitle: banner.title,
+                  bannerType: banner.content_type,
+                  viewDuration: viewDuration,
+                  deviceType: DeviceDetector.getDeviceType(),
+                  eventSubType: 'view_duration'
+                }
+              );
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.5, // Trigger when 50% of banner is visible
+        rootMargin: '0px 0px -50px 0px' // Slight offset to ensure meaningful visibility
+      }
+    );
+
+    observer.observe(bannerRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [storeId, banner.id, index, totalBannersVisible, banner.title, banner.content_type, hasBeenTracked, isVisible, viewStartTime]);
+
+  // Scroll behavior tracking
+  useEffect(() => {
+    if (!storeId || !isVisible) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - scrollBehavior.lastScrollY;
+      const scrollDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'none';
+      const scrollSpeed = Math.abs(scrollDelta);
+
+      setScrollBehavior(prev => ({
+        scrollDirection,
+        scrollSpeed,
+        lastScrollY: currentScrollY,
+        scrollEvents: prev.scrollEvents + 1
+      }));
+
+      // Debounce scroll tracking - track significant scroll behavior
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        if (scrollBehavior.scrollEvents > 5) { // Only track if user scrolled significantly
+          const sessionId = SessionManager.getSessionId();
+          BannerTrackingAPI.trackBannerView(
+            storeId,
+            banner.id,
+            sessionId,
+            {
+              bannerPosition: index + 1,
+              totalBannersVisible: totalBannersVisible || 1,
+              bannerTitle: banner.title,
+              bannerType: banner.content_type,
+              scrollDirection: scrollBehavior.scrollDirection,
+              scrollSpeed: scrollBehavior.scrollSpeed,
+              scrollEvents: scrollBehavior.scrollEvents,
+              deviceType: DeviceDetector.getDeviceType(),
+              eventSubType: 'scroll_behavior'
+            }
+          );
+
+          // Reset scroll tracking
+          setScrollBehavior(prev => ({ ...prev, scrollEvents: 0 }));
+        }
+      }, 1000); // Track scroll behavior every 1 second of activity
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [storeId, banner.id, index, totalBannersVisible, banner.title, banner.content_type, isVisible, scrollBehavior]);
+
   // Text-only banner
   if (banner.content_type === 'text') {
     return (
-      <Card 
+      <Card
+        ref={bannerRef}
         className={cn(
           "overflow-hidden transition-all duration-300 hover:shadow-lg border-0",
           hasClickAction && "cursor-pointer hover:scale-[1.02]",
@@ -91,7 +263,7 @@ export const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
           className
         )}
         style={getBannerStyle()}
-        onClick={hasClickAction ? handleBannerClick : undefined}
+        onClick={hasClickAction ? (e) => handleBannerClick(e) : undefined}
       >
         <CardContent className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -138,7 +310,8 @@ export const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   // Image-only banner
   if (banner.content_type === 'image') {
     return (
-      <Card 
+      <Card
+        ref={bannerRef}
         className={cn(
           "overflow-hidden transition-all duration-300 hover:shadow-lg border-0 min-h-[200px] md:min-h-[250px]",
           hasClickAction && "cursor-pointer hover:scale-[1.02]",
@@ -146,7 +319,7 @@ export const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
           className
         )}
         style={getBannerStyle()}
-        onClick={hasClickAction ? handleBannerClick : undefined}
+        onClick={hasClickAction ? (e) => handleBannerClick(e) : undefined}
       >
         <CardContent className="p-6 md:p-8 h-full flex items-center justify-center">
           <div className="text-center">
@@ -182,14 +355,15 @@ export const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
 
   // Mixed content banner (image + text)
   return (
-    <Card 
+    <Card
+      ref={bannerRef}
       className={cn(
         "overflow-hidden transition-all duration-300 hover:shadow-lg border-0",
         hasClickAction && "cursor-pointer hover:scale-[1.02]",
         animationClass,
         className
       )}
-      onClick={hasClickAction ? handleBannerClick : undefined}
+      onClick={hasClickAction ? (e) => handleBannerClick(e) : undefined}
     >
       <CardContent className="p-0">
         <div className="grid md:grid-cols-2 gap-0 min-h-[200px]">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/lib/supabase';
 import { PromotionalBanner } from '@/lib/api/store/banners';
+import { BannerTrackingAPI, SessionManager, DeviceDetector } from '@/lib/api/store/analytics/bannerTracking';
 
 /**
  * Banner Detail Page
@@ -45,6 +46,29 @@ export const BannerDetail: React.FC = () => {
     },
     enabled: !!bannerId,
   });
+
+  // Track banner detail page view
+  useEffect(() => {
+    if (banner && bannerId) {
+      const sessionId = SessionManager.getSessionId();
+
+      BannerTrackingAPI.trackBannerDetailView(
+        banner.store_id,
+        bannerId,
+        sessionId,
+        {
+          bannerTitle: banner.title,
+          bannerType: banner.content_type,
+          deviceType: DeviceDetector.getDeviceType(),
+          referrer: document.referrer,
+          userAgent: navigator.userAgent,
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
+          timestamp: new Date().toISOString()
+        }
+      );
+    }
+  }, [banner, bannerId]);
 
   // Loading state
   if (isLoading) {

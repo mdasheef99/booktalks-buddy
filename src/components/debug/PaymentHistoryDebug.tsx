@@ -1,14 +1,15 @@
 /**
  * Payment History Debug Component
- * 
- * Temporary debug component to test payment history functionality
- * and diagnose any issues with the API or database.
+ *
+ * ✅ UPDATED: Debug component using direct Supabase queries instead of removed API endpoints.
+ * Tests payment history functionality and database connectivity.
  */
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export const PaymentHistoryDebug: React.FC = () => {
   const { user } = useAuth();
@@ -26,42 +27,73 @@ export const PaymentHistoryDebug: React.FC = () => {
     setError(null);
 
     try {
-      console.log('Testing payment API for user:', user.id);
+      console.log('Testing payment functionality for user:', user.id);
 
-      // Test multiple endpoints
-      const endpoints = [
-        { name: 'Simple Test', url: '/api/users/test' },
-        { name: 'Mock Payments', url: '/api/users/payments-simple' },
-        { name: 'Auth Test', url: '/api/users/payments-test' },
-        { name: 'Payment API v2', url: '/api/users/payments-v2?limit=5&page=1' },
-        { name: 'Debug Records', url: '/api/debug/payment-records' }
-      ];
-
+      // ✅ UPDATED: Direct Supabase queries instead of removed API endpoints
       const results = {};
 
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Testing ${endpoint.name}:`, endpoint.url);
-          const response = await fetch(endpoint.url);
+      // Test 1: Direct Supabase connection test
+      try {
+        console.log('Testing direct Supabase connection...');
+        const { data: connectionTest, error: connectionError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', user.id)
+          .limit(1);
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            results[endpoint.name] = {
-              status: response.status,
-              error: errorText
-            };
-          } else {
-            const data = await response.json();
-            results[endpoint.name] = {
-              status: response.status,
-              data: data
-            };
+        results['Supabase Connection'] = {
+          status: connectionError ? 'error' : 'success',
+          data: connectionError ? { error: connectionError.message } : { connected: true, userFound: !!connectionTest?.length }
+        };
+      } catch (err) {
+        results['Supabase Connection'] = {
+          error: err instanceof Error ? err.message : 'Unknown error'
+        };
+      }
+
+      // Test 2: Payment records query
+      try {
+        console.log('Testing payment records query...');
+        const { data: paymentRecords, error: paymentError } = await supabase
+          .from('payment_records')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        results['Payment Records Query'] = {
+          status: paymentError ? 'error' : 'success',
+          data: paymentError ? { error: paymentError.message } : {
+            recordCount: paymentRecords?.length || 0,
+            records: paymentRecords || []
           }
-        } catch (err) {
-          results[endpoint.name] = {
-            error: err instanceof Error ? err.message : 'Unknown error'
-          };
-        }
+        };
+      } catch (err) {
+        results['Payment Records Query'] = {
+          error: err instanceof Error ? err.message : 'Unknown error'
+        };
+      }
+
+      // Test 3: User profile query
+      try {
+        console.log('Testing user profile query...');
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        results['User Profile Query'] = {
+          status: profileError ? 'error' : 'success',
+          data: profileError ? { error: profileError.message } : {
+            profileFound: !!userProfile,
+            profile: userProfile
+          }
+        };
+      } catch (err) {
+        results['User Profile Query'] = {
+          error: err instanceof Error ? err.message : 'Unknown error'
+        };
       }
 
       setDebugInfo({
@@ -69,8 +101,9 @@ export const PaymentHistoryDebug: React.FC = () => {
           id: user.id,
           email: user.email
         },
-        endpointResults: results,
-        timestamp: new Date().toISOString()
+        testResults: results,
+        timestamp: new Date().toISOString(),
+        note: 'Updated to use direct Supabase queries instead of removed API endpoints'
       });
 
     } catch (err) {
@@ -123,16 +156,16 @@ export const PaymentHistoryDebug: React.FC = () => {
   return (
     <Card className="max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle>Payment History Debug</CardTitle>
+        <CardTitle>Payment History Debug (Direct Supabase)</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4">
-          <Button 
-            onClick={testPaymentAPI} 
+          <Button
+            onClick={testPaymentAPI}
             disabled={loading || !user}
             variant="outline"
           >
-            {loading ? 'Testing...' : 'Test Payment API'}
+            {loading ? 'Testing...' : 'Test Supabase Queries'}
           </Button>
           
           <Button 

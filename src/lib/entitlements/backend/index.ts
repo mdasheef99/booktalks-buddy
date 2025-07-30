@@ -6,8 +6,6 @@
  */
 
 // Re-export all backend enforcement functionality
-export * from './middleware';
 export * from './enforcement';
 export * from './tracking';
 export * from './utils';
-export * from './types';

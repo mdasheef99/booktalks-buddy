@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { PromotionalBanner } from './banners/PromotionalBanner';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Megaphone } from 'lucide-react';
+import { BannerTrackingAPI, SessionManager, DeviceDetector } from '@/lib/api/store/analytics/bannerTracking';
 
 interface BannerItem {
   id: string;
@@ -38,6 +40,7 @@ interface PromotionalBannersSectionProps {
  * Position 3 - Between Hero and Community sections
  */
 export const PromotionalBannersSection: React.FC<PromotionalBannersSectionProps> = ({ storeId }) => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
 
   // Fetch active promotional banners for the store
@@ -139,13 +142,30 @@ export const PromotionalBannersSection: React.FC<PromotionalBannersSectionProps>
               key={banner.id}
               banner={banner}
               index={index}
-              onBannerClick={(bannerId) => {
-                // Track banner click analytics
-                if (banner.cta_url) {
-                  // Analytics tracking would go here
-                  console.log('Banner clicked:', bannerId);
-                  window.open(banner.cta_url, '_blank', 'noopener,noreferrer');
-                }
+              storeId={storeId}
+              totalBannersVisible={banners.length}
+              onBannerClick={async (bannerId) => {
+                // Enhanced banner click tracking
+                const sessionId = SessionManager.getSessionId();
+                const clickedBanner = banners.find(b => b.id === bannerId);
+
+                await BannerTrackingAPI.trackBannerClick(
+                  storeId,
+                  bannerId,
+                  sessionId,
+                  {
+                    bannerPosition: index + 1,
+                    totalBannersVisible: banners.length,
+                    bannerTitle: clickedBanner?.title || 'Unknown',
+                    bannerType: clickedBanner?.content_type || 'text',
+                    deviceType: DeviceDetector.getDeviceType(),
+                    clickSource: 'landing_page',
+                    timestamp: new Date().toISOString()
+                  }
+                );
+
+                // Navigate to banner detail page
+                navigate(`/banner/${bannerId}`);
               }}
             />
           ))}
