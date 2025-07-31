@@ -269,5 +269,5 @@ export class BannerTrackingAPI {
   }
 }
 
-// Export default
+// Export default API
 export default BannerTrackingAPI;
