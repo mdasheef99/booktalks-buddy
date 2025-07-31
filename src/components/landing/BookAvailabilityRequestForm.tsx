@@ -22,6 +22,7 @@ import {
   validateBookTitle,
   validateOptionalText
 } from '@/lib/utils/formValidation';
+import { BookAvailabilityRequestService } from '@/lib/services/bookAvailabilityRequestService';
 
 interface BookAvailabilityRequestFormProps {
   storeId: string;
@@ -124,22 +125,10 @@ export const BookAvailabilityRequestForm: React.FC<BookAvailabilityRequestFormPr
     submissionThrottle.recordSubmission();
     
     try {
-      const response = await fetch('/api/book-availability-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          store_id: storeId,
-        }),
+      const result = await BookAvailabilityRequestService.submitRequest({
+        formData,
+        storeId,
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit request');
-      }
 
       setSubmitSuccess(true);
       toast.success('Book availability request submitted successfully!');

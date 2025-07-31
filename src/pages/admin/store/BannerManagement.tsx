@@ -10,8 +10,19 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Megaphone, Plus, Eye, Settings, Calendar } from 'lucide-react';
+import { Megaphone, Plus, Eye, Settings, Calendar, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
+
+// Banner Analytics Components
+import { AnalyticsPageLayout, AnalyticsPageHeader, TimeRangeSelector } from '@/components/admin/store/analytics/shared';
+import {
+  BannerAnalyticsGrid,
+  MultiBannerPerformanceTable,
+  BannerComparisonChart,
+  BannerTimeSeriesChart,
+  BannerInsightsSection
+} from '@/components/admin/store/analytics/banner';
+import { useBannerAnalytics } from '@/hooks/analytics';
 
 /**
  * Banner Management Page for Store Owners
@@ -20,10 +31,29 @@ import { toast } from 'sonner';
 export const BannerManagement: React.FC = () => {
   const { storeId } = useStoreOwnerContext();
   const queryClient = useQueryClient();
-  
+
   const [showEntryModal, setShowEntryModal] = useState(false);
   const [editingBanner, setEditingBanner] = useState<PromotionalBanner | null>(null);
   const [activeTab, setActiveTab] = useState('manage');
+  const [analyticsTimeRange, setAnalyticsTimeRange] = useState(30);
+
+  // Banner Analytics Hook
+  const {
+    summary,
+    bannerPerformance,
+    timeSeriesData,
+    comparisonData,
+    isLoading: analyticsLoading,
+    hasErrors: analyticsHasErrors,
+    timeRange,
+    setTimeRange,
+    refetchAll: refetchAnalytics,
+    exportData,
+    isExporting
+  } = useBannerAnalytics({
+    storeId,
+    initialTimeRange: analyticsTimeRange
+  });
 
   // Fetch promotional banners
   const {
@@ -156,7 +186,7 @@ export const BannerManagement: React.FC = () => {
             Schedule
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <Megaphone className="h-4 w-4" />
+            <BarChart3 className="h-4 w-4" />
             Analytics
           </TabsTrigger>
         </TabsList>
@@ -219,21 +249,89 @@ export const BannerManagement: React.FC = () => {
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Banner Analytics</CardTitle>
-              <CardDescription>
-                Track banner performance and engagement metrics
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <Megaphone className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Banner analytics coming soon...</p>
-                <p className="text-sm mt-2">Click-through rates, impressions, and conversion tracking</p>
+          <AnalyticsPageLayout>
+            <AnalyticsPageHeader
+              title="Banner Analytics"
+              description="Track banner performance and engagement metrics"
+              actions={
+                <div className="flex items-center gap-3">
+                  <TimeRangeSelector
+                    value={timeRange}
+                    onChange={setTimeRange}
+                    options={[
+                      { label: '7 days', value: 7 },
+                      { label: '30 days', value: 30 },
+                      { label: '90 days', value: 90 }
+                    ]}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={refetchAnalytics}
+                    disabled={analyticsLoading}
+                  >
+                    Refresh
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => exportData('json')}
+                    disabled={isExporting}
+                  >
+                    {isExporting ? 'Exporting...' : 'Export Data'}
+                  </Button>
+                </div>
+              }
+            />
+
+            {/* Analytics Error State */}
+            {analyticsHasErrors && (
+              <Alert>
+                <AlertDescription>
+                  There was an error loading analytics data. Please try refreshing the page.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Analytics Dashboard */}
+            <div className="space-y-8">
+              {/* Overview Metrics Grid */}
+              <BannerAnalyticsGrid
+                summary={summary}
+                isLoading={analyticsLoading}
+              />
+
+              {/* Performance Table and Comparison Chart */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <MultiBannerPerformanceTable
+                  bannerPerformance={bannerPerformance}
+                  isLoading={analyticsLoading}
+                  maxRows={5}
+                  showDeviceBreakdown={true}
+                />
+
+                <BannerComparisonChart
+                  comparisonData={comparisonData}
+                  isLoading={analyticsLoading}
+                  maxBanners={5}
+                />
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Time Series Chart */}
+              <BannerTimeSeriesChart
+                timeSeriesData={timeSeriesData}
+                isLoading={analyticsLoading}
+                chartHeight={350}
+              />
+
+              {/* AI Insights */}
+              <BannerInsightsSection
+                summary={summary}
+                bannerPerformance={bannerPerformance}
+                isLoading={analyticsLoading}
+              />
+            </div>
+          </AnalyticsPageLayout>
         </TabsContent>
       </Tabs>
 

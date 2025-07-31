@@ -1,6 +1,6 @@
 /**
  * Premium Feature Gate Component
- * 
+ *
  * Controls access to premium features based on subscription status and entitlements
  */
 
@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Star, ArrowRight, AlertTriangle } from 'lucide-react';
+import { validateFeatureAccessWithAlerts, FEATURE_SUBSCRIPTION_REQUIREMENTS, type FeatureKey } from '@/lib/alerts/roleAlertTriggers';
+import { useAlerts } from '@/hooks/useAlerts';
 
 interface PremiumFeatureGateProps {
   feature: string;
@@ -22,6 +24,22 @@ interface PremiumFeatureGateProps {
   className?: string;
 }
 
+// Feature mapping for alert integration
+const FEATURE_MAPPING: Record<string, FeatureKey> = {
+  'CAN_CREATE_LIMITED_CLUBS': 'club_creation',
+  'CAN_ACCESS_PREMIUM_CONTENT': 'premium_content',
+  'CAN_ACCESS_EXCLUSIVE_CONTENT': 'exclusive_content',
+  'CAN_SEND_DIRECT_MESSAGES': 'direct_messaging',
+  'CAN_MANAGE_STORE': 'store_management',
+  'CAN_ACCESS_ADVANCED_ANALYTICS': 'advanced_analytics'
+};
+
+// Contact store functionality
+const handleContactStore = () => {
+  // Simple implementation - can be enhanced with modal or contact form
+  alert('Please contact your store owner directly to upgrade your membership or make payments. You can visit the store or call them for assistance.');
+};
+
 export function PremiumFeatureGate({
   feature,
   requiredTier,
@@ -32,16 +50,45 @@ export function PremiumFeatureGate({
   featureDescription,
   className = ''
 }: PremiumFeatureGateProps) {
-  const { 
-    canAccessFeature, 
-    hasRequiredTier, 
+  const {
+    user,
+    canAccessFeature,
+    hasRequiredTier,
     getSubscriptionStatusWithContext,
-    hasValidSubscription 
+    hasValidSubscription
   } = useAuth();
+  const { addAlert } = useAlerts();
 
   const statusContext = getSubscriptionStatusWithContext();
   const hasFeatureAccess = canAccessFeature(feature);
   const hasTierAccess = requiredTier ? hasRequiredTier(requiredTier) : true;
+
+  // ✅ NEW: Alert integration for access denied
+  if (!hasFeatureAccess || !hasTierAccess) {
+    if (user) {
+      // Map feature to alert system feature key
+      const alertFeatureKey = FEATURE_MAPPING[feature];
+
+      if (alertFeatureKey) {
+        // Trigger role access denied alert
+        const alertResult = validateFeatureAccessWithAlerts(
+          user.id,
+          statusContext.tier,
+          statusContext.hasActiveSubscription,
+          alertFeatureKey,
+          {
+            showToast: true,
+            addToAlertContext: true,
+            onContactStore: handleContactStore
+          }
+        );
+
+        if (alertResult.alertTriggered) {
+          console.log(`Alert triggered for feature access: ${feature}`);
+        }
+      }
+    }
+  }
 
   // If user has access, render the feature
   if (hasFeatureAccess && hasTierAccess) {

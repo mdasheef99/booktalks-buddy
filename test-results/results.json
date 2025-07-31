@@ -149,1035 +149,1802 @@
   },
   "suites": [
     {
-      "title": "race-condition-fix.spec.ts",
-      "file": "race-condition-fix.spec.ts",
+      "title": "auth\\authentication-flows.spec.ts",
+      "file": "auth/authentication-flows.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Race Condition Fix - Real-time Chat",
-          "file": "race-condition-fix.spec.ts",
-          "line": 3,
+          "title": "Authentication Flows",
+          "file": "auth/authentication-flows.spec.ts",
+          "line": 8,
           "column": 6,
-          "specs": [
+          "specs": [],
+          "suites": [
             {
-              "title": "should handle presence tracking without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+              "title": "Landing Page Navigation",
+              "file": "auth/authentication-flows.spec.ts",
+              "line": 14,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
+                  "title": "should display landing page with proper sections",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 19547,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 17,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 17,
-                            "line": 14
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:27.238Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\\test-failed-2.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\\error-context.md"
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 20905,
+                          "error": {
+                            "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('main')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('main')\u001b[22m\n",
+                            "stack": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('main')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('main')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:20:44",
+                            "location": {
+                              "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                              "column": 44,
+                              "line": 20
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 18 |\u001b[39m       \n \u001b[90m 19 |\u001b[39m       \u001b[90m// Check for main landing page content using MCP semantic understanding\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 20 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'main'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 21 |\u001b[39m       \n \u001b[90m 22 |\u001b[39m       \u001b[90m// Look for navigation or call-to-action elements\u001b[39m\n \u001b[90m 23 |\u001b[39m       \u001b[36mconst\u001b[39m loginButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/login|sign in/i\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                                "column": 44,
+                                "line": 20
+                              },
+                              "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByRole('main')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('main')\u001b[22m\n\n\n\u001b[0m \u001b[90m 18 |\u001b[39m       \n \u001b[90m 19 |\u001b[39m       \u001b[90m// Check for main landing page content using MCP semantic understanding\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 20 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'main'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 21 |\u001b[39m       \n \u001b[90m 22 |\u001b[39m       \u001b[90m// Look for navigation or call-to-action elements\u001b[39m\n \u001b[90m 23 |\u001b[39m       \u001b[36mconst\u001b[39m loginButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/login|sign in/i\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:20:44\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:05.204Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\\video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\\error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                            "column": 44,
+                            "line": 20
+                          }
                         }
                       ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 17,
-                        "line": 14
-                      }
+                      "status": "unexpected"
                     }
                   ],
-                  "status": "unexpected"
+                  "id": "7476a0e2b40ece6074b2-f072ba86aa88b63fbc2c",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 15,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 14444,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:05.226Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-f96b63460f841c01241e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 31,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 21741,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:05.188Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-faf97af03864d357c772",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 45,
+                  "column": 5
+                },
+                {
+                  "title": "should display landing page with proper sections",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-445405e624b15fb8d44a",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 15,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-662146944458977d2341",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 31,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-4fc9c6728c23833b548e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 45,
+                  "column": 5
+                },
+                {
+                  "title": "should display landing page with proper sections",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-32322e09a908e1bf4417",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 15,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-57972b9577d5d799084b",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 31,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-24ea26e7945895a6d10e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 45,
+                  "column": 5
+                },
+                {
+                  "title": "should display landing page with proper sections",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-3cf46c503cd60eac9ab7",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 15,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-9ac8ecf6071f3c9a5001",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 31,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-1e7b7a70b0c438f80985",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 45,
+                  "column": 5
+                },
+                {
+                  "title": "should display landing page with proper sections",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-26f1dbc420e95619799f",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 15,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-ce9f6327bdddb08dbdaf",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 31,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register from landing page",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-1a80ca348637833fef49",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 45,
+                  "column": 5
                 }
-              ],
-              "id": "36a175575be443fd8800-710e188e524416dcd890",
-              "file": "race-condition-fix.spec.ts",
-              "line": 4,
-              "column": 3
+              ]
             },
             {
-              "title": "should synchronize messages without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+              "title": "Login Page",
+              "file": "auth/authentication-flows.spec.ts",
+              "line": 60,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
+                  "title": "should display login form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 14990,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:27.264Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\\test-failed-2.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\\error-context.md"
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 15263,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:05.207Z",
+                          "annotations": [],
+                          "attachments": []
                         }
                       ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "status": "expected"
                     }
                   ],
-                  "status": "unexpected"
+                  "id": "7476a0e2b40ece6074b2-9d1dcf6fb9e6e6e9ed3e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 65,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 8259,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:20.444Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-e29170eb65dbd42d7fd0",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 81,
+                  "column": 5
+                },
+                {
+                  "title": "should validate email format",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 8967,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:21.240Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-5b3f5711a48daf3518ed",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 97,
+                  "column": 5
+                },
+                {
+                  "title": "should handle login attempt with invalid credentials",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 18367,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:27.816Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-803a671e3d19e380743e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 114,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register page from login",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 5873,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:28.718Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-a62796da668502791c01",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 134,
+                  "column": 5
+                },
+                {
+                  "title": "should display login form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-4647b80530e6e1f9de77",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 65,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-7a13ba0c7e9337bb6d51",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 81,
+                  "column": 5
+                },
+                {
+                  "title": "should validate email format",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-e6a384de0f7b5a6904a7",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 97,
+                  "column": 5
+                },
+                {
+                  "title": "should handle login attempt with invalid credentials",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-563851b726927b323cf9",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 114,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register page from login",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-744480995cab3b98d0af",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 134,
+                  "column": 5
+                },
+                {
+                  "title": "should display login form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-15bcd11b479a8a65667b",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 65,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-314e7960d83b95fdaacf",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 81,
+                  "column": 5
+                },
+                {
+                  "title": "should validate email format",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-9102917cba9bc741598f",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 97,
+                  "column": 5
+                },
+                {
+                  "title": "should handle login attempt with invalid credentials",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-3123f6dd31cc093bb801",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 114,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register page from login",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-9c4284e821a5fb4bac39",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 134,
+                  "column": 5
+                },
+                {
+                  "title": "should display login form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-21ba1f96644d508de372",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 65,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-a3341b4b8355cbef9b8e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 81,
+                  "column": 5
+                },
+                {
+                  "title": "should validate email format",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-68b09af3ff4eaacdc44c",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 97,
+                  "column": 5
+                },
+                {
+                  "title": "should handle login attempt with invalid credentials",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-0809e517480ba17fff48",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 114,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register page from login",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-ce6c8f5229d6a1afc4a3",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 134,
+                  "column": 5
+                },
+                {
+                  "title": "should display login form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-84bab7bdfde53423ec23",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 65,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-050ac8275fb0c9c0efae",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 81,
+                  "column": 5
+                },
+                {
+                  "title": "should validate email format",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-9d840ab5ca01a174b67b",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 97,
+                  "column": 5
+                },
+                {
+                  "title": "should handle login attempt with invalid credentials",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-ed487ac12478ea08a61a",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 114,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to register page from login",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-009d76c5a5e77ef2cb7e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 134,
+                  "column": 5
                 }
-              ],
-              "id": "36a175575be443fd8800-9b3379700fb1fa8ebbab",
-              "file": "race-condition-fix.spec.ts",
-              "line": 58,
-              "column": 3
+              ]
             },
             {
-              "title": "should handle subscription cleanup without memory leaks",
-              "ok": false,
-              "tags": [],
-              "tests": [
+              "title": "Register Page",
+              "file": "auth/authentication-flows.spec.ts",
+              "line": 144,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
+                  "title": "should display register form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 19428,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:27.252Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\\error-context.md"
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 7074,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:30.228Z",
+                          "annotations": [],
+                          "attachments": []
                         }
                       ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "status": "expected"
                     }
                   ],
-                  "status": "unexpected"
+                  "id": "7476a0e2b40ece6074b2-9574b91fa8ad605b48be",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 149,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields on registration",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 18696,
+                          "error": {
+                            "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /create|register|sign up/i })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" data-lov-name=\"Button\" data-component-line=\"148\" data-component-name=\"Button\" data-component-file=\"Register.tsx\" data-lov-id=\"src\\pages\\Register.tsx:148:12\" data-component-path=\"src\\pages\\Register.tsx\" data-component-content=\"%7B%22className%22%3A%22w-full%22%7D\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    17 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+                            "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /create|register|sign up/i })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" data-lov-name=\"Button\" data-component-line=\"148\" data-component-name=\"Button\" data-component-file=\"Register.tsx\" data-lov-id=\"src\\pages\\Register.tsx:148:12\" data-component-path=\"src\\pages\\Register.tsx\" data-component-content=\"%7B%22className%22%3A%22w-full%22%7D\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    17 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:175:26",
+                            "location": {
+                              "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                              "column": 26,
+                              "line": 175
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 173 |\u001b[39m       \u001b[90m// Try to submit empty form\u001b[39m\n \u001b[90m 174 |\u001b[39m       \u001b[36mconst\u001b[39m submitButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/create|register|sign up/i\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 175 |\u001b[39m       \u001b[36mawait\u001b[39m submitButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 176 |\u001b[39m       \n \u001b[90m 177 |\u001b[39m       \u001b[90m// Check for validation\u001b[39m\n \u001b[90m 178 |\u001b[39m       \u001b[36mconst\u001b[39m emailInput \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'textbox'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/email/i\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                                "column": 26,
+                                "line": 175
+                              },
+                              "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /create|register|sign up/i })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" data-lov-name=\"Button\" data-component-line=\"148\" data-component-name=\"Button\" data-component-file=\"Register.tsx\" data-lov-id=\"src\\pages\\Register.tsx:148:12\" data-component-path=\"src\\pages\\Register.tsx\" data-component-content=\"%7B%22className%22%3A%22w-full%22%7D\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    17 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 173 |\u001b[39m       \u001b[90m// Try to submit empty form\u001b[39m\n \u001b[90m 174 |\u001b[39m       \u001b[36mconst\u001b[39m submitButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/create|register|sign up/i\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 175 |\u001b[39m       \u001b[36mawait\u001b[39m submitButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 176 |\u001b[39m       \n \u001b[90m 177 |\u001b[39m       \u001b[90m// Check for validation\u001b[39m\n \u001b[90m 178 |\u001b[39m       \u001b[36mconst\u001b[39m emailInput \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'textbox'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/email/i\u001b[39m })\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:175:26\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:34.601Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--e939d-ired-fields-on-registration-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--e939d-ired-fields-on-registration-chromium\\error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                            "column": 26,
+                            "line": 175
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-e792fc49bf177338ad98",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 172,
+                  "column": 5
+                },
+                {
+                  "title": "should validate password requirements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "interrupted",
+                          "duration": 16577,
+                          "error": {
+                            "message": "Error: locator.click: Test ended.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /create|register|sign up/i })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" data-lov-name=\"Button\" data-component-line=\"148\" data-component-name=\"Button\" data-component-file=\"Register.tsx\" data-lov-id=\"src\\pages\\Register.tsx:148:12\" data-component-path=\"src\\pages\\Register.tsx\" data-component-content=\"%7B%22className%22%3A%22w-full%22%7D\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    17 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+                            "stack": "Error: locator.click: Test ended.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /create|register|sign up/i })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" data-lov-name=\"Button\" data-component-line=\"148\" data-component-name=\"Button\" data-component-file=\"Register.tsx\" data-lov-id=\"src\\pages\\Register.tsx:148:12\" data-component-path=\"src\\pages\\Register.tsx\" data-component-content=\"%7B%22className%22%3A%22w-full%22%7D\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    17 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:198:26",
+                            "location": {
+                              "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                              "column": 26,
+                              "line": 198
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 196 |\u001b[39m       \n \u001b[90m 197 |\u001b[39m       \u001b[36mconst\u001b[39m submitButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/create|register|sign up/i\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 198 |\u001b[39m       \u001b[36mawait\u001b[39m submitButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 199 |\u001b[39m       \n \u001b[90m 200 |\u001b[39m       \u001b[90m// Should show password validation error\u001b[39m\n \u001b[90m 201 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                                "column": 26,
+                                "line": 198
+                              },
+                              "message": "Error: locator.click: Test ended.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /create|register|sign up/i })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" data-lov-name=\"Button\" data-component-line=\"148\" data-component-name=\"Button\" data-component-file=\"Register.tsx\" data-lov-id=\"src\\pages\\Register.tsx:148:12\" data-component-path=\"src\\pages\\Register.tsx\" data-component-content=\"%7B%22className%22%3A%22w-full%22%7D\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    17 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 196 |\u001b[39m       \n \u001b[90m 197 |\u001b[39m       \u001b[36mconst\u001b[39m submitButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/create|register|sign up/i\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 198 |\u001b[39m       \u001b[36mawait\u001b[39m submitButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 199 |\u001b[39m       \n \u001b[90m 200 |\u001b[39m       \u001b[90m// Should show password validation error\u001b[39m\n \u001b[90m 201 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:198:26\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:37.317Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--3aa6b-idate-password-requirements-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--3aa6b-idate-password-requirements-chromium\\video.webm"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                            "column": 26,
+                            "line": 198
+                          }
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-b41c0be2a15c35b82503",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 187,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login page from register",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 6587,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:44.383Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-02cebc3e40f1581d0786",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 212,
+                  "column": 5
+                },
+                {
+                  "title": "should display register form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-ed0675b4231441fe858e",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 149,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields on registration",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-6deed6675b5ea4e1240a",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 172,
+                  "column": 5
+                },
+                {
+                  "title": "should validate password requirements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-4a476084cf5b72d17e39",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 187,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login page from register",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-35245f575c446a44e795",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 212,
+                  "column": 5
+                },
+                {
+                  "title": "should display register form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-c4c1293ba0ce87bedd47",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 149,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields on registration",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-f0d4474f9d9cfae26129",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 172,
+                  "column": 5
+                },
+                {
+                  "title": "should validate password requirements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-3817eaddd08ac8f52f77",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 187,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login page from register",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-fd0315119ccf2e9ea228",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 212,
+                  "column": 5
+                },
+                {
+                  "title": "should display register form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-fd6e418300e25f19c829",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 149,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields on registration",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-29b5f65fbc039d0ab0d6",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 172,
+                  "column": 5
+                },
+                {
+                  "title": "should validate password requirements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-97c586a1fc963b633f13",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 187,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login page from register",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-ab49b82285453d91c94d",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 212,
+                  "column": 5
+                },
+                {
+                  "title": "should display register form with proper elements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-f8fbaaea4f1b59d361e1",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 149,
+                  "column": 5
+                },
+                {
+                  "title": "should validate required fields on registration",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-9fa6a46fbfc4bb0faa0c",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 172,
+                  "column": 5
+                },
+                {
+                  "title": "should validate password requirements",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-79d7a0d52a87592be4c8",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 187,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to login page from register",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7476a0e2b40ece6074b2-b86a081dac366255f76f",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 212,
+                  "column": 5
                 }
-              ],
-              "id": "36a175575be443fd8800-f505b6856e92b0c0148b",
-              "file": "race-condition-fix.spec.ts",
-              "line": 110,
-              "column": 3
+              ]
             },
             {
-              "title": "should handle presence tracking without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+              "title": "Navigation Flow",
+              "file": "auth/authentication-flows.spec.ts",
+              "line": 222,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
-                  "results": [
+                  "title": "should handle back navigation correctly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 30511,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 17,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 17,
-                            "line": 14
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:27.251Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\\test-failed-1.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\\test-failed-2.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\\error-context.md"
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "interrupted",
+                          "duration": 10119,
+                          "error": {
+                            "message": "Error: page.goBack: Test ended.\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n\u001b[2m    - navigated to \"http://localhost:5173/\"\u001b[22m\n",
+                            "stack": "Error: page.goBack: Test ended.\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n\u001b[2m    - navigated to \"http://localhost:5173/\"\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:232:18",
+                            "location": {
+                              "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                              "column": 18,
+                              "line": 232
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 230 |\u001b[39m       \n \u001b[90m 231 |\u001b[39m       \u001b[90m// Use browser back button\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 232 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoBack()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 233 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[32m'/'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 234 |\u001b[39m       \n \u001b[90m 235 |\u001b[39m       \u001b[90m// Navigate to register\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                                "column": 18,
+                                "line": 232
+                              },
+                              "message": "Error: page.goBack: Test ended.\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n\u001b[2m    - navigated to \"http://localhost:5173/\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 230 |\u001b[39m       \n \u001b[90m 231 |\u001b[39m       \u001b[90m// Use browser back button\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 232 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoBack()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 233 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[32m'/'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 234 |\u001b[39m       \n \u001b[90m 235 |\u001b[39m       \u001b[90m// Navigate to register\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts:232:18\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:46.195Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--a32c5-e-back-navigation-correctly-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--a32c5-e-back-navigation-correctly-chromium\\video.webm"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\auth\\authentication-flows.spec.ts",
+                            "column": 18,
+                            "line": 232
+                          }
                         }
                       ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 17,
-                        "line": 14
-                      }
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-1b92426970936fcb69b9",
-              "file": "race-condition-fix.spec.ts",
-              "line": 4,
-              "column": 3
-            },
-            {
-              "title": "should synchronize messages without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-16c5936eca5c977dc64d",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 223,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
-                  "results": [
+                  "title": "should redirect unauthorized users appropriately",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 4,
-                      "parallelIndex": 1,
-                      "status": "timedOut",
-                      "duration": 60007,
-                      "error": {
-                        "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                      },
-                      "errors": [
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
                         {
-                          "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                        },
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 34,
-                            "line": 62
-                          },
-                          "message": "Error: browserContext.newPage: Test ended.\n\n\u001b[0m \u001b[90m 60 |\u001b[39m     \u001b[36mconst\u001b[39m context2 \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m browser\u001b[33m.\u001b[39mnewContext()\u001b[33m;\u001b[39m\n \u001b[90m 61 |\u001b[39m     \n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 62 |\u001b[39m     \u001b[36mconst\u001b[39m page1 \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m context1\u001b[33m.\u001b[39mnewPage()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 63 |\u001b[39m     \u001b[36mconst\u001b[39m page2 \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m context2\u001b[33m.\u001b[39mnewPage()\u001b[33m;\u001b[39m\n \u001b[90m 64 |\u001b[39m\n \u001b[90m 65 |\u001b[39m     \u001b[90m// Setup both users in same book discussion\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:62:34\u001b[22m"
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "interrupted",
+                          "duration": 3814,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-07-29T07:51:51.411Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--da630-horized-users-appropriately-chromium\\test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\auth-authentication-flows--da630-horized-users-appropriately-chromium\\video.webm"
+                            }
+                          ]
                         }
                       ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:46.839Z",
-                      "annotations": [],
-                      "attachments": []
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-8af85dbbb342a503ed5e",
-              "file": "race-condition-fix.spec.ts",
-              "line": 58,
-              "column": 3
-            },
-            {
-              "title": "should handle subscription cleanup without memory leaks",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-1346bd8519044b676aad",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 244,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
-                  "results": [
+                  "title": "should handle back navigation correctly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 5,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 24487,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:50.785Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-0c5f64a308378bc9cd76",
-              "file": "race-condition-fix.spec.ts",
-              "line": 110,
-              "column": 3
-            },
-            {
-              "title": "should handle presence tracking without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-21d5c3e001039bbc6a10",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 223,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
+                  "title": "should redirect unauthorized users appropriately",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 19643,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 17,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 17,
-                            "line": 14
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:11:51.072Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\\test-failed-2.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 17,
-                        "line": 14
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "firefox",
+                      "projectName": "firefox",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-13cbbcf02ade6077c58b",
-              "file": "race-condition-fix.spec.ts",
-              "line": 4,
-              "column": 3
-            },
-            {
-              "title": "should synchronize messages without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-0e0f00c61758778a96e6",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 244,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
+                  "title": "should handle back navigation correctly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 7,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 13819,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:05.114Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\\test-failed-2.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-96f390997e44b5f9d9e5",
-              "file": "race-condition-fix.spec.ts",
-              "line": 58,
-              "column": 3
-            },
-            {
-              "title": "should handle subscription cleanup without memory leaks",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-44e72a0c9cf371a546a6",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 223,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
+                  "title": "should redirect unauthorized users appropriately",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 8,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 13048,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:13.263Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "webkit",
+                      "projectName": "webkit",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-4f34504435e94bf02bc0",
-              "file": "race-condition-fix.spec.ts",
-              "line": 110,
-              "column": 3
-            },
-            {
-              "title": "should handle presence tracking without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-235eac645b9442bbe3ef",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 244,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
+                  "title": "should handle back navigation correctly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 9,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 13864,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 17,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 17,
-                            "line": 14
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:18.061Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\\test-failed-2.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 17,
-                        "line": 14
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-b7e6698d704f9a71af75",
-              "file": "race-condition-fix.spec.ts",
-              "line": 4,
-              "column": 3
-            },
-            {
-              "title": "should synchronize messages without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-078cc697fb1e98512969",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 223,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
+                  "title": "should redirect unauthorized users appropriately",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 10,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 13490,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:21.288Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\\test-failed-2.png"
-                        },
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Chrome",
+                      "projectName": "Mobile Chrome",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-d7769bf4866cc939799e",
-              "file": "race-condition-fix.spec.ts",
-              "line": 58,
-              "column": 3
-            },
-            {
-              "title": "should handle subscription cleanup without memory leaks",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-dd44cc01ab8c5d296b5f",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 244,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
+                  "title": "should handle back navigation correctly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 11,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12639,
-                      "error": {
-                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:27.474Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\\test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\test-results\\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-72a509dfd2faf3afcb46",
-              "file": "race-condition-fix.spec.ts",
-              "line": 110,
-              "column": 3
-            },
-            {
-              "title": "should handle presence tracking without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
+                  "id": "7476a0e2b40ece6074b2-2e4e40ad1788783152a1",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 223,
+                  "column": 5
+                },
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
+                  "title": "should redirect unauthorized users appropriately",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 12,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 7143,
-                      "error": {
-                        "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 17,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 17,
-                            "line": 14
-                          },
-                          "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \u001b[90m// Setup User 1\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'RaceTestUser1'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m page1\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[0m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:14:17\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:33.470Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 17,
-                        "line": 14
-                      }
+                      "expectedStatus": "passed",
+                      "projectId": "Mobile Safari",
+                      "projectName": "Mobile Safari",
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
-                  "status": "unexpected"
+                  "id": "7476a0e2b40ece6074b2-fb6f5362a722373f2228",
+                  "file": "auth/authentication-flows.spec.ts",
+                  "line": 244,
+                  "column": 5
                 }
-              ],
-              "id": "36a175575be443fd8800-a26bd08bb329a2b3afa7",
-              "file": "race-condition-fix.spec.ts",
-              "line": 4,
-              "column": 3
-            },
-            {
-              "title": "should synchronize messages without race conditions",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 13,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 7585,
-                      "error": {
-                        "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n",
-                        "stack": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 145
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 145
-                          },
-                          "message": "Error: page.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"username-input\"]')\u001b[22m\n\n\n\u001b[0m \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n \u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`/book-discussion/${bookId}`\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:145:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:66:5\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:36.952Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 145
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-ca27a62eeb69d1b970c1",
-              "file": "race-condition-fix.spec.ts",
-              "line": 58,
-              "column": 3
-            },
-            {
-              "title": "should handle subscription cleanup without memory leaks",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 14,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1759,
-                      "error": {
-                        "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/chat-selection\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/chat-selection\", waiting until \"load\"\u001b[22m\n\n    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:144:14)\n    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:11",
-                        "location": {
-                          "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                          "column": 14,
-                          "line": 144
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 142 |\u001b[39m \u001b[90m// Helper function to setup user in chat\u001b[39m\n \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                            "column": 14,
-                            "line": 144
-                          },
-                          "message": "Error: page.goto: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/chat-selection\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 142 |\u001b[39m \u001b[90m// Helper function to setup user in chat\u001b[39m\n \u001b[90m 143 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m setupUserInChat(page\u001b[33m:\u001b[39m any\u001b[33m,\u001b[39m username\u001b[33m:\u001b[39m string\u001b[33m,\u001b[39m bookId\u001b[33m:\u001b[39m string) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/chat-selection'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 145 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"username-input\"]'\u001b[39m\u001b[33m,\u001b[39m username)\u001b[33m;\u001b[39m\n \u001b[90m 146 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"genre-select\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Fiction'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 147 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"start-chat-button\"]'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at setupUserInChat (C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:144:14)\u001b[22m\n\u001b[2m    at C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts:115:11\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-07-25T07:12:41.768Z",
-                      "annotations": [],
-                      "attachments": [],
-                      "errorLocation": {
-                        "file": "C:\\Users\\LEGION\\Desktop\\Asheef\\Bookconnect\\booktalks-buddy\\tests\\e2e\\race-condition-fix.spec.ts",
-                        "column": 14,
-                        "line": 144
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "36a175575be443fd8800-c6c4fc815549b2bd457a",
-              "file": "race-condition-fix.spec.ts",
-              "line": 110,
-              "column": 3
+              ]
             }
           ]
         }
@@ -1186,11 +1953,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-07-25T07:11:07.986Z",
-    "duration": 103886.54,
-    "expected": 0,
-    "skipped": 0,
-    "unexpected": 15,
+    "startTime": "2025-07-29T07:50:49.214Z",
+    "duration": 70281.861,
+    "expected": 9,
+    "skipped": 59,
+    "unexpected": 2,
     "flaky": 0
   }
 }

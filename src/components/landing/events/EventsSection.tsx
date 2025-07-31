@@ -28,32 +28,32 @@ const EventsSection = ({ handleEventsClick }: EventsSectionProps) => {
         setLoading(true);
         const featuredEvents = await getFeaturedEvents();
 
-        // If no featured events, get upcoming events
-        if (featuredEvents.length === 0) {
-          try {
-            // Try to fetch from the API endpoint
-            const response = await fetch('/api/events/upcoming');
-            if (response.ok) {
-              const { data } = await response.json();
-              setEvents(data || []);
-            } else {
-              // If API endpoint fails, get upcoming events directly from Supabase
-              const now = new Date().toISOString();
-              const { data: upcomingEvents } = await supabase
-                .from('events')
-                .select('*')
-                .gt('start_time', now)
-                .order('start_time', { ascending: true })
-                .limit(6);
+        // Filter featured events to only show active (non-expired) ones
+        const now = new Date();
+        const activeFeaturedEvents = featuredEvents.filter(event => {
+          const eventDate = new Date(event.start_time || event.date);
+          return eventDate > now;
+        });
 
-              setEvents(upcomingEvents || []);
-            }
+        // If we have active featured events, use them
+        if (activeFeaturedEvents.length > 0) {
+          setEvents(activeFeaturedEvents);
+        } else {
+          // If no active featured events, get upcoming events directly from Supabase
+          try {
+            const nowISOString = now.toISOString();
+            const { data: upcomingEvents } = await supabase
+              .from('events')
+              .select('*')
+              .gt('start_time', nowISOString)
+              .order('start_time', { ascending: true })
+              .limit(6);
+
+            setEvents(upcomingEvents || []);
           } catch (error) {
             console.error('Error fetching upcoming events:', error);
             setEvents([]);
           }
-        } else {
-          setEvents(featuredEvents);
         }
       } catch (error) {
         console.error('Error fetching events:', error);

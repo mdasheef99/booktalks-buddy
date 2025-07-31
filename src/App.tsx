@@ -73,6 +73,7 @@ import { AlertSystemTest } from "./components/testing/AlertSystemTest";
 import { SubscriptionDebugger } from "./components/testing/SubscriptionDebugger";
 import { SubscriptionAlertTest } from "./components/testing/SubscriptionAlertTest";
 import ToastTest from "./components/testing/ToastTest";
+import RoleAccessDeniedTest from "./components/testing/RoleAccessDeniedTest";
 // Username validation debug tools removed - issues resolved
 import CreateBookClubForm from "./components/bookclubs/CreateBookClubForm";
 import CreateTopicForm from "./components/discussions/CreateTopicForm";
@@ -87,6 +88,7 @@ import BookNominationsPage from "./pages/BookNominationsPage";
 import BookNominationFormPage from "./pages/BookNominationFormPage";
 import BookRequestPage from "./pages/BookRequestPage";
 import BookListingPage from "./pages/BookListingPage";
+import BannerDetail from "./pages/BannerDetail";
 import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Unauthorized from "./pages/Unauthorized";
@@ -138,11 +140,15 @@ function App() {
               <Route path="/book-request" element={<BookRequestPage />} />
               <Route path="/book-listing" element={<BookListingPage />} />
 
+              {/* Banner Detail Route */}
+              <Route path="/banner/:bannerId" element={<BannerDetail />} />
+
               {/* Testing Routes */}
               <Route path="/test/alerts" element={<AlertSystemTest />} />
               <Route path="/test/subscription-debug" element={<SubscriptionDebugger />} />
               <Route path="/test/subscription-alerts" element={<SubscriptionAlertTest />} />
               <Route path="/test/toasts" element={<ToastTest />} />
+              <Route path="/test/role-access-denied" element={<RoleAccessDeniedTest />} />
 
               {/* Direct Messaging Routes */}
               <Route path="/messages" element={

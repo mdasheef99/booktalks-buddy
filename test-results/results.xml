@@ -1,505 +1,357 @@
-<testsuites id="" name="" tests="15" failures="15" skipped="0" errors="0" time="103.88654">
-<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="chromium" tests="3" failures="3" skipped="0" time="53.965" errors="0">
-<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="19.547">
-<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
-<![CDATA[  [chromium] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
+<testsuites id="" name="" tests="70" failures="2" skipped="59" errors="0" time="70.281861">
+<testsuite name="auth\authentication-flows.spec.ts" timestamp="2025-07-29T07:51:03.809Z" hostname="chromium" tests="14" failures="2" skipped="3" time="176.686" errors="0">
+<testcase name="Authentication Flows › Landing Page Navigation › should display landing page with proper sections" classname="auth\authentication-flows.spec.ts" time="20.905">
+<failure message="authentication-flows.spec.ts:15:5 should display landing page with proper sections" type="FAILURE">
+<![CDATA[  [chromium] › auth\authentication-flows.spec.ts:15:5 › Authentication Flows › Landing Page Navigation › should display landing page with proper sections 
 
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByRole('main')
+    Expected: visible
+    Received: <element(s) not found>
     Call log:
-      - waiting for locator('[data-testid="username-input"]')
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByRole('main')
 
 
-      12 |     // Setup User 1
-      13 |     await page1.goto('/chat-selection');
-    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
-         |                 ^
-      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
-      16 |     await page1.click('[data-testid="start-chat-button"]');
-      17 |     
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
+      18 |       
+      19 |       // Check for main landing page content using MCP semantic understanding
+    > 20 |       await expect(page.getByRole('main')).toBeVisible();
+         |                                            ^
+      21 |       
+      22 |       // Look for navigation or call-to-action elements
+      23 |       const loginButton = page.getByRole('link', { name: /login|sign in/i });
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\auth\authentication-flows.spec.ts:20:44
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-1.png
+    ..\..\test-results\auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\test-failed-1.png
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-2.png
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\video.webm
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\error-context.md
+    Error Context: ..\..\test-results\auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\error-context.md
 ]]>
 </failure>
 <system-out>
 <![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-1.png]]
+[[ATTACHMENT|auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\test-failed-1.png]]
 
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\test-failed-2.png]]
+[[ATTACHMENT|auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\video.webm]]
 
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-chromium\error-context.md]]
+[[ATTACHMENT|auth-authentication-flows--da1ad-g-page-with-proper-sections-chromium\error-context.md]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="14.99">
-<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
-<![CDATA[  [chromium] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to login from landing page" classname="auth\authentication-flows.spec.ts" time="14.444">
+</testcase>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to register from landing page" classname="auth\authentication-flows.spec.ts" time="21.741">
+</testcase>
+<testcase name="Authentication Flows › Login Page › should display login form with proper elements" classname="auth\authentication-flows.spec.ts" time="15.263">
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate required fields" classname="auth\authentication-flows.spec.ts" time="8.259">
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate email format" classname="auth\authentication-flows.spec.ts" time="8.967">
+</testcase>
+<testcase name="Authentication Flows › Login Page › should handle login attempt with invalid credentials" classname="auth\authentication-flows.spec.ts" time="18.367">
+</testcase>
+<testcase name="Authentication Flows › Login Page › should navigate to register page from login" classname="auth\authentication-flows.spec.ts" time="5.873">
+</testcase>
+<testcase name="Authentication Flows › Register Page › should display register form with proper elements" classname="auth\authentication-flows.spec.ts" time="7.074">
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate required fields on registration" classname="auth\authentication-flows.spec.ts" time="18.696">
+<failure message="authentication-flows.spec.ts:172:5 should validate required fields on registration" type="FAILURE">
+<![CDATA[  [chromium] › auth\authentication-flows.spec.ts:172:5 › Authentication Flows › Register Page › should validate required fields on registration 
 
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
     Call log:
-      - waiting for locator('[data-testid="username-input"]')
+      - waiting for getByRole('button', { name: /create|register|sign up/i })
+        - locator resolved to <button disabled type="submit" data-lov-name="Button" data-component-line="148" data-component-name="Button" data-component-file="Register.tsx" data-lov-id="src\pages\Register.tsx:148:12" data-component-path="src\pages\Register.tsx" data-component-content="%7B%22className%22%3A%22w-full%22%7D" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-r…>Create Account</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 100ms
+        17 × waiting for element to be visible, enabled and stable
+           - element is not enabled
+         - retrying click action
+           - waiting 500ms
 
 
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
+      173 |       // Try to submit empty form
+      174 |       const submitButton = page.getByRole('button', { name: /create|register|sign up/i });
+    > 175 |       await submitButton.click();
+          |                          ^
+      176 |       
+      177 |       // Check for validation
+      178 |       const emailInput = page.getByRole('textbox', { name: /email/i });
+        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\auth\authentication-flows.spec.ts:175:26
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-1.png
+    ..\..\test-results\auth-authentication-flows--e939d-ired-fields-on-registration-chromium\test-failed-1.png
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\error-context.md
+    Error Context: ..\..\test-results\auth-authentication-flows--e939d-ired-fields-on-registration-chromium\error-context.md
 ]]>
 </failure>
 <system-out>
 <![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-1.png]]
+[[ATTACHMENT|auth-authentication-flows--e939d-ired-fields-on-registration-chromium\test-failed-1.png]]
 
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\test-failed-2.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-chromium\error-context.md]]
+[[ATTACHMENT|auth-authentication-flows--e939d-ired-fields-on-registration-chromium\error-context.md]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="19.428">
-<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
-<![CDATA[  [chromium] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-chromium\error-context.md]]
-]]>
-</system-out>
+<testcase name="Authentication Flows › Register Page › should validate password requirements" classname="auth\authentication-flows.spec.ts" time="16.577">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should navigate to login page from register" classname="auth\authentication-flows.spec.ts" time="6.587">
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should handle back navigation correctly" classname="auth\authentication-flows.spec.ts" time="10.119">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should redirect unauthorized users appropriately" classname="auth\authentication-flows.spec.ts" time="3.814">
+<skipped>
+</skipped>
 </testcase>
 </testsuite>
-<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="firefox" tests="3" failures="3" skipped="0" time="115.005" errors="0">
-<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="30.511">
-<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
-<![CDATA[  [firefox] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      12 |     // Setup User 1
-      13 |     await page1.goto('/chat-selection');
-    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
-         |                 ^
-      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
-      16 |     await page1.click('[data-testid="start-chat-button"]');
-      17 |     
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\test-failed-2.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-firefox\error-context.md]]
-]]>
-</system-out>
+<testsuite name="auth\authentication-flows.spec.ts" timestamp="2025-07-29T07:51:03.809Z" hostname="firefox" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flows › Landing Page Navigation › should display landing page with proper sections" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="60.007">
-<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
-<![CDATA[  [firefox] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
-
-    Test timeout of 60000ms exceeded.
-
-    Error: browserContext.newPage: Test ended.
-
-      60 |     const context2 = await browser.newContext();
-      61 |     
-    > 62 |     const page1 = await context1.newPage();
-         |                                  ^
-      63 |     const page2 = await context2.newPage();
-      64 |
-      65 |     // Setup both users in same book discussion
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:62:34
-]]>
-</failure>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to login from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="24.487">
-<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
-<![CDATA[  [firefox] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-firefox\error-context.md]]
-]]>
-</system-out>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to register from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should display login form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate required fields" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate email format" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should handle login attempt with invalid credentials" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should navigate to register page from login" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should display register form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate required fields on registration" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate password requirements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should navigate to login page from register" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should handle back navigation correctly" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should redirect unauthorized users appropriately" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
 </testsuite>
-<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="webkit" tests="3" failures="3" skipped="0" time="46.51" errors="0">
-<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="19.643">
-<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
-<![CDATA[  [webkit] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      12 |     // Setup User 1
-      13 |     await page1.goto('/chat-selection');
-    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
-         |                 ^
-      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
-      16 |     await page1.click('[data-testid="start-chat-button"]');
-      17 |     
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-2.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-webkit\error-context.md]]
-]]>
-</system-out>
+<testsuite name="auth\authentication-flows.spec.ts" timestamp="2025-07-29T07:51:03.809Z" hostname="webkit" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flows › Landing Page Navigation › should display landing page with proper sections" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="13.819">
-<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
-<![CDATA[  [webkit] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-2.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-webkit\error-context.md]]
-]]>
-</system-out>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to login from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="13.048">
-<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
-<![CDATA[  [webkit] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-webkit\error-context.md]]
-]]>
-</system-out>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to register from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should display login form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate required fields" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate email format" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should handle login attempt with invalid credentials" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should navigate to register page from login" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should display register form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate required fields on registration" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate password requirements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should navigate to login page from register" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should handle back navigation correctly" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should redirect unauthorized users appropriately" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
 </testsuite>
-<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="Mobile Chrome" tests="3" failures="3" skipped="0" time="39.993" errors="0">
-<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="13.864">
-<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      12 |     // Setup User 1
-      13 |     await page1.goto('/chat-selection');
-    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
-         |                 ^
-      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
-      16 |     await page1.click('[data-testid="start-chat-button"]');
-      17 |     
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-2.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-cb42a-ing-without-race-conditions-Mobile-Chrome\error-context.md]]
-]]>
-</system-out>
+<testsuite name="auth\authentication-flows.spec.ts" timestamp="2025-07-29T07:51:03.809Z" hostname="Mobile Chrome" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flows › Landing Page Navigation › should display landing page with proper sections" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="13.49">
-<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-2.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-55406-ges-without-race-conditions-Mobile-Chrome\error-context.md]]
-]]>
-</system-out>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to login from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="12.639">
-<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
-
-    TimeoutError: page.fill: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ..\..\test-results\race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\test-failed-1.png]]
-
-[[ATTACHMENT|race-condition-fix-Race-Co-8ce5a-leanup-without-memory-leaks-Mobile-Chrome\error-context.md]]
-]]>
-</system-out>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to register from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should display login form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate required fields" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate email format" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should handle login attempt with invalid credentials" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should navigate to register page from login" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should display register form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate required fields on registration" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate password requirements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should navigate to login page from register" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should handle back navigation correctly" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should redirect unauthorized users appropriately" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
 </testsuite>
-<testsuite name="race-condition-fix.spec.ts" timestamp="2025-07-25T07:11:25.657Z" hostname="Mobile Safari" tests="3" failures="3" skipped="0" time="16.487" errors="0">
-<testcase name="Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions" classname="race-condition-fix.spec.ts" time="7.143">
-<failure message="race-condition-fix.spec.ts:4:3 should handle presence tracking without race conditions" type="FAILURE">
-<![CDATA[  [Mobile Safari] › race-condition-fix.spec.ts:4:3 › Race Condition Fix - Real-time Chat › should handle presence tracking without race conditions 
-
-    Error: page.fill: Target page, context or browser has been closed
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      12 |     // Setup User 1
-      13 |     await page1.goto('/chat-selection');
-    > 14 |     await page1.fill('[data-testid="username-input"]', 'RaceTestUser1');
-         |                 ^
-      15 |     await page1.selectOption('[data-testid="genre-select"]', 'Fiction');
-      16 |     await page1.click('[data-testid="start-chat-button"]');
-      17 |     
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:14:17
-]]>
-</failure>
+<testsuite name="auth\authentication-flows.spec.ts" timestamp="2025-07-29T07:51:03.809Z" hostname="Mobile Safari" tests="14" failures="0" skipped="14" time="0" errors="0">
+<testcase name="Authentication Flows › Landing Page Navigation › should display landing page with proper sections" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should synchronize messages without race conditions" classname="race-condition-fix.spec.ts" time="7.585">
-<failure message="race-condition-fix.spec.ts:58:3 should synchronize messages without race conditions" type="FAILURE">
-<![CDATA[  [Mobile Safari] › race-condition-fix.spec.ts:58:3 › Race Condition Fix - Real-time Chat › should synchronize messages without race conditions 
-
-    Error: page.fill: Target page, context or browser has been closed
-    Call log:
-      - waiting for locator('[data-testid="username-input"]')
-
-
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-      144 |   await page.goto('/chat-selection');
-    > 145 |   await page.fill('[data-testid="username-input"]', username);
-          |              ^
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-      148 |   await page.goto(`/book-discussion/${bookId}`);
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:145:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:66:5
-]]>
-</failure>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to login from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks" classname="race-condition-fix.spec.ts" time="1.759">
-<failure message="race-condition-fix.spec.ts:110:3 should handle subscription cleanup without memory leaks" type="FAILURE">
-<![CDATA[  [Mobile Safari] › race-condition-fix.spec.ts:110:3 › Race Condition Fix - Real-time Chat › should handle subscription cleanup without memory leaks 
-
-    Error: page.goto: Target page, context or browser has been closed
-    Call log:
-      - navigating to "http://localhost:5173/chat-selection", waiting until "load"
-
-
-      142 | // Helper function to setup user in chat
-      143 | async function setupUserInChat(page: any, username: string, bookId: string) {
-    > 144 |   await page.goto('/chat-selection');
-          |              ^
-      145 |   await page.fill('[data-testid="username-input"]', username);
-      146 |   await page.selectOption('[data-testid="genre-select"]', 'Fiction');
-      147 |   await page.click('[data-testid="start-chat-button"]');
-        at setupUserInChat (C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:144:14)
-        at C:\Users\LEGION\Desktop\Asheef\Bookconnect\booktalks-buddy\tests\e2e\race-condition-fix.spec.ts:115:11
-]]>
-</failure>
+<testcase name="Authentication Flows › Landing Page Navigation › should navigate to register from landing page" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should display login form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate required fields" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should validate email format" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should handle login attempt with invalid credentials" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Login Page › should navigate to register page from login" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should display register form with proper elements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate required fields on registration" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should validate password requirements" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Register Page › should navigate to login page from register" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should handle back navigation correctly" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flows › Navigation Flow › should redirect unauthorized users appropriately" classname="auth\authentication-flows.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
 </testsuite>
 </testsuites>
