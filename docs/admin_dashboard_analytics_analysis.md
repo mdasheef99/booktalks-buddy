@@ -1,9 +1,9 @@
 # **Admin Dashboard Analytics - Comprehensive Analysis**
 
-**Date**: 2025-01-31  
-**Analysis Scope**: BookTalks Buddy Admin Dashboard Analytics System  
-**Environment**: Local Development (http://localhost:5173/admin)  
-**Database**: Supabase Production (qsldppxjmrplbmukqorj)  
+**Date**: 2025-01-31 (Updated for Landing Page Analytics Implementation)
+**Analysis Scope**: BookTalks Buddy Admin Dashboard Analytics System
+**Environment**: Local Development (http://localhost:5173/admin)
+**Database**: Supabase Production (qsldppxjmrplbmukqorj)
 
 ---
 
@@ -169,11 +169,25 @@ const { data, loading, error, refetch } = useAnalyticsData({
 
 #### **AnalyticsAPI Class**
 **Core Methods**:
-- `getAnalyticsData(timeRange, refreshKey)` - Main platform analytics
-- `getLandingPageAnalytics(storeId, timeRange)` - Landing page metrics
-- `getBookClubAnalytics(storeId, timeRange)` - Book club performance
-- `getUserTierDistribution()` - User subscription analysis
-- `getPlatformActivity(timeRange)` - Activity metrics by time period
+- `getAnalyticsSummary(storeId, days)` - Basic analytics summary
+- `getEnhancedAnalytics(storeId, days)` - Enhanced analytics with insights
+- `getPerformanceAlerts(storeId)` - Performance monitoring alerts
+- `getSimpleMetrics(storeId)` - Simple dashboard metrics
+
+#### **LandingPageTrackingAPI Class**
+**Core Methods**:
+- `trackPageLoad(storeId, sessionId, metadata)` - Track page load events
+- `trackChatButtonClick(storeId, sessionId, metadata)` - Track chat button clicks
+- `trackCarouselClick(storeId, bookId, sessionId, metadata)` - Track carousel interactions
+- `trackSectionView(storeId, sectionName, sessionId, metadata)` - Track section visibility
+- `trackCommunityInteraction(storeId, elementId, interactionType, sessionId, metadata)` - Track community interactions
+
+#### **BookClubAnalyticsAPI Class**
+**Core Methods**:
+- `getComprehensiveAnalytics(storeId, daysBack)` - Complete book club analytics
+- `getBookClubAnalyticsSummary(storeId, daysBack)` - Summary metrics
+- `getCurrentBookDiscussions(storeId)` - Active book discussions
+- `getTrendingBooks(storeId, daysBack)` - Popular books analysis
 
 ### **Database Query Layer**
 

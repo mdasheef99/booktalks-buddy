@@ -1,8 +1,8 @@
 # **Admin Dashboard Analytics - Technical Parameters Reference**
 
-**Version**: 1.0  
-**Last Updated**: 2025-01-31  
-**Maintainer**: Development Team  
+**Version**: 1.1
+**Last Updated**: 2025-01-31 (Updated for Landing Page Analytics Implementation)
+**Maintainer**: Development Team
 
 ---
 
@@ -12,135 +12,145 @@
 
 #### **Hook Configuration**
 ```typescript
-interface UseAnalyticsDataParams {
-  timeRange: 'week' | 'month' | '6months' | '12months' | 'all';
-  refreshKey: number;
-  enabled: boolean;
+// Main analytics hook (src/hooks/useAnalyticsData.ts)
+const useAnalyticsData = (initialTimeRange: TimeRange = '12months') => {
+  // Returns: { analyticsData, loading, error, timeRange, updateTimeRange, refreshData }
+}
+
+// Landing page analytics hook (src/hooks/useLandingPageTracking.ts)
+interface UseLandingPageTrackingOptions {
   storeId?: string;
+  enabled?: boolean;
 }
 ```
 
 **Parameter Details**:
-- **timeRange**: 
-  - Type: `string`
-  - Default: `'month'`
-  - Options: `'week'`, `'month'`, `'6months'`, `'12months'`, `'all'`
-  - Description: Time period for analytics data filtering
+- **initialTimeRange**:
+  - Type: `TimeRange`
+  - Default: `'12months'`
+  - Options: `'6months'`, `'12months'`, `'all'`
+  - Description: Initial time period for analytics data filtering
   - Validation: Must be one of the predefined options
 
-- **refreshKey**: 
-  - Type: `number`
-  - Default: `0`
-  - Range: `0` to `Number.MAX_SAFE_INTEGER`
-  - Description: Trigger for data refresh, increment to force reload
-  - Usage: Incremented on manual refresh or periodic updates
-
-- **enabled**: 
-  - Type: `boolean`
-  - Default: `true`
-  - Description: Controls whether the hook should fetch data
-  - Usage: Set to `false` to pause data fetching
-
-- **storeId**: 
+- **storeId** (Landing Page Tracking):
   - Type: `string | undefined`
   - Default: `undefined`
   - Format: UUID string
-  - Description: Store identifier for store-specific analytics
-  - Required: For landing page and book club analytics
+  - Description: Store identifier for landing page analytics tracking
+  - Required: For landing page analytics functionality
+
+- **enabled** (Landing Page Tracking):
+  - Type: `boolean`
+  - Default: `true`
+  - Description: Controls whether tracking is enabled
+  - Usage: Set to `false` to disable all tracking
 
 ### **AnalyticsAPI Method Parameters**
 
-#### **getAnalyticsData(timeRange, refreshKey)**
+#### **getAnalyticsSummary(storeId, days)**
 ```typescript
-static async getAnalyticsData(
-  timeRange: TimeRange,
-  refreshKey: number
-): Promise<AnalyticsData>
-```
-
-**Parameters**:
-- **timeRange**: Time period filter (see TimeRange type above)
-- **refreshKey**: Cache-busting parameter for forced refresh
-
-**Returns**:
-```typescript
-interface AnalyticsData {
-  totalUsers: number;
-  totalClubs: number;
-  totalDiscussions: number;
-  totalMembers: number;
-  newUsers: number;
-  newClubs: number;
-  activeDiscussions: number;
-  userTiers: {
-    free: number;
-    privileged: number;
-    privilegedPlus: number;
-  };
-  activityData: MonthlyActivityData[];
-  userGrowthData: MonthlyGrowthData[];
-}
-```
-
-#### **getLandingPageAnalytics(storeId, timeRange)**
-```typescript
-static async getLandingPageAnalytics(
+static async getAnalyticsSummary(
   storeId: string,
-  timeRange: TimeRange
-): Promise<LandingPageAnalytics>
+  days: number = 30
+): Promise<AnalyticsSummary>
 ```
 
 **Parameters**:
-- **storeId**: 
-  - Type: `string`
-  - Format: UUID
-  - Required: `true`
-  - Validation: Must be valid UUID format
-  - Description: Store identifier for analytics scope
+- **storeId**: Store identifier (UUID string)
+- **days**: Number of days to look back (default: 30)
 
-- **timeRange**: Time period filter (see TimeRange type above)
+#### **getEnhancedAnalytics(storeId, days)**
+```typescript
+static async getEnhancedAnalytics(
+  storeId: string,
+  days: number = 30
+): Promise<EnhancedAnalytics>
+```
+
+**Parameters**:
+- **storeId**: Store identifier (UUID string)
+- **days**: Number of days to look back (default: 30)
 
 **Returns**:
 ```typescript
-interface LandingPageAnalytics {
+interface AnalyticsSummary {
   pageViews: number;
   uniqueVisitors: number;
   averageTimeOnPage: number;
   bounceRate: number;
   clickThroughRate: number;
   performanceScore: number;
-  sectionAnalytics: {
-    hero: SectionMetrics;
-    carousel: SectionMetrics;
-    banner: SectionMetrics;
-    community: SectionMetrics;
-  };
-  alerts: PerformanceAlert[];
-  recommendations: Recommendation[];
 }
 ```
 
-#### **getBookClubAnalytics(storeId, timeRange)**
+### **LandingPageTrackingAPI Method Parameters**
+
+#### **trackPageLoad(storeId, sessionId, metadata)**
 ```typescript
-static async getBookClubAnalytics(
+static async trackPageLoad(
   storeId: string,
-  timeRange: TimeRange
-): Promise<BookClubAnalytics>
+  sessionId: string,
+  metadata?: Partial<LandingPageTrackingEvent['metadata']>
+): Promise<void>
 ```
 
-**Parameters**: Same as `getLandingPageAnalytics`
+#### **trackChatButtonClick(storeId, sessionId, metadata)**
+```typescript
+static async trackChatButtonClick(
+  storeId: string,
+  sessionId: string,
+  metadata?: Partial<LandingPageTrackingEvent['metadata']>
+): Promise<void>
+```
+
+#### **trackCarouselClick(storeId, bookId, sessionId, metadata)**
+```typescript
+static async trackCarouselClick(
+  storeId: string,
+  bookId: string,
+  sessionId: string,
+  metadata?: Partial<LandingPageTrackingEvent['metadata']>
+): Promise<void>
+```
+
+**Parameters**:
+- **storeId**: Store identifier (UUID string)
+- **sessionId**: User session identifier
+- **bookId**: Book identifier for carousel clicks
+- **metadata**: Optional tracking metadata object
+
+### **BookClubAnalyticsAPI Method Parameters**
+
+#### **getComprehensiveAnalytics(storeId, daysBack)**
+```typescript
+static async getComprehensiveAnalytics(
+  storeId: string,
+  daysBack: number = 30
+): Promise<ComprehensiveAnalytics>
+```
+
+#### **getBookClubAnalyticsSummary(storeId, daysBack)**
+```typescript
+static async getBookClubAnalyticsSummary(
+  storeId: string,
+  daysBack: number = 30
+): Promise<BookClubAnalyticsSummary>
+```
+
+**Parameters**:
+- **storeId**: Store identifier (UUID string)
+- **daysBack**: Number of days to look back (default: 30)
 
 **Returns**:
 ```typescript
-interface BookClubAnalytics {
-  totalBookClubs: number;
-  activeBookClubs: number;
-  totalMembers: number;
-  averageMembersPerClub: number;
-  discussionMetrics: DiscussionMetrics;
-  engagementRates: EngagementRates;
-  popularBooks: PopularBook[];
-  clubPerformance: ClubPerformanceData[];
+interface BookClubAnalyticsSummary {
+  currentBooksCount: number;
+  activeClubsCount: number;
+  totalDiscussionsCount: number;
+  totalPostsCount: number;
+  avgPostsPerDiscussion: number;
+  publicClubsCount: number;
+  totalMembersCount: number;
 }
 ```
 
@@ -252,37 +262,44 @@ interface TimeRangeFilterProps {
   - Default: `[{ value: '6months', label: '6 Months' }, { value: '12months', label: '12 Months' }, { value: 'all', label: 'All Time' }]`
   - Description: Available time range options
 
-### **LandingPageAnalytics Component**
+### **useLandingPageTracking Hook**
 
 #### **Props Interface**
 ```typescript
-interface LandingPageAnalyticsProps {
-  storeId: string;
-  timeRange: TimeRange;
-  onRefresh?: () => void;
-  className?: string;
+interface UseLandingPageTrackingOptions {
+  storeId?: string;
+  enabled?: boolean;
+}
+
+interface UseLandingPageTrackingReturn {
+  trackPageLoad: (metadata?: any) => void;
+  trackChatButtonClick: (metadata?: any) => void;
+  trackCarouselClick: (bookId: string, metadata?: any) => void;
+  trackSectionView: (sectionName: 'hero' | 'carousel' | 'community' | 'quote', metadata?: any) => void;
+  trackCommunityInteraction: (elementId: string, interactionType: string, metadata?: any) => void;
+  sessionId: string;
+  isEnabled: boolean;
 }
 ```
 
 **Parameter Details**:
-- **storeId**: 
-  - Type: `string`
-  - Required: `true`
-  - Format: UUID string
-  - Validation: Must be valid UUID
-  - Description: Store identifier for analytics scope
-
-- **timeRange**: 
-  - Type: `TimeRange`
-  - Required: `true`
-  - Description: Time period for analytics data
-  - Inherited from parent component state
-
-- **onRefresh**: 
-  - Type: `() => void | undefined`
+- **storeId**:
+  - Type: `string | undefined`
   - Required: `false`
-  - Description: Optional callback for manual refresh trigger
-  - Usage: Increments refreshKey in parent component
+  - Format: UUID string
+  - Description: Store identifier for analytics tracking
+
+- **enabled**:
+  - Type: `boolean`
+  - Required: `false`
+  - Default: `true`
+  - Description: Controls whether tracking is enabled
+
+- **trackPageLoad**: Function to manually track page load events
+- **trackChatButtonClick**: Function to track chat button interactions
+- **trackCarouselClick**: Function to track book carousel clicks
+- **trackSectionView**: Function to track section visibility
+- **trackCommunityInteraction**: Function to track community interactions
 
 ---
 
@@ -362,13 +379,20 @@ interface ActivityQueryParams {
 
 #### **TimeRange Type**
 ```typescript
-type TimeRange = 'week' | 'month' | '6months' | '12months' | 'all';
+// Main analytics (src/lib/analytics/types.ts)
+type TimeRange = '6months' | '12months' | 'all';
+
+// Admin dashboard (src/pages/admin/dashboard/types.ts)
+type TimeRange = 'today' | 'week' | 'month' | 'quarter' | 'halfyear' | 'year' | 'all';
+
+// Store analytics (numeric days)
+type TimeRangeDays = number; // 7, 30, 90, etc.
 ```
 
 **Validation Rules**:
-- Must be one of the predefined string literals
-- Case-sensitive matching required
-- Default fallback to `'month'` if invalid
+- Must be one of the predefined string literals or valid number
+- Case-sensitive matching required for string types
+- Default fallback varies by implementation (`'12months'` for main analytics, `30` for store analytics)
 
 #### **UserTier Type**
 ```typescript
@@ -410,6 +434,43 @@ interface SectionMetrics {
 - `clickThroughRate`: Percentage (0-100)
 - `averageTimeViewed`: Time in seconds
 - `interactionRate`: Percentage (0-100)
+
+#### **LandingPageTrackingEvent Metadata Type**
+```typescript
+interface LandingPageTrackingEvent {
+  metadata?: {
+    deviceType?: 'mobile' | 'desktop' | 'tablet';
+    timestamp?: string;
+    viewportHeight?: number;
+    viewportWidth?: number;
+    scrollPosition?: number;
+    elementPosition?: number;
+    sectionName?: string;
+    elementTitle?: string;
+    clickPosition?: { x: number; y: number };
+    duration?: number;
+    referrer?: string;
+    userAgent?: string;
+    buttonText?: string;
+    buttonPosition?: string;
+    buttonSize?: string;
+    bookTitle?: string;
+    bookAuthor?: string;
+    position?: number;
+    hasDestinationUrl?: boolean;
+    isDemo?: boolean;
+    totalBooks?: number;
+    hasCustomBooks?: boolean;
+    hasSpotlights?: boolean;
+    hasTestimonials?: boolean;
+    hasActivityFeed?: boolean;
+    hasMetrics?: boolean;
+    showingDemo?: boolean;
+    interactionType?: string;
+    [key: string]: any;
+  };
+}
+```
 
 #### **PerformanceAlert Type**
 ```typescript
