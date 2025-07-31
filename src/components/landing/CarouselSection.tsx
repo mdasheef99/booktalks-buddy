@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BookOpen } from 'lucide-react';
 import { useSectionAnimation } from '../../hooks/useScrollAnimation';
+import { useSectionVisibilityTracking } from '@/hooks/useLandingPageTracking';
 import { cn } from '@/lib/utils';
 
 interface CarouselItem {
@@ -25,6 +26,7 @@ interface CarouselItem {
 
 interface CarouselSectionProps {
   storeId?: string;
+  analytics?: any;
 }
 
 /**
@@ -32,10 +34,16 @@ interface CarouselSectionProps {
  * Displays up to 6 featured books in a responsive carousel
  * Position 1 - Above HeroSection
  */
-export const CarouselSection: React.FC<CarouselSectionProps> = ({ storeId }) => {
+export const CarouselSection: React.FC<CarouselSectionProps> = ({ storeId, analytics }) => {
   const [isVisible, setIsVisible] = useState(false);
   const { elementRef: headerRef, animationClass: headerAnimation } = useSectionAnimation('fade-up');
   const { elementRef: carouselRef, animationClass: carouselAnimation } = useSectionAnimation('fade-scale');
+
+  // Track carousel section visibility
+  const carouselSectionRef = useSectionVisibilityTracking('carousel', analytics || {
+    trackSectionView: () => {},
+    isEnabled: false
+  });
 
   // Fetch carousel items for the store
   const {
@@ -186,9 +194,36 @@ export const CarouselSection: React.FC<CarouselSectionProps> = ({ storeId }) => 
     );
   }
 
+  // Enhanced item click handler with analytics
+  const handleItemClick = (item: CarouselItem) => {
+    // Track analytics if available
+    if (analytics && analytics.isEnabled) {
+      analytics.trackCarouselClick(item.id, {
+        bookTitle: item.book_title,
+        bookAuthor: item.book_author,
+        position: item.position,
+        hasDestinationUrl: !!item.click_destination_url,
+        isDemo: shouldShowDemo,
+        featuredBadge: item.featured_badge,
+        hasCustomDescription: !!item.custom_description
+      });
+    }
+
+    // Original functionality
+    if (item.click_destination_url) {
+      window.open(item.click_destination_url, '_blank', 'noopener,noreferrer');
+    } else if (shouldShowDemo) {
+      // For demo items, show a helpful message
+      alert('This is a demo book. Configure your store carousel to add real books with custom click actions.');
+    }
+  };
+
   // Main carousel section
   return (
-    <section className="py-16 md:py-20 bg-bookconnect-cream border-b border-bookconnect-sage/20 relative">
+    <section
+      ref={carouselSectionRef}
+      className="py-16 md:py-20 bg-bookconnect-cream border-b border-bookconnect-sage/20 relative"
+    >
       {/* Decorative bottom border */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-bookconnect-terracotta to-transparent"></div>
       <div className="container mx-auto px-4">
@@ -217,14 +252,7 @@ export const CarouselSection: React.FC<CarouselSectionProps> = ({ storeId }) => 
           )}
           <BookCarousel
             items={displayItems}
-            onItemClick={(item) => {
-              if (item.click_destination_url) {
-                window.open(item.click_destination_url, '_blank', 'noopener,noreferrer');
-              } else if (shouldShowDemo) {
-                // For demo items, show a helpful message
-                alert('This is a demo book. Configure your store carousel to add real books with custom click actions.');
-              }
-            }}
+            onItemClick={handleItemClick}
           />
         </div>
       </div>

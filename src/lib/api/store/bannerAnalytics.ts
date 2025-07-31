@@ -1,11 +1,12 @@
 /**
  * Banner Analytics API
- * 
+ *
  * Comprehensive multi-banner analytics API following BookTalks Buddy patterns
  * Provides detailed analytics for promotional banner performance
  */
 
 import { supabase } from '@/lib/supabase';
+import { withAnalyticsErrorHandling, AnalyticsErrorHandler } from './analytics/errorHandling';
 
 // =========================
 // Type Definitions
@@ -79,50 +80,54 @@ export class MultiBannerAnalyticsAPI {
    * Get comprehensive multi-banner analytics summary
    */
   static async getAnalyticsSummary(
-    storeId: string, 
+    storeId: string,
     days: number = 30
   ): Promise<MultiBannerAnalyticsSummary> {
-    try {
-      const { data, error } = await supabase
-        .rpc('get_multi_banner_analytics_summary', {
-          p_store_id: storeId,
-          p_days_back: days
-        });
+    const { data, error } = await withAnalyticsErrorHandling(
+      'analytics_summary',
+      async () => {
+        const { data, error } = await supabase
+          .rpc('get_multi_banner_analytics_summary', {
+            p_store_id: storeId,
+            p_days_back: days
+          });
 
-      if (error) {
-        console.error('Error fetching banner analytics summary:', error);
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      const result = data?.[0] || {};
-      
-      return {
-        totalImpressions: Number(result.total_impressions || 0),
-        totalClicks: Number(result.total_clicks || 0),
-        overallCTR: Number(result.overall_ctr || 0),
-        activeBannersCount: Number(result.active_banners_count || 0),
-        topPerformingBannerId: result.top_performing_banner_id || 'None',
-        worstPerformingBannerId: result.worst_performing_banner_id || 'None',
-        avgCTRAllBanners: Number(result.avg_ctr_all_banners || 0),
-        totalSessions: Number(result.total_sessions || 0),
-        uniqueVisitors: Number(result.unique_visitors || 0),
-        period: `${days} days`
-      };
-    } catch (error) {
-      console.error('Banner analytics summary failed:', error);
-      return {
-        totalImpressions: 0,
-        totalClicks: 0,
-        overallCTR: 0,
-        activeBannersCount: 0,
-        topPerformingBannerId: 'None',
-        worstPerformingBannerId: 'None',
-        avgCTRAllBanners: 0,
-        totalSessions: 0,
-        uniqueVisitors: 0,
-        period: `${days} days`
-      };
-    }
+        const result = data?.[0] || {};
+
+        return {
+          totalImpressions: Number(result.total_impressions || 0),
+          totalClicks: Number(result.total_clicks || 0),
+          overallCTR: Number(result.overall_ctr || 0),
+          activeBannersCount: Number(result.active_banners_count || 0),
+          topPerformingBannerId: result.top_performing_banner_id || 'None',
+          worstPerformingBannerId: result.worst_performing_banner_id || 'None',
+          avgCTRAllBanners: Number(result.avg_ctr_all_banners || 0),
+          totalSessions: Number(result.total_sessions || 0),
+          uniqueVisitors: Number(result.unique_visitors || 0),
+          period: `${days} days`
+        };
+      },
+      { storeId, timeRange: days }
+    );
+
+    // If there was an error, the fallback data will be returned
+    // The error is logged automatically by the error handler
+    return data || {
+      totalImpressions: 0,
+      totalClicks: 0,
+      overallCTR: 0,
+      activeBannersCount: 0,
+      topPerformingBannerId: 'None',
+      worstPerformingBannerId: 'None',
+      avgCTRAllBanners: 0,
+      totalSessions: 0,
+      uniqueVisitors: 0,
+      period: `${days} days`
+    };
   }
 
   /**

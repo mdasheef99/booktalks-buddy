@@ -7,16 +7,24 @@ import { CommunityMetrics } from './community/CommunityMetrics';
 import { ActivityFeed } from './community/ActivityFeed';
 import { Users, Star, MessageCircle, TrendingUp } from 'lucide-react';
 import { useSectionAnimation, useStaggeredAnimation } from '../../hooks/useScrollAnimation';
+import { useSectionVisibilityTracking } from '@/hooks/useLandingPageTracking';
 import { cn } from '@/lib/utils';
 
 interface CommunityShowcaseSectionProps {
   storeId?: string;
+  analytics?: any;
 }
 
-export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> = ({ storeId }) => {
+export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> = ({ storeId, analytics }) => {
   const { showcaseData, loading, error } = useCommunityShowcase(storeId);
   const { elementRef: headerRef, animationClass: headerAnimation } = useSectionAnimation('fade-up');
   const { elementRef: gridRef, getStaggerClass } = useStaggeredAnimation(4);
+
+  // Track community section visibility
+  const communitySectionRef = useSectionVisibilityTracking('community', analytics || {
+    trackSectionView: () => {},
+    isEnabled: false
+  });
 
 
 
@@ -92,8 +100,25 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
   // Always show the section with either real content or demo content
   const showDemoMetrics = shouldShowDemo;
 
+  // Community interaction tracking
+  const trackCommunityClick = (elementType: string, elementId: string) => {
+    if (analytics && analytics.isEnabled) {
+      analytics.trackCommunityInteraction(elementId, elementType, {
+        sectionType: elementType,
+        isDemo: shouldShowDemo,
+        hasSpotlights,
+        hasTestimonials,
+        hasActivityFeed,
+        hasMetrics
+      });
+    }
+  };
+
   return (
-    <div className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-sage/5 to-bookconnect-sage/15 relative">
+    <section
+      ref={communitySectionRef}
+      className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-sage/5 to-bookconnect-sage/15 relative"
+    >
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div ref={headerRef} className={cn("text-center mb-12", headerAnimation)}>
@@ -135,7 +160,13 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
                     showcaseData.memberSpotlights
                       .slice(0, showcaseData.showcaseSettings.max_spotlights_display)
                       .map((spotlight) => (
-                        <MemberSpotlight key={spotlight.id} spotlight={spotlight} />
+                        <div
+                          key={spotlight.id}
+                          onClick={() => trackCommunityClick('member_spotlight', spotlight.id)}
+                          className="cursor-pointer"
+                        >
+                          <MemberSpotlight spotlight={spotlight} />
+                        </div>
                       ))
                   ) : (
                     <div className="text-center py-4 text-bookconnect-brown/60">
@@ -149,7 +180,10 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
 
             {/* Community Metrics */}
             {(hasMetrics || shouldShowDemo) && (
-              <div className={cn("bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-6", getStaggerClass(1))}>
+              <div
+                className={cn("bg-white/90 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-6 cursor-pointer", getStaggerClass(1))}
+                onClick={() => trackCommunityClick('metrics', 'community_metrics')}
+              >
                 <div className="flex items-center mb-6">
                   <TrendingUp className="h-6 w-6 text-bookconnect-terracotta mr-2" />
                   <h3 className="text-xl font-serif font-semibold text-bookconnect-brown leading-tight">
@@ -229,6 +263,6 @@ export const CommunityShowcaseSection: React.FC<CommunityShowcaseSectionProps> =
 
 
       </div>
-    </div>
+    </section>
   );
 };

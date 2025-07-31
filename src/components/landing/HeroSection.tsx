@@ -6,17 +6,43 @@ import { useHeroCustomization } from "@/hooks/useHeroCustomization";
 import { FONT_STYLE_CONFIGS, CHAT_BUTTON_CONFIGS } from "@/lib/api/store/heroCustomization";
 import { cn } from "@/lib/utils";
 import { useSectionAnimation } from "../../hooks/useScrollAnimation";
+import { useSectionVisibilityTracking } from "@/hooks/useLandingPageTracking";
 
 interface HeroSectionProps {
   handleStartChatting: () => void;
   storeId?: string;
+  analytics?: any;
 }
 
-const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
+const HeroSection = ({ handleStartChatting, storeId, analytics }: HeroSectionProps) => {
   const { data: heroCustomization, isLoading } = useHeroCustomization(storeId);
   const { elementRef, animationClass } = useSectionAnimation('fade-scale');
+
+  // Track hero section visibility
+  const heroRef = useSectionVisibilityTracking('hero', analytics || {
+    trackSectionView: () => {},
+    isEnabled: false
+  });
+
+  // Enhanced chat button click handler with analytics
+  const handleChatButtonClick = () => {
+    // Track analytics if available
+    if (analytics && analytics.isEnabled) {
+      analytics.trackChatButtonClick({
+        buttonText: heroCustomization?.chatButton.text || 'Start Chatting Anonymously',
+        buttonPosition: heroCustomization?.chatButton.position || 'center',
+        buttonSize: heroCustomization?.chatButton.size || 'large',
+        colorScheme: heroCustomization?.chatButton.colorScheme || 'terracotta',
+        isCustomized: !!heroCustomization?.chatButton.enabled
+      });
+    }
+
+    // Original functionality
+    handleStartChatting();
+  };
   return (
-    <div
+    <section
+      ref={heroRef}
       className="relative min-h-[65vh] flex items-center justify-center text-center px-4 py-24 md:py-36 overflow-hidden bg-cover bg-center"
       style={{
         backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')"
@@ -92,7 +118,7 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
             CHAT_BUTTON_CONFIGS.positions[heroCustomization.chatButton.position as keyof typeof CHAT_BUTTON_CONFIGS.positions]?.className || "justify-center"
           )}>
             <Button
-              onClick={handleStartChatting}
+              onClick={handleChatButtonClick}
               size="lg"
               className={cn(
                 "text-white rounded-md button-hover-lift focus-ring-enhanced group",
@@ -108,7 +134,7 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
         ) : (
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
             <Button
-              onClick={handleStartChatting}
+              onClick={handleChatButtonClick}
               size="lg"
               className="enhanced-chat-button text-white px-8 py-7 text-xl rounded-md button-hover-lift focus-ring-enhanced group"
             >
@@ -127,7 +153,7 @@ const HeroSection = ({ handleStartChatting, storeId }: HeroSectionProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

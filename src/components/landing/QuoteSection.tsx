@@ -3,15 +3,23 @@ import React from 'react';
 import { useCustomQuotes } from '@/hooks/useCustomQuotes';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useSectionAnimation } from '../../hooks/useScrollAnimation';
+import { useSectionVisibilityTracking } from '@/hooks/useLandingPageTracking';
 import { cn } from '@/lib/utils';
 
 interface QuoteSectionProps {
   storeId?: string;
+  analytics?: any;
 }
 
-const QuoteSection: React.FC<QuoteSectionProps> = ({ storeId }) => {
+const QuoteSection: React.FC<QuoteSectionProps> = ({ storeId, analytics }) => {
   const { currentQuote, loading, error } = useCustomQuotes(storeId);
   const { elementRef, animationClass } = useSectionAnimation('fade-scale');
+
+  // Track quote section visibility
+  const quoteSectionRef = useSectionVisibilityTracking('quote', analytics || {
+    trackSectionView: () => {},
+    isEnabled: false
+  });
 
 
 
@@ -57,7 +65,10 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({ storeId }) => {
   const isUsingDefaultQuote = !currentQuote;
 
   return (
-    <div className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-sage/20 to-bookconnect-olive/10 relative overflow-hidden">
+    <section
+      ref={quoteSectionRef}
+      className="py-16 md:py-20 px-4 bg-gradient-to-br from-bookconnect-sage/20 to-bookconnect-olive/10 relative overflow-hidden"
+    >
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1550399105-c4db5fb85c18?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
@@ -90,7 +101,7 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({ storeId }) => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

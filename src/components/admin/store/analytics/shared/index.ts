@@ -10,6 +10,8 @@ export { AnalyticsPageHeader } from './AnalyticsPageHeader';
 export { MetricCard } from './MetricCard';
 export { TimeRangeSelector } from './TimeRangeSelector';
 export { AnalyticsDataNotice } from './AnalyticsDataNotice';
+export { AnalyticsErrorBoundary } from './AnalyticsErrorBoundary';
+export { AnalyticsErrorMessage } from './AnalyticsErrorMessage';
 
 // Re-export types for convenience
 export type { default as AnalyticsPageLayoutProps } from './AnalyticsPageLayout';

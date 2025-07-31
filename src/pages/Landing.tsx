@@ -21,6 +21,7 @@ import QuoteSection from "@/components/landing/QuoteSection";
 import { CommunityShowcaseSection } from "@/components/landing/CommunityShowcaseSection";
 import FooterSection from "@/components/landing/FooterSection";
 import { useStoreId } from "@/hooks/useStoreId";
+import { useLandingPageTracking } from "@/hooks/useLandingPageTracking";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -30,6 +31,12 @@ const Landing = () => {
   const [genreDialogOpen, setGenreDialogOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [currentUsername, setCurrentUsername] = useState("");
+
+  // Initialize landing page analytics tracking
+  const analytics = useLandingPageTracking({
+    storeId: storeId || undefined,
+    enabled: !!storeId
+  });
 
   // Refs for scroll-to-section functionality
   const bookListingSectionRef = useRef<HTMLDivElement>(null);
@@ -150,10 +157,14 @@ const Landing = () => {
       />
 
       {/* Carousel Section - Featured Books */}
-      <CarouselSection storeId={storeId} />
+      <CarouselSection storeId={storeId} analytics={analytics} />
 
       {/* Hero Section */}
-      <HeroSection handleStartChatting={handleOpenUsernameDialog} storeId={storeId} />
+      <HeroSection
+        handleStartChatting={handleOpenUsernameDialog}
+        storeId={storeId}
+        analytics={analytics}
+      />
 
       {/* Promotional Banners Section */}
       <PromotionalBannersSection storeId={storeId} />
@@ -178,10 +189,10 @@ const Landing = () => {
       </div>
 
       {/* Community Showcase Section */}
-      <CommunityShowcaseSection storeId={storeId} />
+      <CommunityShowcaseSection storeId={storeId} analytics={analytics} />
 
       {/* Quote Section */}
-      <QuoteSection storeId={storeId} />
+      <QuoteSection storeId={storeId} analytics={analytics} />
 
       {/* Footer Section */}
       <FooterSection

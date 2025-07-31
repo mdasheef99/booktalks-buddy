@@ -1,6 +1,7 @@
--- Multi-Banner Analytics Database Functions
+-- Multi-Banner Analytics Database Functions (CORRECTED)
 -- Migration: 20250201_multi_banner_analytics_functions.sql
 -- Purpose: Add comprehensive multi-banner analytics functions for BookTalks Buddy
+-- Fixed: UUID/TEXT casting issues, timestamp type mismatches, and function deployment issues
 
 -- =========================
 -- Multi-Banner Analytics Summary Function
@@ -22,34 +23,34 @@ CREATE OR REPLACE FUNCTION get_multi_banner_analytics_summary(
 BEGIN
   RETURN QUERY
   WITH banner_stats AS (
-    SELECT 
+    SELECT
       element_id as banner_id,
       COUNT(CASE WHEN event_type = 'banner_view' THEN 1 END) as impressions,
       COUNT(CASE WHEN event_type = 'banner_click' THEN 1 END) as clicks,
       COUNT(DISTINCT session_id) as sessions,
       COUNT(DISTINCT user_id) as unique_users
-    FROM store_landing_analytics 
-    WHERE store_id = p_store_id 
+    FROM store_landing_analytics
+    WHERE store_id = p_store_id
       AND section_name = 'banners'
       AND timestamp >= NOW() - INTERVAL '1 day' * p_days_back
       AND element_id IS NOT NULL
     GROUP BY element_id
   ),
   banner_ctr AS (
-    SELECT 
+    SELECT
       banner_id,
       impressions,
       clicks,
       sessions,
       unique_users,
-      CASE 
+      CASE
         WHEN impressions > 0 THEN ROUND((clicks::DECIMAL / impressions::DECIMAL) * 100, 2)
-        ELSE 0 
+        ELSE 0
       END as ctr
     FROM banner_stats
   ),
   summary_stats AS (
-    SELECT 
+    SELECT
       SUM(impressions) as total_imp,
       SUM(clicks) as total_cl,
       SUM(sessions) as total_sess,
@@ -60,22 +61,22 @@ BEGIN
   ),
   top_banner AS (
     SELECT banner_id as top_id
-    FROM banner_ctr 
-    ORDER BY ctr DESC, clicks DESC 
+    FROM banner_ctr
+    ORDER BY ctr DESC, clicks DESC
     LIMIT 1
   ),
   worst_banner AS (
     SELECT banner_id as worst_id
-    FROM banner_ctr 
-    ORDER BY ctr ASC, clicks ASC 
+    FROM banner_ctr
+    ORDER BY ctr ASC, clicks ASC
     LIMIT 1
   )
-  SELECT 
+  SELECT
     COALESCE(s.total_imp, 0) as total_impressions,
     COALESCE(s.total_cl, 0) as total_clicks,
-    CASE 
+    CASE
       WHEN s.total_imp > 0 THEN ROUND((s.total_cl::DECIMAL / s.total_imp::DECIMAL) * 100, 2)
-      ELSE 0 
+      ELSE 0
     END as overall_ctr,
     COALESCE(s.banner_count, 0) as active_banners_count,
     COALESCE(t.top_id, 'None') as top_performing_banner_id,
@@ -90,7 +91,7 @@ END;
 $$;
 
 -- =========================
--- Individual Banner Performance with Ranking Function
+-- Individual Banner Performance with Ranking Function (FIXED UUID CASTING)
 -- =========================
 CREATE OR REPLACE FUNCTION get_banner_performance_with_ranking(
   p_store_id UUID,
@@ -111,7 +112,7 @@ CREATE OR REPLACE FUNCTION get_banner_performance_with_ranking(
 BEGIN
   RETURN QUERY
   WITH banner_stats AS (
-    SELECT 
+    SELECT
       sla.element_id as banner_id,
       spb.title as banner_title,
       COUNT(CASE WHEN sla.event_type = 'banner_view' THEN 1 END) as impressions,
@@ -119,10 +120,10 @@ BEGIN
       COUNT(DISTINCT sla.session_id) as sessions,
       COUNT(DISTINCT sla.user_id) as unique_users,
       AVG(
-        CASE 
-          WHEN sla.interaction_data->>'viewDuration' IS NOT NULL 
+        CASE
+          WHEN sla.interaction_data->>'viewDuration' IS NOT NULL
           THEN (sla.interaction_data->>'viewDuration')::DECIMAL
-          ELSE 0 
+          ELSE 0
         END
       ) as avg_duration,
       jsonb_build_object(
@@ -131,8 +132,8 @@ BEGIN
         'tablet', COUNT(CASE WHEN sla.interaction_data->>'deviceType' = 'tablet' THEN 1 END)
       ) as device_breakdown
     FROM store_landing_analytics sla
-    LEFT JOIN store_promotional_banners spb ON sla.element_id = spb.id::TEXT
-    WHERE sla.store_id = p_store_id 
+    LEFT JOIN store_promotional_banners spb ON spb.id::TEXT = sla.element_id
+    WHERE sla.store_id = p_store_id
       AND sla.section_name = 'banners'
       AND sla.timestamp >= NOW() - INTERVAL '1 day' * p_days_back
       AND sla.element_id IS NOT NULL
@@ -183,14 +184,14 @@ END;
 $$;
 
 -- =========================
--- Banner Time Series Data Function
+-- Banner Time Series Data Function (FIXED TIMESTAMP TYPE)
 -- =========================
 CREATE OR REPLACE FUNCTION get_banner_time_series_data(
   p_store_id UUID,
   p_days_back INTEGER DEFAULT 30,
   p_interval_type TEXT DEFAULT 'day'
 ) RETURNS TABLE (
-  time_period TIMESTAMP,
+  time_period TIMESTAMP WITH TIME ZONE,
   banner_id TEXT,
   impressions BIGINT,
   clicks BIGINT,
@@ -210,27 +211,27 @@ BEGIN
 
   RETURN QUERY
   WITH time_series AS (
-    SELECT 
+    SELECT
       DATE_TRUNC(p_interval_type, timestamp) as period,
       element_id as banner_id,
       COUNT(CASE WHEN event_type = 'banner_view' THEN 1 END) as impressions,
       COUNT(CASE WHEN event_type = 'banner_click' THEN 1 END) as clicks,
       COUNT(DISTINCT session_id) as sessions
-    FROM store_landing_analytics 
-    WHERE store_id = p_store_id 
+    FROM store_landing_analytics
+    WHERE store_id = p_store_id
       AND section_name = 'banners'
       AND timestamp >= NOW() - INTERVAL '1 day' * p_days_back
       AND element_id IS NOT NULL
     GROUP BY DATE_TRUNC(p_interval_type, timestamp), element_id
   )
-  SELECT 
+  SELECT
     ts.period as time_period,
     ts.banner_id,
     ts.impressions,
     ts.clicks,
-    CASE 
+    CASE
       WHEN ts.impressions > 0 THEN ROUND((ts.clicks::DECIMAL / ts.impressions::DECIMAL) * 100, 2)
-      ELSE 0 
+      ELSE 0
     END as ctr,
     ts.sessions as unique_sessions
   FROM time_series ts
@@ -239,7 +240,7 @@ END;
 $$;
 
 -- =========================
--- Banner Comparison Data Function
+-- Banner Comparison Data Function (FIXED UUID CASTING)
 -- =========================
 CREATE OR REPLACE FUNCTION get_banner_comparison_data(
   p_store_id UUID,
@@ -258,7 +259,7 @@ CREATE OR REPLACE FUNCTION get_banner_comparison_data(
 BEGIN
   RETURN QUERY
   WITH banner_metrics AS (
-    SELECT 
+    SELECT
       sla.element_id as banner_id,
       spb.title as banner_title,
       COUNT(CASE WHEN sla.event_type = 'banner_view' THEN 1 END) as impressions,
@@ -266,8 +267,8 @@ BEGIN
       COUNT(CASE WHEN sla.event_type = 'banner_detail_view' THEN 1 END) as detail_views,
       COUNT(DISTINCT sla.session_id) as sessions
     FROM store_landing_analytics sla
-    LEFT JOIN store_promotional_banners spb ON sla.element_id = spb.id::TEXT
-    WHERE sla.store_id = p_store_id 
+    LEFT JOIN store_promotional_banners spb ON spb.id::TEXT = sla.element_id
+    WHERE sla.store_id = p_store_id
       AND sla.section_name = 'banners'
       AND sla.timestamp >= NOW() - INTERVAL '1 day' * p_days_back
       AND (p_banner_ids IS NULL OR sla.element_id = ANY(p_banner_ids))

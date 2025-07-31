@@ -14,7 +14,7 @@ import { Megaphone, Plus, Eye, Settings, Calendar, BarChart3 } from 'lucide-reac
 import { toast } from 'sonner';
 
 // Banner Analytics Components
-import { AnalyticsPageLayout, AnalyticsPageHeader, TimeRangeSelector } from '@/components/admin/store/analytics/shared';
+import { AnalyticsPageLayout, AnalyticsPageHeader, TimeRangeSelector, AnalyticsErrorBoundary } from '@/components/admin/store/analytics/shared';
 import {
   BannerAnalyticsGrid,
   MultiBannerPerformanceTable,
@@ -253,36 +253,35 @@ export const BannerManagement: React.FC = () => {
             <AnalyticsPageHeader
               title="Banner Analytics"
               description="Track banner performance and engagement metrics"
-              actions={
-                <div className="flex items-center gap-3">
-                  <TimeRangeSelector
-                    value={timeRange}
-                    onChange={setTimeRange}
-                    options={[
-                      { label: '7 days', value: 7 },
-                      { label: '30 days', value: 30 },
-                      { label: '90 days', value: 90 }
-                    ]}
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={refetchAnalytics}
-                    disabled={analyticsLoading}
-                  >
-                    Refresh
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => exportData('json')}
-                    disabled={isExporting}
-                  >
-                    {isExporting ? 'Exporting...' : 'Export Data'}
-                  </Button>
-                </div>
-              }
-            />
+            >
+              <div className="flex items-center gap-3">
+                <TimeRangeSelector
+                  value={timeRange}
+                  onChange={setTimeRange}
+                  options={[
+                    { label: '7 days', value: 7 },
+                    { label: '30 days', value: 30 },
+                    { label: '90 days', value: 90 }
+                  ]}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={refetchAnalytics}
+                  disabled={analyticsLoading}
+                >
+                  Refresh
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportData('json')}
+                  disabled={isExporting}
+                >
+                  {isExporting ? 'Exporting...' : 'Export Data'}
+                </Button>
+              </div>
+            </AnalyticsPageHeader>
 
             {/* Analytics Error State */}
             {analyticsHasErrors && (
@@ -294,43 +293,45 @@ export const BannerManagement: React.FC = () => {
             )}
 
             {/* Analytics Dashboard */}
-            <div className="space-y-8">
-              {/* Overview Metrics Grid */}
-              <BannerAnalyticsGrid
-                summary={summary}
-                isLoading={analyticsLoading}
-              />
+            <AnalyticsErrorBoundary>
+              <div className="space-y-8">
+                {/* Overview Metrics Grid */}
+                <BannerAnalyticsGrid
+                  summary={summary}
+                  isLoading={analyticsLoading}
+                />
 
-              {/* Performance Table and Comparison Chart */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                <MultiBannerPerformanceTable
+                {/* Performance Table and Comparison Chart */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  <MultiBannerPerformanceTable
+                    bannerPerformance={bannerPerformance}
+                    isLoading={analyticsLoading}
+                    maxRows={5}
+                    showDeviceBreakdown={true}
+                  />
+
+                  <BannerComparisonChart
+                    comparisonData={comparisonData}
+                    isLoading={analyticsLoading}
+                    maxBanners={5}
+                  />
+                </div>
+
+                {/* Time Series Chart */}
+                <BannerTimeSeriesChart
+                  timeSeriesData={timeSeriesData}
+                  isLoading={analyticsLoading}
+                  chartHeight={350}
+                />
+
+                {/* AI Insights */}
+                <BannerInsightsSection
+                  summary={summary}
                   bannerPerformance={bannerPerformance}
                   isLoading={analyticsLoading}
-                  maxRows={5}
-                  showDeviceBreakdown={true}
-                />
-
-                <BannerComparisonChart
-                  comparisonData={comparisonData}
-                  isLoading={analyticsLoading}
-                  maxBanners={5}
                 />
               </div>
-
-              {/* Time Series Chart */}
-              <BannerTimeSeriesChart
-                timeSeriesData={timeSeriesData}
-                isLoading={analyticsLoading}
-                chartHeight={350}
-              />
-
-              {/* AI Insights */}
-              <BannerInsightsSection
-                summary={summary}
-                bannerPerformance={bannerPerformance}
-                isLoading={analyticsLoading}
-              />
-            </div>
+            </AnalyticsErrorBoundary>
           </AnalyticsPageLayout>
         </TabsContent>
       </Tabs>
