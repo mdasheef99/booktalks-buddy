@@ -269,6 +269,5 @@ export class BannerTrackingAPI {
   }
 }
 
-// Export utilities for easy access
-export { SessionManager, DeviceDetector };
+// Export default
 export default BannerTrackingAPI;

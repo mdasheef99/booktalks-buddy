@@ -143,11 +143,11 @@ export const PromotionalBannersSection: React.FC<PromotionalBannersSectionProps>
               banner={banner}
               index={index}
               storeId={storeId}
-              totalBannersVisible={banners.length}
+              totalBannersVisible={bannerItems?.length || 0}
               onBannerClick={async (bannerId) => {
                 // Enhanced banner click tracking
                 const sessionId = SessionManager.getSessionId();
-                const clickedBanner = banners.find(b => b.id === bannerId);
+                const clickedBanner = bannerItems?.find(b => b.id === bannerId);
 
                 await BannerTrackingAPI.trackBannerClick(
                   storeId,
@@ -155,7 +155,7 @@ export const PromotionalBannersSection: React.FC<PromotionalBannersSectionProps>
                   sessionId,
                   {
                     bannerPosition: index + 1,
-                    totalBannersVisible: banners.length,
+                    totalBannersVisible: bannerItems?.length || 0,
                     bannerTitle: clickedBanner?.title || 'Unknown',
                     bannerType: clickedBanner?.content_type || 'text',
                     deviceType: DeviceDetector.getDeviceType(),
